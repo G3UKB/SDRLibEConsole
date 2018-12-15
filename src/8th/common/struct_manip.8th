@@ -1,0 +1,78 @@
+(* 
+	struct_manip.8th
+ 
+  Parameter storage
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: C
+
+\ ========================================
+\ Testing only
+
+needs debug/sed
+true SED-CHECK
+
+\ ===============================================================================
+\ Private
+\ ===============================================================================
+
+\ =========================================================================
+\ Getter helpers
+\ Dereference the next level in the structure
+: level@	SED: * n * -- *
+	\ in:		* - key or index to the next element 		
+	\				n - index into path array
+	\				* - arbitrary structure
+	\ out:	* - arbitrary next element, scalar or structure
+	\ Drop unwanted index
+	nip
+	\ Do we have an index or a key
+	\ i.e are we looking in a dict or an array
+	dup >kind ns:s n:= if	
+		\ String, so a map key
+		m:@	nip	
+	else
+		\ Number so an array index
+		a:@	nip
+	then ;
+
+\ ===============================================================================
+\ Public
+\ ===============================================================================
+\ Getter words
+\ Dereference a structure from a path descriptor, returning a field
+: val@	SED: * a -- *
+	\ in:		* - arbitrary structure	
+	\				a - path to an element [s|n, s|n, s|n ...] 	
+	\ out:	* - arbitrary element, scalar or structure
+	' level@ a:each
+	drop ;
+
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+[0, false, ["48000", "96000", "192000"]] ["a"] C:val@ . cr
+bye
