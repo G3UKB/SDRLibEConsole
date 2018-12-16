@@ -32,7 +32,7 @@ ns: C
 \ Testing only
 
 needs debug/sed
-true SED-CHECK
+\ true SED-CHECK
 
 \ ===============================================================================
 \ Private
@@ -100,7 +100,7 @@ true SED-CHECK
 \
 
 \ Update a value in the given struct with value,ix at path descriptor
-: val!	SED: * a * * -- *
+: val!	SED: * a * * -- 
 	\ in:		* - value to put at index or key
 	\				* - index or key to an element in the resulting structure 	
 	\				a - path to an element [s|n, s|n, s|n ...] 
@@ -109,17 +109,17 @@ true SED-CHECK
 	\ stash params 0:structure 1:path 2:idx/key 3:value
 	>p >p >p >p
 	\ Get target structure
-	1 pp@ val@
+	p@ 1 pp@ val@
 	\ Get idx or key
-	2 pp@ >kind ns:s n:= if
+	2 pp@ dup >kind ns:s n:= if
 		\ We have 'm key'
 		3 pp@ m:!
 	else
 		\ We have 'a idx'
-		3 pp@ a:!
+		3 pp@ .s  a:!
 	then
 	\ Clean up
-	nip ps_clear ;
+	drop ps_clear ;
 
 \ ========================================
 \ Reset namespace
@@ -128,8 +128,109 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-
+(*
 ps_alloc
-[0, false, ["48000", "96000", "192000"]] [2] C:val@ . cr
-[0, false, ["48000", "96000", "192000"]] [2] [0] C:idx_val@ . cr
+{
+	"general" : {
+	\	key						src			index/val 	SoD			option list			
+		"smplrate" : 	[false, [0, 				false, 	["48000", "96000", "192000"]]],
+		"numrx" : 		[false, [0, 				false, 	["1", "2", "3"]]],
+		"blksz" : 		[false, [1, 				false, 	["512", "1024", "2048", "4096"]]],
+		"duplex" : 		[false, [false, 		false, 	[]]],
+		"enabletx" : 	[false, [false, 		false, 	[]]]
+	}
+} var, struct
+
+{
+		\ HPSDR Protocol-1 only supports 3 radios
+		\ More can be added into the array as required
+		"radio-state" : [
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			]
+		]
+	} var, struct1
+	
+\ =========================================================================
+\ Getter examples
+: getter_examples
+	\ Block size option list
+	struct @ ["general","blksz",1,2] C:val@ . cr
+	\ Numrx value
+	struct @ ["general","numrx",1,0] C:val@ . cr
+	\ Duplex SoD flag
+	struct @ ["general","duplex",1,1] C:val@ . cr
+	\ Samplerate value
+	struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] C:idx_val@ . cr
+	\ Part structure as delivered by some listeners
+	[0, false, ["48000", "96000", "192000"]] [2] C:val@ . cr
+	[0, false, ["48000", "96000", "192000"]] [0] C:val@ . cr
+	[0, false, ["48000", "96000", "192000"]] [2] [0] C:idx_val@ . cr
+;
+
+\ =========================================================================
+\ Setter examples
+: setter_examples
+	\ Sample rate SoD flag
+	struct @ ["general","smplrate",1] 1 true C:val! struct @ ["general","smplrate"] C:val@ . cr
+	struct @ ["general","numrx",1] 1 true C:val! struct @ ["general","numrx"] C:val@ . cr
+	struct @ ["general","blksz",1] 1 true C:val! struct @ ["general","blksz"] C:val@ . cr
+	struct @ ["general","duplex",1] 1 true C:val! struct @ ["general","duplex"] C:val@ . cr
+	struct @ ["general","enabletx",1] 1 true C:val! struct @ ["general","enabletx"] C:val@ . cr
+	struct @ ["general"] "enabletx" "myval" C:val! struct @ . cr
+	
+	struct1 @ ["radio-state", 0 ] 0 true C:val!
+	struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 C:val!	
+	struct1 @ ["radio-state", 0 , 1 ] 1 true C:val!
+	struct1 @ . cr
+;
+
+\ getter_examples
+setter_examples
 bye
+*)

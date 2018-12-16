@@ -250,11 +250,6 @@ ns: C
 : q_timeout_ms	SED: -- n
 	100 ;
 
-\ ----------------------------------	
-\ Q size 20
-: q_sz	SED: -- n
-	20 ;
-
 \ ----------------------------------
 \ Process 1 item from Q	
 : proc_q	SED: --
@@ -280,8 +275,6 @@ ns: C
 	\ Init the param stack
 	ps_alloc
 	
-	\ Up the q a little
-	\ q_sz t:def-queue
 	\ Set q to return null on empty
 	\ Note, should not happen
 	t:getq false q:throwing drop
@@ -361,7 +354,7 @@ null var, t_pubsub
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-
+(*
 : callback_wd_1	\ data
 	"Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
 
@@ -394,4 +387,4 @@ testit
 \ allow log to flush...
 0.2 sleep
 bye
-	
+*)	
