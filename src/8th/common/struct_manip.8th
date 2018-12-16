@@ -39,7 +39,7 @@ true SED-CHECK
 \ ===============================================================================
 
 \ =========================================================================
-\ Getter helpers
+\ Helpers
 \ Dereference the next level in the structure
 : level@	SED: * n * -- *
 	\ in:		* - key or index to the next element 		
@@ -61,15 +61,20 @@ true SED-CHECK
 \ ===============================================================================
 \ Public
 \ ===============================================================================
+
+\ ========================================
+\
 \ Getter words
+\
 \ Dereference the structure from a path descriptor, returning a field
 : val@	SED: * a -- *
-	\ in:		* - arbitrary structure	
-	\				a - path to an element [s|n, s|n, s|n ...] 	
+	\ in:		a - path to an element [s|n, s|n, s|n ...] 	
+	\				* - arbitrary structure	
 	\ out:	* - arbitrary element, scalar or structure
 	' level@ a:each
 	drop ;
- 
+
+\ ----------------------------------
 \	1. Dereference the structure from path-2 to obtain an index value then
 \ 2. Dereference the structure from path-1 descriptor then
 \ 3. Return the index element
@@ -89,6 +94,34 @@ true SED-CHECK
 	\ Clean up
 	nip ps_clear ;
 
+\ ========================================
+\
+\ Setter words
+\
+
+\ Update a value in the given struct with value,ix at path descriptor
+: val!	SED: * a * * -- *
+	\ in:		* - value to put at index or key
+	\				* - index or key to an element in the resulting structure 	
+	\				a - path to an element [s|n, s|n, s|n ...] 
+	\				* - arbitrary structure	
+	\ out:	* - new structure
+	\ stash params 0:structure 1:path 2:idx/key 3:value
+	>p >p >p >p
+	\ Get target structure
+	1 pp@ val@
+	\ Get idx or key
+	2 pp@ >kind ns:s n:= if
+		\ We have 'm key'
+		3 pp@ m:!
+	else
+		\ We have 'a idx'
+		3 pp@ a:!
+	then
+	\ Clean up
+	nip ps_clear ;
+
+\ ========================================
 \ Reset namespace
 ns: user
 
