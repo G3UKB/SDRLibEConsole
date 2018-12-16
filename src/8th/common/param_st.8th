@@ -142,6 +142,11 @@ needs debug/sed
 	pps@ ;
 	
 \ Clear task param stack
+: ps_clear SED:  -- 
+	ps_check
+	pss@ st:clear drop ;
+
+\ Print the task stack
 
 
 \ ========================================

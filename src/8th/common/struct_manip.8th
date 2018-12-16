@@ -22,6 +22,9 @@
      bob@bobcowdery.plus.com
 *)
 
+\ Includes
+"param_st.8th"  f:include
+
 \ Set namespace
 ns: C
 
@@ -59,13 +62,32 @@ true SED-CHECK
 \ Public
 \ ===============================================================================
 \ Getter words
-\ Dereference a structure from a path descriptor, returning a field
+\ Dereference the structure from a path descriptor, returning a field
 : val@	SED: * a -- *
 	\ in:		* - arbitrary structure	
 	\				a - path to an element [s|n, s|n, s|n ...] 	
 	\ out:	* - arbitrary element, scalar or structure
 	' level@ a:each
 	drop ;
+ 
+\	1. Dereference the structure from path-2 to obtain an index value then
+\ 2. Dereference the structure from path-1 descriptor then
+\ 3. Return the index element
+: idx_val@	SED: * a a -- *
+	\ in:		a - path-2 to an element to yield an index or an index 	
+	\				a - path-1 to an element [s|n, s|n, s|n ...] 
+	\				* - arbitrary structure	
+	\ out:	* - arbitrary element, scalar or structure
+	\ stash params 0:structure 1:path-1 2:path-2
+	>p >p >p
+	\ Deref using path-2 (index) and stash result to r
+	p@ 2 pp@ val@ >r
+	\ Deref using path-1
+	p@ 1 pp@ val@
+	\ Now index the value list returned
+	r> a:@
+	\ Clean up
+	nip ps_clear ;
 
 \ Reset namespace
 ns: user
@@ -74,5 +96,7 @@ ns: user
 \ Testing
 \ ===============================================================================
 
-[0, false, ["48000", "96000", "192000"]] ["a"] C:val@ . cr
+ps_alloc
+[0, false, ["48000", "96000", "192000"]] [2] C:val@ . cr
+[0, false, ["48000", "96000", "192000"]] [2] [0] C:idx_val@ . cr
 bye

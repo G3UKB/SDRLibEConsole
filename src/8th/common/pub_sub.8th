@@ -25,6 +25,9 @@
 \ Includes
 "param_st.8th"  f:include
 
+\ Up the q a little
+100 t:def-queue
+
 \ ========================================
 \ Testing only
 needs debug/sed
@@ -197,7 +200,7 @@ ns: C
 	1 pp@ if
 		\ Dispatch on main thread
 		\ Word to invoke on main thread
-		{ "cb" :' main_thd_dispatch }
+		{ "cb" :' main_thd_dispatch } const
 		\ Word 'to' dispatch 'data' to
 		\ Note we clone the data again to ensure no conflicts
 		"to" r> m:! "data" p@ clone nip m:!
@@ -278,7 +281,7 @@ ns: C
 	ps_alloc
 	
 	\ Up the q a little
-	q_sz t:def-queue
+	\ q_sz t:def-queue
 	\ Set q to return null on empty
 	\ Note, should not happen
 	t:getq false q:throwing drop
@@ -291,7 +294,8 @@ ns: C
 		\ Check for exit
 		"pub_sub_run" t:@
 	while!
-	"pub_sub_task - exiting..." log ;
+	"pub_sub_task - exiting..." log
+	t:main t:notify ;
 
 \ Reset namespace
 ns: user
@@ -308,7 +312,7 @@ null var, t_pubsub
 	\ in: 	none
 	\ out:	none
 	' C:pub_sub_task t:task dup t_pubsub !
-	{"type" : "init"} t:push t_pubsub @ t:notify ;
+	{"type" : "init"} t:push  t_pubsub @ t:notify ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
@@ -326,7 +330,8 @@ null var, t_pubsub
 	\				f - true if to be dispatched on main thread else p/s thread
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
-	{"type" : "reg"} "data" rot m:!
+	\ Const required for literal data as its compile time data
+	{"type" : "reg"} const "data" rot m:!
 	t_pubsub @ swap t:push t_pubsub @ t:notify ;
 
 \ ----------------------------------
@@ -336,7 +341,8 @@ null var, t_pubsub
 	\				w - callback word 	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	{"type" : "sub"} "data" rot m:!
+	\ Const required for literal data as its compile time data
+	{"type" : "sub"} const "data" rot m:!
 	t_pubsub @ swap t:push t_pubsub @ t:notify ;
 
 \ ----------------------------------
@@ -348,7 +354,8 @@ null var, t_pubsub
 	\ Clone the original data to avoid locks
 	clone nip
 	a:new 1 rot a:! 0 rot a:!
-	{"type" : "pub"} "data" rot m:!
+	\ Const required for literal data as its compile time data
+	{"type" : "pub"} const "data" rot m:!
 	t_pubsub @ swap t:push t_pubsub @ t:notify ;
 	
 \ ===============================================================================
@@ -366,45 +373,25 @@ null var, t_pubsub
 	
 	\ Task q gets messed up without sleeps
 	false "Event1" pubsub_register
-	0.2 sleep
 	false "Event2" pubsub_register
-	0.2 sleep
 	true "Event3" pubsub_register
-	0.2 sleep
 	"Event1" ' callback_wd_1 pubsub_subscribe
-	0.2 sleep
 	"Event2" ' callback_wd_1 pubsub_subscribe
-	0.2 sleep
 	"Event3" ' callback_wd_1 pubsub_subscribe
-	0.2 sleep
 	"Event1" ' callback_wd_2 pubsub_subscribe
-	0.2 sleep
 	"Event2" ' callback_wd_2 pubsub_subscribe
-	0.2 sleep
 	"Event3" ' callback_wd_2 pubsub_subscribe
-	0.2 sleep
 	"Event1" [1,2,3,4,5] pubsub_publish
-	0.2 sleep
-	"Event2" [1,2,3,4,5] pubsub_publish
-	0.2 sleep
-	"Event3" [1,2,3,4,5] pubsub_publish
-	0.2 sleep
-	
-	(*
-	\ In-line works
-	true "Event1" a:new 0 rot a:! 1 rot a:!
-	{"type" : "reg"} "data" rot m:!
-	t_pubsub @ swap .s t:push
-	
-	true "Event2" a:new 0 rot a:! 1 rot a:!
-	{"type" : "reg"} "data" rot m:!
-	t_pubsub @ swap .s t:push
-	*)
+	"Event2" [6,7,8,9,10] pubsub_publish
+	"Event3" [11,12,13,14,15] pubsub_publish
 	
 	pubsub_term
 ;
 
-1 sleep
 testit
+\ wait for sub-term to take effect:
+-1 sleep
+\ allow log to flush...
+0.2 sleep
 bye
 	
