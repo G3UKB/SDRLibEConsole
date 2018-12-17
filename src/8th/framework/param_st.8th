@@ -1,0 +1,187 @@
+(* 
+	p_st.8th
+ 
+  Parameter storage
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ========================================
+\ Testing only
+
+needs debug/sed
+\ true SED-CHECK
+
+\ ========================================
+
+\ Max params per stack (depth)
+: PS_MAX_PARAMS 20 ;
+	
+\ ===============================================================================
+\ Private
+\ ===============================================================================
+
+\ Return the stack associated with the calling task
+: pss@	 SED: -- *
+	\ in: 	none
+	\ out:	s0 - true if successful
+	\				s1 - stack | null 
+	"p_st" t:@ ;
+
+\ ----------------------------------
+\ Store the given stack for the current task
+: pss!	 SED: st --
+	\ in: 	stack
+	\ out:	none
+	"p_st" t:! ;
+
+\ ----------------------------------
+\ Pop TOS from the task param stack
+: ps>	 SED: -- *
+	\ in: 	none
+	\ out:	item of any type
+	pss@ st:pop nip ;
+
+\ ----------------------------------
+\ Copy TOS from the task param stack 
+: ps@	 SED: -- *
+	\ in: 	none
+	\ out:	item of any type
+	pss@ 0 st:pick nip ;
+
+\ ----------------------------------
+\ Pick item n from the task param stack 	
+: pps@	 SED: n -- *
+	\ in: 	item index
+	\ out:	item of any type
+	pss@ swap st:pick nip ;
+
+\ ----------------------------------
+\ Push the given item to the task param stack
+: ps!	 SED: * --
+	\ in: 	item of any type
+	\ out:	none
+	pss@ swap st:push drop ;
+
+\ ----------------------------------
+\ Check if initialised for current task
+\ Throw exception if not initialised
+: ps_check  SED: --
+	\ in: 	none
+	\ out:	none
+	pss@ null? if
+		"Access attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then drop ;
+
+\ ===============================================================================
+\ Public	
+\ ===============================================================================
+
+\ Allocate a parameter stack for the given task
+\ Must be called by each task first AFTER it has set a unique task name
+: ps_alloc	 SED: --
+	\ in: 	none
+	\ out:	none
+	pss@ null? if
+		\ No previous allocation for this task
+		\ Create a new entry
+		drop PS_MAX_PARAMS st:new pss!
+	else
+		drop "Param stack already initialised for task [" t:name@ s:+ "]. Ignoring!" s:+ log
+	then ;
+
+\ ========================================
+\ Parameter stack operations
+
+\ ----------------------------------
+\ Store TOS to task param stack
+: >p	 SED: * --
+	\ in: 	any type
+	\ out:	none
+	ps_check
+	ps! ;
+
+\ ----------------------------------
+\ Retrieve TOS from task param stack
+: p>  SED: -- *
+	\ in: 	none
+	\ out:	any type
+	ps_check
+	ps> ;
+
+\ ----------------------------------
+\ Copy TOS from task param stack
+: p@	 SED: -- *
+	\ in: 	none
+	\ out:	any type
+	ps_check
+	ps@ ;
+
+\ ----------------------------------
+\ Copy item n from task param stack
+: pp@ SED: n -- *
+	\ in: 	none
+	\ out:	any type
+	ps_check
+	pps@ ;
+	
+\ Clear task param stack
+: ps_clear SED:  -- 
+	ps_check
+	pss@ st:clear drop ;
+
+\ Print the task stack
+
+
+\ ========================================
+\ Testing
+
+(*
+\ Usage test
+: tn	\ name --
+	t:name!
+	ps_alloc
+	1 2 3 4 5 >p >p >p >p >p
+	p> p> p> p> p>
+	1 2 3 4 5 >p >p >p >p >p
+	p@ p@ p@ p@ p@
+	1 2 3 4 5 >p >p >p >p >p
+	0 pp@ 1 pp@ 2 pp@ 3 pp@ 4 pp@ 5 pp@
+	p> p> p> p> p> p> p> p> p> p>
+	t:name@ " done" s:+ log
+;
+
+[] var, ps_tasks
+
+: run_task	\ n -- 
+	"Task-" swap >s s:+ 1 ' tn t:task-n ps_tasks @ swap a:push drop
+;
+	
+: usage_test	\ --
+	' run_task 1 600 loop
+	0.1 sleep
+;
+
+cr cr "Running usage test..." . cr cr
+usage_test
+"Done usage test" . cr
+
+bye
+
+*)
