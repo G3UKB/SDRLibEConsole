@@ -284,8 +284,7 @@ ns: fr
 		\ Check for exit
 		"pub_sub_run" t:@
 	while!
-	"pub_sub_task - exiting..." log
-	t:main t:notify ;
+	"P/S_Task - exiting..." log ;
 
 \ ===============================================================================
 \ Main code may be called from any thread
@@ -298,15 +297,18 @@ null var, t_pubsub
 : pubsub_init	SED: --
 	\ in: 	none
 	\ out:	none
-	' pub_sub_task t:task dup t_pubsub !
-	{"type" : "init"} t:push  t_pubsub @ t:notify ;
+	\ ' pub_sub_task t:task dup t_pubsub !
+	' pub_sub_task t:task dup "P/S_TASK" task_ref!
+	\ {"type" : "init"} t:push  t_pubsub @ t:notify ;
+	{"type" : "init"} t:push "P/S_TASK" task_ref@ t:notify ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
 : pubsub_term	SED: --
 	\ in: 	none
 	\ out:	none
-	t_pubsub @ {"type" : "term"} t:push t_pubsub @ t:notify ;
+	\ t_pubsub @ {"type" : "term"} t:push t_pubsub @ t:notify ;
+	"P/S_TASK" task_ref@ {"type" : "term"} t:push "P/S_TASK" task_ref@ t:notify ;
 
 \ ----------------------------------	
 \ Register a new event
@@ -319,7 +321,8 @@ null var, t_pubsub
 	a:new 0 rot a:! 1 rot a:!
 	\ Const required for literal data as its compile time data
 	{"type" : "reg"} const "data" rot m:!
-	t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
 
 \ ----------------------------------
 \ Subscribe to an event
@@ -330,7 +333,8 @@ null var, t_pubsub
 	a:new 1 rot a:! 0 rot a:!
 	\ Const required for literal data as its compile time data
 	{"type" : "sub"} const "data" rot m:!
-	t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
 
 \ ----------------------------------
 \ Publish an event to subscribers
@@ -343,7 +347,8 @@ null var, t_pubsub
 	a:new 1 rot a:! 0 rot a:!
 	\ Const required for literal data as its compile time data
 	{"type" : "pub"} const "data" rot m:!
-	t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
+	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
 
 \ Reset namespace
 ns: user

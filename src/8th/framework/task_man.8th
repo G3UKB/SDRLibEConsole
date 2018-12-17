@@ -1,0 +1,102 @@
+(* 
+	task_man.8th
+ 
+  Task management
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ========================================
+\ Testing only
+
+needs debug/sed
+\ true SED-CHECK
+
+\ Set namespace
+ns: fr
+
+\ Holder for task references
+{} var, __task_dict
+
+\ Locked var
+: locked_task_dict@
+	__task_dict lock @ ;
+
+\ Unlocked var	
+: unlock_task_dict
+	__task_dict unlock drop ;
+	
+\ Store task referance
+: task_ref!	SED: t s --
+	\ in: 	t - task object
+	\				s - task name
+	\ out:	none
+	locked_task_dict@
+	swap rot  m:! drop 
+	unlock_task_dict ;
+	
+\ Get task reference by name
+: task_ref@	SED: s -- t
+	\ in: 	s - task name
+	\ out:	t - task reference
+	locked_task_dict@
+	swap m:@ nip 
+	unlock_task_dict ;
+
+\ Wait for task to terminate
+: wait_task SED: s t --
+	\ in:		t - task ref 	(item from dict) 	
+	\				s - task name (key from dict)
+	\ out:	none
+	"Waiting for task: " rot s:+ . cr
+	t:wait ;
+
+\ Wait for all tasks to terminate
+: wait_all	SED: --
+	locked_task_dict@
+	cr ' wait_task m:each 
+	unlock_task_dict drop ;
+
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+(*
+: tn	\ name t
+	swap t:name! 
+	sleep
+	;
+
+
+: make_tasks	\ --
+	"t1" dup 1 2 ' tn t:task-n swap fr:task_ref! 
+	"t2" dup 3 2 ' tn t:task-n swap fr:task_ref!
+	"t3" dup 5 2 ' tn t:task-n swap fr:task_ref!
+	"t4" dup 7 2 ' tn t:task-n swap fr:task_ref!
+	"t5" dup 9 2 ' tn t:task-n swap fr:task_ref!
+;
+	
+make_tasks
+fr:wait_all
+fr:__task_dict @ . cr
+bye
+*)	

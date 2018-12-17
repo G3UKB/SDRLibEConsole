@@ -23,14 +23,15 @@
 *)
 
 \ Includes
+"task_man.8th"  f:include
 "param_st.8th"  f:include
 "struct_manip.8th"  f:include
 "pub_sub.8th"  f:include
 
-\ Set namespace
+\ Set namespace to avoid prefixing for the test
 ns: fr
 
-\ Push data into different tasks using struct_manip to dice data and store valuesand param store as required
+\ Push data into different tasks using struct_manip to dice data and store values and use param store as required
 \ Init the param store
 ps_alloc
 \ Init publish subscribe service
@@ -197,11 +198,12 @@ setup
 ' runtest 50 times
 pubsub_term
 
+\ Wait for all tasks to complete
+wait_all
+
 \ Reset namespace
 ns: user
 
-\ wait for sub-term to take effect:
--1 sleep
 \ allow log to flush...
 0.2 sleep
 bye
