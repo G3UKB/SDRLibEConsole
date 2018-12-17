@@ -22,11 +22,8 @@
      bob@bobcowdery.plus.com
 *)
 
-\ Includes
-"param_st.8th"  f:include
-
 \ Up the q a little
-100 t:def-queue
+1000 t:def-queue
 
 \ ========================================
 \ Testing only
@@ -34,7 +31,7 @@ needs debug/sed
 \ true SED-CHECK
 
 \ Set namespace
-ns: C
+ns: fr
 
 \ =============================================================================================
 \ Publish Subscribe task
@@ -290,9 +287,6 @@ ns: C
 	"pub_sub_task - exiting..." log
 	t:main t:notify ;
 
-\ Reset namespace
-ns: user
-
 \ ===============================================================================
 \ Main code may be called from any thread
 \ ===============================================================================
@@ -304,7 +298,7 @@ null var, t_pubsub
 : pubsub_init	SED: --
 	\ in: 	none
 	\ out:	none
-	' C:pub_sub_task t:task dup t_pubsub !
+	' pub_sub_task t:task dup t_pubsub !
 	{"type" : "init"} t:push  t_pubsub @ t:notify ;
 
 \ ----------------------------------
@@ -350,7 +344,10 @@ null var, t_pubsub
 	\ Const required for literal data as its compile time data
 	{"type" : "pub"} const "data" rot m:!
 	t_pubsub @ swap t:push t_pubsub @ t:notify ;
-	
+
+\ Reset namespace
+ns: user
+
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
@@ -362,23 +359,23 @@ null var, t_pubsub
 	"Hi, callback received on callback_wd_2: " t:name@ s:+ " : " s:+ . . cr ;
 	
 : testit
-	pubsub_init
+	C:pubsub_init
 	
 	\ Task q gets messed up without sleeps
-	false "Event1" pubsub_register
-	false "Event2" pubsub_register
-	true "Event3" pubsub_register
-	"Event1" ' callback_wd_1 pubsub_subscribe
-	"Event2" ' callback_wd_1 pubsub_subscribe
-	"Event3" ' callback_wd_1 pubsub_subscribe
-	"Event1" ' callback_wd_2 pubsub_subscribe
-	"Event2" ' callback_wd_2 pubsub_subscribe
-	"Event3" ' callback_wd_2 pubsub_subscribe
-	"Event1" [1,2,3,4,5] pubsub_publish
-	"Event2" [6,7,8,9,10] pubsub_publish
-	"Event3" [11,12,13,14,15] pubsub_publish
+	false "Event1" C:pubsub_register
+	false "Event2" C:pubsub_register
+	true "Event3" C:pubsub_register
+	"Event1" ' callback_wd_1 fr:pubsub_subscribe
+	"Event2" ' callback_wd_1 fr:pubsub_subscribe
+	"Event3" ' callback_wd_1 fr:pubsub_subscribe
+	"Event1" ' callback_wd_2 fr:pubsub_subscribe
+	"Event2" ' callback_wd_2 fr:pubsub_subscribe
+	"Event3" ' callback_wd_2 fr:pubsub_subscribe
+	"Event1" [1,2,3,4,5] frpubsub_publish
+	"Event2" [6,7,8,9,10] frpubsub_publish
+	"Event3" [11,12,13,14,15] frpubsub_publish
 	
-	pubsub_term
+	C:pubsub_term
 ;
 
 testit

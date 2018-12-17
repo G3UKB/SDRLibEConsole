@@ -27,5 +27,181 @@
 "struct_manip.8th"  f:include
 "pub_sub.8th"  f:include
 
-\ Push data into different tasks using struct_manip to dice data and store values
+\ Set namespace
+ns: fr
+
+\ Push data into different tasks using struct_manip to dice data and store valuesand param store as required
+\ Init the param store
 ps_alloc
+\ Init publish subscribe service
+pubsub_init
+
+\ Structures
+{
+	"general" : {
+	\	key						src			index/val 	SoD			option list			
+		"smplrate" : 	[false, [0, 				false, 	["48000", "96000", "192000"]]],
+		"numrx" : 		[false, [0, 				false, 	["1", "2", "3"]]],
+		"blksz" : 		[false, [1, 				false, 	["512", "1024", "2048", "4096"]]],
+		"duplex" : 		[false, [false, 		false, 	[]]],
+		"enabletx" : 	[false, [false, 		false, 	[]]]
+	}
+} var, struct
+
+{
+		\ HPSDR Protocol-1 only supports 3 radios
+		\ More can be added into the array as required
+		"radio-state" : [
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": 0 ,
+					"filter": 0 ,
+					"agc": 0 ,
+					"attn": 0 ,
+					"hf-preamp": 0 ,
+					"6m-preamp": 0 ,
+					"audio-gain": 50
+				} ]
+			]
+		]
+	} var, struct1
+	
+: callback_wd_1	\ data
+	\ "wd_1: " t:name@ s:+ " : " s:+ . . cr ;
+	"1:" . ;
+
+: callback_wd_2	\ data
+	\ "wd_2: " t:name@ s:+ " : " s:+ . . cr ;
+	"2:" . ;
+
+: callback_wd_3	\ data
+	\ "wd_3: " t:name@ s:+ " : " s:+ . . cr ;
+	"3:" . ;
+	
+: callback_wd_4	\ data
+	\ "wd_4: " t:name@ s:+ " : " s:+ . . cr ;
+	"4:" . ;
+	
+: setup
+	\ Register events
+	false "Event1" pubsub_register
+	false "Event2" pubsub_register
+	true "Event3" pubsub_register
+	false "Event4" pubsub_register
+	false "Event5" pubsub_register
+	true "Event6" pubsub_register
+	false "Event7" pubsub_register
+	false "Event8" pubsub_register
+	true "Event9" pubsub_register
+	
+	\ Subscribe to events
+	"Event1" ' callback_wd_1 pubsub_subscribe
+	"Event2" ' callback_wd_1 pubsub_subscribe
+	"Event3" ' callback_wd_1 pubsub_subscribe
+	"Event4" ' callback_wd_1 pubsub_subscribe
+	"Event5" ' callback_wd_1 pubsub_subscribe
+	"Event6" ' callback_wd_1 pubsub_subscribe
+	"Event7" ' callback_wd_1 pubsub_subscribe
+	"Event8" ' callback_wd_1 pubsub_subscribe
+	"Event9" ' callback_wd_1 pubsub_subscribe
+	
+	"Event1" ' callback_wd_2 pubsub_subscribe
+	"Event2" ' callback_wd_2 pubsub_subscribe
+	"Event3" ' callback_wd_2 pubsub_subscribe
+	"Event4" ' callback_wd_2 pubsub_subscribe
+	"Event5" ' callback_wd_2 pubsub_subscribe
+	"Event6" ' callback_wd_2 pubsub_subscribe
+	"Event7" ' callback_wd_2 pubsub_subscribe
+	"Event8" ' callback_wd_2 pubsub_subscribe
+	"Event9" ' callback_wd_2 pubsub_subscribe
+	
+	"Event1" ' callback_wd_3 pubsub_subscribe
+	"Event2" ' callback_wd_3 pubsub_subscribe
+	"Event3" ' callback_wd_3 pubsub_subscribe
+	"Event4" ' callback_wd_3 pubsub_subscribe
+	"Event5" ' callback_wd_3 pubsub_subscribe
+	"Event6" ' callback_wd_3 pubsub_subscribe
+	"Event7" ' callback_wd_3 pubsub_subscribe
+	"Event8" ' callback_wd_3 pubsub_subscribe
+	"Event9" ' callback_wd_3 pubsub_subscribe
+	
+	"Event1" ' callback_wd_4 pubsub_subscribe
+	"Event2" ' callback_wd_4 pubsub_subscribe
+	"Event3" ' callback_wd_4 pubsub_subscribe
+	"Event4" ' callback_wd_4 pubsub_subscribe
+	"Event5" ' callback_wd_4 pubsub_subscribe
+	"Event6" ' callback_wd_4 pubsub_subscribe
+	"Event7" ' callback_wd_4 pubsub_subscribe
+	"Event8" ' callback_wd_4 pubsub_subscribe
+	"Event9" ' callback_wd_4 pubsub_subscribe
+;
+
+: do_publish	
+	\ Publish events
+	"Event1" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event2" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event3" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event4" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event5" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event6" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event7" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event8" struct @ ["general","blksz",1,2] val@ pubsub_publish
+	"Event9" struct @ ["general","blksz",1,2] val@ pubsub_publish
+;
+
+: runtest
+	cr cr "Run test..." . cr cr
+	do_publish 
+	0.05 sleep ;
+
+setup	
+1 sleep
+' runtest 55 times
+pubsub_term
+
+\ Reset namespace
+ns: user
+
+\ wait for sub-term to take effect:
+-1 sleep
+\ allow log to flush...
+0.2 sleep
+bye
+

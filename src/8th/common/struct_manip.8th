@@ -22,11 +22,8 @@
      bob@bobcowdery.plus.com
 *)
 
-\ Includes
-"param_st.8th"  f:include
-
 \ Set namespace
-ns: C
+ns: fr
 
 \ ========================================
 \ Testing only
