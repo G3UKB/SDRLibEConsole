@@ -56,7 +56,7 @@ needs debug/sed
 \ =========================================
 
 \ Set namespace
-ns: sdr-script
+ns: sdr
 
 \ ======================================================================================
 \ Initialisation
@@ -231,54 +231,58 @@ ns: sdr-script
 			\ Something went wrong
 			"Error getting audio info!" log drop "" ""
 		then ;
-	
-	\ ======================================================================================
-	\ Testing
-	\ ======================================================================================
 
-	\ The test cases exercise each word on all paths and use the SED checker to establish
-	\ correct stack behaviour. Some words may use words that require external calls and possibly
-	\ expect external data. These are simulated by an overwrite of those words and the simulated
-	\ word then behaves as closely as possible to the actual word. These words are at the beginning
-	\ of the module as they need to be compiled first.
-	(*	
-	: test_cases
-		\ Basic words with no dependencies
-		resp_buffer "Buffer: " . b:len . drop cr
-		discover_msg "Discover: " . . cr
-		server_start_msg "Server start: " . . cr
-		0 radio_start_msg "Radio start: " . . cr
-		enum_outputs_msg "Enum outputs: " . . cr
-		"some api" "some_dev" default_route_msg "Default route: " . . cr
-		get_default_route "Get default route: " . cr
-		cmd_port "Cmd port: " . . cr
-		data_1_port "Data_1_port port: " . . cr
-		data_2_port "Data_2_port port: " . . cr
-		data_3_port "Data_3_port port: " . . cr
-		cmd_addr "Cmd addr: " . . cr
-		data_1_addr "Data_1_addr addr: " . . cr
-		data_2_addr "Data_2_addr addr: " . . cr
-		data_3_addr "Data_3_addr addr: " . . cr
-		\ Words with dependencies
-		discover_msg send_cmd_msg "Send discover message" . cr
-		net_wait_recv_cmd "Wait for read data: " . . cr drop
-		cmd_sock recv_from "Read: " . . " Data: " . . cr
-		wait_resp_with_timeout "Response: " . . " Data: " . . cr ;
-	*)
-	
-	\ Runs a basic script to start radio with one receiver on the dafault audio route
-	: basic_script	SED: --
-		\ in: 	none
-		\ out:	none
-		ps_alloc
-		discover_msg send_cmd_msg
-		wait_resp_with_timeout not if ;; then "Discover: " . . cr
-		get_default_route default_route_msg send_cmd_msg
-		wait_resp_with_timeout not if ;; then  "Route: " . . cr
-		server_start_msg send_cmd_msg
-		wait_resp_with_timeout not if ;; then  "Server start: " . . cr
-		0 radio_start_msg send_cmd_msg
-		wait_resp_with_timeout not if ;; then  "Radio start: " . . cr ;
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ======================================================================================
+\ Testing
+\ ======================================================================================
+
+\ The test cases exercise each word on all paths and use the SED checker to establish
+\ correct stack behaviour. Some words may use words that require external calls and possibly
+\ expect external data. These are simulated by an overwrite of those words and the simulated
+\ word then behaves as closely as possible to the actual word. These words are at the beginning
+\ of the module as they need to be compiled first.
+(*	
+: test_cases
+	\ Basic words with no dependencies
+	resp_buffer "Buffer: " . b:len . drop cr
+	discover_msg "Discover: " . . cr
+	server_start_msg "Server start: " . . cr
+	0 radio_start_msg "Radio start: " . . cr
+	enum_outputs_msg "Enum outputs: " . . cr
+	"some api" "some_dev" default_route_msg "Default route: " . . cr
+	get_default_route "Get default route: " . cr
+	cmd_port "Cmd port: " . . cr
+	data_1_port "Data_1_port port: " . . cr
+	data_2_port "Data_2_port port: " . . cr
+	data_3_port "Data_3_port port: " . . cr
+	cmd_addr "Cmd addr: " . . cr
+	data_1_addr "Data_1_addr addr: " . . cr
+	data_2_addr "Data_2_addr addr: " . . cr
+	data_3_addr "Data_3_addr addr: " . . cr
+	\ Words with dependencies
+	discover_msg send_cmd_msg "Send discover message" . cr
+	net_wait_recv_cmd "Wait for read data: " . . cr drop
+	cmd_sock recv_from "Read: " . . " Data: " . . cr
+	wait_resp_with_timeout "Response: " . . " Data: " . . cr ;
+*)
+
+\ Runs a basic script to start radio with one receiver on the dafault audio route
+: basic_script	SED: --
+	\ in: 	none
+	\ out:	none
+	ps_alloc
+	discover_msg send_cmd_msg
+	wait_resp_with_timeout not if ;; then "Discover: " . . cr
+	get_default_route default_route_msg send_cmd_msg
+	wait_resp_with_timeout not if ;; then  "Route: " . . cr
+	server_start_msg send_cmd_msg
+	wait_resp_with_timeout not if ;; then  "Server start: " . . cr
+	0 radio_start_msg send_cmd_msg
+	wait_resp_with_timeout not if ;; then  "Radio start: " . . cr ;
 		
 	\ Run with the simulation words uncommented.
 	\ cr cr "Running test cases..." . cr cr

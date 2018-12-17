@@ -1,7 +1,7 @@
 (*
-	state_model.8th
+	registration.8th
  
-  State model for the SDR application
+  Register names for the publish/subscribe service
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@ needs debug/sed
 \ true SED-CHECK
 
 \ Set namespace
-ns: sdr
+ns: fr
 
 
 \ ========================================
