@@ -240,15 +240,15 @@ ns: fr
 : pubsub_init	SED: --
 	\ in: 	none
 	\ out:	none
-	"P/S_TASK" 1 ' gen_server t:task-n -1 sleep
-	{"cb" : ' do_init } t:push "P/S_TASK" task_reg@ t:notify ;
+	"P/S_TASK" 1 ' gen_server t:task-n -1 sleep drop 
+	"P/S_TASK" ' do_init a:new msg! ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
 : pubsub_term	SED: --
 	\ in: 	none
 	\ out:	none
-	"P/S_TASK" task_reg@ {"cb" : ' do_term } t:push "P/S_TASK" task_reg@ t:notify ;
+	"P/S_TASK" ' do_term a:new msg! ;
 
 \ ----------------------------------	
 \ Register a new event
@@ -260,8 +260,7 @@ ns: fr
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
 	\ Const required for literal data as its compile time data
-	{"cb" : ' do_reg } const "data" rot m:!
-	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
+	"P/S_TASK" ' do_reg rot msg! ;
 
 \ ----------------------------------
 \ Subscribe to an event
@@ -271,8 +270,7 @@ ns: fr
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
 	\ Const required for literal data as its compile time data
-	{"cb" : ' do_sub } const "data" rot m:!
-	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
+	"P/S_TASK" ' do_sub rot msg! ;
 
 \ ----------------------------------
 \ Publish an event to subscribers
@@ -280,12 +278,8 @@ ns: fr
 	\ in:		* - event-data 
 	\				s - event-name	
 	\ out:	none
-	\ Clone the original data to avoid locks
-	clone nip
 	a:new 1 rot a:! 0 rot a:!
-	\ Const required for literal data as its compile time data
-	{"cb" : ' do_pub } const "data" rot m:!
-	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
+	"P/S_TASK" ' do_pub rot msg! ;
 
 \ Reset namespace
 ns: user

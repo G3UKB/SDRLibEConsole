@@ -195,7 +195,7 @@ pubsub_init
 
 setup	
 1 sleep
-' runtest 50 times
+' runtest 10 times
 pubsub_term
 
 \ Wait for all tasks to complete

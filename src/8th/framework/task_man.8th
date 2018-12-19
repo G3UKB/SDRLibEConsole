@@ -117,6 +117,20 @@ ns: fr
 		t:name@ "_run" s:+ t:@
 	while!
 	t:name@ " - exiting..." s:+ log ;
+
+\ ===============================================================================
+\ Message send to a given task
+: msg!	SED: s w * --
+	\ in:		* - opaque data to send 	
+	\				w - word to invoke in task
+	\				s - task name
+	\ out:	none
+	\ Push params and copy task name to r
+	>p >p >r
+	\ Word to invoke under the "cb" key and data under the "data" key
+	\ The data is cloned before the send as it must be detached from the current task pool
+	m:new "cb" p> m:! "data" p> clone nip m:!
+	r@ task_reg@ swap t:push r> task_reg@ t:notify ;
 	
 \ ========================================
 \ Reset namespace
