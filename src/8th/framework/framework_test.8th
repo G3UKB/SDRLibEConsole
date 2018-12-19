@@ -23,8 +23,8 @@
 *)
 
 \ Includes
-"task_man.8th"  f:include
 "param_st.8th"  f:include
+"task_man.8th"  f:include
 "struct_manip.8th"  f:include
 "pub_sub.8th"  f:include
 

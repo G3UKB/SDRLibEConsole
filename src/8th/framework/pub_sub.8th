@@ -28,11 +28,12 @@
 \ ========================================
 \ Testing only
 \ Includes
-"param_st.8th"  f:include
-"task_man.8th"  f:include
+\ "param_st.8th"  f:include
+\ "task_man.8th"  f:include
 
-needs debug/sed
+\ needs debug/sed
 \ true SED-CHECK
+\ ========================================
 
 \ Set namespace
 ns: fr
@@ -292,7 +293,7 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-
+(*
 : callback_wd_1	\ data
 	\ "Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
 	drop "1:" . ;
@@ -337,4 +338,4 @@ fr:wait_all
 \ allow log to flush...
 0.2 sleep
 bye
-	
+*)	

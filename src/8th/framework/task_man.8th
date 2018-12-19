@@ -24,9 +24,9 @@
 
 \ ========================================
 \ Testing only
-
-needs debug/sed
+\ needs debug/sed
 \ true SED-CHECK
+\ ========================================
 
 \ Set namespace
 ns: fr

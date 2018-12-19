@@ -27,9 +27,9 @@ ns: fr
 
 \ ========================================
 \ Testing only
-
-needs debug/sed
+\ needs debug/sed
 \ true SED-CHECK
+\ ========================================
 
 \ ===============================================================================
 \ Private
@@ -113,7 +113,7 @@ needs debug/sed
 		3 pp@ m:!
 	else
 		\ We have 'a idx'
-		3 pp@ .s  a:!
+		3 pp@ a:!
 	then
 	\ Clean up
 	drop ps_clear ;

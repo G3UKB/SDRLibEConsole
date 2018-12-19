@@ -24,10 +24,8 @@
 
 \ ========================================
 \ Testing only
-
-needs debug/sed
+\ needs debug/sed
 \ true SED-CHECK
-
 \ ========================================
 
 \ Max params per stack (depth)
