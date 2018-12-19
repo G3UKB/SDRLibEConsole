@@ -39,7 +39,7 @@
 ns: fr
 
 \ =============================================================================================
-\ Publish Subscribe task
+\ Publish / Subscribe gen_server handlers
 \ ========================================
 \ General Helpers
 \
