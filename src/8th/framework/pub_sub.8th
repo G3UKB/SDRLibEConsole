@@ -1,5 +1,5 @@
 (*
-	pubsub.8th
+	pub_sub.8th
  
   Publish/Subscribe system
  
@@ -27,6 +27,10 @@
 
 \ ========================================
 \ Testing only
+\ Includes
+"param_st.8th"  f:include
+"task_man.8th"  f:include
+
 needs debug/sed
 \ true SED-CHECK
 
@@ -39,21 +43,21 @@ ns: fr
 \ General Helpers
 \
 \ Return the data element
-: data@	SED: m -- *
+: data@	 SED: m -- *
 	\ in: 	{ "type" : ... , "data" : Any }
 	\ out:	Opaque data
 	"data" m:@ nip ;
 
 \ ----------------------------------
 \ Return the pub/sub store	
-: store@	SED: -- m
+: store@	 SED: -- m
 	\ in: 	none
 	\ out:	pub/sub store
 	"ps_s" t:@ ;
 
 \ ----------------------------------	
 \ Retrieve the event name
-: evnt_name@ SED: m -- s
+: evnt_name@  SED: m -- s
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\ out:	evnt-name
 	data@ 0 a:@ nip ;
@@ -62,28 +66,28 @@ ns: fr
 \ Registration helpers
 \
 \ Retrieve the event flag
-: evnt_flg@ SED: m -- T
+: evnt_flg@  SED: m -- T
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\ out:	flag
 	data@ 1 a:@ nip ;	
 
 \ ----------------------------------
 \ Does the event name already exist
-: ps_exists?	SED: m -- F
+: ps_exists?	 SED: m -- F
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\ out:	flag
 	evnt_name@ store@ swap m:exists? nip ;
 
 \ ----------------------------------
 \ Return default event data
-: ps_make_evnt_data	SED: m -- a
+: ps_make_evnt_data	 SED: m -- a
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\ out:	[evnt_flg, []]
 	a:new 0 rot evnt_flg@ a:! 1 a:new a:! ; 
 
 \ ----------------------------------
 \ Store initial event data
-: ps_store_new	SED: a m -- 
+: ps_store_new	 SED: a m -- 
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\				[f, []]
 	\ out:	[evnt_flg, []]
@@ -91,7 +95,7 @@ ns: fr
 
 \ ----------------------------------
 \ Register a new entry	
-: ps_reg_new	SED: m --
+: ps_reg_new	 SED: m --
 	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
 	\ out:	none
 	dup ps_make_evnt_data
@@ -101,7 +105,7 @@ ns: fr
 \ Subscribe helpers
 \
 \ Retrieve the callback word
-: evnt_callback@ SED: m -- w
+: evnt_callback@  SED: m -- w
 	\ in: 	{ "type" : ... , "data" : [w] }
 	\ out:	w
 	data@ 1 a:@ nip ;
@@ -110,7 +114,7 @@ ns: fr
 \ Publish helpers
 \
 \ Retrieve the subscriber list
-: sub_list@ SED: m -- a
+: sub_list@  SED: m -- a
 	\ in: 	{ "type" : ... , "data" : [w] }
 	\ out:	w
 	\ [f,[w,w,..]]
@@ -118,7 +122,7 @@ ns: fr
 
 \ ----------------------------------
 \ Retrieve the event data	
-: evnt_data@ SED: m -- *
+: evnt_data@  SED: m -- *
 	\ in: 	{ "type" : ... , "data" : [w] }
 	\ out:	event-data
 	"data" m:@ nip 1 a:@ nip ;
@@ -126,7 +130,7 @@ ns: fr
 \ ========================================
 \ Message handlers
 \ Initialise the p/s structure
-: do_init SED: m --
+: do_init  SED: m --
 	\ in: 	{ "type" : "init" }
 	\ out:	none
 	\
@@ -137,15 +141,15 @@ ns: fr
 
 \ ----------------------------------
 \ Terminate task
-: do_term SED: m --
+: do_term  SED: m --
 	\ in: 	{ "type" : "term" }
 	\ out:	none
-	drop false "pub_sub_run" t:!
+	drop false t:name@ "_run" s:+ t:!
 ;
 
 \ ----------------------------------
 \ Register a new event
-: do_reg	SED: m --
+: do_reg	 SED: m --
 	\ in: 	{ "type" : "reg" , "data" : [evnt-name, f] }
 	\ out:	none
 	\ data: [evnt-name, f] where f==true if dispatch on main thread
@@ -160,7 +164,7 @@ ns: fr
 
 \ ----------------------------------
 \ Subscribe to an event
-: do_sub	SED: m --
+: do_sub	 SED: m --
 	\ in: 	{ "type" : "sub" , "data" : [event-name, w]}
 	\ out:	none
 	dup >r
@@ -180,7 +184,7 @@ ns: fr
 \ ----------------------------------
 \ Dispatch to subscriber on main thread
 \ Callee must consume 'data' on TOS
-: main_thd_dispatch	SED: m --
+: main_thd_dispatch	  SED: m --
 	\ in: 	{"cb" : w, "to" : w, "data" : Opaque}
 	\ out:	none
 	"data" m:@ swap "to" m:@ nip w:exec ;
@@ -188,7 +192,7 @@ ns: fr
 \ ----------------------------------
 \ Dispatch to subscriber
 \ Callee must consume 'data' on TOS
-: pubsub_dispatch		SED: n w --
+: pubsub_dispatch		  SED: n w -- 
 	\ in: 	idx of item
 	\				word to dispatch to
 	\				p: flag, data
@@ -210,7 +214,7 @@ ns: fr
 
 \ ----------------------------------
 \ Publish an event	
-: do_pub	SED: m --
+: do_pub	 SED: m --
 	\ in: 	{ "type" : pub , "data" : [event-name, event-data]}
 	\ out:	none
 	dup >r
@@ -219,9 +223,6 @@ ns: fr
 		\ Push the dispatch flag to the p stack
 		r@ sub_list@ a:open swap >p
 		\ For each subscriber send data to the subscribers callback word
-		\ This is always being sent from the same task so locking is not necessary
-		\ The data has been cloned from the original publisher so the data is never
-		\ read by more than one task.
 		\ Push the data to the p stack as we need to retain a copy
 		r> evnt_data@ >p ' pubsub_dispatch a:each drop
 	else
@@ -229,86 +230,24 @@ ns: fr
 		"No registration " r> evnt_name@ s:+ " to publish to" s:+ throw 
 	then ;
 
-\ ========================================
-\ Decode and dispatch to message handlers
-: msg_decode	SED: m -- 
-	\ in: 	{"type" : "init"|"reg"|"sub"|"pub|"term", "data" : Opaque
-	\ out:	none
-	"type" m:@
-	{ "init" : ' do_init , "reg" : ' do_reg , "sub" : ' do_sub , "pub" : ' do_pub , "term" : ' do_term }
-	case
-;
-
-\ =============================================================================================
-\ Task helpers and entry point
-
-\ ----------------------------------
-\ Q timeout 100ms
-: q_timeout_ms	SED: -- n
-	100 ;
-
-\ ----------------------------------
-\ Process 1 item from Q	
-: proc_q	SED: --
-	t:pop null? if
-		"Warning, p/s q returned null!" log drop
-	else
-		\ Message to process
-		msg_decode
-	then ;
-
-\ ----------------------------------
-\ Task entry point
-\ All events are handled by this task which dispatches:
-\ 	- on its thread for SYS events
-\		- on the main thread for UI events
-: pub_sub_task	 SED: --
-	\ in: 	none
-	\ out:	none
-	\ Give us a name
-	"PUB-SUB-TASK" t:name!
-	\ Set us in the run state
-	true "pub_sub_run" t:!
-	\ Init the param stack
-	ps_alloc
-	
-	\ Set q to return null on empty
-	\ Note, should not happen
-	t:getq false q:throwing drop
-	
-	\ Loop while running
-	repeat
-		\ Wait for a wake up call or timeout
-		q_timeout_ms t:q-wait
-		' proc_q t:qlen times
-		\ Check for exit
-		"pub_sub_run" t:@
-	while!
-	"P/S_Task - exiting..." log ;
-
 \ ===============================================================================
 \ Main code may be called from any thread
 \ ===============================================================================
-
-null var, t_pubsub
 
 \ ----------------------------------
 \ Initialise publish/subscribe system
 : pubsub_init	SED: --
 	\ in: 	none
 	\ out:	none
-	\ ' pub_sub_task t:task dup t_pubsub !
-	' pub_sub_task t:task dup "P/S_TASK" task_ref!
-	\ {"type" : "init"} t:push  t_pubsub @ t:notify ;
-	{"type" : "init"} t:push "P/S_TASK" task_ref@ t:notify ;
+	"P/S_TASK" 1 ' gen_server t:task-n -1 sleep
+	{"cb" : ' do_init } t:push "P/S_TASK" task_reg@ t:notify ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
 : pubsub_term	SED: --
 	\ in: 	none
 	\ out:	none
-	\ t_pubsub @ {"type" : "term"} t:push t_pubsub @ t:notify ;
-	"P/S_TASK" task_ref@ {"type" : "term"} t:push "P/S_TASK" task_ref@ t:notify ;
+	"P/S_TASK" task_reg@ {"cb" : ' do_term } t:push "P/S_TASK" task_reg@ t:notify ;
 
 \ ----------------------------------	
 \ Register a new event
@@ -320,9 +259,8 @@ null var, t_pubsub
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
 	\ Const required for literal data as its compile time data
-	{"type" : "reg"} const "data" rot m:!
-	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
-	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
+	{"cb" : ' do_reg } const "data" rot m:!
+	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
 
 \ ----------------------------------
 \ Subscribe to an event
@@ -332,9 +270,8 @@ null var, t_pubsub
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
 	\ Const required for literal data as its compile time data
-	{"type" : "sub"} const "data" rot m:!
-	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
-	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
+	{"cb" : ' do_sub } const "data" rot m:!
+	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
 
 \ ----------------------------------
 \ Publish an event to subscribers
@@ -346,9 +283,8 @@ null var, t_pubsub
 	clone nip
 	a:new 1 rot a:! 0 rot a:!
 	\ Const required for literal data as its compile time data
-	{"type" : "pub"} const "data" rot m:!
-	\ t_pubsub @ swap t:push t_pubsub @ t:notify ;
-	"P/S_TASK" task_ref@ swap t:push "P/S_TASK" task_ref@ t:notify ;
+	{"cb" : ' do_pub } const "data" rot m:!
+	"P/S_TASK" task_reg@ swap t:push "P/S_TASK" task_reg@ t:notify ;
 
 \ Reset namespace
 ns: user
@@ -356,37 +292,49 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-(*
+
 : callback_wd_1	\ data
-	"Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
+	\ "Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
+	drop "1:" . ;
 
 : callback_wd_2	\ data
-	"Hi, callback received on callback_wd_2: " t:name@ s:+ " : " s:+ . . cr ;
+	\ "Hi, callback received on callback_wd_2: " t:name@ s:+ " : " s:+ . . cr ;
+	drop "2:" . ;
 	
-: testit
-	C:pubsub_init
+: init_test
+	fr:pubsub_init
 	
 	\ Task q gets messed up without sleeps
-	false "Event1" C:pubsub_register
-	false "Event2" C:pubsub_register
-	true "Event3" C:pubsub_register
+	false "Event1" fr:pubsub_register
+	false "Event2" fr:pubsub_register
+	false "Event3" fr:pubsub_register
 	"Event1" ' callback_wd_1 fr:pubsub_subscribe
 	"Event2" ' callback_wd_1 fr:pubsub_subscribe
 	"Event3" ' callback_wd_1 fr:pubsub_subscribe
 	"Event1" ' callback_wd_2 fr:pubsub_subscribe
 	"Event2" ' callback_wd_2 fr:pubsub_subscribe
 	"Event3" ' callback_wd_2 fr:pubsub_subscribe
-	"Event1" [1,2,3,4,5] frpubsub_publish
-	"Event2" [6,7,8,9,10] frpubsub_publish
-	"Event3" [11,12,13,14,15] frpubsub_publish
-	
-	C:pubsub_term
 ;
 
-testit
-\ wait for sub-term to take effect:
--1 sleep
+: run_test
+	"Event1" [1,2,3,4,5] fr:pubsub_publish
+	"Event2" [6,7,8,9,10] fr:pubsub_publish
+	"Event3" [11,12,13,14,15] fr:pubsub_publish
+	0.001 sleep
+;
+
+: run_tests
+	' run_test 50 times
+;
+
+init_test
+run_tests
+fr:pubsub_term
+
+\ Wait for all tasks to exit
+fr:wait_all
+
 \ allow log to flush...
 0.2 sleep
 bye
-*)	
+	

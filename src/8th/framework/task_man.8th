@@ -31,6 +31,9 @@ needs debug/sed
 \ Set namespace
 ns: fr
 
+\ ===============================================================================
+\ Task reference and termination management
+
 \ Holder for task references
 {} var, __task_dict
 
@@ -43,7 +46,7 @@ ns: fr
 	__task_dict unlock drop ;
 	
 \ Store task referance
-: task_ref!	SED: t s --
+: task_reg!	SED: t s --
 	\ in: 	t - task object
 	\				s - task name
 	\ out:	none
@@ -52,7 +55,7 @@ ns: fr
 	unlock_task_dict ;
 	
 \ Get task reference by name
-: task_ref@	SED: s -- t
+: task_reg@	SED: s -- t
 	\ in: 	s - task name
 	\ out:	t - task reference
 	locked_task_dict@
@@ -64,7 +67,7 @@ ns: fr
 	\ in:		t - task ref 	(item from dict) 	
 	\				s - task name (key from dict)
 	\ out:	none
-	"Waiting for task: " rot s:+ . cr
+	"Waiting for task: " rot s:+ log
 	t:wait ;
 
 \ Wait for all tasks to terminate
@@ -73,6 +76,48 @@ ns: fr
 	cr ' wait_task m:each 
 	unlock_task_dict drop ;
 
+\ ===============================================================================
+\ Generic task for implementing messaging passing concurrency 
+	
+\ ----------------------------------
+\ Process 1 item from task Q	
+: proc_q	SED: --
+	t:pop null? if
+		"Warning, p/s q returned null!" log drop
+	else
+		\ Message to process
+		"cb" m:@ w:exec
+	then ;
+	
+\ ----------------------------------
+\ Task entry point for generic servers
+: gen_server	 SED: --
+	\ in: 	given name
+	\ out:	none
+	\ Assign name and store in registry
+	dup t:name! t:curtask swap task_reg!
+	
+	\ Set us in the run state using a task variable
+	true t:name@ "_run" s:+ t:!
+	\ Init the param stack for this task
+	ps_alloc
+	
+	\ Set q to return null on empty
+	\ Note, should not happen
+	t:getq false q:throwing drop
+	\ Wake up main thread which is waiting for us to finish initialisation
+	t:main t:notify
+	
+	\ Loop while run enabled
+	repeat
+		\ Wait for a wake up notify
+		-1 sleep
+		' proc_q t:qlen times
+		\ Check for exit
+		t:name@ "_run" s:+ t:@
+	while!
+	t:name@ " - exiting..." s:+ log ;
+	
 \ ========================================
 \ Reset namespace
 ns: user
@@ -88,11 +133,11 @@ ns: user
 
 
 : make_tasks	\ --
-	"t1" dup 1 2 ' tn t:task-n swap fr:task_ref! 
-	"t2" dup 3 2 ' tn t:task-n swap fr:task_ref!
-	"t3" dup 5 2 ' tn t:task-n swap fr:task_ref!
-	"t4" dup 7 2 ' tn t:task-n swap fr:task_ref!
-	"t5" dup 9 2 ' tn t:task-n swap fr:task_ref!
+	"t1" dup 1 2 ' tn t:task-n swap fr:task_reg! 
+	"t2" dup 3 2 ' tn t:task-n swap fr:task_reg!
+	"t3" dup 5 2 ' tn t:task-n swap fr:task_reg!
+	"t4" dup 7 2 ' tn t:task-n swap fr:task_reg!
+	"t5" dup 9 2 ' tn t:task-n swap fr:task_reg!
 ;
 	
 make_tasks
