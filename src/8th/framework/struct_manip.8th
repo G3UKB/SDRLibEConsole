@@ -22,14 +22,18 @@
      bob@bobcowdery.plus.com
 *)
 
-\ Set namespace
-ns: fr
-
 \ ========================================
 \ Testing only
-\ needs debug/sed
-\ true SED-CHECK
+false var, struct_manip_test
+
+struct_manip_test @ #if
+	needs debug/sed
+	true SED-CHECK
+#then
 \ ========================================
+
+\ Set namespace
+ns: fr
 
 \ ===============================================================================
 \ Private
@@ -89,7 +93,7 @@ ns: fr
 	\ Now index the value list returned
 	r> a:@
 	\ Clean up
-	nip ps_clear ;
+	nip pclear ;
 
 \ ========================================
 \
@@ -116,7 +120,7 @@ ns: fr
 		3 pp@ a:!
 	then
 	\ Clean up
-	drop ps_clear ;
+	drop pclear ;
 
 \ ========================================
 \ Reset namespace
@@ -125,109 +129,109 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-(*
-param_st_alloc
-{
-	"general" : {
-	\	key						src			index/val 	SoD			option list			
-		"smplrate" : 	[false, [0, 				false, 	["48000", "96000", "192000"]]],
-		"numrx" : 		[false, [0, 				false, 	["1", "2", "3"]]],
-		"blksz" : 		[false, [1, 				false, 	["512", "1024", "2048", "4096"]]],
-		"duplex" : 		[false, [false, 		false, 	[]]],
-		"enabletx" : 	[false, [false, 		false, 	[]]]
-	}
-} var, struct
+struct_manip_test @ #if
+	param_st_alloc
+	{
+		"general" : {
+		\	key						src			index/val 	SoD			option list			
+			"smplrate" : 	[false, [0, 				false, 	["48000", "96000", "192000"]]],
+			"numrx" : 		[false, [0, 				false, 	["1", "2", "3"]]],
+			"blksz" : 		[false, [1, 				false, 	["512", "1024", "2048", "4096"]]],
+			"duplex" : 		[false, [false, 		false, 	[]]],
+			"enabletx" : 	[false, [false, 		false, 	[]]]
+		}
+	} var, struct
 
-{
-		\ HPSDR Protocol-1 only supports 3 radios
-		\ More can be added into the array as required
-		"radio-state" : [
-			[
-				\ src						SoD
-				false, [null, false, 
-				{
-					"display-width": 0,
-					"display-height": 0,
-					"freq": 7100000,
-					"mode": 0 ,
-					"filter": 0 ,
-					"agc": 0 ,
-					"attn": 0 ,
-					"hf-preamp": 0 ,
-					"6m-preamp": 0 ,
-					"audio-gain": 50
-				} ]
-			],
-			[
-				\ src						SoD
-				false, [null, false, 
-				{
-					"display-width": 0,
-					"display-height": 0,
-					"freq": 7100000,
-					"mode": 0 ,
-					"filter": 0 ,
-					"agc": 0 ,
-					"attn": 0 ,
-					"hf-preamp": 0 ,
-					"6m-preamp": 0 ,
-					"audio-gain": 50
-				} ]
-			],
-			[
-				\ src						SoD
-				false, [null, false, 
-				{
-					"display-width": 0,
-					"display-height": 0,
-					"freq": 7100000,
-					"mode": 0 ,
-					"filter": 0 ,
-					"agc": 0 ,
-					"attn": 0 ,
-					"hf-preamp": 0 ,
-					"6m-preamp": 0 ,
-					"audio-gain": 50
-				} ]
+	{
+			\ HPSDR Protocol-1 only supports 3 radios
+			\ More can be added into the array as required
+			"radio-state" : [
+				[
+					\ src						SoD
+					false, [null, false, 
+					{
+						"display-width": 0,
+						"display-height": 0,
+						"freq": 7100000,
+						"mode": 0 ,
+						"filter": 0 ,
+						"agc": 0 ,
+						"attn": 0 ,
+						"hf-preamp": 0 ,
+						"6m-preamp": 0 ,
+						"audio-gain": 50
+					} ]
+				],
+				[
+					\ src						SoD
+					false, [null, false, 
+					{
+						"display-width": 0,
+						"display-height": 0,
+						"freq": 7100000,
+						"mode": 0 ,
+						"filter": 0 ,
+						"agc": 0 ,
+						"attn": 0 ,
+						"hf-preamp": 0 ,
+						"6m-preamp": 0 ,
+						"audio-gain": 50
+					} ]
+				],
+				[
+					\ src						SoD
+					false, [null, false, 
+					{
+						"display-width": 0,
+						"display-height": 0,
+						"freq": 7100000,
+						"mode": 0 ,
+						"filter": 0 ,
+						"agc": 0 ,
+						"attn": 0 ,
+						"hf-preamp": 0 ,
+						"6m-preamp": 0 ,
+						"audio-gain": 50
+					} ]
+				]
 			]
-		]
-	} var, struct1
-	
-\ =========================================================================
-\ Getter examples
-: getter_examples
-	\ Block size option list
-	struct @ ["general","blksz",1,2] fr:val@ . cr
-	\ Numrx value
-	struct @ ["general","numrx",1,0] fr:val@ . cr
-	\ Duplex SoD flag
-	struct @ ["general","duplex",1,1] fr:val@ . cr
-	\ Samplerate value
-	struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] fr:idx_val@ . cr
-	\ Part structure as delivered by some listeners
-	[0, false, ["48000", "96000", "192000"]] [2] fr:val@ . cr
-	[0, false, ["48000", "96000", "192000"]] [0] fr:val@ . cr
-	[0, false, ["48000", "96000", "192000"]] [2] [0] fr:idx_val@ . cr
-;
+		} var, struct1
 
-\ =========================================================================
-\ Setter examples
-: setter_examples
-	\ Sample rate SoD flag
-	struct @ ["general","smplrate",1] 1 true fr:val! struct @ ["general","smplrate"] C:val@ . cr
-	struct @ ["general","numrx",1] 1 true fr:val! struct @ ["general","numrx"] C:val@ . cr
-	struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] C:val@ . cr
-	struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] C:val@ . cr
-	struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] C:val@ . cr
-	struct @ ["general"] "enabletx" "myval" frf:val! struct @ . cr
-	
-	struct1 @ ["radio-state", 0 ] 0 true fr:val!
-	struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
-	struct1 @ ["radio-state", 0 , 1 ] 1 true fr:val!
-	struct1 @ . cr
-;
+	\ =========================================================================
+	\ Getter examples
+	: getter_examples
+		\ Block size option list
+		struct @ ["general","blksz",1,2] fr:val@ . cr
+		\ Numrx value
+		struct @ ["general","numrx",1,0] fr:val@ . cr
+		\ Duplex SoD flag
+		struct @ ["general","duplex",1,1] fr:val@ . cr
+		\ Samplerate value
+		struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] fr:idx_val@ . cr
+		\ Part structure as delivered by some listeners
+		[0, false, ["48000", "96000", "192000"]] [2] fr:val@ . cr
+		[0, false, ["48000", "96000", "192000"]] [0] fr:val@ . cr
+		[0, false, ["48000", "96000", "192000"]] [2] [0] fr:idx_val@ . cr
+	;
 
-\ getter_examples
-setter_examples
-bye
-*)
+	\ =========================================================================
+	\ Setter examples
+	: setter_examples
+		\ Sample rate SoD flag
+		struct @ ["general","smplrate",1] 1 true fr:val! struct @ ["general","smplrate"] C:val@ . cr
+		struct @ ["general","numrx",1] 1 true fr:val! struct @ ["general","numrx"] C:val@ . cr
+		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] C:val@ . cr
+		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] C:val@ . cr
+		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] C:val@ . cr
+		struct @ ["general"] "enabletx" "myval" frf:val! struct @ . cr
+
+		struct1 @ ["radio-state", 0 ] 0 true fr:val!
+		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
+		struct1 @ ["radio-state", 0 , 1 ] 1 true fr:val!
+		struct1 @ . cr
+	;
+
+	\ getter_examples
+	setter_examples
+	bye
+#then

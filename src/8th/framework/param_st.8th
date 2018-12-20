@@ -24,8 +24,13 @@
 
 \ ========================================
 \ Testing only
-\ needs debug/sed
-\ true SED-CHECK
+false var, param_st_test
+
+param_st_test @ #if
+	needs debug/sed
+	true SED-CHECK
+#then
+
 \ ========================================
 
 \ Max params per stack (depth)
@@ -165,37 +170,35 @@
 
 \ ========================================
 \ Testing
+param_st_test @ #if
+	\ Usage test
+	: tn	\ name --
+		t:name!
+		param_st_alloc
+		1 2 3 4 5 >p >p >p >p >p
+		p> p> p> p> p>
+		1 2 3 4 5 >p >p >p >p >p
+		p@ p@ p@ p@ p@
+		1 2 3 4 5 >p >p >p >p >p
+		0 pp@ 1 pp@ 2 pp@ 3 pp@ 4 pp@ 5 pp@
+		p> p> p> p> p> p> p> p> p> p>
+		t:name@ " done" s:+ log
+	;
 
-(*
-\ Usage test
-: tn	\ name --
-	t:name!
-	param_st_alloc
-	1 2 3 4 5 >p >p >p >p >p
-	p> p> p> p> p>
-	1 2 3 4 5 >p >p >p >p >p
-	p@ p@ p@ p@ p@
-	1 2 3 4 5 >p >p >p >p >p
-	0 pp@ 1 pp@ 2 pp@ 3 pp@ 4 pp@ 5 pp@
-	p> p> p> p> p> p> p> p> p> p>
-	t:name@ " done" s:+ log
-;
+	[] var, ps_tasks
 
-[] var, ps_tasks
+	: run_task	\ n -- 
+		"Task-" swap >s s:+ 1 ' tn t:task-n ps_tasks @ swap a:push drop
+	;
 
-: run_task	\ n -- 
-	"Task-" swap >s s:+ 1 ' tn t:task-n ps_tasks @ swap a:push drop
-;
-	
-: usage_test	\ --
-	' run_task 1 600 loop
-	0.1 sleep
-;
+	: usage_test	\ --
+		' run_task 1 600 loop
+		0.1 sleep
+	;
 
-cr cr "Running usage test..." . cr cr
-usage_test
-"Done usage test" . cr
+	cr cr "Running usage test..." . cr cr
+	usage_test
+	"Done usage test" . cr
 
-bye
-
-*)
+	bye
+#then

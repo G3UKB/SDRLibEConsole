@@ -27,12 +27,15 @@
 
 \ ========================================
 \ Testing only
-\ Includes
-"param_st.8th"  f:include
-"task_man.8th"  f:include
+false var, pub_sub_test
 
-\ needs debug/sed
-\ true SED-CHECK
+pub_sub_test @ #if
+	needs debug/sed
+	true SED-CHECK
+	\ Includes
+	"param_st.8th"  f:include
+	"task_man.8th"  f:include
+#then
 \ ========================================
 
 \ Set namespace
@@ -286,49 +289,50 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
+pub_sub_test @ #if
+	: callback_wd_1	\ data
+		\ "Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
+		drop "1:" . ;
 
-: callback_wd_1	\ data
-	\ "Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
-	drop "1:" . ;
+	: callback_wd_2	\ data
+		\ "Hi, callback received on callback_wd_2: " t:name@ s:+ " : " s:+ . . cr ;
+		drop "2:" . ;
 
-: callback_wd_2	\ data
-	\ "Hi, callback received on callback_wd_2: " t:name@ s:+ " : " s:+ . . cr ;
-	drop "2:" . ;
-	
-: init_test
-	fr:pubsub_init
-	
-	\ Task q gets messed up without sleeps
-	false "Event1" fr:pubsub_register
-	false "Event2" fr:pubsub_register
-	false "Event3" fr:pubsub_register
-	"Event1" ' callback_wd_1 fr:pubsub_subscribe
-	"Event2" ' callback_wd_1 fr:pubsub_subscribe
-	"Event3" ' callback_wd_1 fr:pubsub_subscribe
-	"Event1" ' callback_wd_2 fr:pubsub_subscribe
-	"Event2" ' callback_wd_2 fr:pubsub_subscribe
-	"Event3" ' callback_wd_2 fr:pubsub_subscribe
-;
+	: init_test
+		fr:pubsub_init
 
-: run_test
-	"Event1" [1,2,3,4,5] fr:pubsub_publish
-	"Event2" [6,7,8,9,10] fr:pubsub_publish
-	"Event3" [11,12,13,14,15] fr:pubsub_publish
-	0.001 sleep
-;
+		\ Task q gets messed up without sleeps
+		false "Event1" fr:pubsub_register
+		false "Event2" fr:pubsub_register
+		false "Event3" fr:pubsub_register
+		"Event1" ' callback_wd_1 fr:pubsub_subscribe
+		"Event2" ' callback_wd_1 fr:pubsub_subscribe
+		"Event3" ' callback_wd_1 fr:pubsub_subscribe
+		"Event1" ' callback_wd_2 fr:pubsub_subscribe
+		"Event2" ' callback_wd_2 fr:pubsub_subscribe
+		"Event3" ' callback_wd_2 fr:pubsub_subscribe
+	;
 
-: run_tests
-	' run_test 100 times
-;
+	: run_test
+		"Event1" [1,2,3,4,5] fr:pubsub_publish
+		"Event2" [6,7,8,9,10] fr:pubsub_publish
+		"Event3" [11,12,13,14,15] fr:pubsub_publish
+		0.001 sleep
+	;
 
-param_st_alloc
-init_test
-run_tests
-fr:pubsub_term 
-\ Wait for all tasks to exit
-fr:wait_all
+	: run_tests
+		' run_test 500 times
+	;
 
-\ allow log to flush...
-0.2 sleep
-bye
+	param_st_alloc
+	init_test
+	run_tests
+	fr:pubsub_term 
+	\ Wait for all tasks to exit
+	fr:wait_all
+
+	\ allow log to flush...
+	0.2 sleep
+	bye
+#then
 	
