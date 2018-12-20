@@ -30,8 +30,8 @@
 false var, pub_sub_test
 
 pub_sub_test @ #if
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 	\ Includes
 	"param_st.8th"  f:include
 	"task_man.8th"  f:include

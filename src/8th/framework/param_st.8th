@@ -1,5 +1,5 @@
 (* 
-	p_st.8th
+	param_st.8th
  
   Parameter storage
  
@@ -27,8 +27,9 @@
 false var, param_st_test
 
 param_st_test @ #if
-	needs debug/sed
-	true SED-CHECK
+	\ 18.08.2 SED: works single task only
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 
 \ ========================================
@@ -43,8 +44,7 @@ param_st_test @ #if
 \ Return the stack associated with the calling task
 : pss@	 SED: -- *
 	\ in: 	none
-	\ out:	s0 - true if successful
-	\				s1 - stack | null 
+	\ out:	s0 - stack | null 
 	"p_st" t:@ ;
 
 \ ----------------------------------
@@ -192,7 +192,7 @@ param_st_test @ #if
 	;
 
 	: usage_test	\ --
-		' run_task 1 600 loop
+		' run_task 1 500 loop
 		0.1 sleep
 	;
 

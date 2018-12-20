@@ -27,6 +27,8 @@
 false var, struct_manip_test
 
 struct_manip_test @ #if
+	\ Includes
+	"param_st.8th"  f:include
 	needs debug/sed
 	true SED-CHECK
 #then
@@ -218,12 +220,12 @@ struct_manip_test @ #if
 	\ Setter examples
 	: setter_examples
 		\ Sample rate SoD flag
-		struct @ ["general","smplrate",1] 1 true fr:val! struct @ ["general","smplrate"] C:val@ . cr
-		struct @ ["general","numrx",1] 1 true fr:val! struct @ ["general","numrx"] C:val@ . cr
-		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] C:val@ . cr
-		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] C:val@ . cr
-		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] C:val@ . cr
-		struct @ ["general"] "enabletx" "myval" frf:val! struct @ . cr
+		struct @ ["general","smplrate",1] 1 true fr:val! struct @ ["general","smplrate"] fr:val@ . cr
+		struct @ ["general","numrx",1] 1 true fr:val! struct @ ["general","numrx"] fr:val@ . cr
+		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] fr:val@ . cr
+		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] fr:val@ . cr
+		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] fr:val@ . cr
+		struct @ ["general"] "enabletx" "myval" fr:val! struct @ . cr
 
 		struct1 @ ["radio-state", 0 ] 0 true fr:val!
 		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
@@ -231,7 +233,8 @@ struct_manip_test @ #if
 		struct1 @ . cr
 	;
 
-	\ getter_examples
+	param_st_alloc
+	getter_examples
 	setter_examples
 	bye
 #then
