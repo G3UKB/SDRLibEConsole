@@ -126,7 +126,7 @@ ns: user
 \ Testing
 \ ===============================================================================
 (*
-ps_alloc
+param_st_alloc
 {
 	"general" : {
 	\	key						src			index/val 	SoD			option list			

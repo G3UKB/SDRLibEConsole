@@ -28,8 +28,8 @@
 \ ========================================
 \ Testing only
 \ Includes
-\ "param_st.8th"  f:include
-\ "task_man.8th"  f:include
+"param_st.8th"  f:include
+"task_man.8th"  f:include
 
 \ needs debug/sed
 \ true SED-CHECK
@@ -229,7 +229,8 @@ ns: fr
 	else
 		\ Problem
 		"No registration " r> evnt_name@ s:+ " to publish to" s:+ throw 
-	then ;
+	then 
+	2 pndrop ;
 
 \ ===============================================================================
 \ Main code may be called from any thread
@@ -259,7 +260,6 @@ ns: fr
 	\				f - true if to be dispatched on main thread else p/s thread
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
-	\ Const required for literal data as its compile time data
 	"P/S_TASK" ' do_reg rot msg! ;
 
 \ ----------------------------------
@@ -269,7 +269,6 @@ ns: fr
 	\				w - callback word 	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	\ Const required for literal data as its compile time data
 	"P/S_TASK" ' do_sub rot msg! ;
 
 \ ----------------------------------
@@ -287,7 +286,7 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-(*
+
 : callback_wd_1	\ data
 	\ "Hi, callback received on callback_wd_1: " t:name@ s:+ " : " s:+ . . cr ;
 	drop "1:" . ;
@@ -319,17 +318,17 @@ ns: user
 ;
 
 : run_tests
-	' run_test 50 times
+	' run_test 100 times
 ;
 
+param_st_alloc
 init_test
 run_tests
-fr:pubsub_term
-
+fr:pubsub_term 
 \ Wait for all tasks to exit
 fr:wait_all
 
 \ allow log to flush...
 0.2 sleep
 bye
-*)	
+	

@@ -33,7 +33,7 @@ ns: fr
 
 \ Push data into different tasks using struct_manip to dice data and store values and use param store as required
 \ Init the param store
-ps_alloc
+param_st_alloc
 \ Init publish subscribe service
 pubsub_init
 
@@ -195,7 +195,7 @@ pubsub_init
 
 setup	
 1 sleep
-' runtest 10 times
+' runtest 500 times
 pubsub_term
 
 \ Wait for all tasks to complete

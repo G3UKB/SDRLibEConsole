@@ -80,7 +80,7 @@
 \ ----------------------------------
 \ Check if initialised for current task
 \ Throw exception if not initialised
-: ps_check  SED: --
+: param_st_check  SED: --
 	\ in: 	none
 	\ out:	none
 	pss@ null? if
@@ -93,7 +93,7 @@
 
 \ Allocate a parameter stack for the given task
 \ Must be called by each task first AFTER it has set a unique task name
-: ps_alloc	 SED: --
+: param_st_alloc	 SED: --
 	\ in: 	none
 	\ out:	none
 	pss@ null? if
@@ -112,7 +112,7 @@
 : >p	 SED: * --
 	\ in: 	any type
 	\ out:	none
-	ps_check
+	param_st_check
 	ps! ;
 
 \ ----------------------------------
@@ -120,7 +120,7 @@
 : p>  SED: -- *
 	\ in: 	none
 	\ out:	any type
-	ps_check
+	param_st_check
 	ps> ;
 
 \ ----------------------------------
@@ -128,7 +128,7 @@
 : p@	 SED: -- *
 	\ in: 	none
 	\ out:	any type
-	ps_check
+	param_st_check
 	ps@ ;
 
 \ ----------------------------------
@@ -136,14 +136,30 @@
 : pp@ SED: n -- *
 	\ in: 	none
 	\ out:	any type
-	ps_check
+	param_st_check
 	pps@ ;
+
+\ ----------------------------------
+\ Drop n items from task param stack
+: pndrop SED: n -- 
+	\ in: 	none
+	\ out:	any type
+	param_st_check
+	pss@ swap st:ndrop ;
 	
+\ ----------------------------------	
 \ Clear task param stack
-: ps_clear SED:  -- 
-	ps_check
+: pclear SED:  -- 
+	param_st_check
 	pss@ st:clear drop ;
 
+\ ----------------------------------
+\ Stack depth
+: pdepth SED:  -- n
+	param_st_check
+	pss@ st:len nip ;
+
+\ ----------------------------------	
 \ Print the task stack
 
 
@@ -154,7 +170,7 @@
 \ Usage test
 : tn	\ name --
 	t:name!
-	ps_alloc
+	param_st_alloc
 	1 2 3 4 5 >p >p >p >p >p
 	p> p> p> p> p>
 	1 2 3 4 5 >p >p >p >p >p

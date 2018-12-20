@@ -100,7 +100,7 @@ ns: fr
 	\ Set us in the run state using a task variable
 	true t:name@ "_run" s:+ t:!
 	\ Init the param stack for this task
-	ps_alloc
+	param_st_alloc
 	
 	\ Set q to return null on empty
 	\ Note, should not happen
