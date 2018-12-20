@@ -29,8 +29,8 @@ false var, task_man_test
 task_man_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 \ ========================================
 
@@ -84,7 +84,15 @@ ns: fr
 
 \ ===============================================================================
 \ Generic task for implementing messaging passing concurrency 
-	
+
+\ ----------------------------------
+\ Terminate task
+: do_term  SED: m --
+	\ in: 	{ "type" : "term" }
+	\ out:	none
+	drop false t:name@ "_run" s:+ t:!
+;
+
 \ ----------------------------------
 \ Process 1 item from task Q	
 : proc_q	SED: --
@@ -146,23 +154,32 @@ ns: user
 \ Testing
 \ ===============================================================================
 task_man_test @ #if
-	: tn	\ name t
-		swap t:name! 
-		sleep
-		;
-
 	: make_tasks	\ --
-		"t1" dup 1 2 ' tn t:task-n swap fr:task_reg! 
-		"t2" dup 3 2 ' tn t:task-n swap fr:task_reg!
-		"t3" dup 1 2 ' tn t:task-n swap fr:task_reg!
-		"t4" dup 2 2 ' tn t:task-n swap fr:task_reg!
-		"t5" dup 3 2 ' tn t:task-n swap fr:task_reg!
+			"t1" 1 ' fr:gen_server t:task-n
+			-1 sleep drop
+			"t2" 1 ' fr:gen_server t:task-n 
+			-1 sleep drop
+			"t3" 1 ' fr:gen_server t:task-n 
+			-1 sleep drop
+			"t4" 1 ' fr:gen_server t:task-n 
+			-1 sleep drop
+			"t5" 1 ' fr:gen_server t:task-n 
 	;
 
+	: terminate_all
+		"t1" ' fr:do_term a:new fr:msg!
+		"t2" ' fr:do_term a:new fr:msg! 
+		"t3" ' fr:do_term a:new fr:msg! 
+		"t4" ' fr:do_term a:new fr:msg! 
+		"t5" ' fr:do_term a:new fr:msg!
+	;
+
+	param_st_alloc
 	make_tasks
 	0.2 sleep
+	terminate_all
 	fr:__task_dict @ . cr
 	fr:wait_all
-	
+
 	bye
 #then	
