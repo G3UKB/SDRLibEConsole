@@ -182,11 +182,19 @@ task_man_test @ #if
 		"t5" ' fr:do_term a:new fr:msg!
 	;
 
+	: runtest
+		"Run: " . . cr
+		make_tasks
+		0.2 sleep
+		terminate_all
+		fr:__task_dict @ . cr
+		fr:wait_all
+		__task_dict @ m:clear
+		\ depth . " " . dstack st:len nip . " " . pdepth . cr
+	;
+	
 	param_st_alloc
-	make_tasks
-	0.2 sleep
-	terminate_all
-	fr:__task_dict @ . cr
-	fr:wait_all
+	' runtest 1 5000 loop
+		
 	bye
 #then	

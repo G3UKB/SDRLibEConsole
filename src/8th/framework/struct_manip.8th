@@ -29,8 +29,8 @@ false var, struct_manip_test
 struct_manip_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 \ ========================================
 
@@ -131,8 +131,9 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
+
+param_st_alloc
 struct_manip_test @ #if
-	param_st_alloc
 	{
 		"general" : {
 		\	key						src			index/val 	SoD			option list			
@@ -225,16 +226,25 @@ struct_manip_test @ #if
 		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] fr:val@ . cr
 		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] fr:val@ . cr
 		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] fr:val@ . cr
-		struct @ ["general"] "enabletx" "myval" fr:val! struct @ . cr
+		\ struct @ ["general"] "enabletx" "myval" fr:val! struct @ . cr
 
 		struct1 @ ["radio-state", 0 ] 0 true fr:val!
 		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
 		struct1 @ ["radio-state", 0 , 1 ] 1 true fr:val!
-		struct1 @ . cr
+		\ struct1 @ . cr
 	;
 
-	param_st_alloc
-	getter_examples
-	setter_examples
+	: run_test
+		"Run: " . . cr
+		getter_examples
+		setter_examples
+		1 sleep
+	;
+
+	: run_tests
+		' run_test 1 5000 loop
+	;
+	
+	run_tests
 	bye
 #then

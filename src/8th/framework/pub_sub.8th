@@ -306,14 +306,17 @@ pub_sub_test @ #if
 	;
 
 	: run_test
+		"Run: " . . cr
 		"Event1" [1,2,3,4,5] fr:pubsub_publish
 		"Event2" [6,7,8,9,10] fr:pubsub_publish
 		"Event3" [11,12,13,14,15] fr:pubsub_publish
-		0.001 sleep
+		0.005 sleep
+		\ cr cr depth . " " . dstack st:len nip . " " . pdepth . cr
 	;
 
 	: run_tests
-		' run_test 500 times
+		' run_test 1 20000 loop
+		0.2 sleep
 	;
 
 	param_st_alloc

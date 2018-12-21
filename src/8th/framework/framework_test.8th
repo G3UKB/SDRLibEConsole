@@ -188,14 +188,14 @@ pubsub_init
 ;
 
 : runtest
-	cr cr "Run test..." . cr cr
+	cr cr "Run test: " . . " " . depth . " " . rstack st:len nip . " " . pdepth . cr cr
 	do_publish 
 	0.05
 	sleep ;
 
 setup	
 1 sleep
-' runtest 50 times
+' runtest 1 5000 loop
 pubsub_term
 
 \ Wait for all tasks to complete
