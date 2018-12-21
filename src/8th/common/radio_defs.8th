@@ -1,0 +1,129 @@
+(* 
+	radio_defs
+ 
+  Modes, filters etc
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ===============================================================================
+\  RX modes
+0 enum:
+	CH_LSB
+	CH_USB
+	CH_DSB
+	CH_CWL
+	CH_CWU
+	CH_FM
+	CH_AM
+	CH_DIGU
+	CH_SPEC
+	CH_DIGL
+	CH_SAM
+	CH_DRM
+enum;
+
+: name_for_mode	\ mode-id -- name
+	["LSB","USB","DSB","CW-L","CW-U","FM","AM","DIGU","SPEC","DIGL","SAM","DRM"]
+	swap a:@ nip
+;
+
+: mode_for_name	\ name -- mode-id
+	{
+		"LSB" : 	` CH_LSB `,
+		"USB" : 	` CH_USB `,
+		"DSB" : 	` CH_DSB `,
+		"CW-L" : 	` CH_CWL `,
+		"CW-U" : 	` CH_CWU `,
+		"FM" : 		` CH_FM `,
+		"AM" : 		` CH_AM `,
+		"DIGU" : 	` CH_DIGU `,
+		"SPEC" : 	` CH_SPEC `,
+		"DIGL" : 	` CH_DIGL `,
+		"SAM" : 	` CH_SAM `,
+		"DRM" : 	` CH_DRM `
+	} swap m:@ nip
+;
+
+\ ========================================
+\ Filters
+0 enum:
+	CH_6K0
+	CH_4K0
+	CH_2K7
+	CH_2K4
+	CH_2K1
+	CH_1K0
+	CH_500
+	CH_250
+	CH_100
+enum;
+
+: filter_lookup	\ filter-id -- a[low, high, name]
+	[
+		[ 100, 6100, "6.0KHz"],
+		[ 100, 4100, "4.0KHz"],
+		[ 300, 3000, "2.7KHz"],
+		[ 300, 2700, "2.4KHz"],
+		[ 300, 2400, "2.1KHz"],
+		[ 300, 1300, "1.0KHz"],
+		[ 500, 1000, "500Hz"],
+		[ 600, 850, "250Hz"],
+		[ 700, 800, "100Hz"]
+	] swap a:@ nip
+;
+
+: filter_for_name	\ name -- mode-id
+	{
+		"6.0KHz" : ` CH_6K0 `,
+		"4.0KHz" : ` CH_4K0 `,
+		"2.7KHz" : ` CH_2K7 `,
+		"2.4KHz" : ` CH_2K4 `,
+		"2.1KHz" : ` CH_2K1 `,
+		"1.0KHz" : ` CH_1K0 `,
+		"500Hz" : ` CH_500 `,
+		"250Hz" : ` CH_250 `,
+		"100Hz" : ` CH_100 `
+	} swap m:@ nip
+;
+
+\ ========================================
+\ AGC
+0 enum:
+	CH_AGC_OFF
+	CH_AGC_LONG
+	CH_AGC_SLOW
+	CH_AGC_MED
+	CH_AGC_FAST
+enum;
+
+: name_for_agc	\ agc-id -- name
+	["Off","Long","Slow","Med","Fast"]
+	swap a:@ nip
+;
+
+: agc_for_name	\ name -- agc-id
+	{
+		"Off" : 	` CH_AGC_OFF `,
+		"Long" : 	` CH_AGC_LONG `,
+		"Slow" : 	` CH_AGC_SLOW `,
+		"Med" : 	` CH_AGC_MED `,
+		"Fast" : 	` CH_AGC_FAST `
+	} swap m:@ nip
+;

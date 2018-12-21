@@ -27,12 +27,13 @@ ns: sdr
 
 \ ========================================
 \ Testing only
-false var, app_model_test
+true var, app_model_test
 
 app_model_test @ #if
 	\ Includes
-	"param_st.8th"  f:include
+	"../framework/param_st.8th"  f:include
 	" ../common/persist.8th f:include
+	" ../common/radio_defs.8th f:include
 	needs debug/sed
 	true SED-CHECK
 #then
@@ -140,36 +141,55 @@ app_model_test @ #if
 
 \ ========================================
 \ Model management
-: app_model_restore
+
+\ ----------------------------------
+\ Restore model else use the default
+: app_model_restore	SED: --
+	\ in: 	none
+	\ out:	none
 	\ Attempt to restore the model
 	\ Get the path to the conf app file
-	APP_CONF_FILE create_conf_path null? if
-		"Failed to find conf directory. Please create." throw
+	APP_MODEL_FILENAME create_model_path null? if
+		"Failed to locate directory. Please create a conf directory under /8th." throw
 	then
 	\ Attempt to restore the options model
-	restore_conf_data null?
+	restore_model_data null?
 	if
 		"No app model found, using app default" log
 		drop
-		\ No persisted model so use default
-		app_model_default dup app_model !
+		\ No persisted model so use default and save to task var
+		app_model_default dup "app_model" swap t:!
 		\ Save the default model
-		APP_CONF_FILE create_model_path create_model_file save_model_data
+		APP_MODEL_FILENAME create_model_path create_model_file save_model_data
 		2drop
 	else
-		\ Save the restored model
-		app_model !
+		\ Save the restored model to a task var
+		"app_model" swap t:!
 	then
 ;
 
-: app_model_save
-	app_model locked@ APP_CONF_FILE create_conf_path save_model_data
+\ ----------------------------------
+\ Save current model 
+: app_model_save	SED: --
+	\ in: 	none
+	\ out:	none
+	"app_model" t:@ APP_MODEL_FILENAME create_model_path save_model_data
 ;
 
 \ ========================================
 
-: do_init
+\ Initialise the app model at task level
+: do_init	SED: --
+	\ in: 	none
+	\ out:	none
 	app_model_restore
+;
+
+\ Close the app model at task level
+: do_close	SED: --
+	\ in: 	none
+	\ out:	none
+	app_model_save
 ;
 
 \ ===========================================================================================
@@ -196,8 +216,10 @@ app_model_test @ #if
 : app_model_close	SED: --
 	\ in: 	none
 	\ out:	none
-	\ Ask the model to close itself
-	"AppModel_TASK" ' do_term a:new msg! ;
+	\ Tidy close the model
+	"AppModel_TASK" ' do_close a:new msg! ;
+	\ Ask the model to exit
+	"AppModel_TASK" ' fr:do_term a:new msg! ;
 ;
 
 \ ========================================
@@ -207,9 +229,12 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
+
 app_model_test @ #if
 	
 	param_st_alloc
-	
+	app_model_init
+	app_model_close
 	bye
+	
 #then	

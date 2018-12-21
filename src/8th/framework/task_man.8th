@@ -26,6 +26,7 @@
 \ Testing only
 false var, task_man_test
 
+\ ----------------------------------
 task_man_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
@@ -43,14 +44,17 @@ ns: fr
 \ Holder for task references
 {} var, __task_dict
 
+\ ----------------------------------
 \ Locked var
 : locked_task_dict@
 	__task_dict lock @ ;
 
+\ ----------------------------------
 \ Unlocked var	
 : unlock_task_dict
 	__task_dict unlock drop ;
-	
+
+\ ----------------------------------	
 \ Store task referance
 : task_reg!	SED: t s --
 	\ in: 	t - task object
@@ -59,7 +63,8 @@ ns: fr
 	locked_task_dict@
 	swap rot  m:! drop 
 	unlock_task_dict ;
-	
+
+\ ----------------------------------	
 \ Get task reference by name
 : task_reg@	SED: s -- t
 	\ in: 	s - task name
@@ -68,6 +73,7 @@ ns: fr
 	swap m:@ nip 
 	unlock_task_dict ;
 
+\ ----------------------------------
 \ Wait for task to terminate
 : wait_task SED: s t --
 	\ in:		t - task ref 	(item from dict) 	
@@ -76,6 +82,7 @@ ns: fr
 	"Waiting for task: " rot s:+ log
 	t:wait 0.1 sleep ;
 
+\ ----------------------------------
 \ Wait for all tasks to terminate
 : wait_all	SED: --
 	locked_task_dict@
