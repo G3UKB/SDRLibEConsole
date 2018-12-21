@@ -163,7 +163,8 @@ task_man_test @ #if
 			-1 sleep drop
 			"t4" 1 ' fr:gen_server t:task-n 
 			-1 sleep drop
-			"t5" 1 ' fr:gen_server t:task-n 
+			"t5" 1 ' fr:gen_server t:task-n
+			-1 sleep drop
 	;
 
 	: terminate_all
@@ -180,6 +181,5 @@ task_man_test @ #if
 	terminate_all
 	fr:__task_dict @ . cr
 	fr:wait_all
-
 	bye
 #then	

@@ -199,6 +199,6 @@ param_st_test @ #if
 	cr cr "Running usage test..." . cr cr
 	usage_test
 	"Done usage test" . cr
-
+	1 sleep
 	bye
 #then
