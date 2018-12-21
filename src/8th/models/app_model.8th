@@ -1,0 +1,217 @@
+(*
+	app_model.8th
+ 
+  radio state model for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Define our SDR namespace
+ns: sdr
+
+\ ========================================
+\ Testing only
+false var, app_model_test
+
+app_model_test @ #if
+	\ Includes
+	"param_st.8th"  f:include
+	" ../common/persist.8th f:include
+	needs debug/sed
+	true SED-CHECK
+#then
+\ ========================================
+
+\ ===============================================================================
+\ Default app model structure
+\ Model data which is used as default when there is no saved model.
+
+: app_model_default
+	{
+		\ General state
+		"window" : {
+				"wide" :	0,
+				"high" :	0,
+				"left" :	0,
+				"top"	 :	0
+		},
+		\ HPSDR Protocol-1 only supports 3 radios
+		\ More can be added into the array as required
+		"radio-state" : [
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": ` CH_LSB ` ,
+					"filter": ` CH_2K4 ` ,
+					"agc": ` CH_AGC_MED ` ,
+					"attn": ` ATTN_NONE ` ,
+					"hf-preamp": ` PRE_OFF ` ,
+					"6m-preamp": ` PRE_OFF ` ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": ` CH_LSB ` ,
+					"filter": ` CH_2K4 ` ,
+					"agc": ` CH_AGC_MED ` ,
+					"attn": ` ATTN_NONE ` ,
+					"hf-preamp": ` PRE_OFF ` ,
+					"6m-preamp": ` PRE_OFF ` ,
+					"audio-gain": 50
+				} ]
+			],
+			[
+				\ src						SoD
+				false, [null, false, 
+				{
+					"display-width": 0,
+					"display-height": 0,
+					"freq": 7100000,
+					"mode": ` CH_LSB ` ,
+					"filter": ` CH_2K4 ` ,
+					"agc": ` CH_AGC_MED ` ,
+					"attn": ` ATTN_NONE ` ,
+					"hf-preamp": ` PRE_OFF ` ,
+					"6m-preamp": ` PRE_OFF ` ,
+					"audio-gain": 50
+				} ]
+			]
+		],
+		"tx-state" : [
+			\ src						SoD
+			false, [null, false, 
+			{
+				"state" :
+				{
+					"duplex" : false,
+					"rf-gain": 50,
+					"mic-gain": 50
+				},
+				\ In simplex mode the TX follows Radio 1 and can't be changed
+				"simplex" : 
+				{
+					\ Copy of the radio 1 values
+					"freq": 7100000,
+					"mode": ` CH_LSB ` ,
+					"filter": ` CH_2K4 `
+				},
+				\ In duplex mode the TX can be on a different freq/mode/filter than Radio 1
+				"duplex" : 
+				{
+					\ Any allowable combination
+					"freq": 7100000,
+					"mode": ` CH_LSB ` ,
+					"filter": ` CH_2K4 `
+				}
+			} ]
+		]
+	}
+;
+
+\ ===========================================================================================
+\ TASK LEVEL CODE.
+\ Called only by the gen-server in response to messages.
+
+\ ========================================
+\ Model management
+: app_model_restore
+	\ Attempt to restore the model
+	\ Get the path to the conf app file
+	APP_CONF_FILE create_conf_path null? if
+		"Failed to find conf directory. Please create." throw
+	then
+	\ Attempt to restore the options model
+	restore_conf_data null?
+	if
+		"No app model found, using app default" log
+		drop
+		\ No persisted model so use default
+		app_model_default dup app_model !
+		\ Save the default model
+		APP_CONF_FILE create_conf_path create_conf_file save_conf_data
+		2drop
+	else
+		\ Save the restored model
+		app_model !
+	then
+;
+
+: app_model_save
+	app_model locked@ APP_CONF_FILE create_conf_path save_conf_data
+;
+
+\ ========================================
+
+: do_init
+	app_model_restore
+;
+
+\ ===========================================================================================
+\ MAIN CODE
+
+\ Call level interface from all modules, may be called by any task.
+\ The app model does not subscribe to any events, it is called directly usually off an 
+\ event fielded by another module. However it does publish events where others may be 
+\ interested in updates to the model. 
+
+\ Module initialisation
+: app_model_init	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Create the app model gen-server
+	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop 
+	\ Ask the model to initialise itself
+	"AppModel_TASK" ' do_init a:new msg! ;
+	
+	"App model initialised" log
+;
+
+\ Module close
+: app_model_close	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Ask the model to close itself
+	"AppModel_TASK" ' do_term a:new msg! ;
+;
+
+
+
+\ ========================================
+\ Restore namespace	
+ns: user	
+
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+task_man_test @ #if
+	
+	param_st_alloc
+	
+	bye
+#then	

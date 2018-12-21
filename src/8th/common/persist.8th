@@ -1,0 +1,84 @@
+(*
+	persist.8th
+ 
+  Models save/restore for the DynamicSDR application
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ============================================================================
+
+\ Set namespace
+ns: sdr
+
+\ Step path back n directory levels
+: pbk	\	path n -- path/../../etc
+	repeat
+		swap ".." s:+
+		f:sep s:+ swap n:1- 
+	while 
+	drop
+;
+
+\ Find 8th directory index in path components array
+: levels	\ idx directory -- idx directory (match) | empty (no match)
+	dup "8th" s:= if break
+	else 2drop then
+;
+
+\ Create fully qualified path
+: create_conf_path							\ filename -- qualified-path
+	\ Separate the current working directory into path components
+	getcwd "" f:sep s:+ s:/
+	\ Find how many levels back the 8th directory is
+	' levels a:each								\ idx directory array
+	\ Breaks with a match on "8th"
+	\ Calc number of levels back from the current directory
+	a:len nip nip swap n:- 1 n:-	\	levels
+	\ Get relative path back to 8th
+	"" swap pbk										\ e.g. "..\..\"
+	\ Get fully qualified path to conf file
+	"conf" s:+ f:sep s:+ swap s:+	\ qualified-path
+;
+	
+\ Create options file
+: create_conf_file	\	conf-file-path -- conf-file-path
+	.s dup f:create f:close 
+;
+
+\ Save conf data as a Json string
+: save_conf_data	\ data-structure conf-file-path -- conf-file-path
+	dup f:open rot >json f:write drop f:close 
+;
+
+\ Restore conf data
+: restore_conf_data	\	conf-file-path -- data|null
+	f:slurp null? if null else json> then 
+;
+
+\ Testing
+(*
+"test_model.txt" create_conf_path
+create_conf_file
+[1,2,3,4] save_conf_data
+restore_conf_data .s
+*)
+
+\ Restore namespace	
+ns: user
