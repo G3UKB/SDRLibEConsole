@@ -22,6 +22,8 @@
      bob@bobcowdery.plus.com
 *)
 
+needs utils/enums
+
 \ ===============================================================================
 \  RX modes
 0 enum:
@@ -127,3 +129,14 @@ enum;
 		"Fast" : 	` CH_AGC_FAST `
 	} swap m:@ nip
 ;
+
+\ ========================================
+\ Attenuator
+: ATTN_NONE 0 ;
+: ATTN_10 10 ;
+: ATTN_20 20 ;
+: ATTN_30 30 ;
+
+\ Preamps
+: PRE_OFF 0 ;
+: PRE_ON 1 ;

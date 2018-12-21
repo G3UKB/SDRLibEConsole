@@ -150,7 +150,7 @@ ns: fr
 	>p >p >r
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
-	m:new "cb" p> m:! "data" p> clone nip m:!
+	m:new "cb" p> m:! const "data" p> const m:!
 	r@ task_reg@ swap t:push r> task_reg@ t:notify ;
 	
 \ ========================================

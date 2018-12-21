@@ -22,9 +22,6 @@
      bob@bobcowdery.plus.com
 *)
 
-\ Define our SDR namespace
-ns: sdr
-
 \ ========================================
 \ Testing only
 true var, app_model_test
@@ -32,12 +29,16 @@ true var, app_model_test
 app_model_test @ #if
 	\ Includes
 	"../framework/param_st.8th"  f:include
-	" ../common/persist.8th f:include
-	" ../common/radio_defs.8th f:include
-	needs debug/sed
-	true SED-CHECK
+	"../framework/task_man.8th"  f:include
+	"../common/persist.8th" f:include
+	"../common/radio_defs.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 \ ========================================
+
+\ Define our SDR namespace
+ns: sdr
 
 \ ===============================================================================
 \ Default app model structure
@@ -149,7 +150,8 @@ app_model_test @ #if
 	\ out:	none
 	\ Attempt to restore the model
 	\ Get the path to the conf app file
-	APP_MODEL_FILENAME create_model_path null? if
+	\ BC: why do I need a sleep, else fails and crashes
+	APP_MODEL_FILENAME create_model_path 0.1 sleep null? if
 		"Failed to locate directory. Please create a conf directory under /8th." throw
 	then
 	\ Attempt to restore the options model
@@ -158,13 +160,13 @@ app_model_test @ #if
 		"No app model found, using app default" log
 		drop
 		\ No persisted model so use default and save to task var
-		app_model_default dup "app_model" swap t:!
+		app_model_default dup "app_model" t:!
 		\ Save the default model
-		APP_MODEL_FILENAME create_model_path create_model_file save_model_data
+		APP_MODEL_FILENAME create_model_path create_model_file 0.1 sleep save_model_data
 		2drop
 	else
 		\ Save the restored model to a task var
-		"app_model" swap t:!
+		"app_model" t:!
 	then
 ;
 
@@ -182,15 +184,19 @@ app_model_test @ #if
 : do_init	SED: --
 	\ in: 	none
 	\ out:	none
-	app_model_restore
+	drop app_model_restore
 ;
 
 \ Close the app model at task level
 : do_close	SED: --
 	\ in: 	none
 	\ out:	none
-	app_model_save
+	drop app_model_save
 ;
+
+\ ========================================
+\ Message Handlers
+
 
 \ ===========================================================================================
 \ MAIN CODE
@@ -207,20 +213,22 @@ app_model_test @ #if
 	\ Create the app model gen-server
 	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop 
 	\ Ask the model to initialise itself
-	"AppModel_TASK" ' do_init a:new msg! ;
-	
-	"App model initialised" log
-;
+	"AppModel_TASK" ' do_init a:new fr:msg!
+	"App model initialised" log ;
 
 \ Module close
 : app_model_close	SED: --
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the model
-	"AppModel_TASK" ' do_close a:new msg! ;
+	"AppModel_TASK" ' do_close a:new fr:msg!
+	0.2 sleep
 	\ Ask the model to exit
-	"AppModel_TASK" ' fr:do_term a:new msg! ;
-;
+	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
+
+\ ========================================
+\ Execution
+\ All execution functions send messages to the app model which are fielded by the message handlers
 
 \ ========================================
 \ Restore namespace	
@@ -233,8 +241,11 @@ ns: user
 app_model_test @ #if
 	
 	param_st_alloc
-	app_model_init
-	app_model_close
+	sdr:app_model_init
+	0.2 sleep
+	sdr:app_model_close
+	0.2 sleep
+	fr:wait_all
 	bye
 	
-#then	
+#then
