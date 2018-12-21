@@ -154,7 +154,7 @@ app_model_test @ #if
 		\ No persisted model so use default
 		app_model_default dup app_model !
 		\ Save the default model
-		APP_CONF_FILE create_conf_path create_conf_file save_conf_data
+		APP_CONF_FILE create_model_path create_model_file save_model_data
 		2drop
 	else
 		\ Save the restored model
@@ -163,7 +163,7 @@ app_model_test @ #if
 ;
 
 : app_model_save
-	app_model locked@ APP_CONF_FILE create_conf_path save_conf_data
+	app_model locked@ APP_CONF_FILE create_conf_path save_model_data
 ;
 
 \ ========================================
@@ -200,8 +200,6 @@ app_model_test @ #if
 	"AppModel_TASK" ' do_term a:new msg! ;
 ;
 
-
-
 \ ========================================
 \ Restore namespace	
 ns: user	
@@ -209,7 +207,7 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-task_man_test @ #if
+app_model_test @ #if
 	
 	param_st_alloc
 	
