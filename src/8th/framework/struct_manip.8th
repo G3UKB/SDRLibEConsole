@@ -132,8 +132,8 @@ ns: user
 \ Testing
 \ ===============================================================================
 
-param_st_alloc
 struct_manip_test @ #if
+	param_st_alloc
 	{
 		"general" : {
 		\	key						src			index/val 	SoD			option list			
@@ -238,7 +238,7 @@ struct_manip_test @ #if
 		"Run: " . . cr
 		getter_examples
 		setter_examples
-		1 sleep
+		0.1 sleep
 	;
 
 	: run_tests

@@ -30,8 +30,8 @@ false var, task_man_test
 task_man_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
-	\ needs debug/sed
-	\ true SED-CHECK
+	needs debug/sed
+	true SED-CHECK
 #then
 \ ========================================
 
@@ -65,14 +65,20 @@ ns: fr
 	unlock_task_dict ;
 
 \ ----------------------------------	
-\ Get task reference by name
-: task_reg@	SED: s -- t
+\ Lock and get task reference by name
+: task_reg_lock@	SED: s -- t
 	\ in: 	s - task name
 	\ out:	t - task reference
 	locked_task_dict@
-	swap m:@ nip 
-	unlock_task_dict ;
+	swap m:@ nip ;
 
+\ ----------------------------------	
+\ Unlock task reference
+: task_reg_unlock	SED: -- 
+	\ in: 	s - task name
+	\ out:	t - task reference
+	unlock_task_dict ;
+	
 \ ----------------------------------
 \ Wait for task to terminate
 : wait_task SED: s t --
@@ -151,7 +157,7 @@ ns: fr
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
 	m:new "cb" p> m:! const "data" p> const m:!
-	r@ task_reg@ swap t:push r> task_reg@ t:notify ;
+	r> task_reg_lock@ dup >r swap t:push r> t:notify task_reg_unlock ;
 	
 \ ========================================
 \ Reset namespace
