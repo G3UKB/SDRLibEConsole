@@ -24,17 +24,21 @@
 
 \ ========================================
 \ Testing only
-true var, app_model_test
-
+false var, app_model_test
 app_model_test @ #if
 	\ Includes
 	"../framework/param_st.8th"  f:include
 	"../framework/task_man.8th"  f:include
+	"../framework/struct_manip.8th" f:include
+	"../framework/registrations.8th" f:include
+	"../framework/pub_sub.8th"  f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
+	"model_common.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 #then
+
 \ ========================================
 
 \ Define our SDR namespace
@@ -178,17 +182,82 @@ ns: sdr
 	"app_model" t:@ APP_MODEL_FILENAME create_model_path save_model_data
 ;
 
+\ ----------------------------------
+\ Start-of-day. Send restored/default data to all subscribers
+: app_start_of_day	SED: --
+	\ in: 	none
+	\ out:	none
+	"app_model" t:@ >r
+	fr:UI_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:UI_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:UI_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:UI_R1_FREQ r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R2_FREQ r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R3_FREQ r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_TX_FREQ r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R1_MODE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R2_MODE r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R3_MODE r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_TX_MODE r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R1_FILT r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R2_FILT r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R3_FILT r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_TX_FILT r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R1_AGC r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R2_AGC r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R3_AGC r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:UI_R3_AFGAIN r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	
+	fr:SYS_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:SYS_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:SYS_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
+	fr:SYS_R1_FREQ r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R2_FREQ r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R3_FREQ r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_TX_FREQ r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R1_MODE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R2_MODE r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R3_MODE r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish	
+	fr:SYS_TX_MODE r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R1_FILT r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R2_FILT r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish  
+	fr:SYS_R3_FILT r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_TX_FILT r@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R1_AGC r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R2_AGC r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R3_AGC r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_R3_AFGAIN r> ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+
+	"App Start-of-Day complete " log
+;
+
 \ ========================================
 
 \ Initialise the app model at task level
-: do_init	SED: --
+: do_app_init	SED: --
 	\ in: 	none
 	\ out:	none
 	drop app_model_restore
 ;
 
+: do_app_start_of_day	SED: --
+	\ in: 	none
+	\ out:	none
+	drop app_start_of_day
+;
+
 \ Close the app model at task level
-: do_close	SED: --
+: do_app_close	SED: --
 	\ in: 	none
 	\ out:	none
 	drop app_model_save
@@ -213,15 +282,17 @@ ns: sdr
 	\ Create the app model gen-server
 	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop 
 	\ Ask the model to initialise itself
-	"AppModel_TASK" ' do_init a:new fr:msg!
-	"App model initialised" log ;
+	"AppModel_TASK" ' do_app_init a:new fr:msg!
+	"App model initialised sent" log
+	"AppModel_TASK" ' do_app_start_of_day a:new fr:msg!
+	"App model start of day sent" log ;
 
 \ Module close
 : app_model_close	SED: --
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the model
-	"AppModel_TASK" ' do_close a:new fr:msg!
+	"AppModel_TASK" ' do_app_close a:new fr:msg!
 	0.2 sleep
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
@@ -237,13 +308,14 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-
 app_model_test @ #if
 	
 	param_st_alloc
+	fr:pubsub_init
 	sdr:app_model_init
-	0.2 sleep
+	5 sleep
 	sdr:app_model_close
+	fr:pubsub_term 
 	0.2 sleep
 	fr:wait_all
 	bye
