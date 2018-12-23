@@ -22,21 +22,24 @@
      bob@bobcowdery.plus.com
 *)
 
+needs stack/3drop
+
 \ ========================================
 \ Testing only
-false var, app_model_test
+true var, app_model_test
 app_model_test @ #if
 	\ Includes
 	"../framework/param_st.8th"  f:include
 	"../framework/task_man.8th"  f:include
 	"../framework/struct_manip.8th" f:include
 	"../framework/registrations.8th" f:include
+	"../framework/test_sink.8th" f:include
 	"../framework/pub_sub.8th"  f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"model_common.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
+	needs debug/sed
+	true SED-CHECK
 #then
 
 \ ========================================
@@ -44,11 +47,15 @@ app_model_test @ #if
 \ Define our SDR namespace
 ns: sdr
 
+\ ===========================================================================================
+\ TASK LEVEL CODE
+\ PRIVATE
+
 \ ===============================================================================
 \ Default app model structure
 \ Model data which is used as default when there is no saved model.
 
-: app_model_default
+: __app_model_default
 	{
 		\ General state
 		"window" : {
@@ -108,48 +115,59 @@ ns: sdr
 					"audio-gain": 50
 				} ]
 			]
-		],
-		"tx-state" : [
-			\ src						SoD
-			false, [null, false, 
-			{
-				"state" :
+			],
+			"tx-state" : [
+				\ src						SoD
+				false, [null, false, 
 				{
-					"duplex" : false,
-					"rf-gain": 50,
-					"mic-gain": 50
-				},
-				\ In simplex mode the TX follows Radio 1 and can't be changed
-				"simplex" : 
-				{
-					\ Copy of the radio 1 values
-					"freq": 7100000,
-					"mode": ` CH_LSB ` ,
-					"filter": ` CH_2K4 `
-				},
-				\ In duplex mode the TX can be on a different freq/mode/filter than Radio 1
-				"duplex" : 
-				{
-					\ Any allowable combination
-					"freq": 7100000,
-					"mode": ` CH_LSB ` ,
-					"filter": ` CH_2K4 `
+					"state" :
+					{
+						"duplex" : false,
+						"rf-gain": 50,
+						"mic-gain": 50
+					},
+					\ In simplex mode the TX follows Radio 1 and can't be changed
+					"simplex" : 
+					{
+						\ Copy of the radio 1 values
+						"freq": 7100000,
+						"mode": ` CH_LSB ` ,
+						"filter": ` CH_2K4 `
+					},
+					\ In duplex mode the TX can be on a different freq/mode/filter than Radio 1
+					"duplex" : 
+					{
+						\ Any allowable combination
+						"freq": 7100000,
+						"mode": ` CH_LSB ` ,
+						"filter": ` CH_2K4 `
+					}
 				}
-			} ]
+			]
 		]
 	}
 ;
-
-\ ===========================================================================================
-\ TASK LEVEL CODE.
-\ Called only by the gen-server in response to messages.
 
 \ ========================================
 \ Model management
 
 \ ----------------------------------
+\ Get model
+: __app_model@	SED: -- m
+	\ in: 	none
+	\ out:	model
+	"app_model" t:@ ;
+
+\ ----------------------------------
+\ Save model
+: __app_model!	SED: m -- 
+	\ in: 	model
+	\ out:	none
+	"app_model" t:! ;
+	
+\ ----------------------------------
 \ Restore model else use the default
-: app_model_restore	SED: --
+: __app_model_restore	SED: --
 	\ in: 	none
 	\ out:	none
 	\ Attempt to restore the model
@@ -164,30 +182,30 @@ ns: sdr
 		"No app model found, using app default" log
 		drop
 		\ No persisted model so use default and save to task var
-		app_model_default dup "app_model" t:!
+		__app_model_default dup __app_model!
 		\ Save the default model
 		APP_MODEL_FILENAME create_model_path create_model_file 0.1 sleep save_model_data
 		2drop
 	else
 		\ Save the restored model to a task var
-		"app_model" t:!
+		__app_model!
 	then
 ;
 
 \ ----------------------------------
 \ Save current model 
-: app_model_save	SED: --
+: __app_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	"app_model" t:@ APP_MODEL_FILENAME create_model_path save_model_data
+	__app_model@ APP_MODEL_FILENAME create_model_path save_model_data drop
 ;
 
 \ ----------------------------------
 \ Start-of-day. Send restored/default data to all subscribers
-: app_start_of_day	SED: --
+: __app_start_of_day	SED: --
 	\ in: 	none
 	\ out:	none
-	"app_model" t:@ >r
+	__app_model@ >r
 	fr:UI_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
 	fr:UI_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
 	fr:UI_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] fr:val@ fr:pubsub_publish
@@ -242,30 +260,334 @@ ns: sdr
 ;
 
 \ ========================================
+\ Helpers
 
-\ Initialise the app model at task level
-: do_app_init	SED: --
+\ Get window section
+: __model_win_section	SED: -- m
 	\ in: 	none
-	\ out:	none
-	drop app_model_restore
-;
-
-: do_app_start_of_day	SED: --
-	\ in: 	none
-	\ out:	none
-	drop app_start_of_day
-;
-
-\ Close the app model at task level
-: do_app_close	SED: --
-	\ in: 	none
-	\ out:	none
-	drop app_model_save
+	\ out:	window section map
+	__app_model@ "window" m:@ nip
 ;
 
 \ ========================================
 \ Message Handlers
+\ Called only by app model gen-server
+\ ========================================
 
+\ Initialise the app model at task level
+: do_app_init	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_model_restore
+;
+
+: do_app_start_of_day	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_start_of_day
+;
+
+\ Close the app model at task level
+: do_app_close	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_model_save
+;
+
+\ ========================================
+\ Getters and Setters
+
+\ Set windows size
+: do_app_win_set_size	SED: n n --
+	\ in: 	0: n - width
+	\				1: n - height
+	\ out:	none
+	__model_win_section null? if 
+		"App model win section not found!" log
+	else
+		"wide" 3 pick m:!
+		"high" 2 pick m:!
+	then
+	3drop
+;
+
+\ Set window position
+: do_app_win_set_pos	SED: n n --
+	\ in: 	0: n - top
+	\				1: n - left
+	\ out:	none
+	__model_win_section null? if 
+			"App model win section not found!" log
+		else
+			"left" 3 pick m:!
+			"top" 2 pick m:!
+		then
+	3drop
+;
+
+\ Get window size
+: do_app_win_get_size	SED: -- n n
+	\ in: 	none
+	\ out: 	0: n - width
+	\				1: n - height
+	__model_win_section null? if 
+				"App model win section not found!" log
+	else
+		"wide"  m:@
+		swap "high" m:@ nip
+	then
+;
+
+\ Get window position
+: do_app_win_get_pos	\ -- left top
+	\ in: 	model
+	\ out: 	0: n - top
+	\				1: n - left
+	__model_win_section null? if 
+		"App model win section not found!" log
+	else
+		"left"  m:@
+		swap "top" m:@ nip
+	then
+;
+
+\ ========================================
+\ Get/Set radio section value holders
+\ Frequency
+
+: do_app_r1_set_freq	SED: n T --
+	\ in: 	0: f - new R1 frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick fr:val! 
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick fr:val!
+	fr:SYS_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	fr:SYS_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
+	if
+		fr:UI_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+		fr:UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
+	then
+	drop
+;
+
+(*
+: model_r2_set_freq	\ freq f --
+	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick app_model_lock val! app_model_unlock drop
+	SYS_R2_FREQ app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	if
+		UI_R2_FREQ app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	then
+;
+
+: model_r3_set_freq	\ freq f --
+	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick app_model_lock val! app_model_unlock drop
+	SYS_R3_FREQ app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	if
+		UI_R3_FREQ app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	then
+;
+
+: model_tx_set_simplex_freq	\ freq f --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick app_model_lock val! app_model_unlock drop
+	SYS_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+	if
+		UI_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+	then
+;
+
+: model_tx_set_duplex_freq	\ freq f --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "freq" 4 pick app_model_lock val! app_model_unlock drop
+	SYS_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+	if
+		UI_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+	then
+;
+
+: model_tx_set_freq	\ freq f --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+		model_tx_set_duplex_freq
+	else
+		model_tx_set_simplex_freq
+	then
+;
+
+: model_r1_set_mode	\ value --
+	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock drop
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick app_model_lock val! app_model_unlock drop
+	SYS_R1_MODE app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	drop
+;
+
+: model_r2_set_mode	\	value --
+	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock
+	SYS_R2_MODE app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	drop
+;
+
+: model_r3_set_mode	\	value --
+	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock
+	SYS_R3_MODE app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	drop
+;
+
+: model_tx_set_simplex_mode	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick app_model_lock val! app_model_unlock
+	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+;
+
+: model_tx_set_duplex_mode	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "mode" 3 pick app_model_lock val! app_model_unlock
+	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+;
+
+: model_tx_set_mode	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+		model_tx_set_duplex_mode
+	else
+		model_tx_set_simplex_mode
+	then
+	2drop
+;
+
+: model_r1_set_filter	\ value --
+	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock drop
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick app_model_lock val! app_model_unlock drop
+	SYS_R1_FILT app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	drop 
+;
+
+: model_r2_set_filter	\	value --
+	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock
+	SYS_R2_FILT app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r3_set_filter	\	value --
+	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock
+	SYS_R3_FILT app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	drop
+;
+
+: model_tx_set_simplex_filter	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick app_model_lock val! app_model_unlock
+	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+;
+
+: model_tx_set_duplex_filter	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "filter" 3 pick app_model_lock val! app_model_unlock
+	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+;
+
+: model_tx_set_filter	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+		model_tx_set_duplex_filter
+	else
+		model_tx_set_simplex_filter
+	then
+	2drop
+;
+
+: model_r1_set_agc	\ value --
+	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick app_model_lock val! app_model_unlock
+	SYS_R1_AGC app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r2_set_agc	\	value --
+	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick app_model_lock val! app_model_unlock
+	SYS_R2_AGC app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r3_set_agc	\	value --
+	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick app_model_lock val! app_model_unlock
+	SYS_R3_AGC app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r1_set_afgain	\ value --
+	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick app_model_lock val! app_model_unlock
+	SYS_R1_AFGAIN app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r2_set_afgain	\	value --
+	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick app_model_lock val! app_model_unlock
+	SYS_R2_AFGAIN app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_r3_set_afgain	\	value --
+	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick app_model_lock val! app_model_unlock
+	SYS_R3_AFGAIN app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+\ ============================================
+\ Get/Set tx section value holders
+\ Duplex
+: model_tx_set_duplex	\ f --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex" 3 pick app_model_lock val! app_model_unlock 
+	2drop
+;
+
+: model_tx_get_duplex	\ -- f 
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex"
+;
+
+: model_tx_get_simplex_freq	\ -- freq
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] val@
+;
+
+: model_tx_get_duplex_freq	\ -- freq
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] val@
+;
+
+: model_tx_get_simplex_mode	\ -- mode
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] val@
+;
+
+: model_tx_get_duplex_mode	\ -- mode
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] val@
+;
+
+: model_tx_get_simplex_filter	\ -- filter
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] val@
+;
+
+: model_tx_get_duplex_filter	\ -- filter
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] val@
+;
+
+: model_tx_set_rfgain	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "rf-gain" 3 pick app_model_lock val! app_model_unlock
+	SYS_RFGAIN app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+
+: model_tx_set_micgain	\ value --
+	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "mic-gain" 3 pick app_model_lock val! app_model_unlock
+	SYS_MICGAIN app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+	2drop
+;
+*)
+
+\ ========================================
+\ Internal tests
+: do_app_tests	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop 
+	\ __model_win_section . cr
+	\ 100 100 do_app_win_set_size
+	\ do_app_win_get_size . " " . . cr
+	\ 200 200 do_app_win_set_pos
+	\ do_app_win_get_pos  . " " . . cr
+	\ __model_win_section . cr
+	7100000 true do_app_r1_set_freq
+;
 
 \ ===========================================================================================
 \ MAIN CODE
@@ -297,6 +619,10 @@ ns: sdr
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
 
+\ Ask task to run internal tests
+: app_model_tests SED: --
+	"AppModel_TASK" ' do_app_tests a:new fr:msg! ;
+
 \ ========================================
 \ Execution
 \ All execution functions send messages to the app model which are fielded by the message handlers
@@ -309,15 +635,23 @@ ns: user
 \ Testing
 \ ===============================================================================
 app_model_test @ #if
-	
+
 	param_st_alloc
 	fr:pubsub_init
+	fr:test_sink
+	1 sleep
 	sdr:app_model_init
-	5 sleep
+	3 sleep
+	
+	\ Internal tests
+	sdr:app_model_tests
+	1 sleep
+	
 	sdr:app_model_close
 	fr:pubsub_term 
 	0.2 sleep
 	fr:wait_all
+	
 	bye
 	
 #then
