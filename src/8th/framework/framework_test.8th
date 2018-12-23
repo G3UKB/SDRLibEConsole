@@ -169,18 +169,22 @@ pubsub_init
 	SYS_INPUT_DEV ' callback_wd_4 pubsub_subscribe
 ;
 
+\ Runs longer with sleeps
 : do_publish	
 	\ Publish events using struct_manip to extract values from the test structures
 	UI_SMPL_RATE struct @ ["general","blksz",1,2] val@ pubsub_publish
 	UI_NUM_RX struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] idx_val@ pubsub_publish
 	UI_BLK_SZ struct @ ["general","blksz",1,2] val@ pubsub_publish
+	0.2 sleep
 	UI_INPUT_SRC struct @ ["general","blksz",1,2] val@ pubsub_publish
 	UI_OUTPUT_SINK struct @ ["general","numrx",1,0] val@ pubsub_publish
 	SYS_SMPL_RATE struct @ ["general","blksz",1,2] val@ pubsub_publish
+	0.2 sleep
 	SYS_NUM_RX struct @ ["general","blksz",1,2] val@ pubsub_publish
 	SYS_BLK_SZ struct @ ["general","blksz",1,2] val@ pubsub_publish
 	SYS_INPUT_SRC [0, false, ["48000", "96000", "192000"]] [2] [0] idx_val@  pubsub_publish
 	SYS_INPUT_DEV [0, false, ["48000", "96000", "192000"]] [2] [0] idx_val@  pubsub_publish
+	0.2 sleep
 ;
 
 : runtest

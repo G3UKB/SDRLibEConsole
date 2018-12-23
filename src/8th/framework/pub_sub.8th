@@ -425,7 +425,7 @@ pub_sub_test @ #if
 	;
 
 	: run_tests
-		' run_test 1 1000 loop
+		' run_test 1 5000 loop
 		0.2 sleep
 	;
 

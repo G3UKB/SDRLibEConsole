@@ -26,7 +26,7 @@ ns: fr
 
 : test_callback	\ data
 	drop "cb: " t:name@ s:+ log 
-	depth >s log ;
+;
 
 \ Use to check specific data as can't cope with printing too much data	
 : test_callback_check
