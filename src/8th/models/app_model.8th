@@ -29,17 +29,17 @@ needs stack/3drop
 true var, app_model_test
 app_model_test @ #if
 	\ Includes
-	"../framework/param_st.8th"  f:include
-	"../framework/task_man.8th"  f:include
+	"../framework/param_st.8th" f:include
+	"../framework/task_man.8th" f:include
 	"../framework/struct_manip.8th" f:include
 	"../framework/registrations.8th" f:include
-	"../framework/test_sink.8th" f:include
 	"../framework/pub_sub.8th"  f:include
+	"../framework/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"model_common.8th" f:include
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 
 \ ========================================
@@ -585,8 +585,8 @@ ns: sdr
 	\ do_app_win_get_size . " " . . cr
 	\ 200 200 do_app_win_set_pos
 	\ do_app_win_get_pos  . " " . . cr
-	\ __model_win_section . cr
 	7100000 true do_app_r1_set_freq
+	\ __model_win_section . cr
 ;
 
 \ ===========================================================================================
@@ -638,8 +638,9 @@ app_model_test @ #if
 
 	param_st_alloc
 	fr:pubsub_init
-	fr:test_sink
 	1 sleep
+	fr:test_registrations
+	3 sleep
 	sdr:app_model_init
 	3 sleep
 	

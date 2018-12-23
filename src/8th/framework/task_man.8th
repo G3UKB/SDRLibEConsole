@@ -24,14 +24,14 @@
 
 \ ========================================
 \ Testing only
-false var, task_man_test
+true var, task_man_test
 
 \ ----------------------------------
 task_man_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 #then
 \ ========================================
 
@@ -70,13 +70,7 @@ ns: fr
 	\ in: 	s - task name
 	\ out:	t - task reference
 	locked_task_dict@
-	swap m:@ nip ;
-
-\ ----------------------------------	
-\ Unlock task reference
-: task_reg_unlock	SED: -- 
-	\ in: 	s - task name
-	\ out:	t - task reference
+	swap m:@ nip
 	unlock_task_dict ;
 	
 \ ----------------------------------
@@ -157,7 +151,7 @@ ns: fr
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
 	m:new "cb" p> m:! const "data" p> const m:!
-	r> task_reg_lock@ dup >r swap t:push r> t:notify task_reg_unlock ;
+	r> task_reg_lock@ dup >r swap t:push r> t:notify ;
 	
 \ ========================================
 \ Reset namespace
@@ -191,6 +185,7 @@ task_man_test @ #if
 	: runtest
 		"Run: " . . cr
 		make_tasks
+		"Done make tasks" . cr
 		0.2 sleep
 		terminate_all
 		fr:__task_dict @ . cr

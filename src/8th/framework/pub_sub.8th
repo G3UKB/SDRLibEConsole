@@ -190,10 +190,9 @@ ns: fr
 \ Dispatch to subscriber
 \ Callee must consume 'data' on TOS
 : pubsub_dispatch		  SED: n w -- 
-	\ in: 	idx of item
-	\				word to dispatch to
-	\				p: flag, data
-	\ out:	p: flag, data
+	\ in: 	0: w - word to dispatch to
+	\				1: T - true if dispatch on main thread
+	\ out:	none
 	nip >r
 	1 pp@ if
 		\ Dispatch on main thread
@@ -206,7 +205,7 @@ ns: fr
 	else
 		\ Dispatch on this thread, no clone as ownership is this thread
 		\ The subscriber callback must not dispatch again on another thread!
-		p@ r> w:exec	
+		p@ r> w:exec
 	then ;
 
 \ ----------------------------------

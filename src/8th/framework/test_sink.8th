@@ -25,7 +25,14 @@
 ns: fr
 
 : test_callback	\ data
-	"callback: " t:name@ s:+ " : " s:+ . . cr ;
+	drop "cb: " t:name@ s:+ log 
+	depth >s log ;
+
+\ Use to check specific data as can't cope with printing too much data	
+: test_callback_check
+	\ "cb1: " t:name@ s:+ " : " s:+ s:+ . cr ;
+	drop "cb1: " t:name@ s:+ log 
+	depth log ;
 
 : test_registrations	
 	UI_SMPL_RATE ' test_callback pubsub_subscribe
@@ -46,7 +53,7 @@ ns: fr
 	SYS_SMPL_RATE ' test_callback pubsub_subscribe
 	SYS_NUM_RX ' test_callback pubsub_subscribe
 	SYS_BLK_SZ ' test_callback pubsub_subscribe
-	SYS_ENABLE_TX ' test_callback pubsub_subscribe
+	\ SYS_ENABLE_TX ' test_callback pubsub_subscribe
 	SYS_INPUT_SRC ' test_callback pubsub_subscribe
 	SYS_INPUT_DEV ' test_callback pubsub_subscribe
 	SYS_OUTPUT_SINK ' test_callback pubsub_subscribe
@@ -77,7 +84,7 @@ ns: fr
 	UI_R1_AFGAIN ' test_callback pubsub_subscribe
 	UI_R2_AFGAIN ' test_callback pubsub_subscribe
 	UI_R3_AFGAIN ' test_callback pubsub_subscribe
-	SYS_R1_FREQ ' test_callback pubsub_subscribe
+	SYS_R1_FREQ ' test_callback_check pubsub_subscribe
 	SYS_R2_FREQ ' test_callback pubsub_subscribe
 	SYS_R3_FREQ ' test_callback pubsub_subscribe
 	SYS_R1_MODE ' test_callback pubsub_subscribe
@@ -114,4 +121,4 @@ ns: fr
 	SYS_RUN_STATE ' test_callback pubsub_subscribe
 ;
 
-ns:user
+ns: user

@@ -150,7 +150,7 @@ param_st_test @ #if
 	\ in: 	none
 	\ out:	any type
 	param_st_check
-	pss@ swap st:ndrop ;
+	pss@ swap st:ndrop drop ;
 	
 \ ----------------------------------	
 \ Clear task param stack
@@ -163,7 +163,7 @@ param_st_test @ #if
 : pdepth SED:  -- n
 	param_st_check
 	pss@ st:len nip ;
-
+	
 \ ----------------------------------	
 \ Print the task stack
 
@@ -198,7 +198,7 @@ param_st_test @ #if
 
 	cr cr "Running usage test..." . cr cr
 	usage_test
-	"Done usage test" . cr
 	1 sleep
+	"Done usage test" . cr
 	bye
 #then
