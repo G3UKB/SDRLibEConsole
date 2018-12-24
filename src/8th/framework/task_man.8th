@@ -24,7 +24,7 @@
 
 \ ========================================
 \ Testing only
-false var, task_man_test
+true var, task_man_test
 
 \ ----------------------------------
 task_man_test @ #if
@@ -80,7 +80,7 @@ ns: fr
 	\				s - task name (key from dict)
 	\ out:	none
 	"Waiting for task: " rot s:+ log
-	t:wait 0.1 sleep ;
+	t:wait ; \ 0.1 sleep ;
 
 \ ----------------------------------
 \ Wait for all tasks to terminate
@@ -150,8 +150,8 @@ ns: fr
 	>p >p >r
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
-	m:new "cb" p> m:! const "data" p> const m:!
-	r> task_reg_lock@ dup >r swap t:push r> t:notify ;
+	m:new "cb" p> m:! "data" p> m:! \ clone nip
+	r> task_reg_lock@ dup >r swap clone nip t:push r> t:notify ;
 	
 \ ========================================
 \ Reset namespace
@@ -161,25 +161,24 @@ ns: user
 \ Testing
 \ ===============================================================================
 task_man_test @ #if
+
+	: iterations 10 ;
+	
+	: make_task	\ n --
+		"t" swap >s s:+ 1 ' fr:gen_server t:task-n
+		-1 sleep drop
+	;
+	
 	: make_tasks	\ --
-			"t1" 1 ' fr:gen_server t:task-n
-			-1 sleep drop
-			"t2" 1 ' fr:gen_server t:task-n 
-			-1 sleep drop
-			"t3" 1 ' fr:gen_server t:task-n 
-			-1 sleep drop
-			"t4" 1 ' fr:gen_server t:task-n 
-			-1 sleep drop
-			"t5" 1 ' fr:gen_server t:task-n
-			-1 sleep drop
+		' make_task 1 iterations loop
 	;
 
-	: terminate_all
-		"t1" ' fr:do_term a:new fr:msg!
-		"t2" ' fr:do_term a:new fr:msg! 
-		"t3" ' fr:do_term a:new fr:msg! 
-		"t4" ' fr:do_term a:new fr:msg! 
-		"t5" ' fr:do_term a:new fr:msg!
+	: term_task	\ n --
+		"t" swap >s s:+ ' fr:do_term a:new fr:msg!
+	;
+
+	: term_all
+		' term_task 1 iterations loop
 	;
 
 	: runtest
@@ -187,15 +186,16 @@ task_man_test @ #if
 		make_tasks
 		"Done make tasks" . cr
 		0.2 sleep
-		terminate_all
+		term_all
 		fr:__task_dict @ . cr
 		fr:wait_all
-		__task_dict @ m:clear
+		fr:__task_dict @ m:clear
+		fr:__task_dict @ . cr
 		\ depth . " " . dstack st:len nip . " " . pdepth . cr
 	;
 	
 	param_st_alloc
-	' runtest 1 5000 loop
+	' runtest 1 500 loop
 		
 	bye
 #then	

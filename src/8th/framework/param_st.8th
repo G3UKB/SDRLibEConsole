@@ -109,6 +109,14 @@ param_st_test @ #if
 		drop "Param stack already initialised for task [" t:name@ s:+ "]. Ignoring!" s:+ log
 	then ;
 
+\ Ensure the stack is freed
+: param_st_free	SED: --
+	\ in: 	none
+	\ out:	none
+	pss@ null? if
+			"Free attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then free ;
+
 \ ========================================
 \ Parameter stack operations
 
