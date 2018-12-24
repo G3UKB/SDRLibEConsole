@@ -59,28 +59,40 @@ param_st_test @ #if
 : ps>	 SED: -- *
 	\ in: 	none
 	\ out:	item of any type
-	pss@ st:pop nip ;
+	pss@ null? if
+		"ps> attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then
+	st:pop nip ;
 
 \ ----------------------------------
 \ Copy TOS from the task param stack 
 : ps@	 SED: -- *
 	\ in: 	none
 	\ out:	item of any type
-	pss@ 0 st:pick nip ;
+	pss@ null? if
+		"pa@ attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then
+	0 st:pick nip ;
 
 \ ----------------------------------
 \ Pick item n from the task param stack 	
 : pps@	 SED: n -- *
 	\ in: 	item index
 	\ out:	item of any type
-	pss@ swap st:pick nip ;
+	pss@ null? if
+		"pps@ attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then
+	swap st:pick nip ;
 
 \ ----------------------------------
 \ Push the given item to the task param stack
 : ps!	 SED: * --
 	\ in: 	item of any type
 	\ out:	none
-	pss@ swap st:push drop ;
+	pss@ null? if
+		"ps! attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	then
+	swap st:push drop ;
 
 \ ----------------------------------
 \ Check if initialised for current task
@@ -89,7 +101,7 @@ param_st_test @ #if
 	\ in: 	none
 	\ out:	none
 	pss@ null? if
-		"Access attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+		"param_st_check attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then drop ;
 
 \ ===============================================================================
@@ -114,7 +126,7 @@ param_st_test @ #if
 	\ in: 	none
 	\ out:	none
 	pss@ null? if
-			"Free attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+			"param_st_free attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then free ;
 
 \ ========================================

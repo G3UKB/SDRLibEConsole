@@ -80,7 +80,7 @@ ns: fr
 	\				s - task name (key from dict)
 	\ out:	none
 	"Waiting for task: " rot s:+ log
-	t:wait ; \ 0.1 sleep ;
+	t:wait ;
 
 \ ----------------------------------
 \ Wait for all tasks to terminate
@@ -147,11 +147,11 @@ ns: fr
 	\				s - task name
 	\ out:	none
 	\ Push params and copy task name to r
-	>p >p >r
+	const >p >p >r
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
-	m:new "cb" p> m:! "data" p> m:! \ clone nip
-	r> task_reg_lock@ dup >r swap clone nip t:push r> t:notify ;
+	m:new "cb" p> m:! "data" p> m:! const
+	r> task_reg_lock@ dup >r swap t:push r> t:notify ;
 	
 \ ========================================
 \ Reset namespace
@@ -162,7 +162,7 @@ ns: user
 \ ===============================================================================
 task_man_test @ #if
 
-	: iterations 10 ;
+	: iterations 100 ;
 	
 	: make_task	\ n --
 		"t" swap >s s:+ 1 ' fr:gen_server t:task-n
@@ -175,6 +175,9 @@ task_man_test @ #if
 
 	: term_task	\ n --
 		"t" swap >s s:+ ' fr:do_term a:new fr:msg!
+		\ Memory creeps up between terminating and creating a new batch of tasks
+		\ This is about the minimal sleep required. However it still increases.
+		0.2 sleep
 	;
 
 	: term_all
@@ -182,15 +185,13 @@ task_man_test @ #if
 	;
 
 	: runtest
-		"Run: " . . cr
+		"Run: " swap >s s:+ log
 		make_tasks
-		"Done make tasks" . cr
-		0.2 sleep
 		term_all
-		fr:__task_dict @ . cr
+		\ fr:__task_dict @ . cr
 		fr:wait_all
 		fr:__task_dict @ m:clear
-		fr:__task_dict @ . cr
+		0.2 sleep
 		\ depth . " " . dstack st:len nip . " " . pdepth . cr
 	;
 	
