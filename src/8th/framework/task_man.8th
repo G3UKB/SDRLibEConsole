@@ -24,7 +24,7 @@
 
 \ ========================================
 \ Testing only
-true var, task_man_test
+false var, task_man_test
 
 \ ----------------------------------
 task_man_test @ #if
