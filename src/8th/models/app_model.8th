@@ -28,7 +28,7 @@ needs stack/3drop
 \ Testing only
 true var, app_model_test
 app_model_test @ #if
-	\ Includes
+	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
 	"../framework/param_st.8th" f:include
 	"../framework/task_man.8th" f:include
 	"../framework/struct_manip.8th" f:include
@@ -602,7 +602,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Create the app model gen-server
-	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop 
+	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
 	"AppModel_TASK" ' do_app_init a:new fr:msg!
 	"App model initialised sent" log
@@ -635,7 +635,6 @@ ns: user
 \ Testing
 \ ===============================================================================
 app_model_test @ #if
-
 	param_st_alloc
 	fr:pubsub_init
 	1 sleep

@@ -226,12 +226,11 @@ struct_manip_test @ #if
 		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] fr:val@ . cr
 		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] fr:val@ . cr
 		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] fr:val@ . cr
-		\ struct @ ["general"] "enabletx" "myval" fr:val! struct @ . cr
 
 		struct1 @ ["radio-state", 0 ] 0 true fr:val!
 		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
 		struct1 @ ["radio-state", 0 , 1 ] 1 true fr:val!
-		\ struct1 @ . cr
+		struct1 @ . cr
 	;
 
 	: run_test
