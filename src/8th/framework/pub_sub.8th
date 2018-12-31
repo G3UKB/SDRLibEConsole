@@ -240,7 +240,9 @@ ns: fr
 	\				f - true if to be dispatched on main thread else p/s thread
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
-	"P/S_TASK" ' do_reg rot msg! ;
+	"P/S_TASK" ' do_reg rot msg! 
+	\ Needs a short sleep, else can fail if messages pumped into q too fast, locking od q?
+	0.01 sleep ;
 
 \ ----------------------------------	
 \ UI and SYS registrations
@@ -376,7 +378,8 @@ ns: fr
 	\				w - callback word 	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	"P/S_TASK" ' do_sub rot msg! ;
+	"P/S_TASK" ' do_sub rot msg!
+	0.01 sleep ;
 
 \ ----------------------------------
 \ Publish an event to subscribers
@@ -385,7 +388,8 @@ ns: fr
 	\				s - event-name	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	"P/S_TASK" ' do_pub rot msg! ;
+	"P/S_TASK" ' do_pub rot msg! 
+	0.01 sleep ;
 
 \ ========================================
 \ Reset namespace

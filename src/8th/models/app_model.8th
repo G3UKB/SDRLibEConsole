@@ -635,23 +635,33 @@ ns: user
 \ Testing
 \ ===============================================================================
 app_model_test @ #if
-	param_st_alloc
-	fr:pubsub_init
+
+	: setup
+		param_st_alloc
+		fr:pubsub_init
+		1 sleep
+		fr:test_registrations
+		1 sleep ;
+
+
+	: runtest
+		cr cr "Run test: " . . cr cr
+		sdr:app_model_init
+		1 sleep
+
+		\ Internal tests
+		sdr:app_model_tests
+		1 sleep
+		sdr:app_model_close ;
+	
+	setup	
 	1 sleep
-	fr:test_registrations
-	3 sleep
-	sdr:app_model_init
-	3 sleep
+	' runtest 1 5000 loop
+	fr:pubsub_term
 	
-	\ Internal tests
-	sdr:app_model_tests
-	1 sleep
-	
-	sdr:app_model_close
-	fr:pubsub_term 
-	0.2 sleep
-	fr:wait_all
-	
+	\ Wait for all tasks to complete
+	wait_all
+
 	bye
 	
 #then

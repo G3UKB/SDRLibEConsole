@@ -167,6 +167,7 @@ pubsub_init
 	SYS_BLK_SZ ' callback_wd_4 pubsub_subscribe
 	SYS_INPUT_SRC ' callback_wd_4 pubsub_subscribe
 	SYS_INPUT_DEV ' callback_wd_4 pubsub_subscribe
+	
 ;
 
 \ Runs longer with sleeps
@@ -189,8 +190,7 @@ pubsub_init
 
 : runtest
 	cr cr "Run test: " . . cr cr
-	do_publish 
-	0.2 sleep ;
+	do_publish ;
 
 setup	
 1 sleep
