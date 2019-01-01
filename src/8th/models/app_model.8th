@@ -281,12 +281,15 @@ ns: sdr
 	drop __app_model_restore
 ;
 
+\ ----------------------------------
+\ Run SOD
 : do_app_start_of_day	SED: m --
 	\ in: 	message
 	\ out:	none
 	drop __app_start_of_day
 ;
 
+\ ----------------------------------
 \ Close the app model at task level
 : do_app_close	SED: m --
 	\ in: 	message
@@ -311,6 +314,7 @@ ns: sdr
 	3drop
 ;
 
+\ ----------------------------------
 \ Set window position
 : do_app_win_set_pos	SED: n n --
 	\ in: 	0: n - top
@@ -325,6 +329,7 @@ ns: sdr
 	3drop
 ;
 
+\ ----------------------------------
 \ Get window size
 : do_app_win_get_size	SED: -- n n
 	\ in: 	none
@@ -338,6 +343,7 @@ ns: sdr
 	then
 ;
 
+\ ----------------------------------
 \ Get window position
 : do_app_win_get_pos	\ -- left top
 	\ in: 	model
@@ -353,10 +359,12 @@ ns: sdr
 
 \ ========================================
 \ Get/Set radio section value holders
+
+\ ========================================
 \ Frequency
 
 : do_app_r1_set_freq	SED: n T --
-	\ in: 	0: f - new R1 frequency in Hz
+	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick fr:val! 
@@ -370,124 +378,177 @@ ns: sdr
 	drop
 ;
 
-(*
-: model_r2_set_freq	\ freq f --
-	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick app_model_lock val! app_model_unlock drop
-	SYS_R2_FREQ app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+\ ----------------------------------
+: do_app_r2_set_freq	SED: n T --
+	\ in: 	0: n - new R2 frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick fr:val!
+	SYS_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 	if
-		UI_R2_FREQ app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+		UI_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 	then
 ;
 
-: model_r3_set_freq	\ freq f --
-	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick app_model_lock val! app_model_unlock drop
-	SYS_R3_FREQ app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+\ ----------------------------------
+: do_app_r3_set_freq	SED: n T --
+	\ in: 	0: n - new R3 frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick fr:val!
+	SYS_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 	if
-		UI_R3_FREQ app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
+		UI_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 	then
 ;
 
-: model_tx_set_simplex_freq	\ freq f --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick app_model_lock val! app_model_unlock drop
-	SYS_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_simplex_freq	SED: n T --
+	\ in: 	0: n - new TX simplex frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick fr:val!
+	SYS_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 	if
-		UI_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+		UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 	then
 ;
 
-: model_tx_set_duplex_freq	\ freq f --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "freq" 4 pick app_model_lock val! app_model_unlock drop
-	SYS_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_duplex_freq		SED: n T --
+	\ in: 	0: n - new TX duplex frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "dulex"] "freq" 4 pick fr:val!
+	SYS_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 	if
-		UI_TX_FREQ app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+		UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 	then
 ;
 
-: model_tx_set_freq	\ freq f --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+\ ----------------------------------
+: do_app_tx_set_freq	SED: n T --
+	\ in: 	0: n - new simplex/duplex TX frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
 		model_tx_set_duplex_freq
 	else
 		model_tx_set_simplex_freq
 	then
 ;
 
-: model_r1_set_mode	\ value --
-	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock drop
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick app_model_lock val! app_model_unlock drop
-	SYS_R1_MODE app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	drop
+\ ========================================
+\ Modes
+
+\ ----------------------------------
+: do_app_r1_set_mode	SED: n --
+	\ in: 	0: n - new R1 mode
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick fr:val!
+	SYS_R1_MODE __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	SYS_TX_MODE __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
-: model_r2_set_mode	\	value --
-	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock
-	SYS_R2_MODE app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	drop
+\ ----------------------------------
+: do_app_r2_set_mode	SED: n --
+	\ in: 	0: n - new R2 mode
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
+	SYS_R2_MODE __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
-: model_r3_set_mode	\	value --
-	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick app_model_lock val! app_model_unlock
-	SYS_R3_MODE app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	drop
+\ ----------------------------------
+: do_app_r3_set_mode	SED: n --
+	\ in: 	0: n - new R3 mode
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
+	SYS_R3_MODE __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_simplex_mode	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick app_model_lock val! app_model_unlock
-	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_simplex_mode SED: n --
+	\ in: 	0: n - new TX simplex mode
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick fr:val!
+	SYS_TX_MODE __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_duplex_mode	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "mode" 3 pick app_model_lock val! app_model_unlock
-	SYS_TX_MODE app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_duplex_mode SED: n --
+	\ in: 	0: n - new TX duplex mode
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "mode" 3 pick fr:val!
+	SYS_TX_MODE __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_mode	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+\ ----------------------------------
+: do_app_tx_set_mode SED: n --
+	\ in: 	0: n - new simplex/duplex TX mode
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
 		model_tx_set_duplex_mode
 	else
 		model_tx_set_simplex_mode
 	then
-	2drop
 ;
 
-: model_r1_set_filter	\ value --
-	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock drop
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick app_model_lock val! app_model_unlock drop
-	SYS_R1_FILT app_model locked@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	drop 
+\ ========================================
+\ Filters
+
+: do_app_r1_set_filter SED: n --
+	\ in: 	0: n - new R1 filter
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick fr:val!
+	SYS_R1_FILT __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ pubsub_publish
 ;
 
-: model_r2_set_filter	\	value --
-	app_model locked@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock
-	SYS_R2_FILT app_model locked@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	2drop
+\ ----------------------------------
+: do_app_r2_set_filter SED: n --
+	\ in: 	0: n - new R2 filter
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
+	SYS_R2_FILT __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
-: model_r3_set_filter	\	value --
-	app_model locked@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick app_model_lock val! app_model_unlock
-	SYS_R3_FILT app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
-	drop
+\ ----------------------------------
+: do_app_r3_set_filter SED: n --
+	\ in: 	0: n - new R2 filter
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
+	SYS_R3_FILT __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_simplex_filter	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick app_model_lock val! app_model_unlock
-	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_simplex_filter SED: n --
+	\ in: 	0: n - new TX simplex filter
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick fr:val!
+	SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_duplex_filter	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "filter" 3 pick app_model_lock val! app_model_unlock
-	SYS_TX_FILT app_model locked@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ pubsub_publish
+\ ----------------------------------
+: do_app_tx_set_duplex_filter SED: n --
+	\ in: 	0: n - new TX duplex filter
+	\ out: 	none
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "filter" 3 pick fr:val!
+	SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 ;
 
-: model_tx_set_filter	\ value --
-	app_model locked@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+\ ----------------------------------
+: do_app_tx_set_filter SED: n --
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
 		model_tx_set_duplex_filter
 	else
 		model_tx_set_simplex_filter
 	then
-	2drop
 ;
+
+\ ========================================
+\ AGC
 
 : model_r1_set_agc	\ value --
 	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick app_model_lock val! app_model_unlock
@@ -506,6 +567,9 @@ ns: sdr
 	SYS_R3_AGC app_model locked@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ pubsub_publish
 	2drop
 ;
+
+\ ========================================
+\ AF Gain
 
 : model_r1_set_afgain	\ value --
 	app_model locked@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick app_model_lock val! app_model_unlock
@@ -647,11 +711,11 @@ app_model_test @ #if
 	: runtest
 		cr cr "Run test: " . . cr cr
 		sdr:app_model_init
-		1 sleep
+		0.1 sleep
 
 		\ Internal tests
 		sdr:app_model_tests
-		1 sleep
+		0.1 sleep
 		sdr:app_model_close ;
 	
 	setup	
