@@ -560,6 +560,7 @@ ns: sdr
 	fr:SYS_R1_AGC __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
+\ ----------------------------------
 : do_app_r2_set_agc SED: n --
 	\ in: 	0: n - new R2 AGC setting
 	\ out: 	none
@@ -567,6 +568,7 @@ ns: sdr
 	fr:SYS_R2_AGC __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
+\ ----------------------------------
 : do_app_r3_set_agc SED: n --
 	\ in: 	0: n - new R3 AGC setting
 	\ out: 	none
@@ -584,6 +586,7 @@ ns: sdr
 	fr:SYS_R1_AFGAIN __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
+\ ----------------------------------
 : do_app_r2_set_afgain SED: n --
 	\ in: 	0: n - new R2 AF gain setting
 	\ out: 	none
@@ -591,6 +594,7 @@ ns: sdr
 	fr:SYS_R2_AFGAIN __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
+\ ----------------------------------
 : do_app_r3_set_afgain SED: n --
 	\ in: 	0: n - new R3 AF gain setting
 	\ out: 	none
@@ -605,6 +609,7 @@ ns: sdr
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex" 3 pick fr:val! 
 ;
 
+\ ----------------------------------
 : do_app_tx_get_duplex	\ -- f 
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex"
 ;
@@ -613,31 +618,38 @@ ns: sdr
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_get_duplex_freq	\ -- freq
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_get_simplex_mode	\ -- mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_get_duplex_mode	\ -- mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_get_simplex_filter	\ -- filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_get_duplex_filter	\ -- filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
 ;
 
+\ ----------------------------------
 : do_app_tx_set_rfgain	\ value --
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "rf-gain" 3 pick fr:val!
 	fr:SYS_RFGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
+\ ----------------------------------
 : do_app_tx_set_micgain	\ value --
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "mic-gain" 3 pick fr:val!
 	fr:SYS_MICGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
@@ -660,6 +672,7 @@ ns: sdr
 \ event fielded by another module. However it does publish events where others may be 
 \ interested in updates to the model. 
 
+\ ----------------------------------
 \ Module initialisation
 : app_model_init	SED: --
 	\ in: 	none
@@ -672,6 +685,7 @@ ns: sdr
 	"AppModel_TASK" ' do_app_start_of_day a:new fr:msg!
 	"App model start of day sent" log ;
 
+\ ----------------------------------
 \ Module close
 : app_model_term	SED: --
 	\ in: 	none
@@ -682,21 +696,48 @@ ns: sdr
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
 
+\ ----------------------------------
 \ Ask task to run internal tests
 : app_model_tests SED: --
 	"AppModel_TASK" ' do_app_tests a:new fr:msg! ;
 
-\ ========================================
+\ ===============================================================================
 \ Public call-level interface
-\ Messages are passed to the app model task
+\ ===============================================================================
 
+\ ========================================
+\ Frequency
 : model_r1_set_freq	SED: n T --
 	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
-	\ Make the message array and clone
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_r1_set_freq rot fr:msg! ;
+
+\ ----------------------------------
+: model_r2_set_freq	SED: n T --
+	\ in: 	0: n - new R2 frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	a:new rot a:push swap a:push
+	"AppModel_TASK" ' do_app_r2_set_freq rot fr:msg! ;
+
+\ ----------------------------------	
+: model_r3_set_freq	SED: n T --
+	\ in: 	0: n - new R3 frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	a:new rot a:push swap a:push
+	"AppModel_TASK" ' do_app_r3_set_freq rot fr:msg! ;
+
+\ ========================================
+\ Modes
+
+: model_r1_set_mode	SED: n --
+	\ in: 	0: n - new R1 mode
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r1_set_mode rot fr:msg! ;
 	
 \ ========================================
 \ Restore namespace	
