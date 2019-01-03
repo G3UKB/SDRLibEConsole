@@ -418,12 +418,12 @@ pub_sub_test @ #if
 
 	: run_test
 		"Run: " swap >s s:+ log
-		sdr:UI_SMPL_RATE fr:UI_SMPL_RATE fr:pubsub_publish
-		sdr:UI_NUM_RX fr:UI_NUM_RX fr:pubsub_publish
-		sdr:UI_R1_FREQ fr:UI_R1_FREQ fr:pubsub_publish
-		sdr:SYS_SMPL_RATE fr:SYS_SMPL_RATE fr:pubsub_publish
-		sdr:SYS_NUM_RX fr:SYS_NUM_RX fr:pubsub_publish
-		sdr:SYS_R1_FREQ fr:SYS_R1_FREQ fr:pubsub_publish
+		sdr:UI_SMPL_RATE sdr:UI_SMPL_RATE fr:pubsub_publish
+		sdr:UI_NUM_RX sdr:UI_NUM_RX fr:pubsub_publish
+		sdr:UI_R1_FREQ sdr:UI_R1_FREQ fr:pubsub_publish
+		sdr:SYS_SMPL_RATE sdr:SYS_SMPL_RATE fr:pubsub_publish
+		sdr:SYS_NUM_RX sdr:SYS_NUM_RX fr:pubsub_publish
+		sdr:SYS_R1_FREQ sdr:SYS_R1_FREQ fr:pubsub_publish
 		0.05 sleep
 		\ cr cr depth . " " . dstack st:len nip . " " . pdepth . cr
 	;

@@ -32,9 +32,9 @@ app_model_test @ #if
 	"../framework/param_st.8th" f:include
 	"../framework/task_man.8th" f:include
 	"../framework/struct_manip.8th" f:include
-	"../framework/registrations.8th" f:include
+	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
-	"../framework/test_sink.8th" f:include
+	"../common/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"model_common.8th" f:include
@@ -756,7 +756,7 @@ app_model_test @ #if
 		fr:pubsub_init
 		1 sleep
 		\ Set up test sink subscriptions
-		fr:test_registrations
+		sdr:test_registrations
 		1 sleep ;
 
 	\ Run one test iteration
