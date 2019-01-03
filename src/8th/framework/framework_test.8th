@@ -37,7 +37,7 @@ ns: fr
 \ Init the param store
 param_st_alloc
 \ Init publish subscribe service
-pubsub_init
+' sdr:do_registrations pubsub_init
 2 sleep
 
 \ Test structures

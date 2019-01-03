@@ -754,7 +754,7 @@ app_model_test @ #if
 		\ Param stack alloc
 		param_st_alloc
 		\ Pub/sub init
-		fr:pubsub_init
+		' sdr:do_registrations fr:pubsub_init
 		1 sleep
 		\ Set up test sink subscriptions
 		sdr:test_registrations

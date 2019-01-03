@@ -240,20 +240,18 @@ ns: fr
 	\ Needs a short sleep, else can fail if messages pumped into q too fast, locking od q?
 	0.005 sleep ;
 
-\ Assign the deferred register word
-' pubsub_register w:is sdr:pubsub_register
-
 \ ----------------------------------
 \ Initialise publish/subscribe system
-: pubsub_init	SED: --
-	\ in: 	none
+: pubsub_init	SED: w --
+	\ in: 	0: w - do_registrations	(call to do registrations for app namespace)
 	\ out:	none
+	>r
 	\ Create and start the gen-server
 	"P/S_TASK" 1 ' gen_server t:task-n -1 sleep drop
 	\ Initialise the server
 	"P/S_TASK" ' do_init a:new msg! 
 	\ Register all events
-	sdr:do_registrations ;
+	' pubsub_register r> w:exec ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
@@ -297,7 +295,7 @@ pub_sub_test @ #if
 		"wd_2: " t:name@ s:+ " : " s:+ swap s:+ log ;
 
 	: init_test
-		fr:pubsub_init
+		' sdr:do_registrations fr:pubsub_init
 		1 sleep
 		sdr:UI_SMPL_RATE ' callback_wd_1 fr:pubsub_subscribe
 		sdr:UI_NUM_RX ' callback_wd_1 fr:pubsub_subscribe
