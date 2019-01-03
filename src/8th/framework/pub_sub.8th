@@ -27,7 +27,7 @@
 
 \ ========================================
 \ Testing only
-false var, pub_sub_test
+true var, pub_sub_test
 
 pub_sub_test @ #if
 	\ needs debug/sed
@@ -35,6 +35,7 @@ pub_sub_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
 	"task_man.8th"  f:include
+	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 #then
 \ ========================================
@@ -244,6 +245,7 @@ ns: fr
 	\ Needs a short sleep, else can fail if messages pumped into q too fast, locking od q?
 	0.005 sleep ;
 
+(*
 \ ----------------------------------	
 \ UI and SYS registrations
 : do_registrations	SED: --
@@ -351,6 +353,7 @@ ns: fr
 	\ End of init
 	false sdr:SYS_RUN_STATE pubsub_register
 ;
+*)
 
 \ ----------------------------------
 \ Initialise publish/subscribe system
