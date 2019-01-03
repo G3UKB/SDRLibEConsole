@@ -25,108 +25,8 @@
 \ Set namespace
 ns: sdr
 
-(*
-\ =============================================================================================
-\ PubSub Event Names
-\ Options events
-\ UI subscribers
-: UI_SMPL_RATE "UiSampleRate" ;
-: UI_NUM_RX "UiNumRx" ;
-: UI_BLK_SZ "UiBlkSz" ;
-: UI_INPUT_SRC "UiInputSrc" ;
-: UI_INPUT_DEV "UiInputDev" ;
-: UI_OUTPUT_SINK "UiOutputSink" ;
-: UI_RECEIVER "UiReceiver" ;
-: UI_OUTPUT_DEV "UiOutputDev" ;
-: UI_CHANNEL "UiChannel" ;
-: UI_AVMODE "UiAvMode" ;
-: UI_AVOVER "UiAvOver" ;
-: UI_WINTYPE "UiWinType" ;
-: UI_FFT_SIZE "UiFftSize" ;
-: UI_TUNE_LEVEL "UiTuneLevel" ;
-\ System subscribers
-: SYS_SMPL_RATE "SysSampleRate" ;
-: SYS_NUM_RX "SysNumRx" ;
-: SYS_BLK_SZ "SysBlkSz" ;
-: SYS_ENABLE_TX "SysEnableTx" ;
-: SYS_INPUT_SRC "SysInputSrc" ;
-: SYS_INPUT_DEV "SysInputDev" ;
-: SYS_OUTPUT_SINK "SysOutputSink" ;
-: SYS_RECEIVER "SysReceiver" ;
-: SYS_OUTPUT_DEV "SysOutputDev" ;
-: SYS_CHANNEL "SysChannel" ;
-: SYS_AVMODE "SysAvMode" ;
-: SYS_AVOVER "SysAvOver" ;
-: SYS_WINTYPE "SysWinType" ;
-: SYS_FFT_SIZE "SysFftSize" ;
-: SYS_TUNE_LEVEL "SysTuneLevel" ;
-: SYS_AUDIO_ROUTE "SysAudioRoute" ;
-
-\ Radio RX events
-\ UI subscribers
-: UI_R1_FREQ "UiR1Freq" ;
-: UI_R2_FREQ "UiR2Freq" ;
-: UI_R3_FREQ "UiR3Freq" ;
-: UI_R1_MODE "UiR1Mode" ;
-: UI_R2_MODE "UiR2Mode" ;
-: UI_R3_MODE "UiR3Mode" ;
-: UI_R1_FILT "UiR1Filt" ;
-: UI_R2_FILT "UiR2Filt" ;
-: UI_R3_FILT "UiR3Filt" ;
-: UI_R1_AGC "UiR1Agc" ;
-: UI_R2_AGC "UiR2Agc" ;
-: UI_R3_AGC "UiR3Agc" ;
-: UI_R_ATTN "UiRAttn" ;
-: UI_R_HF_PRE "UiRHfPre" ;
-: UI_R_6M_PRE "UiR6MPre" ;
-: UI_R1_AFGAIN "UiR1AfGain" ;
-: UI_R2_AFGAIN "UiR2AfGain" ;
-: UI_R3_AFGAIN "UiR3AfGain" ;
-\ System subscribers
-: SYS_R1_FREQ "SysR1Freq" ;
-: SYS_R2_FREQ "SysR2Freq" ;
-: SYS_R3_FREQ "SysR3Freq" ;
-: SYS_R1_MODE "SysR1Mode" ;
-: SYS_R2_MODE "SysR2Mode" ;
-: SYS_R3_MODE "SysR3Mode" ;
-: SYS_R1_FILT "SysR1Filt" ;
-: SYS_R2_FILT "SysR2Filt" ;
-: SYS_R3_FILT "SysR3Filt" ;
-: SYS_R1_AGC "SysR1Agc" ;
-: SYS_R2_AGC "SysR2Agc" ;
-: SYS_R3_AGC "SysR3Agc" ;
-: SYS_R_ATTN "SysRAttn" ;
-: SYS_R_HF_PRE "SysRHfPre" ;
-: SYS_R_6M_PRE "SysR6MPre" ;
-: SYS_R1_AFGAIN "SysR1AfGain" ;
-: SYS_R2_AFGAIN "SysR2AfGain" ;
-: SYS_R3_AFGAIN "SysR3AfGain" ;
-
-\ Radio TX events
-\ UI subscribers
-: UI_DUPLEX "UiDuplex" ;
-: UI_RFGAIN "UiRfGain" ;
-: UI_MICGAIN "UiMicGain" ;
-: UI_TX_FREQ "UiTXFreq" ;
-: UI_TX_MODE "UiTXMode" ;
-: UI_TX_FILT "UiTXFilt" ;
-\ System subscribers
-: SYS_MOX	"SysMOX" ;
-: SYS_DUPLEX "SysDuplex" ;
-: SYS_RFGAIN "SysRfGain" ;
-: SYS_MICGAIN "SysMicGain" ;
-: SYS_TX_FREQ "SysTXFreq" ;
-: SYS_TX_MODE "SysTXMode" ;
-: SYS_TX_FILT "SysTXFilt" ;
-
-\ Window system events
-: SYS_R1_DISP_UPDT "SysR1DispUpdt" ;
-: SYS_R2_DISP_UPDT "SysR2DispUpdt" ;
-: SYS_R3_DISP_UPDT "SysR3DispUpdt" ;
-
-\ End of init
-: SYS_RUN_STATE "SysRunState" ;
-*)
+\ Circular reference needs to call fr:pubsub_register
+defer: pubsub_register
 
 \ ----------------------------------	
 \ UI and SYS registrations
@@ -139,101 +39,101 @@ ns: sdr
 	\
 	\ Options events
 	\ UI subscribers
-	true UI_SMPL_RATE fr:pubsub_register
-	true UI_NUM_RX fr:pubsub_register
-	true UI_BLK_SZ fr:pubsub_register
-	true UI_INPUT_SRC fr:pubsub_register
-	true UI_INPUT_DEV fr:pubsub_register
-	true UI_OUTPUT_SINK fr:pubsub_register
-	true UI_RECEIVER fr:pubsub_register
-	true UI_OUTPUT_DEV fr:pubsub_register
-	true UI_CHANNEL fr:pubsub_register
-	true UI_AVMODE fr:pubsub_register
-	true UI_AVOVER fr:pubsub_register
-	true UI_WINTYPE fr:pubsub_register
-	true UI_FFT_SIZE fr:pubsub_register
-	true UI_TUNE_LEVEL fr:pubsub_register
+	true UI_SMPL_RATE pubsub_register
+	true UI_NUM_RX pubsub_register
+	true UI_BLK_SZ pubsub_register
+	true UI_INPUT_SRC pubsub_register
+	true UI_INPUT_DEV pubsub_register
+	true UI_OUTPUT_SINK pubsub_register
+	true UI_RECEIVER pubsub_register
+	true UI_OUTPUT_DEV pubsub_register
+	true UI_CHANNEL pubsub_register
+	true UI_AVMODE pubsub_register
+	true UI_AVOVER pubsub_register
+	true UI_WINTYPE pubsub_register
+	true UI_FFT_SIZE pubsub_register
+	true UI_TUNE_LEVEL pubsub_register
 	\ System subscribers
-	false SYS_SMPL_RATE fr:pubsub_register
-	false SYS_NUM_RX fr:pubsub_register
-	false SYS_BLK_SZ fr:pubsub_register
-	false SYS_INPUT_SRC fr:pubsub_register
-	false SYS_INPUT_DEV fr:pubsub_register
-	false SYS_OUTPUT_SINK fr:pubsub_register
-	false SYS_RECEIVER fr:pubsub_register
-	false SYS_OUTPUT_DEV fr:pubsub_register
-	false SYS_CHANNEL fr:pubsub_register
-	false SYS_AVMODE fr:pubsub_register
-	false SYS_AVOVER fr:pubsub_register
-	false SYS_WINTYPE fr:pubsub_register
-	false SYS_FFT_SIZE fr:pubsub_register
-	false SYS_TUNE_LEVEL fr:pubsub_register
-	false SYS_AUDIO_ROUTE fr:pubsub_register
+	false SYS_SMPL_RATE pubsub_register
+	false SYS_NUM_RX pubsub_register
+	false SYS_BLK_SZ pubsub_register
+	false SYS_INPUT_SRC pubsub_register
+	false SYS_INPUT_DEV pubsub_register
+	false SYS_OUTPUT_SINK pubsub_register
+	false SYS_RECEIVER pubsub_register
+	false SYS_OUTPUT_DEV pubsub_register
+	false SYS_CHANNEL pubsub_register
+	false SYS_AVMODE pubsub_register
+	false SYS_AVOVER pubsub_register
+	false SYS_WINTYPE pubsub_register
+	false SYS_FFT_SIZE pubsub_register
+	false SYS_TUNE_LEVEL pubsub_register
+	false SYS_AUDIO_ROUTE pubsub_register
 
 	\ Radio RX events
 	\ UI subscribers
-	true UI_R1_FREQ fr:pubsub_register
-	true UI_R2_FREQ fr:pubsub_register
-	true UI_R3_FREQ fr:pubsub_register
-	true UI_R1_MODE fr:pubsub_register
-	true UI_R2_MODE fr:pubsub_register
-	true UI_R3_MODE fr:pubsub_register
-	true UI_R1_FILT fr:pubsub_register
-	true UI_R2_FILT fr:pubsub_register
-	true UI_R3_FILT fr:pubsub_register
-	true UI_R1_AGC fr:pubsub_register
-	true UI_R2_AGC fr:pubsub_register
-	true UI_R3_AGC fr:pubsub_register
-	true UI_R_ATTN fr:pubsub_register
-	true UI_R_HF_PRE fr:pubsub_register
-	true UI_R_6M_PRE fr:pubsub_register
-	true UI_R1_AFGAIN fr:pubsub_register
-	true UI_R2_AFGAIN fr:pubsub_register
-	true UI_R3_AFGAIN fr:pubsub_register
+	true UI_R1_FREQ pubsub_register
+	true UI_R2_FREQ pubsub_register
+	true UI_R3_FREQ pubsub_register
+	true UI_R1_MODE pubsub_register
+	true UI_R2_MODE pubsub_register
+	true UI_R3_MODE pubsub_register
+	true UI_R1_FILT pubsub_register
+	true UI_R2_FILT pubsub_register
+	true UI_R3_FILT pubsub_register
+	true UI_R1_AGC pubsub_register
+	true UI_R2_AGC pubsub_register
+	true UI_R3_AGC pubsub_register
+	true UI_R_ATTN pubsub_register
+	true UI_R_HF_PRE pubsub_register
+	true UI_R_6M_PRE pubsub_register
+	true UI_R1_AFGAIN pubsub_register
+	true UI_R2_AFGAIN pubsub_register
+	true UI_R3_AFGAIN pubsub_register
 	\ System subscribers
-	false SYS_R1_FREQ fr:pubsub_register
-	false SYS_R2_FREQ fr:pubsub_register
-	false SYS_R3_FREQ fr:pubsub_register
-	false SYS_R1_MODE fr:pubsub_register
-	false SYS_R2_MODE fr:pubsub_register
-	false SYS_R3_MODE fr:pubsub_register
-	false SYS_TX_MODE fr:pubsub_register
-	false SYS_R1_FILT fr:pubsub_register
-	false SYS_R2_FILT fr:pubsub_register
-	false SYS_R3_FILT fr:pubsub_register
-	false SYS_R1_AGC fr:pubsub_register
-	false SYS_R2_AGC fr:pubsub_register
-	false SYS_R3_AGC fr:pubsub_register
-	false SYS_R_ATTN fr:pubsub_register
-	false SYS_R_HF_PRE fr:pubsub_register
-	false SYS_R_6M_PRE fr:pubsub_register
-	false SYS_R1_AFGAIN fr:pubsub_register
-	false SYS_R2_AFGAIN fr:pubsub_register
-	false SYS_R3_AFGAIN fr:pubsub_register
+	false SYS_R1_FREQ pubsub_register
+	false SYS_R2_FREQ pubsub_register
+	false SYS_R3_FREQ pubsub_register
+	false SYS_R1_MODE pubsub_register
+	false SYS_R2_MODE pubsub_register
+	false SYS_R3_MODE pubsub_register
+	false SYS_TX_MODE pubsub_register
+	false SYS_R1_FILT pubsub_register
+	false SYS_R2_FILT pubsub_register
+	false SYS_R3_FILT pubsub_register
+	false SYS_R1_AGC pubsub_register
+	false SYS_R2_AGC pubsub_register
+	false SYS_R3_AGC pubsub_register
+	false SYS_R_ATTN pubsub_register
+	false SYS_R_HF_PRE pubsub_register
+	false SYS_R_6M_PRE pubsub_register
+	false SYS_R1_AFGAIN pubsub_register
+	false SYS_R2_AFGAIN pubsub_register
+	false SYS_R3_AFGAIN pubsub_register
 
 	\ Radio TX events
 	\ UI subscribers
-	true UI_DUPLEX fr:pubsub_register
-	true UI_RFGAIN fr:pubsub_register
-	true UI_MICGAIN fr:pubsub_register
-	true UI_TX_FREQ fr:pubsub_register
-	true UI_TX_MODE fr:pubsub_register
-	true UI_TX_FILT fr:pubsub_register
+	true UI_DUPLEX pubsub_register
+	true UI_RFGAIN pubsub_register
+	true UI_MICGAIN pubsub_register
+	true UI_TX_FREQ pubsub_register
+	true UI_TX_MODE pubsub_register
+	true UI_TX_FILT pubsub_register
 	\ System subscribers
-	false SYS_MOX fr:pubsub_register 
-	false SYS_DUPLEX fr:pubsub_register
-	false SYS_RFGAIN fr:pubsub_register
-	false SYS_MICGAIN fr:pubsub_register
-	false SYS_TX_FREQ fr:pubsub_register
-	false SYS_TX_FILT fr:pubsub_register
+	false SYS_MOX pubsub_register 
+	false SYS_DUPLEX pubsub_register
+	false SYS_RFGAIN pubsub_register
+	false SYS_MICGAIN pubsub_register
+	false SYS_TX_FREQ pubsub_register
+	false SYS_TX_FILT pubsub_register
 
 	\ Window system events 
-	false SYS_R1_DISP_UPDT fr:pubsub_register
-	false SYS_R2_DISP_UPDT fr:pubsub_register
-	false SYS_R3_DISP_UPDT fr:pubsub_register
+	false SYS_R1_DISP_UPDT pubsub_register
+	false SYS_R2_DISP_UPDT pubsub_register
+	false SYS_R3_DISP_UPDT pubsub_register
 
 	\ End of init
-	false SYS_RUN_STATE fr:pubsub_register
+	false SYS_RUN_STATE pubsub_register
 ;
 
 \ ========================================

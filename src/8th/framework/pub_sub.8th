@@ -245,115 +245,8 @@ ns: fr
 	\ Needs a short sleep, else can fail if messages pumped into q too fast, locking od q?
 	0.005 sleep ;
 
-(*
-\ ----------------------------------	
-\ UI and SYS registrations
-: do_registrations	SED: --
-	\ in:		none
-	\ out:	none
-	\
-	\ true means dispatch on main thread
-	\ false means dispatch on p/s thread
-	\
-	\ Options events
-	\ UI subscribers
-	true sdr:UI_SMPL_RATE pubsub_register
-	true sdr:UI_NUM_RX pubsub_register
-	true sdr:UI_BLK_SZ pubsub_register
-	true sdr:UI_INPUT_SRC pubsub_register
-	true sdr:UI_INPUT_DEV pubsub_register
-	true sdr:UI_OUTPUT_SINK pubsub_register
-	true sdr:UI_RECEIVER pubsub_register
-	true sdr:UI_OUTPUT_DEV pubsub_register
-	true sdr:UI_CHANNEL pubsub_register
-	true sdr:UI_AVMODE pubsub_register
-	true sdr:UI_AVOVER pubsub_register
-	true sdr:UI_WINTYPE pubsub_register
-	true sdr:UI_FFT_SIZE pubsub_register
-	true sdr:UI_TUNE_LEVEL pubsub_register
-	\ System subscribers
-	false sdr:SYS_SMPL_RATE pubsub_register
-	false sdr:SYS_NUM_RX pubsub_register
-	false sdr:SYS_BLK_SZ pubsub_register
-	false sdr:SYS_INPUT_SRC pubsub_register
-	false sdr:SYS_INPUT_DEV pubsub_register
-	false sdr:SYS_OUTPUT_SINK pubsub_register
-	false sdr:SYS_RECEIVER pubsub_register
-	false sdr:SYS_OUTPUT_DEV pubsub_register
-	false sdr:SYS_CHANNEL pubsub_register
-	false sdr:SYS_AVMODE pubsub_register
-	false sdr:SYS_AVOVER pubsub_register
-	false sdr:SYS_WINTYPE pubsub_register
-	false sdr:SYS_FFT_SIZE pubsub_register
-	false sdr:SYS_TUNE_LEVEL pubsub_register
-	false sdr:SYS_AUDIO_ROUTE pubsub_register
-
-	\ Radio RX events
-	\ UI subscribers
-	true sdr:UI_R1_FREQ pubsub_register
-	true sdr:UI_R2_FREQ pubsub_register
-	true sdr:UI_R3_FREQ pubsub_register
-	true sdr:UI_R1_MODE pubsub_register
-	true sdr:UI_R2_MODE pubsub_register
-	true sdr:UI_R3_MODE pubsub_register
-	true sdr:UI_R1_FILT pubsub_register
-	true sdr:UI_R2_FILT pubsub_register
-	true sdr:UI_R3_FILT pubsub_register
-	true sdr:UI_R1_AGC pubsub_register
-	true sdr:UI_R2_AGC pubsub_register
-	true sdr:UI_R3_AGC pubsub_register
-	true sdr:UI_R_ATTN pubsub_register
-	true sdr:UI_R_HF_PRE pubsub_register
-	true sdr:UI_R_6M_PRE pubsub_register
-	true sdr:UI_R1_AFGAIN pubsub_register
-	true sdr:UI_R2_AFGAIN pubsub_register
-	true sdr:UI_R3_AFGAIN pubsub_register
-	\ System subscribers
-	false sdr:SYS_R1_FREQ pubsub_register
-	false sdr:SYS_R2_FREQ pubsub_register
-	false sdr:SYS_R3_FREQ pubsub_register
-	false sdr:SYS_R1_MODE pubsub_register
-	false sdr:SYS_R2_MODE pubsub_register
-	false sdr:SYS_R3_MODE pubsub_register
-	false sdr:SYS_TX_MODE pubsub_register
-	false sdr:SYS_R1_FILT pubsub_register
-	false sdr:SYS_R2_FILT pubsub_register
-	false sdr:SYS_R3_FILT pubsub_register
-	false sdr:SYS_R1_AGC pubsub_register
-	false sdr:SYS_R2_AGC pubsub_register
-	false sdr:SYS_R3_AGC pubsub_register
-	false sdr:SYS_R_ATTN pubsub_register
-	false sdr:SYS_R_HF_PRE pubsub_register
-	false sdr:SYS_R_6M_PRE pubsub_register
-	false sdr:SYS_R1_AFGAIN pubsub_register
-	false sdr:SYS_R2_AFGAIN pubsub_register
-	false sdr:SYS_R3_AFGAIN pubsub_register
-
-	\ Radio TX events
-	\ UI subscribers
-	true sdr:UI_DUPLEX pubsub_register
-	true sdr:UI_RFGAIN pubsub_register
-	true sdr:UI_MICGAIN pubsub_register
-	true sdr:UI_TX_FREQ pubsub_register
-	true sdr:UI_TX_MODE pubsub_register
-	true sdr:UI_TX_FILT pubsub_register
-	\ System subscribers
-	false sdr:SYS_MOX pubsub_register 
-	false sdr:SYS_DUPLEX pubsub_register
-	false sdr:SYS_RFGAIN pubsub_register
-	false sdr:SYS_MICGAIN pubsub_register
-	false sdr:SYS_TX_FREQ pubsub_register
-	false sdr:SYS_TX_FILT pubsub_register
-
-	\ Window system events 
-	false sdr:SYS_R1_DISP_UPDT pubsub_register
-	false sdr:SYS_R2_DISP_UPDT pubsub_register
-	false sdr:SYS_R3_DISP_UPDT pubsub_register
-
-	\ End of init
-	false sdr:SYS_RUN_STATE pubsub_register
-;
-*)
+\ Assign the deferred register word
+' pubsub_register w:is sdr:pubsub_register
 
 \ ----------------------------------
 \ Initialise publish/subscribe system
@@ -365,7 +258,7 @@ ns: fr
 	\ Initialise the server
 	"P/S_TASK" ' do_init a:new msg! 
 	\ Register all events
-	do_registrations ;
+	sdr:do_registrations ;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
