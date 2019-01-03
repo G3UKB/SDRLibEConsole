@@ -27,6 +27,7 @@
 "task_man.8th"  f:include
 "struct_manip.8th"  f:include
 "../common/events.8th" f:include
+"../common/registrations.8th" f:include
 "pub_sub.8th"  f:include
 
 \ Set namespace to avoid prefixing for the test

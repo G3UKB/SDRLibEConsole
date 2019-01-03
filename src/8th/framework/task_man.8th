@@ -106,8 +106,9 @@ ns: fr
 	t:pop null? if
 		"Warning, p/s q returned null!" log drop
 	else
-		\ Message to process
-		"cb" m:@ w:exec
+		\ Message to process, just send data part
+		\ "cb" m:@ w:exec
+		"data" m:@ swap "cb" m:@ nip w:exec
 	then ;
 	
 \ ----------------------------------

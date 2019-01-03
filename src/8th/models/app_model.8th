@@ -32,6 +32,7 @@ app_model_test @ #if
 	"../framework/param_st.8th" f:include
 	"../framework/task_man.8th" f:include
 	"../framework/struct_manip.8th" f:include
+	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
 	"../common/test_sink.8th" f:include
@@ -363,8 +364,8 @@ ns: sdr
 \ ========================================
 \ Frequency
 
-: do_app_r1_set_freq	SED: m --
-	"data" m:@ a:open
+: do_app_r1_set_freq	SED: a --
+	a:open
 	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none

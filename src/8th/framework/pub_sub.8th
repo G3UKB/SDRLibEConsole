@@ -27,7 +27,7 @@
 
 \ ========================================
 \ Testing only
-true var, pub_sub_test
+false var, pub_sub_test
 
 pub_sub_test @ #if
 	\ needs debug/sed
@@ -48,11 +48,6 @@ ns: fr
 \ ========================================
 \ General Helpers
 \
-\ Return the data element
-: data@	 SED: m -- *
-	\ in: 	{ "type" : ... , "data" : Any }
-	\ out:	Opaque data
-	"data" m:@ nip ;
 
 \ ----------------------------------
 \ Return the pub/sub store	
@@ -63,46 +58,46 @@ ns: fr
 
 \ ----------------------------------	
 \ Retrieve the event name
-: evnt_name@  SED: m -- s
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
+: evnt_name@  SED: a -- s
+	\ in: 	[evnt-name, f]
 	\ out:	evnt-name
-	data@ 0 a:@ nip ;
+	0 a:@ nip ;
 	
 \ ========================================
 \ Registration helpers
 \
 \ Retrieve the event flag
-: evnt_flg@  SED: m -- T
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
-	\ out:	flag
-	data@ 1 a:@ nip ;	
+: evnt_flg@  SED: a -- T
+	\ in: 	[evnt-name, f]
+	\ out:	flag	
+	1 a:@ nip ;	
 
 \ ----------------------------------
 \ Does the event name already exist
-: ps_exists?	 SED: m -- F
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
+: ps_exists?	 SED: a -- F
+	\ in: 	[evnt-name, f]
 	\ out:	flag
 	evnt_name@ store@ swap m:exists? nip ;
 
 \ ----------------------------------
 \ Return default event data
-: ps_make_evnt_data	 SED: m -- a
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
+: ps_make_evnt_data	 SED: a -- a
+	\ in: 	[evnt-name, f]
 	\ out:	[evnt_flg, []]
 	a:new 0 rot evnt_flg@ a:! 1 a:new a:! ; 
 
 \ ----------------------------------
 \ Store initial event data
-: ps_store_new	 SED: a m -- 
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
+: ps_store_new	 SED: a a -- 
+	\ in: 	[evnt-name, f]
 	\				[f, []]
 	\ out:	[evnt_flg, []]
 	evnt_name@ store@ swap rot m:! drop ;
 
 \ ----------------------------------
 \ Register a new entry	
-: ps_reg_new	 SED: m --
-	\ in: 	{ "type" : ... , "data" : [evnt-name, f] }
+: ps_reg_new	 SED: a --
+	\ in: 	[evnt-name, f]
 	\ out:	none
 	dup ps_make_evnt_data
 	swap ps_store_new ;
@@ -111,33 +106,33 @@ ns: fr
 \ Subscribe helpers
 \
 \ Retrieve the callback word
-: evnt_callback@  SED: m -- w
-	\ in: 	{ "type" : ... , "data" : [w] }
+: evnt_callback@  SED: a -- w
+	\ in: 	[w]
 	\ out:	w
-	data@ 1 a:@ nip ;
+	1 a:@ nip ;
 
 \ ========================================
 \ Publish helpers
 \
 \ Retrieve the subscriber list
-: sub_list@  SED: m -- a
-	\ in: 	{ "type" : ... , "data" : [w] }
+: sub_list@  SED: a -- a
+	\ in: 	[w]
 	\ out:	w
 	\ [f,[w,w,..]]
 	evnt_name@ store@ swap m:@ nip ;
 
 \ ----------------------------------
 \ Retrieve the event data	
-: evnt_data@  SED: m -- *
-	\ in: 	{ "type" : ... , "data" : [w] }
+: evnt_data@  SED: a -- *
+	\ in: 	[w]
 	\ out:	event-data
-	"data" m:@ nip 1 a:@ nip ;
+	1 a:@ nip ;
 
 \ ========================================
 \ Message handlers
 \ Initialise the p/s structure
-: do_init  SED: m --
-	\ in: 	{ "type" : "init" }
+: do_init  SED: a --
+	\ in: 	[]
 	\ out:	none
 	\
 	\ Create the dictionary in a task var
@@ -147,8 +142,8 @@ ns: fr
 
 \ ----------------------------------
 \ Register a new event
-: do_reg	 SED: m --
-	\ in: 	{ "type" : "reg" , "data" : [evnt-name, f] }
+: do_reg	 SED: a --
+	\ in: 	[evnt-name, f]
 	\ out:	none
 	\ data: [evnt-name, f] where f==true if dispatch on main thread
 	dup >r
@@ -162,8 +157,8 @@ ns: fr
 
 \ ----------------------------------
 \ Subscribe to an event
-: do_sub	 SED: m --
-	\ in: 	{ "type" : "sub" , "data" : [event-name, w]}
+: do_sub	 SED: a --
+	\ in: 	[event-name, w]
 	\ out:	none
 	dup >r
 	ps_exists? if
@@ -211,8 +206,8 @@ ns: fr
 
 \ ----------------------------------
 \ Publish an event	
-: do_pub	 SED: m --
-	\ in: 	{ "type" : pub , "data" : [event-name, event-data]}
+: do_pub	 SED: a --
+	\ in: 	[event-name, event-data]
 	\ out:	none
 	dup >r
 	ps_exists? if
