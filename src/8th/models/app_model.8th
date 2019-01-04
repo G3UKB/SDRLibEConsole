@@ -58,13 +58,6 @@ ns: sdr
 
 : __app_model_default
 	{
-		\ General state
-		"window" : {
-				"wide" :	0,
-				"high" :	0,
-				"left" :	0,
-				"top"	 :	0
-		},
 		\ HPSDR Protocol-1 only supports 3 radios
 		\ More can be added into the array as required
 		"radio-state" : [
@@ -295,7 +288,6 @@ ns: sdr
 \ Frequency
 
 : do_app_r1_set_freq	SED: a --
-	a:open
 	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
@@ -307,7 +299,6 @@ ns: sdr
 		sdr:UI_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 		sdr:UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] fr:val@ fr:pubsub_publish
 	then
-	drop
 ;
 
 \ ----------------------------------
@@ -861,12 +852,12 @@ ns: sdr
 
 \ ----------------------------------		
 \ Following are request/response words
-: __single_plus_q	SED	* -- a
+: __single_plus_q	SED:	* -- a
 	\ in: 	0: * - value
 	\ out: 	0: a - [value, new 1 item queue for response]
 	a:new swap a:push 1 q:new dup false q:throwing >p swap a:push ;
 
-: __get_response	SED -- *
+: __get_response	SED: -- *
 	p> 1000 q:wait q:pop null? if 
 			"Timeout waiting for app model response!" log 
 	then ;
@@ -961,27 +952,27 @@ app_model_test @ #if
 		7100000 false sdr:model_r3_set_freq
 		7100000 false sdr:model_tx_set_freq
 		
-		"LSB" sdr:mode_for_name false sdr:model_r1_set_mode
-		"USB" sdr:mode_for_name  false sdr:model_r2_set_mode
-		"AM" sdr:mode_for_name  false sdr:model_r3_set_mode
-		"FM" sdr:mode_for_name  false sdr:model_tx_set_mode
+		"LSB" sdr:mode_for_name sdr:model_r1_set_mode
+		"USB" sdr:mode_for_name sdr:model_r2_set_mode
+		"AM" sdr:mode_for_name sdr:model_r3_set_mode
+		"FM" sdr:mode_for_name sdr:model_tx_set_mode
 		
-		"6.0KHz" sdr:filter_for_name false sdr:model_r1_set_filter
-		"4.0KHz" sdr:filter_for_name false sdr:model_r2_set_filter
-		"2.4KHz" sdr:filter_for_name false sdr:model_r3_set_filter
-		"1.0KHz" sdr:filter_for_name false sdr:model_tx_set_filter
+		"6.0KHz" sdr:filter_for_name sdr:model_r1_set_filter
+		"4.0KHz" sdr:filter_for_name sdr:model_r2_set_filter
+		"2.4KHz" sdr:filter_for_name sdr:model_r3_set_filter
+		"1.0KHz" sdr:filter_for_name sdr:model_tx_set_filter
 		
-		"OFF" sdr:agc_for_name false sdr:model_r1_set_agc
-		"FAST" sdr:agc_for_name false sdr:model_r2_set_agc
-		"SLOW" sdr:agc_for_name false sdr:model_r3_set_agc
+		"OFF" sdr:agc_for_name sdr:model_r1_set_agc
+		"FAST" sdr:agc_for_name sdr:model_r2_set_agc
+		"SLOW" sdr:agc_for_name sdr:model_r3_set_agc
+		*)
+		50 sdr:model_r1_set_afgain
+		60 sdr:model_r2_set_afgain
+		70 sdr:model_r3_set_afgain
 		
-		50 false sdr:model_r1_set_afgain
-		60 false sdr:model_r2_set_afgain
-		70 false sdr:model_r3_set_afgain
-		
-		true false sdr:model_tx_set_duplex
-		50 false sdr:model_tx_set_rfgain
-		50 false sdr:model_tx_set_micgain
+		true sdr:model_tx_set_duplex
+		50 sdr:model_tx_set_rfgain
+		50 sdr:model_tx_set_micgain
 		
 		false sdr:model_tx_get_duplex "Duplex: " . . cr
 		false sdr:model_tx_get_simplex_freq "Simplex freq: " . . cr

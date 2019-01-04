@@ -24,6 +24,9 @@
 
 needs utils/enums
 
+\ Define our SDR namespace
+ns: sdr
+
 \ ===============================================================================
 \  RX modes
 0 enum:
@@ -140,3 +143,7 @@ enum;
 \ Preamps
 : PRE_OFF 0 ;
 : PRE_ON 1 ;
+
+\ ========================================
+\ Restore namespace	
+ns: user	
