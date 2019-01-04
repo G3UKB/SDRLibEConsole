@@ -957,6 +957,39 @@ app_model_test @ #if
 
 		\ Interface tests
 		7100000 false sdr:model_r1_set_freq
+		7100000 false sdr:model_r2_set_freq
+		7100000 false sdr:model_r3_set_freq
+		7100000 false sdr:model_tx_set_freq
+		
+		"LSB" sdr:mode_for_name false sdr:model_r1_set_mode
+		"USB" sdr:mode_for_name  false sdr:model_r2_set_mode
+		"AM" sdr:mode_for_name  false sdr:model_r3_set_mode
+		"FM" sdr:mode_for_name  false sdr:model_tx_set_mode
+		
+		"6.0KHz" sdr:filter_for_name false sdr:model_r1_set_filter
+		"4.0KHz" sdr:filter_for_name false sdr:model_r2_set_filter
+		"2.4KHz" sdr:filter_for_name false sdr:model_r3_set_filter
+		"1.0KHz" sdr:filter_for_name false sdr:model_tx_set_filter
+		
+		"OFF" sdr:agc_for_name false sdr:model_r1_set_agc
+		"FAST" sdr:agc_for_name false sdr:model_r2_set_agc
+		"SLOW" sdr:agc_for_name false sdr:model_r3_set_agc
+		
+		50 false sdr:model_r1_set_afgain
+		60 false sdr:model_r2_set_afgain
+		70 false sdr:model_r3_set_afgain
+		
+		true false sdr:model_tx_set_duplex
+		50 false sdr:model_tx_set_rfgain
+		50 false sdr:model_tx_set_micgain
+		
+		false sdr:model_tx_get_duplex "Duplex: " . . cr
+		false sdr:model_tx_get_simplex_freq "Simplex freq: " . . cr
+		false sdr:model_tx_get_duplex_freq "Duplex freq: " . . cr
+		false sdr:model_tx_get_simplex_mode "Simplex mode: " . . cr
+		false sdr:model_tx_get_duplex_mode "Duplex mode: " . . cr
+		false sdr:model_tx_get_simplex_filter "Simplex filter: " . . cr
+		false sdr:model_tx_get_duplex_filter "Duplex filter: " . . cr		
 		
 		\ Close app model to clean up for next iteration
 		0.1 sleep
