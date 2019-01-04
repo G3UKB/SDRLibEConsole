@@ -261,16 +261,6 @@ ns: sdr
 ;
 
 \ ========================================
-\ Helpers
-
-\ Get window section
-: __model_win_section	SED: -- m
-	\ in: 	none
-	\ out:	window section map
-	__app_model@ "window" m:@ nip
-;
-
-\ ========================================
 \ Message Handlers
 \ Called only by app model gen-server
 \ ========================================
@@ -301,66 +291,6 @@ ns: sdr
 \ ========================================
 \ Getters and Setters
 
-\ Set windows size
-: do_app_win_set_size	SED: n n --
-	\ in: 	0: n - width
-	\				1: n - height
-	\ out:	none
-	__model_win_section null? if 
-		"App model win section not found!" log
-	else
-		"wide" 3 pick m:!
-		"high" 2 pick m:!
-	then
-	3drop
-;
-
-\ ----------------------------------
-\ Set window position
-: do_app_win_set_pos	SED: n n --
-	\ in: 	0: n - top
-	\				1: n - left
-	\ out:	none
-	__model_win_section null? if 
-			"App model win section not found!" log
-		else
-			"left" 3 pick m:!
-			"top" 2 pick m:!
-		then
-	3drop
-;
-
-\ ----------------------------------
-\ Get window size
-: do_app_win_get_size	SED: -- n n
-	\ in: 	none
-	\ out: 	0: n - width
-	\				1: n - height
-	__model_win_section null? if 
-				"App model win section not found!" log
-	else
-		"wide"  m:@
-		swap "high" m:@ nip
-	then
-;
-
-\ ----------------------------------
-\ Get window position
-: do_app_win_get_pos	\ -- left top
-	\ in: 	model
-	\ out: 	0: n - top
-	\				1: n - left
-	__model_win_section null? if 
-		"App model win section not found!" log
-	else
-		"left"  m:@
-		swap "top" m:@ nip
-	then
-;
-
-\ ========================================
-\ Get/Set radio section value holders
-
 \ ========================================
 \ Frequency
 
@@ -381,7 +311,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r2_set_freq	SED: n T --
+: do_app_r2_set_freq	SED: a --
+	a:open
 	\ in: 	0: n - new R2 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
@@ -393,7 +324,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r3_set_freq	SED: n T --
+: do_app_r3_set_freq	SED: a --
+	a:open
 	\ in: 	0: n - new R3 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
@@ -405,7 +337,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_simplex_freq	SED: n T --
+: __do_app_tx_set_simplex_freq	SED: a --
+	a:open
 	\ in: 	0: n - new TX simplex frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
@@ -417,7 +350,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_duplex_freq		SED: n T --
+: __do_app_tx_set_duplex_freq		SED: a --
+	a:open
 	\ in: 	0: n - new TX duplex frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
@@ -429,14 +363,15 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_freq	SED: n T --
+: do_app_tx_set_freq	SED: a --
+	a:open
 	\ in: 	0: n - new simplex/duplex TX frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
-		do_app_tx_set_duplex_freq
+		__do_app_tx_set_duplex_freq
 	else
-		do_app_tx_set_simplex_freq
+		__do_app_tx_set_simplex_freq
 	then
 ;
 
@@ -444,7 +379,8 @@ ns: sdr
 \ Modes
 
 \ ----------------------------------
-: do_app_r1_set_mode	SED: n --
+: do_app_r1_set_mode	SED: a --
+	a:open
 	\ in: 	0: n - new R1 mode
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
@@ -454,7 +390,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r2_set_mode	SED: n --
+: do_app_r2_set_mode	SED: a --
+	a:open
 	\ in: 	0: n - new R2 mode
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
@@ -462,7 +399,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r3_set_mode	SED: n --
+: do_app_r3_set_mode	SED: a --
+	a:open
 	\ in: 	0: n - new R3 mode
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
@@ -470,7 +408,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_simplex_mode SED: n --
+: __do_app_tx_set_simplex_mode SED: a --
+	a:open
 	\ in: 	0: n - new TX simplex mode
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick fr:val!
@@ -478,7 +417,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_duplex_mode SED: n --
+: __do_app_tx_set_duplex_mode SED: a --
+	a:open
 	\ in: 	0: n - new TX duplex mode
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "mode" 3 pick fr:val!
@@ -486,20 +426,22 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_mode SED: n --
+: do_app_tx_set_mode SED: a --
+	a:open
 	\ in: 	0: n - new simplex/duplex TX mode
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
-		do_app_tx_set_duplex_mode
+		__do_app_tx_set_duplex_mode
 	else
-		do_app_tx_set_simplex_mode
+		__do_app_tx_set_simplex_mode
 	then
 ;
 
 \ ========================================
 \ Filters
 
-: do_app_r1_set_filter SED: n --
+: do_app_r1_set_filter SED: a --
+	a:open
 	\ in: 	0: n - new R1 filter
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
@@ -509,7 +451,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r2_set_filter SED: n --
+: do_app_r2_set_filter SED: a --
+	a:open
 	\ in: 	0: n - new R2 filter
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
@@ -517,7 +460,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r3_set_filter SED: n --
+: do_app_r3_set_filter SED: a --
+	a:open
 	\ in: 	0: n - new R2 filter
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
@@ -525,7 +469,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_simplex_filter SED: n --
+: __do_app_tx_set_simplex_filter SED: a --
+	a:open
 	\ in: 	0: n - new TX simplex filter
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick fr:val!
@@ -533,7 +478,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_duplex_filter SED: n --
+: __do_app_tx_set_duplex_filter SED: a --
+	a:open
 	\ in: 	0: n - new TX duplex filter
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex"] "filter" 3 pick fr:val!
@@ -541,20 +487,22 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_tx_set_filter SED: n --
+: do_app_tx_set_filter SED: a --
+	a:open
 	\ in: 	0: n - new simplex/duplex filter
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@ if
-		do_app_tx_set_duplex_filter
+		__do_app_tx_set_duplex_filter
 	else
-		do_app_tx_set_simplex_filter
+		__do_app_tx_set_simplex_filter
 	then
 ;
 
 \ ========================================
 \ AGC
 
-: do_app_r1_set_agc SED: n --
+: do_app_r1_set_agc SED: a --
+	a:open
 	\ in: 	0: n - new R1 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
@@ -562,7 +510,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r2_set_agc SED: n --
+: do_app_r2_set_agc SED: a --
+	a:open
 	\ in: 	0: n - new R2 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
@@ -570,7 +519,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r3_set_agc SED: n --
+: do_app_r3_set_agc SED: a --
+	a:open
 	\ in: 	0: n - new R3 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
@@ -580,7 +530,8 @@ ns: sdr
 \ ========================================
 \ AF Gain
 
-: do_app_r1_set_afgain SED: n --
+: do_app_r1_set_afgain SED: a --
+	a:open
 	\ in: 	0: n - new R1 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
@@ -588,7 +539,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r2_set_afgain SED: n --
+: do_app_r2_set_afgain SED: a --
+	a:open
 	\ in: 	0: n - new R2 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
@@ -596,7 +548,8 @@ ns: sdr
 ;
 
 \ ----------------------------------
-: do_app_r3_set_afgain SED: n --
+: do_app_r3_set_afgain SED: a --
+	a:open
 	\ in: 	0: n - new R3 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
@@ -604,54 +557,84 @@ ns: sdr
 ;
 
 \ ============================================
-\ Get/Set tx section value holders
+\ Get/Set TX Attributes
 \ Duplex
-: do_app_tx_set_duplex	\ f --
+: do_app_tx_set_duplex SED: a --
+	a:open
+	\ in: 	0: T - true if duplex on
+	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex" 3 pick fr:val! 
 ;
 
 \ ----------------------------------
-: do_app_tx_get_duplex	\ -- f 
+: do_app_tx_get_duplex SED: a --
+	\ in: 	none
+	\ out: 	0: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex"
 ;
 
-: do_app_tx_get_simplex_freq	\ -- freq
+\ ----------------------------------
+: do_app_tx_get_simplex_freq SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - simplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_get_duplex_freq	\ -- freq
+: do_app_tx_get_duplex_freq SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - duplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_get_simplex_mode	\ -- mode
+: do_app_tx_get_simplex_mode SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - simplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_get_duplex_mode	\ -- mode
+: do_app_tx_get_duplex_mode SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_get_simplex_filter	\ -- filter
+: do_app_tx_get_simplex_filter SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - simplex filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_get_duplex_filter	\ -- filter
+: do_app_tx_get_duplex_filter SED: a --
+	a:open
+	\ in: 	none
+	\ out: 	0: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
 ;
 
 \ ----------------------------------
-: do_app_tx_set_rfgain	\ value --
+: do_app_tx_set_rfgain SED: a --
+	a:open
+	\ in: 	0: n - rf gain value
+	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "rf-gain" 3 pick fr:val!
 	sdr:SYS_RFGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
 
 \ ----------------------------------
-: do_app_tx_set_micgain	\ value --
+: do_app_tx_set_micgain SED: a --
+	a:open
+	\ in: 	0: n - mic gain value
+	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "mic-gain" 3 pick fr:val!
 	sdr:SYS_MICGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
 ;
@@ -703,7 +686,7 @@ ns: sdr
 	"AppModel_TASK" ' do_app_tests a:new fr:msg! ;
 
 \ ===============================================================================
-\ Public call-level interface
+\ Public procedural interface
 \ ===============================================================================
 
 \ ========================================
@@ -731,6 +714,14 @@ ns: sdr
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_r3_set_freq rot fr:msg! ;
 
+\ ----------------------------------	
+: model_tx_set_freq	SED: n T --
+	\ in: 	0: n - new TX frequency in Hz
+	\				1: T - true if to be propogated to UI as well as SYS
+	\ out: 	none
+	a:new rot a:push swap a:push
+	"AppModel_TASK" ' do_app_tx_set_freq rot fr:msg! ;
+	
 \ ========================================
 \ Modes
 
@@ -739,6 +730,166 @@ ns: sdr
 	\ out: 	none
 	a:new swap a:push
 	"AppModel_TASK" ' do_app_r1_set_mode rot fr:msg! ;
+
+\ ----------------------------------	
+: model_r2_set_mode	SED: n --
+	\ in: 	0: n - new R2 mode
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r2_set_mode rot fr:msg! ;
+
+\ ----------------------------------	
+: model_r3_set_mode	SED: n --
+	\ in: 	0: n - new R3 mode
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r3_set_mode rot fr:msg! ;
+
+\ ----------------------------------	
+: model_tx_set_mode	SED: n --
+	\ in: 	0: n - new TX mode
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_set_mode rot fr:msg! ;
+
+\ ========================================
+\ Filters
+
+: model_r1_set_filter	SED: n --
+	\ in: 	0: n - new R1 filter
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r1_set_filter rot fr:msg! ;
+
+\ ----------------------------------
+: model_r2_set_filter	SED: n --
+	\ in: 	0: n - new R2 filter
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r2_set_filter rot fr:msg! ;
+
+\ ----------------------------------	
+: model_r3_set_filter	SED: n --
+	\ in: 	0: n - new R3 filter
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r3_set_filter rot fr:msg! ;
+
+\ ----------------------------------	
+: model_tx_set_filter	SED: n --
+	\ in: 	0: n - new TX filter
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_set_filter rot fr:msg! ;
+
+\ ========================================
+\ AGC
+
+: model_r1_set_agc	SED: n --
+	\ in: 	0: n - new R1 AGC
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r1_set_agc rot fr:msg! ;
+
+\ ----------------------------------
+: model_r2_set_agc	SED: n --
+	\ in: 	0: n - new R2 AGC
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r2_set_agc rot fr:msg! ;
+
+\ ----------------------------------	
+: model_r3_set_agc	SED: n --
+	\ in: 	0: n - new R3 AGC
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r3_set_agc rot fr:msg! ;
+
+\ ========================================
+\ AF Gain
+
+: model_r1_set_afgain	SED: n --
+	\ in: 	0: n - new R1 AF gain
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r1_set_afgain rot fr:msg! ;
+
+ model_r2_set_afgain	SED: n --
+	\ in: 	0: n - new R2 AF gain
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r2_set_afgain rot fr:msg! ;
+	
+ model_r3_set_afgain	SED: n --
+	\ in: 	0: n - new R3 AF gain
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_r3_set_afgain rot fr:msg! ;
+
+\ ========================================
+\ TX Attributes
+
+model_tx_set_duplex SED: T --
+	\ in: 	0: T - true if duplex
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_set_duplex rot fr:msg! ;
+
+\ TODO - How to get result back?
+model_tx_get_duplex SED:  -- T
+	\ in: 	none
+	\ out: 	0: T - true if duplex on
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_duplex rot fr:msg! ;
+
+model_tx_get_simplex_freq SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - simplex freq
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_simplex_freq rot fr:msg! ;
+
+model_tx_get_duplex_freq SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - duplex freq
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_duplex_freq rot fr:msg! ;
+
+model_tx_get_simplex_mode SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - simplex mode
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_simplex_mode rot fr:msg! ;
+
+model_tx_get_duplex_mode SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - duplex mode
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_duplex_mode rot fr:msg! ;
+	
+model_tx_get_simplex_filter SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - simplex filter
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_simplex_filter rot fr:msg! ;
+	
+model_tx_get_duplex_filter SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - duplex filter
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_get_duplex_filter rot fr:msg! ;
+\ END ToDo
+
+model_tx_set_rfgain SED:  n --
+	\ in: 	0: n - RF gain
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_set_rfgain rot fr:msg! ;
+
+model_tx_set_micgain SED:  n --
+	\ in: 	0: n - Mic gain
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_tx_set_micgain rot fr:msg! ;
 	
 \ ========================================
 \ Restore namespace	
