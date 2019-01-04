@@ -558,7 +558,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	swap fr:q_get_from_id swap q:push q:notify drop
 ;
 
 \ ----------------------------------
@@ -851,11 +851,11 @@ ns: sdr
 	\ in: 	none
 	\ out: 	0: a - [new q id for response]
 	a:new
-	1 fr:q_get dup
+	fr:q_get dup
 	>p a:push ;
 
 : __get_response	SED: -- *
-	p@ fr:q_get_from_id 100 q:wait q:pop nip null? if 
+	p@ fr:q_get_from_id 1000 q:wait q:pop nip null? if 
 			"Timeout waiting for app model response!" log 
 	then 
 	p> fr:q_release ;
@@ -935,7 +935,9 @@ app_model_test @ #if
 		1 sleep
 		\ Set up test sink subscriptions
 		sdr:test_registrations
-		1 sleep ;
+		1 sleep 
+		\ Set up q manager
+		fr:q_man_alloc ;
 
 	\ Run one test iteration
 	: runtest
@@ -976,12 +978,12 @@ app_model_test @ #if
 		0.1 sleep
 		*)
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
-		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
-		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
-		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
-		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
-		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
-		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
+		\ sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
+		\ sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
+		\ sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
+		\ sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
+		\ sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
+		\ sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
 		
 		\ Close app model to clean up for next iteration
 		0.1 sleep

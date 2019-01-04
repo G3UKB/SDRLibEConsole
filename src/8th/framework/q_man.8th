@@ -62,7 +62,7 @@ ns: fr
 	\ in: 	0: a - q_array
 	\				1: n - idx
 	\ out:	none
-	a:new 0 false a:! 1 10 q:new a:! nip a:push ;
+	a:new 0 false a:! 1 10 q:new false q:throwing a:! nip a:push ;
 
 \ Create a pool of q's	
 : q_man_alloc	SED: --
@@ -99,9 +99,9 @@ ns: fr
 : q_get_from_id	SED: n -- q
 	\ in: 	0: n - q id
 	\ out:	0: q - q for id
-	locked_q_array@
-	swap a:@ 1 a:@ nip
-	unlock_q_array ;
+	.s locked_q_array@
+	swap a:@ 1 a:@ nip nip
+	unlock_q_array .s ;
 	
 \ ----------------------------------
 \ Release and clear the given q id
@@ -113,7 +113,7 @@ ns: fr
 	swap a:@ 0 false a:!
 	\ Clear q
 	1 a:@ q:clear
-	unlock_q_array ;
+	unlock_q_array .s ;
 	
 	
 \ ========================================
