@@ -24,7 +24,7 @@
 
 \ ========================================
 \ Testing only
-true var, q_man_test
+false var, q_man_test
 
 \ ----------------------------------
 q_man_test @ #if
