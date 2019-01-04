@@ -24,7 +24,7 @@
 
 \ ========================================
 \ Testing only
-false var, q_man_test
+true var, q_man_test
 
 \ ----------------------------------
 q_man_test @ #if
@@ -57,47 +57,83 @@ ns: fr
 
 \ ----------------------------------
 
-\ Add q to the array
-: make_q	SED: q_array idx
-	a:new 0 false a:! 1 q:new a:! a:push ;
+\ Add q with depth 10 to the array
+: make_q	SED: a n --
+	\ in: 	0: a - q_array
+	\				1: n - idx
+	\ out:	none
+	a:new 0 false a:! 1 10 q:new a:! nip a:push ;
 
 \ Create a pool of q's	
 : q_man_alloc	SED: --
+	\ in: 	none
+	\ out:	none
 	locked_q_array@
-	' make_q 0 9 loop
+	' make_q 0 9 loop drop
 	unlock_q_array ;
 
 \ ----------------------------------
-\ Find a free slot
-: find_slot	SED: ix item
-	0 a:@ not if
-		\ Found a free slot so grab it
-		0 true a:!
-		break
-
-\ ----------------------------------
 \ Find and return a free q
-: q_get	SED: -- q
+: q_get	SED: -- n
+	\ in: 	none
+	\ out:	0: n - id of free q
 	locked_q_array@
 		0 >r
 		repeat
-			r@ 0 a:@ not if
+			r@ a:@ 0 a:@ not if
 				\ Found a free slot so grab it
-				0 true a:! r> ;;
+				0 true a:! r> break
 			else
-				r> n:1+ >r a:len n:> if
-					"No free slots found in q array!" log ;;
+				r> n:1+ dup >r 2 pick a:len nip n:> if
+					"No free slots found in q array!" log drop break
+				else
+					drop
 				then
+			then
 		again
+		nip nip
 	unlock_q_array ;
 
 \ ----------------------------------
 \ Release and clear the given q id
 : q_release	SED: n --
+	\ in: 	0: n - id of q to release
+	\ out:	none
 	locked_q_array@
 	\ Release q
 	swap a:@ 0 false a:!
+	\ Clear q
 	1 a:@ q:clear
 	unlock_q_array ;
 	
 	
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+q_man_test @ #if
+	
+	: run_get	\ --
+		drop fr:q_get . cr \ fr:__q_array . cr
+	;
+	
+	: run_free	\ --
+			fr:q_release fr:__q_array . cr
+	;
+	
+	: usage_test	\ --
+		' run_get 0 9 loop
+		' run_free 0 9 loop
+		0.1 sleep
+	;
+
+	cr cr "Running usage test..." . cr cr
+	fr:q_man_alloc \ fr:__q_array . cr
+	usage_test
+	1 sleep
+	"Done usage test" . cr
+	bye
+#then
