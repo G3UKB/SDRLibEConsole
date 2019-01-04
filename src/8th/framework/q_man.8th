@@ -1,0 +1,103 @@
+(* 
+	q_man.8th
+ 
+  manage a pool of queues for use by tasks to return values etc.
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ========================================
+\ Testing only
+false var, q_man_test
+
+\ ----------------------------------
+q_man_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+\ ========================================
+
+\ Set namespace
+ns: fr
+
+\ ===============================================================================
+\ Queue reference and termination management
+
+\ Holder for queue references
+\ [[T,q],[T,q] ...]
+\ If T is true the q is in use
+[] var, __q_array
+
+\ ----------------------------------
+\ Locked var
+: locked_q_array@
+	__q_array lock @ ;
+
+\ ----------------------------------
+\ Unlocked var	
+: unlock_q_array
+	__q_array unlock drop ;
+
+\ ----------------------------------
+
+\ Add q to the array
+: make_q	SED: q_array idx
+	a:new 0 false a:! 1 q:new a:! a:push ;
+
+\ Create a pool of q's	
+: q_man_alloc	SED: --
+	locked_q_array@
+	' make_q 0 9 loop
+	unlock_q_array ;
+
+\ ----------------------------------
+\ Find a free slot
+: find_slot	SED: ix item
+	0 a:@ not if
+		\ Found a free slot so grab it
+		0 true a:!
+		break
+
+\ ----------------------------------
+\ Find and return a free q
+: q_get	SED: -- q
+	locked_q_array@
+		0 >r
+		repeat
+			r@ 0 a:@ not if
+				\ Found a free slot so grab it
+				0 true a:! r> ;;
+			else
+				r> n:1+ >r a:len n:> if
+					"No free slots found in q array!" log ;;
+				then
+		again
+	unlock_q_array ;
+
+\ ----------------------------------
+\ Release and clear the given q id
+: q_release	SED: n --
+	locked_q_array@
+	\ Release q
+	swap a:@ 0 false a:!
+	1 a:@ q:clear
+	unlock_q_array ;
+	
+	
