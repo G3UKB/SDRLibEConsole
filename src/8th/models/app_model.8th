@@ -35,6 +35,7 @@ app_model_test @ #if
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
+	"../framework/q_man.8th"  f:include
 	"../common/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
@@ -554,64 +555,64 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_freq SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_freq SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_mode SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_mode SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_filter SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_filter SED: a --
 	a:open
-	\ in: 	0: q - q to send reply on
+	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
-	q:push q:notify drop
+	fr:q_get_from_id q:push q:notify drop
 ;
 
 \ ----------------------------------
@@ -848,15 +849,16 @@ ns: sdr
 \ Following are request/response words
 : __plus_q	SED:	-- a
 	\ in: 	none
-	\ out: 	0: a - [new 1 item queue for response]
+	\ out: 	0: a - [new q id for response]
 	a:new
-	1 q:new dup false q:throwing
+	1 fr:q_get dup
 	>p a:push ;
 
 : __get_response	SED: -- *
-	p> 100 q:wait q:pop nip null? if 
+	p@ fr:q_get_from_id 100 q:wait q:pop nip null? if 
 			"Timeout waiting for app model response!" log 
-	then ;
+	then 
+	p> fr:q_release ;
 
 \ ----------------------------------	
 : model_tx_get_duplex SED:  -- T

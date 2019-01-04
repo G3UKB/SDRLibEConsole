@@ -24,7 +24,7 @@
 
 \ ========================================
 \ Testing only
-false var, q_man_test
+true var, q_man_test
 
 \ ----------------------------------
 q_man_test @ #if
@@ -95,6 +95,15 @@ ns: fr
 	unlock_q_array ;
 
 \ ----------------------------------
+\ Return a q by id
+: q_get_from_id	SED: n -- q
+	\ in: 	0: n - q id
+	\ out:	0: q - q for id
+	locked_q_array@
+	swap a:@ 1 a:@ nip
+	unlock_q_array ;
+	
+\ ----------------------------------
 \ Release and clear the given q id
 : q_release	SED: n --
 	\ in: 	0: n - id of q to release
@@ -116,16 +125,21 @@ ns: user
 \ ===============================================================================
 q_man_test @ #if
 	
-	: run_get	\ --
+	: run_get	\ idx --
 		drop fr:q_get . cr \ fr:__q_array . cr
 	;
 	
+	: run_get_from_id	\ idx -- q
+		fr:q_get_from_id . cr 
+	;
+		
 	: run_free	\ --
 			fr:q_release fr:__q_array . cr
 	;
 	
 	: usage_test	\ --
 		' run_get 0 9 loop
+		' run_get_from_id 0 9 loop
 		' run_free 0 9 loop
 		0.1 sleep
 	;
