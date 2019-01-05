@@ -292,6 +292,7 @@ ns: sdr
 	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
+	a:open
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick fr:val! 
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick fr:val!
 	sdr:SYS_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
@@ -544,6 +545,12 @@ ns: sdr
 
 \ ============================================
 \ Get/Set TX Attributes
+: __do_response	SED: --
+	\ in: 	none
+	\ out: 	none
+	swap fr:q_get_from_id swap q:push q:notify drop 
+;
+	
 \ Duplex
 : do_app_tx_set_duplex SED: a --
 	a:open
@@ -558,7 +565,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@
-	swap fr:q_get_from_id swap q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -567,7 +574,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -576,7 +583,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -585,7 +592,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -594,7 +601,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -603,7 +610,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - simplex filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -612,7 +619,7 @@ ns: sdr
 	\ in: 	0: q - q id to send reply on
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
-	fr:q_get_from_id q:push q:notify drop
+	__do_response
 ;
 
 \ ----------------------------------
@@ -857,7 +864,7 @@ ns: sdr
 : __get_response	SED: -- *
 	p@ fr:q_get_from_id 1000 q:wait q:pop nip null? if 
 			"Timeout waiting for app model response!" log 
-	then 
+	then
 	p> fr:q_release ;
 
 \ ----------------------------------	
@@ -945,10 +952,9 @@ app_model_test @ #if
 		
 		\ Initialise
 		sdr:app_model_init
-		0.1 sleep
+		0.05 sleep
 
-		\ Interface tests
-		(*
+		\ Procedural interface tests
 		7100000 false sdr:model_r1_set_freq
 		7100000 false sdr:model_r2_set_freq
 		7100000 false sdr:model_r3_set_freq
@@ -964,9 +970,9 @@ app_model_test @ #if
 		"2.4KHz" sdr:filter_for_name sdr:model_r3_set_filter
 		"1.0KHz" sdr:filter_for_name sdr:model_tx_set_filter
 		0.1 sleep
-		"OFF" sdr:agc_for_name sdr:model_r1_set_agc
-		"FAST" sdr:agc_for_name sdr:model_r2_set_agc
-		"SLOW" sdr:agc_for_name sdr:model_r3_set_agc
+		"Off" sdr:agc_for_name sdr:model_r1_set_agc
+		"Fast" sdr:agc_for_name sdr:model_r2_set_agc
+		"Slow" sdr:agc_for_name sdr:model_r3_set_agc
 		0.1 sleep
 		50 sdr:model_r1_set_afgain
 		60 sdr:model_r2_set_afgain
@@ -976,18 +982,19 @@ app_model_test @ #if
 		50 sdr:model_tx_set_rfgain
 		50 sdr:model_tx_set_micgain
 		0.1 sleep
-		*)
+		
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
-		\ sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
-		\ sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
-		\ sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
-		\ sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
-		\ sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
-		\ sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
+		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
+		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
+		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
+		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
+		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
+		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
 		
 		\ Close app model to clean up for next iteration
 		0.1 sleep
-		sdr:app_model_term ;
+		sdr:app_model_term 
+		1 sleep ;
 	
 	\ Test sequence
 	setup	

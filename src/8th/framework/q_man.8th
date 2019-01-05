@@ -1,7 +1,7 @@
 (* 
 	q_man.8th
  
-  manage a pool of queues for use by tasks to return values etc.
+  Manage a pool of queues for use by tasks for responses or event data etc.
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -58,10 +58,10 @@ ns: fr
 \ ----------------------------------
 
 \ Add q with depth 10 to the array
-: make_q	SED: a n --
+: make_q	SED: a n -- a
 	\ in: 	0: a - q_array
 	\				1: n - idx
-	\ out:	none
+	\ out:	0: a - q_array
 	a:new 0 false a:! 1 10 q:new false q:throwing a:! nip a:push ;
 
 \ Create a pool of q's	
@@ -99,9 +99,9 @@ ns: fr
 : q_get_from_id	SED: n -- q
 	\ in: 	0: n - q id
 	\ out:	0: q - q for id
-	.s locked_q_array@
+	locked_q_array@
 	swap a:@ 1 a:@ nip nip
-	unlock_q_array .s ;
+	unlock_q_array ;
 	
 \ ----------------------------------
 \ Release and clear the given q id
@@ -110,11 +110,10 @@ ns: fr
 	\ out:	none
 	locked_q_array@
 	\ Release q
-	swap a:@ 0 false a:!
+	swap a:@ 0 false a:! nip
 	\ Clear q
-	1 a:@ q:clear
-	unlock_q_array .s ;
-	
+	1 a:@ q:clear 2drop
+	unlock_q_array ;
 	
 \ ========================================
 \ Reset namespace
