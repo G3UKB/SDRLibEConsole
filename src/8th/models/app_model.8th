@@ -963,12 +963,12 @@ app_model_test @ #if
 		"LSB" sdr:mode_for_name sdr:model_r1_set_mode
 		"USB" sdr:mode_for_name sdr:model_r2_set_mode
 		"AM" sdr:mode_for_name sdr:model_r3_set_mode
-		\ "FM" sdr:mode_for_name sdr:model_tx_set_mode
+		"FM" sdr:mode_for_name sdr:model_tx_set_mode
 		0.1 sleep
 		"6.0KHz" sdr:filter_for_name sdr:model_r1_set_filter
 		"4.0KHz" sdr:filter_for_name sdr:model_r2_set_filter
 		"2.4KHz" sdr:filter_for_name sdr:model_r3_set_filter
-		\ "1.0KHz" sdr:filter_for_name sdr:model_tx_set_filter
+		"1.0KHz" sdr:filter_for_name sdr:model_tx_set_filter
 		0.1 sleep
 		"Off" sdr:agc_for_name sdr:model_r1_set_agc
 		"Fast" sdr:agc_for_name sdr:model_r2_set_agc
