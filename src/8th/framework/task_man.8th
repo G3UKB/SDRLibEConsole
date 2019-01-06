@@ -64,15 +64,6 @@ ns: fr
 	swap rot  m:! drop 
 	unlock_task_dict ;
 
-\ ----------------------------------	
-\ Lock and get task reference by name
-: task_reg_lock@	SED: s -- t
-	\ in: 	s - task name
-	\ out:	t - task reference
-	locked_task_dict@
-	swap m:@ nip
-	unlock_task_dict ;
-	
 \ ----------------------------------
 \ Wait for task to terminate
 : wait_task SED: s t --
@@ -89,6 +80,15 @@ ns: fr
 	' wait_task m:each 
 	unlock_task_dict drop ;
 
+\ ----------------------------------
+\ Wait for task to terminate
+: wait_single_task	SED: s --
+	dup >r "Waiting for task: " swap s:+ log
+	locked_task_dict@
+	r@ m:@ t:wait
+	r> m:-
+	unlock_task_dict drop ;
+	
 \ ===============================================================================
 \ Generic task for implementing messaging passing concurrency 
 
@@ -159,7 +159,12 @@ ns: fr
 	m:new "cb" p> m:! "data" p> m:!
 	\ Clone the whole message structure and push to the task q
 	clone nip
-	r> task_reg_lock@ dup >r swap t:push r> t:notify ;
+	\ Get task for name and lock task-dict
+	r> locked_task_dict@ swap m:@ nip 
+	\ Push message to task q
+	dup >r swap t:push r> t:notify 
+	\ Release lock
+	unlock_task_dict ;
 	
 \ ========================================
 \ Reset namespace

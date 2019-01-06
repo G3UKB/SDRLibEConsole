@@ -956,8 +956,8 @@ app_model_test @ #if
 		
 		\ Initialise
 		sdr:app_model_init
-		0.2 sleep
-
+		1.0 sleep
+		
 		\ Procedural interface tests
 		7100000 false sdr:model_r1_set_freq
 		7100000 false sdr:model_r2_set_freq
@@ -990,14 +990,15 @@ app_model_test @ #if
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
 		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
+		0.1 sleep
 		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
 		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
 		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
 		
 		\ Close app model to clean up for next iteration
-		0.1 sleep
+		2.0 sleep
 		sdr:app_model_term 
-		1 sleep ;
+		"AppModel_TASK" fr:wait_single_task ;
 	
 	\ Test sequence
 	setup	
@@ -1008,7 +1009,7 @@ app_model_test @ #if
 	fr:pubsub_term
 	
 	\ Wait for all tasks to complete
-	wait_all
+	fr:wait_all
 
 	bye
 	
