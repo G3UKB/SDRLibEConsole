@@ -548,7 +548,11 @@ ns: sdr
 : __do_response	SED: --
 	\ in: 	none
 	\ out: 	none
-	swap fr:q_get_from_id swap q:push q:notify drop 
+	swap fr:q_get_from_id swap 
+	\ Clone response data (probably unnecessary as all scalers
+	clone nip
+	\ Push to given q and notify caller
+	q:push q:notify drop 
 ;
 	
 \ Duplex
