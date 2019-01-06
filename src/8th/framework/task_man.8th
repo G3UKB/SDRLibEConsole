@@ -137,6 +137,10 @@ ns: fr
 		' proc_q t:qlen times
 		\ Check for exit
 		t:name@ "_run" s:+ t:@
+		\ Check for stack problem, only the T value should be on stack at this point.
+		depth 1 n:> if
+			"Task " t:name@ s:+ " warning - stack growing [" s:+ depth >s s:+ "]!" s:+ log
+		then
 	while!
 	t:name@ " - exiting..." s:+ log ;
 
@@ -148,10 +152,12 @@ ns: fr
 	\				s - task name
 	\ out:	none
 	\ Push params and copy task name to r
-	const >p >p >r
+	>p >p >r
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
-	m:new "cb" p> m:! "data" p> m:! const
+	m:new "cb" p> m:! "data" p> m:!
+	\ Clone the whole message structure and push to the task q
+	clone nip
 	r> task_reg_lock@ dup >r swap t:push r> t:notify ;
 	
 \ ========================================

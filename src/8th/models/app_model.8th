@@ -377,7 +377,7 @@ ns: sdr
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "mode" 3 pick fr:val!
 	sdr:SYS_R1_MODE __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
-	sdr:SYS_TX_MODE __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_TX_MODE __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -386,7 +386,7 @@ ns: sdr
 	\ in: 	0: n - new R2 mode
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
-	sdr:SYS_R2_MODE __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R2_MODE __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -395,7 +395,7 @@ ns: sdr
 	\ in: 	0: n - new R3 mode
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "mode" 3 pick fr:val!
-	sdr:SYS_R3_MODE __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R3_MODE __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -423,7 +423,7 @@ ns: sdr
 		__do_app_tx_set_duplex_mode
 	else
 		__do_app_tx_set_simplex_mode
-	then
+	then drop
 ;
 
 \ ========================================
@@ -436,7 +436,7 @@ ns: sdr
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick fr:val!
 	sdr:SYS_R1_FILT __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
-	sdr:SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ pubsub_publish
+	sdr:SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -445,7 +445,7 @@ ns: sdr
 	\ in: 	0: n - new R2 filter
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
-	sdr:SYS_R2_FILT __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R2_FILT __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -454,7 +454,7 @@ ns: sdr
 	\ in: 	0: n - new R2 filter
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick fr:val!
-	sdr:SYS_R3_FILT __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R3_FILT __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -482,7 +482,7 @@ ns: sdr
 		__do_app_tx_set_duplex_filter
 	else
 		__do_app_tx_set_simplex_filter
-	then
+	then drop
 ;
 
 \ ========================================
@@ -493,7 +493,7 @@ ns: sdr
 	\ in: 	0: n - new R1 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
-	sdr:SYS_R1_AGC __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R1_AGC __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -502,7 +502,7 @@ ns: sdr
 	\ in: 	0: n - new R2 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
-	sdr:SYS_R2_AGC __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R2_AGC __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -511,7 +511,7 @@ ns: sdr
 	\ in: 	0: n - new R3 AGC setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "agc" 3 pick fr:val!
-	sdr:SYS_R3_AGC __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R3_AGC __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ========================================
@@ -522,7 +522,7 @@ ns: sdr
 	\ in: 	0: n - new R1 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
-	sdr:SYS_R1_AFGAIN __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R1_AFGAIN __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -531,7 +531,7 @@ ns: sdr
 	\ in: 	0: n - new R2 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
-	sdr:SYS_R2_AFGAIN __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R2_AFGAIN __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -540,7 +540,7 @@ ns: sdr
 	\ in: 	0: n - new R3 AF gain setting
 	\ out: 	none
 	__app_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx ` ] "audio-gain" 3 pick fr:val!
-	sdr:SYS_R3_AFGAIN __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_R3_AFGAIN __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ============================================
@@ -556,7 +556,7 @@ ns: sdr
 	a:open
 	\ in: 	0: T - true if duplex on
 	\ out: 	none
-	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex" 3 pick fr:val! 
+	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state" ] "duplex" 3 pick fr:val! drop
 ;
 
 \ ----------------------------------
@@ -628,7 +628,7 @@ ns: sdr
 	\ in: 	0: n - rf gain value
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "rf-gain" 3 pick fr:val!
-	sdr:SYS_RFGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_RFGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -637,7 +637,7 @@ ns: sdr
 	\ in: 	0: n - mic gain value
 	\ out: 	none
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state"] "mic-gain" 3 pick fr:val!
-	sdr:SYS_MICGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish
+	sdr:SYS_MICGAIN __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] fr:val@ fr:pubsub_publish drop
 ;
 
 \ ========================================
