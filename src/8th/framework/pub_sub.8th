@@ -193,10 +193,10 @@ ns: fr
 	1 pp@ if
 		\ Dispatch on main thread
 		\ Word to invoke on main thread
-		{ "cb" :' main_thd_dispatch } const
+		{ "cb" : ' main_thd_dispatch }
 		\ Word 'to' dispatch 'data' to
 		\ Note we clone the data again to ensure no conflicts
-		"to" r> m:! "data" p@ const m:!
+		"to" r> m:! "data" p@ m:! clone nip
 		g:do
 	else
 		\ Dispatch on this thread, no clone as ownership is this thread

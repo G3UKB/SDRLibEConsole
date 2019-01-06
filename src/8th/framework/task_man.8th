@@ -146,6 +146,7 @@ ns: fr
 
 \ ===============================================================================
 \ Message send to a given task
+\ NOTE: leave p stack as we found it
 : msg!	SED: s w * --
 	\ in:		* - opaque data to send 	
 	\				w - word to invoke in task

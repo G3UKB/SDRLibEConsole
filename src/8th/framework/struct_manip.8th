@@ -81,6 +81,7 @@ ns: fr
 \	1. Dereference the structure from path-2 to obtain an index value then
 \ 2. Dereference the structure from path-1 descriptor then
 \ 3. Return the index element
+\ NOTE: leave p stack as we found it
 : idx_val@	SED: * a a -- *
 	\ in:		a - path-2 to an element to yield an index or an index 	
 	\				a - path-1 to an element [s|n, s|n, s|n ...] 
@@ -95,7 +96,7 @@ ns: fr
 	\ Now index the value list returned
 	r> a:@
 	\ Clean up
-	nip pclear ;
+	nip 3 pndrop ;
 
 \ ========================================
 \
@@ -103,6 +104,7 @@ ns: fr
 \
 
 \ Update a value in the given struct with value,ix at path descriptor
+\ NOTE: leave p stack as we found it
 : val!	SED: * a * * -- 
 	\ in:		* - value to put at index or key
 	\				* - index or key to an element in the resulting structure 	
@@ -122,7 +124,7 @@ ns: fr
 		3 pp@ a:!
 	then
 	\ Clean up
-	drop pclear ;
+	drop 4 pndrop ;
 
 \ ========================================
 \ Reset namespace
