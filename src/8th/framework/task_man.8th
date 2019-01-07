@@ -114,11 +114,12 @@ ns: fr
 	
 \ ----------------------------------
 \ Task entry point for generic servers
-: gen_server	 SED: s --
-	\ in: 	given name
+: gen_server	 SED: s t --
+	\ in: 	0 t: calling task
+	\				1 s: this task name
 	\ out:	none
 	\ Assign name and store in registry
-	dup t:name! t:curtask swap task_reg!
+	>r dup t:name! t:curtask swap task_reg!
 	
 	\ Set us in the run state using a task variable
 	true t:name@ "_run" s:+ t:!
@@ -129,7 +130,7 @@ ns: fr
 	\ Note, should not happen
 	t:getq false q:throwing drop
 	\ Wake up main thread which is waiting for us to finish initialisation
-	t:main t:notify
+	r> t:notify
 	
 	\ Loop while run enabled
 	repeat

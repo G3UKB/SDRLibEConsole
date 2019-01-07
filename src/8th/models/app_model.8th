@@ -667,7 +667,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Create the app model gen-server
-	"AppModel_TASK" 1 ' fr:gen_server t:task-n -1 sleep drop
+	"AppModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
 	"AppModel_TASK" ' do_app_init a:new fr:msg!
 	"App model initialised sent" log
@@ -879,7 +879,23 @@ ns: sdr
 		then
 	then
 	p> fr:q_release nip ;
-	
+
+(*
+: __get_response	SED: -- *
+	\ in: 	none
+	\ out: 	0: * - response
+	p@ fr:q_get_from_id >r
+	100
+	repeat
+		r@ q:pop null? if
+			2drop 0.01 sleep
+			n:1-
+		else
+			nip p> fr:q_release ;;
+		then
+	while drop "???" p> fr:q_release ;
+*)
+
 \ ----------------------------------	
 : model_tx_get_duplex SED:  -- T
 	\ in: 	none
@@ -948,25 +964,20 @@ app_model_test @ #if
 
 	\ Common initialisation
 	: setup
+		"Doing setup" log
 		\ Param stack alloc
 		param_st_alloc
 		\ Pub/sub init
 		' sdr:do_registrations fr:pubsub_init
-		1 sleep
 		\ Set up test sink subscriptions
 		sdr:test_registrations
-		1 sleep 
 		\ Set up q manager
-		fr:q_man_alloc ;
-
-	\ Run one test iteration
-	: runtest
-		cr cr "Run test: " . . cr cr
+		fr:q_man_alloc 
+		"Setup complete" log
+	;
 		
-		\ Initialise
-		sdr:app_model_init
-		1.0 sleep
-		
+	\ Run the procedural tests
+	: run_proc
 		\ Procedural interface tests
 		7100000 false sdr:model_r1_set_freq
 		7100000 false sdr:model_r2_set_freq
@@ -989,30 +1000,52 @@ app_model_test @ #if
 		true sdr:model_tx_set_duplex
 		50 sdr:model_tx_set_rfgain
 		50 sdr:model_tx_set_micgain
+
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
 		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
 		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
 		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
-		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
+		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log
+	;
+
+	\ Run one test iteration
+	: runtest
+		cr cr "Run test: " swap >s s:+ log
+		
+		\ Initialise and do SOD etc
+		"Initialising" log
+		sdr:app_model_init
+		\ 2 sleep
+		"Done initialise" log
+		\ Run proc tests
+		"Running proc tests" log
+		run_proc
+		"Done proc tests" log
+		2.0 sleep
 		
 		\ Close app model to clean up for next iteration
-		2.0 sleep
+		"Closing model" log
 		sdr:app_model_term 
-		"AppModel_TASK" fr:wait_single_task ;
+		"AppModel_TASK" fr:wait_single_task 
+		"Done closing model" log
+	;
+	
+	: run_tests
+		setup	
+		1 sleep
+		' runtest 1 5 loop
+		\ Terminate pub/sub
+		cr "Closing test..." log
+		fr:pubsub_term		
+		\ Wait for all tasks to complete
+		fr:wait_all
+	;
 	
 	\ Test sequence
-	setup	
-	1 sleep
-	' runtest 1 1 loop
-	
-	\ Terminate pub/sub
-	fr:pubsub_term
-	
-	\ Wait for all tasks to complete
-	fr:wait_all
-
+	' run_tests t:task
+	t:wait
 	bye
 	
 #then

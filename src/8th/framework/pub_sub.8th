@@ -247,7 +247,7 @@ ns: fr
 	\ out:	none
 	>r
 	\ Create and start the gen-server
-	"P/S_TASK" 1 ' gen_server t:task-n -1 sleep drop
+	"P/S_TASK" t:curtask 2 ' gen_server t:task-n -1 sleep drop
 	\ Initialise the server
 	"P/S_TASK" ' do_init a:new msg! 
 	\ Register all events
