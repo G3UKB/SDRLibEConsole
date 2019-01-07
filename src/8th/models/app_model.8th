@@ -865,12 +865,21 @@ ns: sdr
 	fr:q_get dup
 	>p a:push ;
 
+\ ----------------------------------
+\ Get task response
 : __get_response	SED: -- *
-	p@ fr:q_get_from_id 1000 q:wait q:pop nip null? if 
-			"Timeout waiting for app model response!" log 
+	\ in: 	none
+	\ out: 	0: * - response
+	p@ fr:q_get_from_id
+	q:pop null? if
+		\ Nothing yet, so wait a while
+		drop 1000 q:wait q:pop null? if 
+			drop "Timeout waiting for app model response!" log 
+			"???"
+		then
 	then
-	p> fr:q_release ;
-
+	p> fr:q_release nip ;
+	
 \ ----------------------------------	
 : model_tx_get_duplex SED:  -- T
 	\ in: 	none
@@ -963,34 +972,27 @@ app_model_test @ #if
 		7100000 false sdr:model_r2_set_freq
 		7100000 false sdr:model_r3_set_freq
 		7100000 false sdr:model_tx_set_freq
-		0.1 sleep
 		"LSB" sdr:mode_for_name sdr:model_r1_set_mode
 		"USB" sdr:mode_for_name sdr:model_r2_set_mode
 		"AM" sdr:mode_for_name sdr:model_r3_set_mode
 		"FM" sdr:mode_for_name sdr:model_tx_set_mode
-		0.1 sleep
 		"6.0KHz" sdr:filter_for_name sdr:model_r1_set_filter
 		"4.0KHz" sdr:filter_for_name sdr:model_r2_set_filter
 		"2.4KHz" sdr:filter_for_name sdr:model_r3_set_filter
 		"1.0KHz" sdr:filter_for_name sdr:model_tx_set_filter
-		0.1 sleep
 		"Off" sdr:agc_for_name sdr:model_r1_set_agc
 		"Fast" sdr:agc_for_name sdr:model_r2_set_agc
 		"Slow" sdr:agc_for_name sdr:model_r3_set_agc
-		0.1 sleep
 		50 sdr:model_r1_set_afgain
 		60 sdr:model_r2_set_afgain
 		70 sdr:model_r3_set_afgain
-		0.1 sleep
 		true sdr:model_tx_set_duplex
 		50 sdr:model_tx_set_rfgain
 		50 sdr:model_tx_set_micgain
-		0.1 sleep
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
 		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
-		0.1 sleep
 		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
 		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
 		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log	
@@ -1003,7 +1005,7 @@ app_model_test @ #if
 	\ Test sequence
 	setup	
 	1 sleep
-	' runtest 1 5000 loop
+	' runtest 1 1 loop
 	
 	\ Terminate pub/sub
 	fr:pubsub_term

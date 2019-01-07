@@ -77,7 +77,9 @@ ns: fr
 \ Wait for all tasks to terminate
 : wait_all	SED: --
 	locked_task_dict@
-	' wait_task m:each 
+	' wait_task m:each
+	1 sleep
+	m:clear
 	unlock_task_dict drop ;
 
 \ ----------------------------------
@@ -107,7 +109,6 @@ ns: fr
 		"Warning, p/s q returned null!" log drop
 	else
 		\ Message to process, just send data part
-		\ "cb" m:@ w:exec
 		"data" m:@ swap "cb" m:@ nip w:exec
 	then ;
 	
@@ -134,7 +135,10 @@ ns: fr
 	repeat
 		\ Wait for a wake up notify
 		-1 sleep
-		' proc_q t:qlen times
+		' proc_q t:qlen 
+		\ Check q length
+		dup 1 n:> if "Q: " . t:qlen . cr cr then 
+		times
 		\ Check for exit
 		t:name@ "_run" s:+ t:@
 		\ Check for stack problem, only the T value should be on stack at this point.
@@ -164,7 +168,10 @@ ns: fr
 	\ Push message to task q
 	dup >r swap t:push r> t:notify 
 	\ Release lock
-	unlock_task_dict ;
+	unlock_task_dict 
+	\ Required in 18.08.2
+	\ Keeps q down to one item I think
+	0.01 sleep ;
 	
 \ ========================================
 \ Reset namespace
