@@ -35,7 +35,7 @@ app_model_test @ #if
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
-	"../framework/q_man.8th"  f:include
+	\ "../framework/q_man.8th"  f:include
 	"../common/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
@@ -545,6 +545,7 @@ ns: sdr
 
 \ ============================================
 \ Get/Set TX Attributes
+(*
 : __do_response	SED: --
 	\ in: 	none
 	\ out: 	none
@@ -554,7 +555,18 @@ ns: sdr
 	\ Push to given q and notify caller
 	q:push q:notify drop 
 ;
-	
+*)
+
+: __do_response	SED: s * --
+	\ in: 	none
+	\ out: 	none
+	swap fr:task_reg@ swap 
+	\ Clone response data (probably unnecessary as all scalers
+	clone nip
+	\ Push to given q and notify caller
+	2dup t:push drop t:notify
+;
+
 \ Duplex
 : do_app_tx_set_duplex SED: a --
 	a:open
@@ -681,7 +693,7 @@ ns: sdr
 	\ out:	none
 	\ Tidy close the model
 	"AppModel_TASK" ' do_app_close a:new fr:msg!
-	0.2 sleep
+	2.0 sleep
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
 
@@ -858,15 +870,23 @@ ns: sdr
 
 \ ----------------------------------		
 \ Following are request/response words
-: __plus_q	SED:	-- a
+\ : __plus_q	SED:	-- a
+\ 	\ in: 	none
+\ 	\ out: 	0: a - [new q id for response]
+\ 	a:new
+\ 	fr:q_get dup
+\ 	>p a:push ;
+
+: __plus_sender	SED:	-- a
 	\ in: 	none
 	\ out: 	0: a - [new q id for response]
 	a:new
-	fr:q_get dup
-	>p a:push ;
-
+	"AppModel_TASK"
+	a:push ;
+	
 \ ----------------------------------
 \ Get task response
+(*
 : __get_response	SED: -- *
 	\ in: 	none
 	\ out: 	0: * - response
@@ -879,29 +899,25 @@ ns: sdr
 		then
 	then
 	p> fr:q_release nip ;
+*)
 
-(*
 : __get_response	SED: -- *
 	\ in: 	none
 	\ out: 	0: * - response
-	p@ fr:q_get_from_id >r
-	100
-	repeat
-		r@ q:pop null? if
-			2drop 0.01 sleep
-			n:1-
-		else
-			nip p> fr:q_release ;;
+	t:pop null? if
+		\ Nothing yet, so wait a while
+		drop 1000 t:q-wait t:pop null? if 
+			drop "Timeout waiting for app model response!" log 
+			"???"
 		then
-	while drop "???" p> fr:q_release ;
-*)
+	then ;
 
 \ ----------------------------------	
 : model_tx_get_duplex SED:  -- T
 	\ in: 	none
 	\ out: 	0: T - true if duplex on
 	\ Send the parameters plus a reply q
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex rot fr:msg! 
 	__get_response ;
 
@@ -909,7 +925,7 @@ ns: sdr
 : model_tx_get_simplex_freq SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex freq
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_freq rot fr:msg! 
 	__get_response ;
 
@@ -917,7 +933,7 @@ ns: sdr
 : model_tx_get_duplex_freq SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex freq
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_freq rot fr:msg!
 	__get_response ;
 
@@ -925,7 +941,7 @@ ns: sdr
 : model_tx_get_simplex_mode SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex mode
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_mode rot fr:msg! 
 	__get_response ;
 
@@ -933,7 +949,7 @@ ns: sdr
 : model_tx_get_duplex_mode SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex mode
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_mode rot fr:msg! 
 	__get_response ;
 
@@ -941,7 +957,7 @@ ns: sdr
 : model_tx_get_simplex_filter SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex filter
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_filter rot fr:msg! 
 	__get_response ;
 
@@ -949,7 +965,7 @@ ns: sdr
 : model_tx_get_duplex_filter SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex filter
-	__plus_q
+	__plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_filter rot fr:msg! 
 	__get_response ;
 
@@ -972,7 +988,7 @@ app_model_test @ #if
 		\ Set up test sink subscriptions
 		sdr:test_registrations
 		\ Set up q manager
-		fr:q_man_alloc 
+		\ fr:q_man_alloc 
 		"Setup complete" log
 	;
 		
@@ -1028,11 +1044,14 @@ app_model_test @ #if
 		\ Close app model to clean up for next iteration
 		"Closing model" log
 		sdr:app_model_term 
+		2.0 sleep
 		"AppModel_TASK" fr:wait_single_task 
 		"Done closing model" log
+		2.0 sleep
 	;
 	
 	: run_tests
+		t:getq false q:throwing drop
 		setup	
 		1 sleep
 		' runtest 1 5 loop

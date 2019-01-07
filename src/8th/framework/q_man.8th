@@ -136,17 +136,45 @@ q_man_test @ #if
 			fr:q_release fr:__q_array . cr
 	;
 	
-	: usage_test	\ --
+	: basic_test	\ --
 		' run_get 0 9 loop
 		' run_get_from_id 0 9 loop
 		' run_free 0 9 loop
 		0.1 sleep
 	;
 
-	cr cr "Running usage test..." . cr cr
+	
+	: t1
+		\ Push it a q id
+		t:curtask swap fr:q_get t:push t:notify
+		1000 
+	;
+	
+	: t2
+		1000 t:wait t:pop null? if
+			drop "Timeout?" log
+		else
+			fr:q_get_from_id "Help" q:push
+		then
+	;
+	
+	: usage_test
+		\ Start t1 and send it a q id
+		' t1 t:task
+		' t2 t:task
+	;
+	
+	
+	cr cr "Running basic test..." . cr cr
 	fr:q_man_alloc \ fr:__q_array . cr
+	basic_test
+	1 sleep
+	"Done basic test" . cr
+	
+	cr cr "Running usage test..." . cr cr
 	usage_test
 	1 sleep
 	"Done usage test" . cr
+	
 	bye
 #then

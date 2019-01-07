@@ -64,6 +64,15 @@ ns: fr
 	swap rot  m:! drop 
 	unlock_task_dict ;
 
+\ ----------------------------------	
+\ Get task referance
+: task_reg@	SED: s -- t
+	\ in: 	0: s - task name
+	\ out:	0: t - task ref
+	locked_task_dict@
+	swap m:@ nip 
+	unlock_task_dict ;
+	
 \ ----------------------------------
 \ Wait for task to terminate
 : wait_task SED: s t --
