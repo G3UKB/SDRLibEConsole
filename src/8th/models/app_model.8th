@@ -881,7 +881,7 @@ ns: sdr
 	\ in: 	none
 	\ out: 	0: a - [new q id for response]
 	a:new
-	"AppModel_TASK"
+	"TEST_TASK"
 	a:push ;
 	
 \ ----------------------------------
@@ -1016,20 +1016,26 @@ app_model_test @ #if
 		true sdr:model_tx_set_duplex
 		50 sdr:model_tx_set_rfgain
 		50 sdr:model_tx_set_micgain
-
+		1 sleep
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
+		1 sleep
 		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log
+		1 sleep
 	;
 
 	\ Run one test iteration
 	: runtest
 		cr cr "Run test: " swap >s s:+ log
-		
 		\ Initialise and do SOD etc
 		"Initialising" log
 		sdr:app_model_init
@@ -1052,11 +1058,13 @@ app_model_test @ #if
 	
 	: run_tests
 		t:getq false q:throwing drop
+		t:curtask "TEST_TASK" fr:task_reg!
 		setup	
 		1 sleep
 		' runtest 1 5 loop
 		\ Terminate pub/sub
 		cr "Closing test..." log
+		"TEST_TASK" fr:task_reg@ 0 t:kill
 		fr:pubsub_term		
 		\ Wait for all tasks to complete
 		fr:wait_all
