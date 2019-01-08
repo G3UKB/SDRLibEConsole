@@ -35,7 +35,6 @@ app_model_test @ #if
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
-	\ "../framework/q_man.8th"  f:include
 	"../common/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
@@ -870,43 +869,21 @@ ns: sdr
 
 \ ----------------------------------		
 \ Following are request/response words
-\ : __plus_q	SED:	-- a
-\ 	\ in: 	none
-\ 	\ out: 	0: a - [new q id for response]
-\ 	a:new
-\ 	fr:q_get dup
-\ 	>p a:push ;
 
+\ Add sender to message
 : __plus_sender	SED:	-- a
 	\ in: 	none
 	\ out: 	0: a - [new q id for response]
-	a:new
-	"TEST_TASK"
-	a:push ;
+	a:new t:name@ a:push ;
 	
 \ ----------------------------------
 \ Get task response
-(*
-: __get_response	SED: -- *
-	\ in: 	none
-	\ out: 	0: * - response
-	p@ fr:q_get_from_id
-	q:pop null? if
-		\ Nothing yet, so wait a while
-		drop 1000 q:wait q:pop null? if 
-			drop "Timeout waiting for app model response!" log 
-			"???"
-		then
-	then
-	p> fr:q_release nip ;
-*)
-
 : __get_response	SED: -- *
 	\ in: 	none
 	\ out: 	0: * - response
 	t:pop null? if
 		\ Nothing yet, so wait a while
-		drop 1000 t:q-wait t:pop null? if 
+		drop -1 sleep t:pop null? if 
 			drop "Timeout waiting for app model response!" log 
 			"???"
 		then
@@ -987,8 +964,6 @@ app_model_test @ #if
 		' sdr:do_registrations fr:pubsub_init
 		\ Set up test sink subscriptions
 		sdr:test_registrations
-		\ Set up q manager
-		\ fr:q_man_alloc 
 		"Setup complete" log
 	;
 		
@@ -1018,19 +993,12 @@ app_model_test @ #if
 		50 sdr:model_tx_set_micgain
 		1 sleep
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_simplex_mode "Simplex mode: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_duplex_mode "Duplex mode: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_simplex_filter "Simplex filter: " swap >s s:+ log
-		1 sleep
 		sdr:model_tx_get_duplex_filter "Duplex filter: " swap >s s:+ log
-		1 sleep
 	;
 
 	\ Run one test iteration
@@ -1058,6 +1026,7 @@ app_model_test @ #if
 	
 	: run_tests
 		t:getq false q:throwing drop
+		"TEST_TASK" t:name!
 		t:curtask "TEST_TASK" fr:task_reg!
 		setup	
 		1 sleep
