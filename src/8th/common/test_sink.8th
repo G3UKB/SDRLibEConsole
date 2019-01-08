@@ -30,9 +30,7 @@ ns: sdr
 
 \ Use to check specific data as can't cope with printing too much data	
 : test_callback_check
-	\ "cb1: " t:name@ s:+ " : " s:+ s:+ . cr ;
-	drop "cb1: " t:name@ s:+ log 
-	depth log ;
+	"cb1: " t:name@ s:+ 0.1 sleep " : " s:+ . . cr ;
 
 : test_registrations	
 	UI_SMPL_RATE ' test_callback fr:pubsub_subscribe

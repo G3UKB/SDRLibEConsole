@@ -991,7 +991,7 @@ app_model_test @ #if
 		true sdr:model_tx_set_duplex
 		50 sdr:model_tx_set_rfgain
 		50 sdr:model_tx_set_micgain
-		1 sleep
+		2 sleep
 		sdr:model_tx_get_duplex "Duplex: " swap >s s:+ log
 		sdr:model_tx_get_simplex_freq "Simplex freq: " swap >s s:+ log
 		sdr:model_tx_get_duplex_freq "Duplex freq: " swap >s s:+ log
@@ -1007,41 +1007,41 @@ app_model_test @ #if
 		\ Initialise and do SOD etc
 		"Initialising" log
 		sdr:app_model_init
-		\ 2 sleep
 		"Done initialise" log
 		\ Run proc tests
 		"Running proc tests" log
 		run_proc
 		"Done proc tests" log
-		2.0 sleep
-		
 		\ Close app model to clean up for next iteration
 		"Closing model" log
 		sdr:app_model_term 
-		2.0 sleep
 		"AppModel_TASK" fr:wait_single_task 
 		"Done closing model" log
-		2.0 sleep
 	;
 	
+	\ Run tests on a separate thread
 	: run_tests
 		t:getq false q:throwing drop
 		"TEST_TASK" t:name!
 		t:curtask "TEST_TASK" fr:task_reg!
 		setup	
-		1 sleep
-		' runtest 1 5 loop
+		2 sleep
+		' runtest 1 500 loop
 		\ Terminate pub/sub
 		cr "Closing test..." log
-		"TEST_TASK" fr:task_reg@ 0 t:kill
 		fr:pubsub_term		
-		\ Wait for all tasks to complete
-		fr:wait_all
+		\ Wait for P/S to terminate
+		\ AppModel_TASK already terminated
+		"P/S_TASK" fr:wait_single_task 
+		"TEST_TASK exiting..." log
 	;
 	
 	\ Test sequence
+	"MAIN_TASK" t:name!
 	' run_tests t:task
+	\ Wait for main task to terminate
 	t:wait
+	2 sleep
 	bye
 	
 #then
