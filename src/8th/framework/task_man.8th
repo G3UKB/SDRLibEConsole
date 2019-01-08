@@ -178,10 +178,7 @@ ns: fr
 	\ Push message to task q
 	dup >r swap t:push r> t:notify 
 	\ Release lock
-	unlock_task_dict 
-	\ Required in 18.08.2
-	\ Keeps q down to one item I think
-	0.01 sleep ;
+	unlock_task_dict ;
 	
 \ ========================================
 \ Reset namespace

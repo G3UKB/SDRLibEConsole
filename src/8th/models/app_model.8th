@@ -1026,7 +1026,7 @@ app_model_test @ #if
 		t:curtask "TEST_TASK" fr:task_reg!
 		setup	
 		2 sleep
-		' runtest 1 500 loop
+		' runtest 1 5000 loop
 		\ Terminate pub/sub
 		cr "Closing test..." log
 		fr:pubsub_term		
