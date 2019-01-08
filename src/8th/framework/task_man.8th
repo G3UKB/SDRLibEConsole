@@ -178,7 +178,8 @@ ns: fr
 	\ Push message to task q
 	dup >r swap t:push r> t:notify 
 	\ Release lock
-	unlock_task_dict ;
+	unlock_task_dict 
+	0.01 sleep ;
 	
 \ ========================================
 \ Reset namespace
