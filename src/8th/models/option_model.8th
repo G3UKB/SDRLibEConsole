@@ -169,13 +169,18 @@ ns: sdr
 	"option_model" t:! ;
 
 \ ----------------------------------
-: __option_get_db_num_rx	\ -- num-rx
+\ Return number of RX channels from the database
+: __option_get_db_num_rx	SED: -- n
+	\ in: 	none
+	\ out:	0: n - num rx
 	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@ >n
 ;
 
 \ ----------------------------------
-\ Set the value holders
-: __option_copy_to_holding_vars
+\ Copy db fields to local value holders
+: __option_copy_to_holding_vars	SED: --
+	\ in: 	none
+	\ out:	none
 	\ Only need num-rx at present as we must give the current number and not the new number as restart required
 	__option_get_db_num_rx "curr_numrx" t:!
 ;
@@ -306,29 +311,58 @@ ns: sdr
 
 \ ============================================
 \ Get/Set general section value holders
-: __option_get_num_rx	\ -- num-rx
+: __option_get_num_rx	SED: -- n
+	\ in: 	none
+	\ out: 	0: n - current num rx (not saved db value if different)
 	"curr_numrx" t:@
 ;
 
-\ Number of receivers
-: do_option_get_num_rx	\ -- num-rx
-	__option_get_num_rx
+\ ----------------------------------
+\ Push response data to sender
+: __option_do_response	SED: s * --
+	\ in: 	0: * - response data
+	\				1: s - sender (task name)
+	\ out: 	none
+	swap fr:task_reg@ swap 
+	\ Clone response data (probably unnecessary as all scalers
+	clone nip
+	\ Push to given q and notify caller
+	2dup t:push drop t:notify
 ;
 
-: do_option_set_num_rx	\	value --
-	\ Set numrx index
+\ ----------------------------------
+\ Number of receivers
+: do_option_get_num_rx SED: a --
+	a:open
+	\ in: 	0: q - sender (task name)
+	\ out: 	q: n - num rx
+	__option_get_num_rx
+	__option_do_response
+;
+
+\ ----------------------------------
+: do_option_set_num_rx	SED: n --
+	a:open
+	\ in: 	0: n - num rx
+	\ out: 	none
 	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
+\ ----------------------------------
 \ Sample rate
-: do_option_set_sample_rate	\	value --
-	\ Set smplrate index
+: do_option_set_sample_rate	SED: n --
+	a:open
+	\ in: 	0: n - sample rate
+	\ out: 	none
 	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
+\ ----------------------------------
 \ Block size
-: do_option_set_blk_sz	\	value --
-	\ Set blksz index
+: do_option_set_blk_sz	SED: n --
+	a:open
+	\ in: 	0: n - block size
+	\ out: 	none
 	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 

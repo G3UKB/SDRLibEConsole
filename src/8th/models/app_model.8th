@@ -547,20 +547,10 @@ ns: sdr
 
 \ ============================================
 \ Get/Set TX Attributes
-(*
-: __do_response	SED: --
-	\ in: 	none
-	\ out: 	none
-	swap fr:q_get_from_id swap 
-	\ Clone response data (probably unnecessary as all scalers
-	clone nip
-	\ Push to given q and notify caller
-	q:push q:notify drop 
-;
-*)
-
-: __do_response	SED: s * --
-	\ in: 	none
+\ Push response data to sender
+: __app_do_response	SED: s * --
+	\ in: 	0: * - response data
+	\				1: s - sender (task name)
 	\ out: 	none
 	swap fr:task_reg@ swap 
 	\ Clone response data (probably unnecessary as all scalers
@@ -580,64 +570,64 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_freq SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - simplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_freq SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - duplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_mode SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - simplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_mode SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_simplex_filter SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - simplex filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
 : do_app_tx_get_duplex_filter SED: a --
 	a:open
-	\ in: 	0: q - q id to send reply on
+	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
-	__do_response
+	__app_do_response
 ;
 
 \ ----------------------------------
