@@ -256,6 +256,9 @@ ns: sdr
 \ ========================================
 \ Message Handlers
 \ Called only by app model gen-server
+\ Convention:
+\		__app_...		=	local word, not externally callable
+\		do_app_...	=	Message handler
 \ ========================================
 
 \ Initialise the app model at task level

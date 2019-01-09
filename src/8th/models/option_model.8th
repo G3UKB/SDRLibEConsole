@@ -1,0 +1,663 @@
+(*
+	options_model.8th
+ 
+  radio options model for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+true var, option_model_test
+option_model_test @ #if
+	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
+	"../framework/param_st.8th" f:include
+	"../framework/task_man.8th" f:include
+	"../framework/struct_manip.8th" f:include
+	"../common/events.8th" f:include
+	"../common/registrations.8th" f:include
+	"../framework/pub_sub.8th"  f:include
+	"../common/test_sink.8th" f:include
+	"../common/persist.8th" f:include
+	"../common/radio_defs.8th" f:include
+	"model_common.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
+\ ========================================
+
+\ Define our SDR namespace
+ns: sdr
+
+\ ===========================================================================================
+\ TASK LEVEL CODE
+\ PRIVATE
+
+\ ===========================================================================================
+\ OPTIONS MODEL
+(*
+	Model for options -
+		1. The model has a default which is used if there is no persisted model. If there is a persisted
+		model this is restored and used as the current model.
+		2. The model is saved at end of day and may be saved at other times as a precaution.
+		3. This model contains all the data and settings for the options. It is used to both populate the
+		UI and to set the current values. In some cases values are obtained at runtime [such as the current
+		audio devices].
+*)
+
+\ Variables that holds the current audio device information
+\ Of the form -
+(*
+	{
+		"inputs" | "outputs":
+		[
+			{
+				"channels":2,
+				"direction":0,
+				"index":1,
+				"api":"MME",
+				"name":"Microphone [Realtek High Defini"
+			},
+
+			{
+				"channels":8,
+				"direction":0,
+				"index":2,
+				"api":"MME",
+				"name":"Line 2 [Virtual Audio Cable]"
+			},
+			...
+		]
+	}
+*)
+
+\ ===========================================================================================	
+\ Default model
+: __option_model_default	\	-- default-structure
+	(*
+	 	Default options model structure
+	 	This is the model data which is used as default and saved/restored thus after
+	 	Listeners are set on the dynamic part of the data e.g. [0,false,["48000", "96000", "192000"]]]
+	 	There is one flag outside of the listener region.
+			flag 1 - true if the update source was the UI i.e. a user interaction, false otherwise
+		There is one flag within the listener region
+			flag 2 - is set on every dynamic area at SoD, also flag 1 is set. This will cause all
+								listeners to fire and update the UI.
+	 	e.g. [0, false, [48000, 96000, 192000]], the flag is false, the index into the array is 0
+		thus selecting 48000 and the array values are the items for the dropdown list.
+	*)
+	
+	{
+		"general" : {
+		\	key								src			index/val 	SoD			option list			
+			"smplrate" : 			[false, [0, 				true, 	["48000", "96000", "192000"]]],
+			"numrx" : 				[false, [0, 				true, 	["1", "2", "3"]]],
+			"blksz" : 				[false, [1, 				true, 	["512", "1024", "2048", "4096"]]]
+		},
+		"audio" : {
+			"inputsrc" : 			[false, [0, 				true, 	["HPSDR", "Local"]]],
+			"inputdev" : 			[false, [0, 				true, 	[]]],
+			"outputsnk" :			[false, [0, 				true, 	["HPSDR", "Local"]]],
+			"receiver" :			[false, [0, 				true, 	["1","2","3"]]],
+			"outputdev" :			[false, [0, 				true, 	[]]],
+			"channel" :				[false, [0, 				true, 	["Left","Right","Both"]]],
+			\ Routes [[sink, rx, device, ch],[...],...]
+			"routes" :		[]
+		},
+		"antenna" : {
+		},
+		"receiver" : {
+			\	key						src			index/val 	SoD			option list			
+			"avmode" : 		[false, [0, 				true, 	["Time Average Log", 
+																								"Peak Detect",
+																								"No Average",
+																								"Time Average Linear",
+																								"Time Average Log",
+																								"Window Average Linear",
+																								"Window Average Log",
+																								"Low Noise Floor Linear",
+																								"Low Noise Floor Log"]]],
+			"avover" : 		[false, [0, 				true, 	["10", "20", "30", "40", "50", "60"]]],
+			"wintype" : 	[false, [0, 				true, 	["Rectangular",
+																								"Blackman-Harris",
+																								"Hann",
+																								"Flat-top",
+																								"Hamming",
+																								"Kaiser"]]],
+			"fftsize" : 	[false, [0, 				true, 	["4096", "8192", "16384", "32768", "65536"]]]
+		},
+		"transmitter" : {
+			"tunelevel" : [false, [20, 		true, 	[]]]
+		}	
+	}
+;
+
+\ ===============================================================================
+\ Model management
+
+\ ----------------------------------
+\ Get model
+: __option_model@	SED: -- m
+	\ in: 	none
+	\ out:	model
+	"option_model" t:@ ;
+
+\ ----------------------------------
+\ Save model
+: __option_model!	SED: m -- 
+	\ in: 	model
+	\ out:	none
+	"option_model" t:! ;
+
+\ ----------------------------------
+: __option_get_db_num_rx	\ -- num-rx
+	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@ >n
+;
+
+\ ----------------------------------
+\ Set the value holders
+: __option_copy_to_holding_vars
+	\ Only need num-rx at present as we must give the current number and not the new number as restart required
+	__option_get_db_num_rx "curr_numrx" t:!
+;
+
+\ ----------------------------------
+\ Restore model else use the default
+: __option_model_restore	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Attempt to restore the model
+	\ Get the path to the conf app file
+	\ BC: why do I need a sleep, else fails and crashes
+	OPTION_MODEL_FILENAME create_model_path 0.1 sleep null? if
+		"Failed to locate directory. Please create a conf directory under /8th." throw
+	then
+	\ Attempt to restore the options model
+	restore_model_data null?
+	if
+		"No options model found, using options default" log
+		drop
+		\ No persisted model so use default and save to task var
+		__option_model_default dup __option_model!
+		\ Save the default model
+		OPTION_MODEL_FILENAME create_model_path create_model_file 0.1 sleep save_model_data
+		2drop
+	else
+		\ Save the restored model to a task var
+		__option_model!
+	then
+	\ Copy current values into holding vars
+	__option_copy_to_holding_vars
+;
+
+\ ----------------------------------
+\ Save current model 
+: __option_model_save	SED: --
+	\ in: 	none
+	\ out:	none
+	__option_model@ OPTION_MODEL_FILENAME create_model_path save_model_data drop
+;
+
+\ ===============================================================================
+\ Audio device management
+(*
+\ Set audio section lists
+\ Build the device list as api:index:name
+: __option_build_device_name_array	\ a:device-names idx device-data	-- a:+device_name
+	nip 
+	"name" m:@ 
+	swap "index" m:@  
+	swap "api" m:@ nip
+	"%s:%d:%s" s:strfmt a:push
+;
+
+\ ----------------------------------
+\ Populate input device list
+: __option_set_input_device_list	\	 --
+	\ Get device list from the C layer
+	c_i_server_enum_audio_inputs dup audio_device_inputs ! "inputs" m:@ nip
+	\ Get array of device names
+	a:new swap ' __option_build_device_name_array a:each drop
+	\ Populate model
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+\ Populate output device list
+: __option_set_output_device_list	\	 --
+	\ Get device list from the C layer
+	c_i_server_enum_audio_outputs dup audio_device_outputs ! "outputs" m:@ nip
+	\ Get array of device names
+	a:new swap ' __option_build_device_name_array a:each drop
+	\ Populate model
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> fr:val! drop
+;
+*)
+\ ========================================
+\ Start-of-day. Send restored/default data to all subscribers
+: options_start_of_day	SED: --
+	\ in: 	none
+	\ out:	none
+	__option_model@ >r
+	\ The model has been restored from disc at this point
+	\ First get the current audio devices from the C layer
+	\ as these are dynamic so have to be refreshed.
+	\ __option_set_input_device_list
+	\ __option_set_output_device_list
+	
+	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_RECEIVER r@ ["audio", "receiver", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_OUTPUT_DEV r@ ["audio", "outputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_CHANNEL r@ ["audio", "channel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_TUNE_LEVEL r@ ["transmitter", "tunelevel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+
+	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_NUM_RX r@ ["general", "numrx", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_AUDIO_ROUTE r@ ["audio", "routes"] fr:val@ fr:pubsub_publish
+	SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+
+	"Options Start-of-Day complete " log
+;
+
+\ ===============================================================================
+\ Message Handlers
+\ Called only by option model gen-server
+\ Convention:
+\		__option_...	=	local word, not externally callable
+\		do_option_...	=	Message handler
+\ ===============================================================================
+
+\ ============================================
+\ Get/Set general section value holders
+: __option_get_num_rx	\ -- num-rx
+	"curr_numrx" t:@
+;
+
+\ Number of receivers
+: do_option_get_num_rx	\ -- num-rx
+	__option_get_num_rx
+;
+
+: do_option_set_num_rx	\	value --
+	\ Set numrx index
+	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ Sample rate
+: do_option_set_sample_rate	\	value --
+	\ Set smplrate index
+	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ Block size
+: do_option_set_blk_sz	\	value --
+	\ Set blksz index
+	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ============================================
+\ Get/Set audio section value holders
+: do_option_set_input_source	\	value --
+	\ Set input src
+	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_set_input_device	\	value --
+	\ Set inputdev index
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_set_output_sink	\	value --
+	\ Set outputsnk index
+	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_get_output_sink	\	 -- value
+	__option_model@ ["audio","outputsnk", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputsnk", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+;
+
+\ ----------------------------------
+: do_option_set_receiver	\	value --
+	\ Set receiver index
+	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_get_receiver	\	 -- value
+	__option_model@ ["audio","receiver", ` dyn_idx ` , ` lst_idx ` ] ["audio","receiver", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+;
+
+\ ----------------------------------
+: do_option_set_output_device	\	value --
+	\ Set outputdev index
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_get_output_device	\	 -- value
+	__option_model@ ["audio","outputdev", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputdev", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+;
+
+\ ----------------------------------
+: do_option_set_channel	\	value --
+	\ Set channel index
+	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ----------------------------------
+: do_option_get_channel	\	 -- value
+	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+;
+
+\ ========================================
+\ Audio Route Management
+
+\ Get/set audio routes
+: do_option_remove_route	\ index
+	__option_model@ ["audio","routes" ] fr:val@ swap a:-
+;
+
+\ ----------------------------------
+\ Get all current routes
+: __option_get_routes	\	-- routes
+	__option_model@ ["audio","routes" ] fr:val@
+;
+
+\ ----------------------------------
+\ Get all current routes
+: do_option_get_routes	\	-- routes
+	__option_get_routes
+;
+
+\ ----------------------------------
+\ Get route count
+: do_option_get_route_count
+	__option_get_routes a:len
+;
+
+\ ----------------------------------
+\ Check for channel conflicts
+\ Get the channel data on the r stack
+: __option_get_ch_data 									\ f new-route existing-route -- f new-route existing-route r:[existing-ch, new-ch]
+	ch_idx a:@ >r									\ f new-route existing-route -- f new-route existing-route r:existing-ch
+	swap													\ f new-route existing-route r:existing-ch -- f existing-route new-route r:existing-ch
+	ch_idx a:@ >r									\ f existing-route new-route r:existing-ch -- f existing-route new-route r:existing-ch new-ch
+	swap													\ f existing-route new-route r:existing-ch new-ch -- f new-route existing-route r:existing-ch new-ch
+	a:new r> a:push r> a:push >r 	\ f new-route existing-route r:existing-ch new-ch -- f new-route existing-route r:[existing-ch, new-ch]
+;
+
+\ ----------------------------------
+\ Ensure neither route uses both channels
+: __option_both_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
+	r@ 0 a:@ "Both" s:=ic if
+		drop true
+	else
+		1 a:@ "Both" s:=ic if
+			drop true
+		else
+			drop false
+		then
+	then
+;
+
+\ ----------------------------------
+\ Ensure neither route uses the same channel
+: __option_left_right_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
+	r@ 
+	0 a:@ "Left" s:=ic if
+		1 a:@ "Right" s:=ic if
+			drop false ;;
+		then
+	then
+	0 a:@ "Right" s:=ic if
+		1 a:@ "Left" s:=ic if
+			drop false ;;
+		then
+	then
+	drop true
+;
+
+\ ----------------------------------
+\ Rules - signal conflict when :
+\		1. Either route uses both channels
+\		2. Both routes use left channel
+\		3. Both routes use right channel
+: __option_check_channels								\ f new-route existing-route -- f new-route existing-route f
+	\ Get channel data in r
+	__option_get_ch_data										\ f new-route existing-route  -- ... r:[existing-ch, new-ch]
+	__option_both_conflict if
+		true
+	else
+		__option_left_right_conflict
+	then
+;
+
+\ ----------------------------------
+\ Check for identical device, this is id, name and api
+: __option_same_device? 									\ f new-route existing-route -- f new-route existing-route f
+	dev_idx a:@										\ f new-route existing-route -- f new-route existing-route existing-dev
+	rot 													\ f new-route existing-route existing-dev -- f existing-route existing-dev new-route 
+	dev_idx a:@ 									\ f existing-route existing-dev new-route -- f existing-route existing-dev new-route new-dev
+	rot 													\ f existing-route existing-dev new-route new-dev -- f existing-route new-route new-dev existing-dev
+	s:= swap rot rot 							\ f existing-route new-route new-dev existing-dev -- f new-route existing-route f
+;
+
+\ ----------------------------------
+\ Does new-route conflict with any existing route
+\ f = true if conflict else false
+: __option_compare_routes								\ f new-route idx existing-route -- f new-route
+	nip __option_same_device?							\ f new-route idx existing-route -- f new-route existing-route f
+	if 														\ f existing-route new-route new-dev existing-dev -- f existing-route new-route
+		\ We have the same device including index and api
+		\ Now need to check the channel allocations
+		__option_check_channels							\ f existing-route new-route -- f existing-route new-route f
+		if
+			\ There is a channel conflict so exit scan
+			rot 											\ new-route existing-route f
+			drop 											\ new-route existing-route 
+			true -rot break						\ f new-route existing-route
+		then
+	then
+	\ Remember that break does not break at the execution point but runs to end of word
+	drop													\ f new-route 
+;
+
+\ ----------------------------------
+\ Is the route already defined
+: __option_route_in_use	\	new-route	-- new-route true|false
+		false swap __option_model@ ["audio","routes" ] fr:val@ a:len 0 n:>
+		if
+			\ Entries to compare
+			' __option_compare_routes a:each
+		then
+;
+
+\ ----------------------------------
+\ Check conflicts and push route to the model
+: do_option_push_route		\ new-route -- true|false
+	__option_route_in_use drop swap if
+		false
+	else
+		__option_model@ ["audio","routes" ] fr:val@ swap a:push
+		\ Publish all routes as we don't know what changed, we may have deleted some etc
+		SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] fr:val@ pubsub_publish
+		true		
+	then
+;
+
+\ ============================================
+\ Get/Set receiver section value holders
+: do_option_set_average_mode	\	value --
+	\ Set averagemode index
+	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+: do_option_set_over	\	value --
+	\ Set averageover index
+	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+: do_option_set_window_type	\	value --
+	\ Set windowtype index
+	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+: do_option_set_fft_size	\	value --
+	\ Set fftsize index
+	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ============================================
+\ Get/Set transmitter section value holders
+\ Tune level
+: do_option_set_tune_level	\	value --
+	\ Set tune level value
+	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+;
+
+\ ===========================================================================================
+\ MAIN CODE
+
+\ Call level interface from all modules, may be called by any task.
+\ The options model does not subscribe to any events, it is called directly usually off an 
+\ event fielded by another module. However it does publish events where others may be 
+\ interested in updates to the model. 
+
+\ ----------------------------------
+\ Module initialisation
+: option_model_init	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Create the app model gen-server
+	"OptionsModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
+	\ Ask the model to initialise itself
+	"OptionsModel_TASK" ' do_options_init a:new fr:msg!
+	"Options model initialised sent" log
+	"OptionsModel_TASK" ' do_options_start_of_day a:new fr:msg!
+	"Options model start of day sent" log ;
+
+\ ----------------------------------
+\ Module close
+: option_model_term	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Tidy close the model
+	"OptionsModel_TASK" ' do_options_close a:new fr:msg!
+	2.0 sleep
+	\ Ask the model to exit
+	"OptionsModel_TASK" ' fr:do_term a:new fr:msg! ;
+
+\ ===============================================================================
+\ Public procedural interface
+\ ===============================================================================
+
+
+\ ========================================
+\ Restore namespace	
+ns: user	
+
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+option_model_test @ #if
+
+	\ Common initialisation
+	: setup
+		"Doing setup" log
+		\ Param stack alloc
+		param_st_alloc
+		\ Pub/sub init
+		' sdr:do_registrations fr:pubsub_init
+		\ Set up test sink subscriptions
+		sdr:test_registrations
+		"Setup complete" log
+	;
+	
+	\ Run the procedural tests
+	: run_proc
+	;
+	
+	\ Run one test iteration
+	: runtest
+		cr cr "Run test: " swap >s s:+ log
+		\ Initialise and do SOD etc
+		"Initialising" log
+		sdr:option_model_init
+		"Done initialise" log
+		\ Run proc tests
+		"Running proc tests" log
+		run_proc
+		"Done proc tests" log
+		\ Close options model to clean up for next iteration
+		"Closing model" log
+		sdr:option_model_term 
+		"OptionModel_TASK" fr:wait_single_task 
+		"Done closing model" log
+	;
+
+	\ Run tests on a separate thread
+	: run_tests
+		t:getq false q:throwing drop
+		"TEST_TASK" t:name!
+		t:curtask "TEST_TASK" fr:task_reg!
+		setup	
+		2 sleep
+		' runtest 1 1 loop
+		\ Terminate pub/sub
+		cr "Closing test..." log
+		fr:pubsub_term		
+		\ Wait for P/S to terminate
+		\ OptionModel_TASK already terminated
+		"P/S_TASK" fr:wait_single_task 
+		"TEST_TASK exiting..." log
+	;
+
+	\ Test sequence
+	"MAIN_TASK" t:name!
+	' run_tests t:task
+	\ Wait for main task to terminate
+	t:wait
+	2 sleep
+	bye
+	
+#then

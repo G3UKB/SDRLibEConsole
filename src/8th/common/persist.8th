@@ -41,6 +41,7 @@ ns: sdr
 \ ===============================================================================
 \ File names
 : APP_MODEL_FILENAME "app-model.cfg" ;
+: OPTION_MODEL_FILENAME "option-model.cfg" ;
 
 \ ----------------------------------
 \ Step path back n directory levels
