@@ -98,31 +98,25 @@ ns: sdr
 \ ===============================================================================
 \ Initialisation
 \ Create UDP socket
-: __conn_alloc_cmd_sock	SED: -- net
-	\ in: 	none
-	\ out:	s0 - command socket
-	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! ;
+{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, udp_cmd_sock
 	
 \ Get command socket
 : __conn_cmd_sock@	SED: -- net
 	\ in: 	none
 	\ out:	s0 - command socket
-	"udp_cmd_sock" t:@ ;
+	udp_cmd_sock @ ;
 
 \ ===============================================================================
 \ Buffers
 \ Response buffer
-: conn_alloc_resp_buff	SED: -- 
-	\ in: 	none
-	\ out:	none
-	5000 b:new 0x0 b:fill "b_resp_buffer" t:! ;
+5000 b:new 0x0 b:fill var, b_resp_buffer
 
 \ ----------------------------------	
 \ Get response buffer
 : __conn_resp_buff@	SED: -- b
 	\ in: 	none
 	\ out:	0: b - response buffer
-	"b_resp_buffer" t:@ ;
+	b_resp_buffer @ ;
  
 \ ===============================================================================
 \ Json encoded request messages
@@ -269,7 +263,7 @@ ns: sdr
 	\ out:	0: T - true if response received
 	\				1: m - the response structure (map in this case)
 	__conn_net_wait_recv_cmd if
-		recv_from
+		__conn_recv_from
 	else
 		"Timeout waiting for response!" log drop {} false
 	then ;
@@ -314,24 +308,21 @@ ns: sdr
 : do_app_init	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __conn_alloc_cmd_sock __conn_alloc_resp_buff
-;
+	drop ;
 
 \ ----------------------------------
 \ Run SOD
-: do_app_start_of_day	SED: m --
+: do_conn_start_of_day	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __app_start_of_day
-;
+	drop ;
 
 \ ----------------------------------
 \ Close the app model at task level
 : do_app_close	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __app_model_save
-;
+	drop ;
 
 \ ========================================
 \ Basic receiver scripting
@@ -417,7 +408,7 @@ ns: sdr
 	\ Ask the model to initialise itself
 	"Connector_TASK" ' do_conn_init a:new fr:msg!
 	"Connector initialised sent" log
-	"Connector_TASK" ' do_conn_start_of_day a:new fr:msg!
+	"Connector_TASK" ' do_conn_start_of_day a:new fr:msg! ;
 
 \ ----------------------------------
 \ Module close
@@ -552,7 +543,7 @@ connector_test_2 @ #if
 	
 	\ Run one test iteration
 	: runtest
-		cr cr "Run test: " swap >s s:+ log
+		cr cr "Run test" log
 		t:getq false q:throwing drop
 		"TEST_TASK" t:name!
 		t:curtask "TEST_TASK" fr:task_reg!
