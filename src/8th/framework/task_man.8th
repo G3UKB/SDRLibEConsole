@@ -180,6 +180,27 @@ ns: fr
 	\ Release lock
 	unlock_task_dict 
 	0.01 sleep ;
+
+\ ===============================================================================
+\ Message response to sender
+\ Add sender to message
+: +sender	SED:	-- a
+	\ in: 	none
+	\ out: 	0: a - [new q id for response]
+	a:new t:name@ a:push ;
+	
+\ ----------------------------------
+\ Get task response
+: response@	SED: -- *
+	\ in: 	none
+	\ out: 	0: * - response
+	t:pop null? if
+		\ Nothing yet, so wait a while
+		drop -1 sleep t:pop null? if 
+			drop "Timeout waiting for task response!" log 
+			"???"
+		then
+	then ;
 	
 \ ========================================
 \ Reset namespace

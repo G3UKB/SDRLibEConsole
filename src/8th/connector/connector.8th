@@ -439,7 +439,7 @@ ns: sdr
 	t:pop null? if
 		\ Nothing yet, so wait a while
 		drop -1 sleep t:pop null? if 
-			drop "Timeout waiting for app model response!" log 
+			drop "Timeout waiting for task response!" log 
 			"???"
 		then
 	then ;
