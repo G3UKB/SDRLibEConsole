@@ -41,6 +41,54 @@ option_model_test @ #if
 	"model_common.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
+	
+	\ Test audio data (normally supplied by server)
+	: c_i_server_enum_audio_inputs
+		{
+			"inputs":
+			[
+				{
+					"channels":2,
+					"direction":0,
+					"index":1,
+					"api":"MME",
+					"name":"Microphone [Realtek High Defini"
+				},
+	
+				{
+					"channels":8,
+					"direction":0,
+					"index":2,
+					"api":"MME",
+					"name":"Line 2 [Virtual Audio Cable]"
+				}
+			]
+		}
+	;
+	
+	: c_i_server_enum_audio_outputs
+		{
+				"outputs":
+				[
+					{
+						"channels":2,
+						"direction":1,
+						"index":1,
+						"api":"MME",
+						"name":"Speakers""
+					},
+		
+					{
+						"channels":8,
+						"direction":1,
+						"index":2,
+						"api":"MME",
+						"name":"Line 3 [Virtual Audio Cable]"
+					}
+				]
+		}
+	;
+	
 #then
 
 \ ========================================
@@ -224,7 +272,6 @@ ns: sdr
 
 \ ===============================================================================
 \ Audio device management
-(*
 \ Set audio section lists
 \ Build the device list as api:index:name
 : __option_build_device_name_array	\ a:device-names idx device-data	-- a:+device_name
@@ -256,7 +303,7 @@ ns: sdr
 	\ Populate model
 	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> fr:val! drop
 ;
-*)
+
 \ ========================================
 \ Start-of-day. Send restored/default data to all subscribers
 : options_start_of_day	SED: --
@@ -463,165 +510,98 @@ ns: sdr
 \ Audio Route Management
 
 \ Get/set audio routes
-: do_option_remove_route	\ index
+\ Remove the given audio route
+: do_option_remove_route	SED: a --
+	a:open
+	\ in: 	0: n - route index
+	\ out: 	none
 	__option_model@ ["audio","routes" ] fr:val@ swap a:-
 ;
 
 \ ----------------------------------
 \ Get all current routes
-: __option_get_routes	\	-- routes
+: __option_get_routes	SED:  -- a
+	\ in: 	none
+	\ out: 	0: a - route array
 	__option_model@ ["audio","routes" ] fr:val@
 ;
 
 \ ----------------------------------
 \ Get all current routes
-: do_option_get_routes	\	-- routes
+: do_option_get_routes	SED: a --
+	a:open
+	\ in: 	0: q - sender (task name)
+	\ out: 	q: a - route array
 	__option_get_routes
+	__option_do_response
 ;
 
 \ ----------------------------------
 \ Get route count
-: do_option_get_route_count
+: do_option_get_route_count	SED: a --
+	a:open
+	\ in: 	0: q - sender (task name)
+	\ out: 	q: a - route array
 	__option_get_routes a:len
+	__option_do_response
 ;
 
 \ ----------------------------------
-\ Check for channel conflicts
-\ Get the channel data on the r stack
-: __option_get_ch_data 									\ f new-route existing-route -- f new-route existing-route r:[existing-ch, new-ch]
-	ch_idx a:@ >r									\ f new-route existing-route -- f new-route existing-route r:existing-ch
-	swap													\ f new-route existing-route r:existing-ch -- f existing-route new-route r:existing-ch
-	ch_idx a:@ >r									\ f existing-route new-route r:existing-ch -- f existing-route new-route r:existing-ch new-ch
-	swap													\ f existing-route new-route r:existing-ch new-ch -- f new-route existing-route r:existing-ch new-ch
-	a:new r> a:push r> a:push >r 	\ f new-route existing-route r:existing-ch new-ch -- f new-route existing-route r:[existing-ch, new-ch]
-;
-
-\ ----------------------------------
-\ Ensure neither route uses both channels
-: __option_both_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
-	r@ 0 a:@ "Both" s:=ic if
-		drop true
-	else
-		1 a:@ "Both" s:=ic if
-			drop true
-		else
-			drop false
-		then
-	then
-;
-
-\ ----------------------------------
-\ Ensure neither route uses the same channel
-: __option_left_right_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
-	r@ 
-	0 a:@ "Left" s:=ic if
-		1 a:@ "Right" s:=ic if
-			drop false ;;
-		then
-	then
-	0 a:@ "Right" s:=ic if
-		1 a:@ "Left" s:=ic if
-			drop false ;;
-		then
-	then
-	drop true
-;
-
-\ ----------------------------------
-\ Rules - signal conflict when :
-\		1. Either route uses both channels
-\		2. Both routes use left channel
-\		3. Both routes use right channel
-: __option_check_channels								\ f new-route existing-route -- f new-route existing-route f
-	\ Get channel data in r
-	__option_get_ch_data										\ f new-route existing-route  -- ... r:[existing-ch, new-ch]
-	__option_both_conflict if
-		true
-	else
-		__option_left_right_conflict
-	then
-;
-
-\ ----------------------------------
-\ Check for identical device, this is id, name and api
-: __option_same_device? 									\ f new-route existing-route -- f new-route existing-route f
-	dev_idx a:@										\ f new-route existing-route -- f new-route existing-route existing-dev
-	rot 													\ f new-route existing-route existing-dev -- f existing-route existing-dev new-route 
-	dev_idx a:@ 									\ f existing-route existing-dev new-route -- f existing-route existing-dev new-route new-dev
-	rot 													\ f existing-route existing-dev new-route new-dev -- f existing-route new-route new-dev existing-dev
-	s:= swap rot rot 							\ f existing-route new-route new-dev existing-dev -- f new-route existing-route f
-;
-
-\ ----------------------------------
-\ Does new-route conflict with any existing route
-\ f = true if conflict else false
-: __option_compare_routes								\ f new-route idx existing-route -- f new-route
-	nip __option_same_device?							\ f new-route idx existing-route -- f new-route existing-route f
-	if 														\ f existing-route new-route new-dev existing-dev -- f existing-route new-route
-		\ We have the same device including index and api
-		\ Now need to check the channel allocations
-		__option_check_channels							\ f existing-route new-route -- f existing-route new-route f
-		if
-			\ There is a channel conflict so exit scan
-			rot 											\ new-route existing-route f
-			drop 											\ new-route existing-route 
-			true -rot break						\ f new-route existing-route
-		then
-	then
-	\ Remember that break does not break at the execution point but runs to end of word
-	drop													\ f new-route 
-;
-
-\ ----------------------------------
-\ Is the route already defined
-: __option_route_in_use	\	new-route	-- new-route true|false
-		false swap __option_model@ ["audio","routes" ] fr:val@ a:len 0 n:>
-		if
-			\ Entries to compare
-			' __option_compare_routes a:each
-		then
-;
-
-\ ----------------------------------
-\ Check conflicts and push route to the model
-: do_option_push_route		\ new-route -- true|false
-	__option_route_in_use drop swap if
-		false
-	else
-		__option_model@ ["audio","routes" ] fr:val@ swap a:push
-		\ Publish all routes as we don't know what changed, we may have deleted some etc
-		SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] fr:val@ pubsub_publish
-		true		
-	then
+\ Push route to the model
+: do_option_push_route	SED: a --
+	a:open
+	\ in: 	0: a - new route
+	\ out: 	none
+	\ pre:	route must have been validated
+	__option_model@ ["audio","routes" ] fr:val@ swap a:push
+	\ Publish all routes as we don't know what changed, we may have deleted some etc
+	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] fr:val@ pubsub_publish
 ;
 
 \ ============================================
 \ Get/Set receiver section value holders
-: do_option_set_average_mode	\	value --
-	\ Set averagemode index
+\ Set the average mode type
+: do_option_set_average_mode	SED: a --
+	a:open
+	\ in: 	0: n - av mode index
+	\ out: 	none
 	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
-: do_option_set_over	\	value --
-	\ Set averageover index
+\ ----------------------------------
+\ Set the number of cycles to average over
+: do_option_set_over	SED: a --
+	a:open
+	\ in: 	0: n - average over n cycles
+	\ out: 	none
 	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
-: do_option_set_window_type	\	value --
-	\ Set windowtype index
+\ ----------------------------------
+\ Set the window type for averaging
+: do_option_set_window_type	SED: a --
+	a:open
+	\ in: 	0: s - window type
+	\ out: 	none
 	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
-: do_option_set_fft_size	\	value --
-	\ Set fftsize index
+\ ----------------------------------
+\ Set display FFT size
+: do_option_set_fft_size	SED: a --
+	a:open
+	\ in: 	0: n - fft size
+	\ out: 	none
 	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 
 \ ============================================
 \ Get/Set transmitter section value holders
-\ Tune level
-: do_option_set_tune_level	\	value --
-	\ Set tune level value
+\ Set the TX tune level
+: do_option_set_tune_level	SED: a --
+	a:open
+	\ in: 	0: n - tune level 0-100
+	\ out: 	none
 	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> fr:val! drop
 ;
 

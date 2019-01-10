@@ -1,0 +1,121 @@
+(*
+	val_audio_route.8th
+ 
+  radio options model for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+
+\ ----------------------------------
+\ Check for channel conflicts
+\ Get the channel data on the r stack
+: __option_get_ch_data 									\ f new-route existing-route -- f new-route existing-route r:[existing-ch, new-ch]
+	ch_idx a:@ >r									\ f new-route existing-route -- f new-route existing-route r:existing-ch
+	swap													\ f new-route existing-route r:existing-ch -- f existing-route new-route r:existing-ch
+	ch_idx a:@ >r									\ f existing-route new-route r:existing-ch -- f existing-route new-route r:existing-ch new-ch
+	swap													\ f existing-route new-route r:existing-ch new-ch -- f new-route existing-route r:existing-ch new-ch
+	a:new r> a:push r> a:push >r 	\ f new-route existing-route r:existing-ch new-ch -- f new-route existing-route r:[existing-ch, new-ch]
+;
+
+\ ----------------------------------
+\ Ensure neither route uses both channels
+: __option_both_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
+	r@ 0 a:@ "Both" s:=ic if
+		drop true
+	else
+		1 a:@ "Both" s:=ic if
+			drop true
+		else
+			drop false
+		then
+	then
+;
+
+\ ----------------------------------
+\ Ensure neither route uses the same channel
+: __option_left_right_conflict	\	... r:[existing-ch, new-ch] -- ... f r:[existing-ch, new-ch]
+	r@ 
+	0 a:@ "Left" s:=ic if
+		1 a:@ "Right" s:=ic if
+			drop false ;;
+		then
+	then
+	0 a:@ "Right" s:=ic if
+		1 a:@ "Left" s:=ic if
+			drop false ;;
+		then
+	then
+	drop true
+;
+
+\ ----------------------------------
+\ Rules - signal conflict when :
+\		1. Either route uses both channels
+\		2. Both routes use left channel
+\		3. Both routes use right channel
+: __option_check_channels								\ f new-route existing-route -- f new-route existing-route f
+	\ Get channel data in r
+	__option_get_ch_data										\ f new-route existing-route  -- ... r:[existing-ch, new-ch]
+	__option_both_conflict if
+		true
+	else
+		__option_left_right_conflict
+	then
+;
+
+\ ----------------------------------
+\ Check for identical device, this is id, name and api
+: __option_same_device? 									\ f new-route existing-route -- f new-route existing-route f
+	dev_idx a:@										\ f new-route existing-route -- f new-route existing-route existing-dev
+	rot 													\ f new-route existing-route existing-dev -- f existing-route existing-dev new-route 
+	dev_idx a:@ 									\ f existing-route existing-dev new-route -- f existing-route existing-dev new-route new-dev
+	rot 													\ f existing-route existing-dev new-route new-dev -- f existing-route new-route new-dev existing-dev
+	s:= swap rot rot 							\ f existing-route new-route new-dev existing-dev -- f new-route existing-route f
+;
+
+\ ----------------------------------
+\ Does new-route conflict with any existing route
+\ f = true if conflict else false
+: __option_compare_routes								\ f new-route idx existing-route -- f new-route
+	nip __option_same_device?							\ f new-route idx existing-route -- f new-route existing-route f
+	if 														\ f existing-route new-route new-dev existing-dev -- f existing-route new-route
+		\ We have the same device including index and api
+		\ Now need to check the channel allocations
+		__option_check_channels							\ f existing-route new-route -- f existing-route new-route f
+		if
+			\ There is a channel conflict so exit scan
+			rot 											\ new-route existing-route f
+			drop 											\ new-route existing-route 
+			true -rot break						\ f new-route existing-route
+		then
+	then
+	\ Remember that break does not break at the execution point but runs to end of word
+	drop													\ f new-route 
+;
+
+\ ----------------------------------
+\ Is the route already defined
+: __option_route_in_use	\	new-route	-- new-route true|false
+		false swap __option_model@ ["audio","routes" ] fr:val@ a:len 0 n:>
+		if
+			\ Entries to compare
+			' __option_compare_routes a:each
+		then
+;
