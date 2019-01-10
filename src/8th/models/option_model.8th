@@ -45,7 +45,7 @@ option_model_test @ #if
 	\ Test audio data (normally supplied by server)
 	: c_i_server_enum_audio_inputs
 		{
-			"inputs":
+			"inputs" :
 			[
 				{
 					"channels":2,
@@ -68,14 +68,14 @@ option_model_test @ #if
 	
 	: c_i_server_enum_audio_outputs
 		{
-				"outputs":
+				"outputs" :
 				[
 					{
 						"channels":2,
 						"direction":1,
 						"index":1,
 						"api":"MME",
-						"name":"Speakers""
+						"name":"Speakers"
 					},
 		
 					{
@@ -90,7 +90,6 @@ option_model_test @ #if
 	;
 	
 #then
-
 \ ========================================
 
 \ Define our SDR namespace
@@ -286,7 +285,7 @@ ns: sdr
 \ Populate input device list
 : __option_set_input_device_list	\	 --
 	\ Get device list from the C layer
-	c_i_server_enum_audio_inputs dup audio_device_inputs ! "inputs" m:@ nip
+	c_i_server_enum_audio_inputs dup "audio_device_inputs" t:! "inputs" m:@ nip
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
@@ -297,7 +296,7 @@ ns: sdr
 \ Populate output device list
 : __option_set_output_device_list	\	 --
 	\ Get device list from the C layer
-	c_i_server_enum_audio_outputs dup audio_device_outputs ! "outputs" m:@ nip
+	c_i_server_enum_audio_outputs dup "audio_device_outputs" t:! "outputs" m:@ nip
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
@@ -306,7 +305,7 @@ ns: sdr
 
 \ ========================================
 \ Start-of-day. Send restored/default data to all subscribers
-: options_start_of_day	SED: --
+: __option_start_of_day	SED: --
 	\ in: 	none
 	\ out:	none
 	__option_model@ >r
@@ -355,6 +354,29 @@ ns: sdr
 \		__option_...	=	local word, not externally callable
 \		do_option_...	=	Message handler
 \ ===============================================================================
+
+\ Initialise the option model at task level
+: do_option_init	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __option_model_restore
+;
+
+\ ----------------------------------
+\ Run SOD
+: do_option_start_of_day	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __option_start_of_day
+;
+
+\ ----------------------------------
+\ Close the app model at task level
+: do_option_close	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __option_model_save
+;
 
 \ ============================================
 \ Get/Set general section value holders
@@ -621,9 +643,9 @@ ns: sdr
 	\ Create the app model gen-server
 	"OptionsModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
-	"OptionsModel_TASK" ' do_options_init a:new fr:msg!
+	"OptionsModel_TASK" ' do_option_init a:new fr:msg!
 	"Options model initialised sent" log
-	"OptionsModel_TASK" ' do_options_start_of_day a:new fr:msg!
+	"OptionsModel_TASK" ' do_option_start_of_day a:new fr:msg!
 	"Options model start of day sent" log ;
 
 \ ----------------------------------
@@ -692,7 +714,7 @@ option_model_test @ #if
 		t:curtask "TEST_TASK" fr:task_reg!
 		setup	
 		2 sleep
-		' runtest 1 1 loop
+		' runtest 1 500 loop
 		\ Terminate pub/sub
 		cr "Closing test..." log
 		fr:pubsub_term		
@@ -704,7 +726,7 @@ option_model_test @ #if
 
 	\ Test sequence
 	"MAIN_TASK" t:name!
-	' run_tests t:task
+	' run_tests t:task 1 sleep
 	\ Wait for main task to terminate
 	t:wait
 	2 sleep

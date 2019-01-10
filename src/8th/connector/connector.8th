@@ -22,92 +22,149 @@
      bob@bobcowdery.plus.com
 *)
 
-\ =========================================
+\ ========================================
 \ Testing only
-"p_st.8th"  f:include
+false var, connector_test_1
+true var, connector_test_2
+connector_test_1 @ #if
 
-needs debug/sed
-\ true SED-CHECK
-\ false log-async
+	\ includes
+	"../framework/param_st.8th" f:include
+	"../framework/task_man.8th" f:include
+	"../framework/struct_manip.8th" f:include
+	"../common/events.8th" f:include
+	"../common/registrations.8th" f:include
+	"../framework/pub_sub.8th"  f:include
 
-\ Test cases simulation words start
-\ Overwrite words that are needed for simulation testing 
-(*
-: net:sendto	\ net ai buf flags -- net #sent
-	drop s:len nip nip ;	\ Good case
-	\ drop 10 nip nip ;		\ Bad case
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ false log-async
 	
-: net:wait	\ net read? msecs -- net f
-	2drop true ;								\ Read ready
-	\ 1000 / sleep drop false ;	\ Timeout
+	\ Test cases simulation words start
+	\ Overwrite words that are needed for simulation testing 
+	: net:sendto	\ net ai buf flags -- net #sent
+		drop s:len nip nip ;	\ Good case
+		\ drop 10 nip nip ;		\ Bad case
 
-: ack_resp \ -- ack
-	{"resp":"ACK"} ;
-	
-: audio_resp \ -- audio-resp
-	{"outputs": [{},{"api":"someapi" , "name":"somedev"}] } ;
-	
-: net:recvfrom \ net buf flags -- net addr port buf #recv | net null
-	\ 2drop "127.0.0.1" 10010 ack_resp >json s:len ; 	\ Good case
-	2drop "127.0.0.1" 10010 audio_resp >json s:len ; 	\ Good case
-	\ 2drop null ;																		\ Bad case
-*)	
-\ Testing end
+	: net:wait	\ net read? msecs -- net f
+		2drop true ;								\ Read ready
+		\ 1000 / sleep drop false ;	\ Timeout
+
+	: ack_resp \ -- ack
+		{"resp":"ACK"} ;
+
+	: audio_resp \ -- audio-resp
+		{"outputs": [{},{"api":"someapi" , "name":"somedev"}] } ;
+
+	: net:recvfrom \ net buf flags -- net addr port buf #recv | net null
+		\ 2drop "127.0.0.1" 10010 ack_resp >json s:len ; 	\ Good case
+		2drop "127.0.0.1" 10010 audio_resp >json s:len ; 	\ Good case
+		\ 2drop null ;																		\ Bad case
+
+#then
+connector_test_2 @ #if
+
+	\ includes
+	"../framework/param_st.8th" f:include
+	"../framework/task_man.8th" f:include
+	"../framework/struct_manip.8th" f:include
+	"../common/events.8th" f:include
+	"../common/registrations.8th" f:include
+	"../framework/pub_sub.8th"  f:include
+
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ false log-async
+#then
 \ =========================================
+
+(*
+	The connector drives the SDRLibE/connector executable via a JSON UDP interface. This enables
+	distribution if required and also makes it a managed server which will execute on its own
+	once its setup is complete which could be a command line client or a GUI client. It is also
+	much more ameanable to multi-language implementation as the interface remains the same on the
+	client side rather than an implementation for language ffi implementation.
+	
+	As all services the connector executes on its own gen_server thread through a messaging interface. 
+*)
 
 \ Set namespace
 ns: sdr
 
-\ ======================================================================================
+\ ===========================================================================================
+\ TASK LEVEL CODE
+\ PRIVATE
+
+\ ===============================================================================
 \ Initialisation
 \ Create UDP socket
-{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, udp_cmd_sock
-\ Accessor
-\ Return the command socket
-: cmd_sock	SED: -- net
+: __conn_alloc_cmd_sock	SED: -- net
 	\ in: 	none
 	\ out:	s0 - command socket
-	udp_cmd_sock @ ;
-
-\ ======================================================================================
-\ Buffers
-5000 b:new 0x0 b:fill var, b_resp_buffer
-\ Return the response bubber
-: resp_buffer	SED: -- b
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! ;
+	
+\ Get command socket
+: __conn_cmd_sock@	SED: -- net
 	\ in: 	none
-	\ out:	s0 - response buffer
-	b_resp_buffer @ ;
+	\ out:	s0 - command socket
+	"udp_cmd_sock" t:@ ;
+
+\ ===============================================================================
+\ Buffers
+\ Response buffer
+: conn_alloc_resp_buff	SED: -- 
+	\ in: 	none
+	\ out:	none
+	5000 b:new 0x0 b:fill "b_resp_buffer" t:! ;
+
+\ ----------------------------------	
+\ Get response buffer
+: __conn_resp_buff@	SED: -- b
+	\ in: 	none
+	\ out:	0: b - response buffer
+	"b_resp_buffer" t:@ ;
  
-\ ======================================================================================
-\ Messages
+\ ===============================================================================
+\ Json encoded request messages
 \ Return the discover message
-: discover_msg 			SED: -- s
+: __conn_discover_msg 			SED: -- s
 	\ in: 	none
 	\ out:	s0 - json encoded discover message
 	{ "cmd" : "radio_discover" , "params" : [] } >json ;
 
+\ ----------------------------------
 \ Return the server start message
-: server_start_msg 	SED: -- s
+: __conn_server_start_msg 	SED: -- s
 	\ in: 	none
 	\ out:	s0 - json encoded server start message
 	{ "cmd" : "server_start" , "params" : [] } >json ;
 
+\ ----------------------------------
 \ Return the 	radio start message
-: radio_start_msg 	SED: n -- s
+: __conn_radio_start_msg 	SED: n -- s
 	\ in: 	s0 - 0 = start without WBS else start with WBS
 	\ out:	s0 - json encoded radio start message
 	>r
 	{ "cmd" : "radio_start" , "params" : [] } 
 	"params" m:@ r> a:push drop >json ;
 
+\ ----------------------------------
+\ Return the enum audio inputs message
+: __conn_enum_inputs_msg 	SED: -- s
+	\ in: 	none
+	\ out:	s0 - json encoded enum audio inputs message
+	{ "cmd" : "enum_inputs" , "params" : [] } >json ;
+
+\ ----------------------------------
 \ Return the enum audio outputs message
-: enum_outputs_msg 	SED: -- s
+: __conn_enum_outputs_msg 	SED: -- s
 	\ in: 	none
 	\ out:	s0 - json encoded enum audo outputs message
 	{ "cmd" : "enum_outputs" , "params" : [] } >json ;
 	
+\ ----------------------------------	
 \ Return the default route message i.e. receiver1 -> speaker audio
-: default_route_msg	SED: s s -- s
+: __conn_default_route_msg	SED: s s -- s
 	\ in:		s0 - audio api i.e. "MME"
 	\				s1 - audio device name string
 	\ out:	s0 - json encoded default route message
@@ -115,184 +172,412 @@ ns: sdr
 	{ "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
 	"params" m:@ 3 p> a:! 4 p> a:! drop >json ;
 	
-\ ======================================================================================
+\ ===============================================================================
 \ Net
-\ ==================
+\ ========================================
 \ Address management
 \ Return the command port
-: cmd_port	SED: -- n
+: __conn_cmd_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - cmd port
 	10010 ;
 
+\ ----------------------------------	
 \ Return the display data receiver 1 port	
-: data_1_port	SED: -- n
+: __conn_data_1_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 1 port
 	10011 ;
 
+\ ----------------------------------	
 \ Return the display data receiver 2 port
-: data_2_port	SED: -- n
+: __conn_data_2_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 2 port
 	10012 ;
 
+\ ----------------------------------	
 \ Return the display data receiver 3 port
-: data_3_port	SED: -- n
+: __conn_data_3_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 3 port
 	10013 ;
-
+	
+\ ----------------------------------	
 \ Return the command address info
-: cmd_addr		SED: -- X
+: __conn_cmd_addr		SED: -- X
 	\ in: 	none
 	\ out:	s0 - cmd address info
-	"127.0.0.1" cmd_port net:getaddrinfo ;
-
+	"127.0.0.1" __conn_cmd_port net:getaddrinfo ;
+	
+\ ----------------------------------	
 \ Return the display data receiver 1 address info	
-: data_1_addr	SED: -- X
+: __conn_data_1_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 1 address info
-	"127.0.0.1" data_1_port net:getaddrinfo ;
+	"127.0.0.1" __conn_data_1_port net:getaddrinfo ;
 
+\ ----------------------------------	
 \ Return the display data receiver 2 address info		
-: data_2_addr	SED: -- X
+: __conn_data_2_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 2 address info
-	"127.0.0.1" data_2_port net:getaddrinfo ;
+	"127.0.0.1" __conn_data_2_port net:getaddrinfo ;
 
+\ ----------------------------------	
 \ Return the display data receiver 3 address info	
-: data_3_addr	SED: -- X
+: __conn_data_3_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 3 address info
-	"127.0.0.1" data_3_port net:getaddrinfo ;
+	"127.0.0.1" __conn_data_3_port net:getaddrinfo ;
 
-\ ==================
+\ ========================================
 \ Message send/receive
 
 \ Send given command
-: send_cmd_msg	SED: s --
+: __conn_send_cmd_msg	SED: s --
 	\ in: 	so - json encoded message string
 	\ out:	s0 - none
 	s:len >r
-	cmd_sock cmd_addr rot 0 net:sendto nip
+	__conn_cmd_sock@ __conn_cmd_addr rot 0 net:sendto nip
 	r> n:= not if "Short send!" log then ;
 
+\ ----------------------------------	
 \ Wait for read data available from cmd socket
-: net_wait_recv_cmd	SED:  -- net T
+: __conn_net_wait_recv_cmd	SED:  -- net T
 	\ in: 	none
 	\ out:	s0 - true if wait successful
 	\				s1 - the target socket
-	cmd_sock true 2000 net:wait ;
+	__conn_cmd_sock@ true 2000 net:wait ;
 
+\ ----------------------------------	
 \ Receive data from the given socket
-: recv_from	SED:  net -- m T
+: __conn_recv_from	SED:  net -- m T
 	\ in: 	s0 - socket
 	\ out:	s0 - true if receive successful
 	\ pre: 	read data ready condition true
-	resp_buffer 0 net:recvfrom null? if 
+	__conn_resp_buff@ 0 net:recvfrom null? if 
 		"Error in read!" log 2drop {} false
 	else
 		drop nip nip nip json> true
 	then ;
-		
+
+\ ----------------------------------			
 \ Wait for and read cmd response
-: wait_resp_with_timeout	SED:  -- m T
+: __conn_wait_resp_with_timeout	SED:  -- m T
 	\ in: 	none
-	\ out:	s0 - true if response received
-	\				s1 - the response structure (map in this case)
-	net_wait_recv_cmd if
+	\ out:	0: T - true if response received
+	\				1: m - the response structure (map in this case)
+	__conn_net_wait_recv_cmd if
 		recv_from
 	else
 		"Timeout waiting for response!" log drop {} false
 	then ;
 	
-	\ ======================================================================================
-	\ Protocol words
-	\ Return the audio info for all output devices
-	: get_audio_output_info	SED: -- m T
-		\ in: 	none
-		\ out:	s0 - true if successful
-		\ out:	s1 - the audio info map
-		enum_outputs_msg send_cmd_msg
-		wait_resp_with_timeout ;
-		
-	\ Return the default route audio parameters
-	: get_default_route	SED:  -- s s
-		\ in: 	none
-		\ out:	s0 - the audio api
-		\				s1 - the audio device
-		get_audio_output_info if
-			\ Return api and dev for the default device
-			\ Note, we should select for this aka gui interface
-			"outputs" m:@ nip 1 a:@ nip
-			"api" m:@ swap "name" m:@ nip 
-		else
-			\ Something went wrong
-			"Error getting audio info!" log drop "" ""
-		then ;
+\ ===============================================================================
+\ Protocol words
+\ Return the audio info for all output devices
+: __conn_get_audio_output_info	SED: -- m T
+	\ in: 	none
+	\ out:	s0 - true if successful
+	\ out:	s1 - the audio info map
+	__conn_enum_outputs_msg __conn_send_cmd_msg
+	__conn_wait_resp_with_timeout ;
 
+\ ----------------------------------	
+\ Return the default route audio parameters
+: __conn_get_default_route	SED:  -- s s
+	\ in: 	none
+	\ out:	s0 - the audio api
+	\				s1 - the audio device
+	__conn_get_audio_output_info if
+		\ Return api and dev for the default device
+		\ Note, we should select for this aka gui interface
+		"outputs" m:@ nip 1 a:@ nip
+		"api" m:@ swap "name" m:@ nip 
+	else
+		\ Something went wrong
+		"Error getting audio info!" log drop "" ""
+	then ;
+
+\ ========================================
+\ Message Handlers
+\ Called only by app model gen-server
+\ Convention:
+\		__app_...		=	local word, not externally callable
+\		do_app_...	=	Message handler
+\ ========================================
+
+\ ========================================
+\ General management
+\ Initialise the connector at task level
+: do_app_init	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __conn_alloc_cmd_sock __conn_alloc_resp_buff
+;
+
+\ ----------------------------------
+\ Run SOD
+: do_app_start_of_day	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_start_of_day
+;
+
+\ ----------------------------------
+\ Close the app model at task level
+: do_app_close	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_model_save
+;
+
+\ ========================================
+\ Basic receiver scripting
+
+\ Push response data to sender
+: __conn_do_response	SED: s * --
+	\ in: 	0: * - response data
+	\				1: s - sender (task name)
+	\ out: 	none
+	swap fr:task_reg@ swap 
+	\ Clone response data (probably unnecessary as all scalers
+	clone nip
+	\ Push to given q and notify caller
+	2dup t:push drop t:notify
+;
+
+\ ----------------------------------
+\ Execute discover protocol
+: do_conn_discover	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_discover_msg __conn_send_cmd_msg
+	__conn_wait_resp_with_timeout not if
+		"Timeout!"
+	then
+	__conn_do_response
+;
+
+\ ----------------------------------
+\ Set a default route for RX1 to Speaker output both channels
+: do_conn_set_default_route	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_get_default_route __conn_default_route_msg __conn_send_cmd_msg
+	__conn_wait_resp_with_timeout not if	
+		"Timeout!"
+	then
+	__conn_do_response
+;
+
+\ ----------------------------------
+\ Start the server 
+: do_conn_start_server	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_server_start_msg __conn_send_cmd_msg
+	__conn_wait_resp_with_timeout not if 	
+		"Timeout!"
+	then
+	__conn_do_response
+;
+
+\ ----------------------------------
+\ Start the radio
+: do_conn_start_radio	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	0 __conn_radio_start_msg __conn_send_cmd_msg
+	__conn_wait_resp_with_timeout not if 	
+		"Timeout!"
+	then
+	__conn_do_response
+;
+
+\ ===========================================================================================
+\ MAIN CODE
+
+\ Call level interface from all modules, may be called by any task.
+\ The connector both subscribes to events and is called directly.
+\ It may publish data events or make direct calls for efficiency.
+
+\ ----------------------------------
+\ Module initialisation
+: conn_init	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Create the app model gen-server
+	"Connector_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
+	\ Ask the model to initialise itself
+	"Connector_TASK" ' do_conn_init a:new fr:msg!
+	"Connector initialised sent" log
+	"Connector_TASK" ' do_conn_start_of_day a:new fr:msg!
+
+\ ----------------------------------
+\ Module close
+: conn_term	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Tidy close the model
+	"Connector_TASK" ' do_conn_close a:new fr:msg!
+	2.0 sleep
+	\ Ask the model to exit
+	"Connector_TASK" ' fr:do_term a:new fr:msg! ;
+
+\ ===============================================================================
+\ Public procedural interface
+\ ===============================================================================
+
+\ Add sender to message
+: __conn_plus_sender	SED:	-- a
+	\ in: 	none
+	\ out: 	0: a - [new q id for response]
+	a:new t:name@ a:push ;
+	
+\ ----------------------------------
+\ Get task response
+: __conn_get_response	SED: -- *
+	\ in: 	none
+	\ out: 	0: * - response
+	t:pop null? if
+		\ Nothing yet, so wait a while
+		drop -1 sleep t:pop null? if 
+			drop "Timeout waiting for app model response!" log 
+			"???"
+		then
+	then ;
+	
+\ ----------------------------------
+\ Execute discover protocol
+: conn_discover	SED:  -- *
+	__conn_plus_sender
+		"Connector_TASK" ' do_conn_discover rot fr:msg! 
+	__conn_get_response ;
+
+\ ----------------------------------
+\ Set a default route for RX1 to Speaker output both channels
+: conn_set_default_route	SED:  -- *
+	__conn_plus_sender
+		"Connector_TASK" ' do_conn_set_default_route rot fr:msg! 
+	__conn_get_response ;
+
+\ ----------------------------------
+\ Start the server 
+: conn_start_server	SED:  -- *
+	__conn_plus_sender
+	"Connector_TASK" ' do_conn_start_server rot fr:msg! 
+	__conn_get_response ;
+
+\ ----------------------------------
+\ Start the radio
+: conn_start_radio	SED:  -- *
+	__conn_plus_sender
+	"Connector_TASK" ' do_conn_start_radio rot fr:msg! 
+	__conn_get_response ;
+	
 \ ========================================
 \ Reset namespace
 ns: user
 
-\ ======================================================================================
+\ ===============================================================================
 \ Testing
-\ ======================================================================================
+\ ===============================================================================
 
-\ The test cases exercise each word on all paths and use the SED checker to establish
-\ correct stack behaviour. Some words may use words that require external calls and possibly
-\ expect external data. These are simulated by an overwrite of those words and the simulated
-\ word then behaves as closely as possible to the actual word. These words are at the beginning
-\ of the module as they need to be compiled first.
-(*	
-: test_cases
-	\ Basic words with no dependencies
-	resp_buffer "Buffer: " . b:len . drop cr
-	discover_msg "Discover: " . . cr
-	server_start_msg "Server start: " . . cr
-	0 radio_start_msg "Radio start: " . . cr
-	enum_outputs_msg "Enum outputs: " . . cr
-	"some api" "some_dev" default_route_msg "Default route: " . . cr
-	get_default_route "Get default route: " . cr
-	cmd_port "Cmd port: " . . cr
-	data_1_port "Data_1_port port: " . . cr
-	data_2_port "Data_2_port port: " . . cr
-	data_3_port "Data_3_port port: " . . cr
-	cmd_addr "Cmd addr: " . . cr
-	data_1_addr "Data_1_addr addr: " . . cr
-	data_2_addr "Data_2_addr addr: " . . cr
-	data_3_addr "Data_3_addr addr: " . . cr
-	\ Words with dependencies
-	discover_msg send_cmd_msg "Send discover message" . cr
-	net_wait_recv_cmd "Wait for read data: " . . cr drop
-	cmd_sock recv_from "Read: " . . " Data: " . . cr
-	wait_resp_with_timeout "Response: " . . " Data: " . . cr ;
-*)
+\ ========================================
+\ Test 1 - run all words with simulation.
+connector_test_1 @ #if
 
-\ Runs a basic script to start radio with one receiver on the dafault audio route
-: basic_script	SED: --
-	\ in: 	none
-	\ out:	none
-	ps_alloc
-	discover_msg send_cmd_msg
-	wait_resp_with_timeout not if ;; then "Discover: " . . cr
-	get_default_route default_route_msg send_cmd_msg
-	wait_resp_with_timeout not if ;; then  "Route: " . . cr
-	server_start_msg send_cmd_msg
-	wait_resp_with_timeout not if ;; then  "Server start: " . . cr
-	0 radio_start_msg send_cmd_msg
-	wait_resp_with_timeout not if ;; then  "Radio start: " . . cr ;
+	\ The test cases exercise each word on all paths and use the SED checker to establish
+	\ correct stack behaviour. Some words may use words that require external calls and possibly
+	\ expect external data. These are simulated by an overwrite of those words and the simulated
+	\ word then behaves as closely as possible to the actual word. These words are at the beginning
+	\ of the module as they need to be compiled first.	
+	: test_cases
+		\ Basic words with no dependencies
+		resp_buffer "Buffer: " . b:len . drop cr
+		discover_msg "Discover: " . . cr
+		server_start_msg "Server start: " . . cr
+		0 radio_start_msg "Radio start: " . . cr
+		enum_outputs_msg "Enum outputs: " . . cr
+		"some api" "some_dev" default_route_msg "Default route: " . . cr
+		get_default_route "Get default route: " . cr
+		cmd_port "Cmd port: " . . cr
+		data_1_port "Data_1_port port: " . . cr
+		data_2_port "Data_2_port port: " . . cr
+		data_3_port "Data_3_port port: " . . cr
+		cmd_addr "Cmd addr: " . . cr
+		data_1_addr "Data_1_addr addr: " . . cr
+		data_2_addr "Data_2_addr addr: " . . cr
+		data_3_addr "Data_3_addr addr: " . . cr
+		\ Words with dependencies
+		discover_msg send_cmd_msg "Send discover message" . cr
+		net_wait_recv_cmd "Wait for read data: " . . cr drop
+		cmd_sock recv_from "Read: " . . " Data: " . . cr
+		wait_resp_with_timeout "Response: " . . " Data: " . . cr ;
 		
-	\ Run with the simulation words uncommented.
-	\ cr cr "Running test cases..." . cr cr
-	\ test_cases
-	\ "Done test cases" . cr
-	
-	\ Run with the simulation words commented out.
-	"Running basic script..." . cr
-	basic_script
-	"Done.. the server will continue to run without the client." . cr
-	
+	cr cr "Running test cases..." . cr cr
+	test_cases
+	"Done test cases" . cr
 	bye
+#then
+
+\ ========================================
+\ Test 2 - basic script to run 1 receiver
+connector_test_2 @ #if
+
+\ Common initialisation
+	: setup
+		"Doing setup" log
+		\ Param stack alloc
+		param_st_alloc
+		\ Pub/sub init
+		' sdr:do_registrations fr:pubsub_init
+		"Setup complete" log
+	;
+	
+	\ Runs a basic script to start radio with one receiver on the dafault audio route
+	: basic_script	SED: --
+		\ in: 	none
+		\ out:	none
+		sdr:conn_discover "Discover: " . . cr
+		sdr:conn_set_default_route "Route: " . . cr
+		sdr:conn_start_server "Server start: " . . cr
+		sdr:conn_start_radio "Radio start: " . . cr ;
+	
+	\ Run one test iteration
+	: runtest
+		cr cr "Run test: " swap >s s:+ log
+		t:getq false q:throwing drop
+		"TEST_TASK" t:name!
+		t:curtask "TEST_TASK" fr:task_reg!
+		\ Do common setup
+		setup	
+		\ Initialise and do SOD etc
+		"Initialising" log
+		sdr:conn_init
+		"Done initialise" log
+		\ Run basic tests
+		basic_script
+		"Done basic tests" log
+		sdr:conn_term 
+		"Connector_TASK" fr:wait_single_task 
+		"P/S_TASK" fr:wait_single_task 
+		"TEST_TASK exiting..." log
+		1 sleep
+	;
+
+	\ Test sequence
+	"MAIN_TASK" t:name!
+	' runtest t:task
+	\ Wait for main task to terminate
+	t:wait
+	2 sleep
+	bye
+#then
 	

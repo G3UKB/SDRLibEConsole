@@ -570,7 +570,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: T - true if duplex on
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] fr:val@
 	__app_do_response
@@ -579,7 +579,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_simplex_freq SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - simplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "freq"] fr:val@
 	__app_do_response
@@ -588,7 +588,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex_freq SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - duplex frequency
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "freq"] fr:val@
 	__app_do_response
@@ -597,7 +597,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_simplex_mode SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - simplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "mode"] fr:val@
 	__app_do_response
@@ -606,7 +606,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex_mode SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "mode"] fr:val@
 	__app_do_response
@@ -615,7 +615,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_simplex_filter SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - simplex filter
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex", "filter"] fr:val@
 	__app_do_response
@@ -624,7 +624,7 @@ ns: sdr
 \ ----------------------------------
 : do_app_tx_get_duplex_filter SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: n - duplex mode
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "duplex", "filter"] fr:val@
 	__app_do_response
@@ -864,14 +864,14 @@ ns: sdr
 \ Following are request/response words
 
 \ Add sender to message
-: __plus_sender	SED:	-- a
+: __model_plus_sender	SED:	-- a
 	\ in: 	none
 	\ out: 	0: a - [new q id for response]
 	a:new t:name@ a:push ;
 	
 \ ----------------------------------
 \ Get task response
-: __get_response	SED: -- *
+: __model_get_response	SED: -- *
 	\ in: 	none
 	\ out: 	0: * - response
 	t:pop null? if
@@ -887,57 +887,57 @@ ns: sdr
 	\ in: 	none
 	\ out: 	0: T - true if duplex on
 	\ Send the parameters plus a reply q
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------	
 : model_tx_get_simplex_freq SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex freq
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_freq rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------	
 : model_tx_get_duplex_freq SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex freq
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_freq rot fr:msg!
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------	
 : model_tx_get_simplex_mode SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex mode
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_mode rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------	
 : model_tx_get_duplex_mode SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex mode
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_mode rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------		
 : model_tx_get_simplex_filter SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - simplex filter
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_simplex_filter rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ----------------------------------		
 : model_tx_get_duplex_filter SED:  -- n
 	\ in: 	none
 	\ out: 	0: n - duplex filter
-	__plus_sender
+	__model_plus_sender
 	"AppModel_TASK" ' do_app_tx_get_duplex_filter rot fr:msg! 
-	__get_response ;
+	__model_get_response ;
 
 \ ========================================
 \ Restore namespace	
@@ -1010,6 +1010,7 @@ app_model_test @ #if
 		sdr:app_model_term 
 		"AppModel_TASK" fr:wait_single_task 
 		"Done closing model" log
+		1 sleep
 	;
 	
 	\ Run tests on a separate thread
