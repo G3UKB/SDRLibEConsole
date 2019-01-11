@@ -128,11 +128,21 @@ ns: sdr
 	
 \ ===============================================================================
 \ Json encoded request messages	
-: __conn_push_one_param 	SED: n a -- 
+: __conn_push_one_param 	SED: * a -- 
+	\ in:		0: m - empty message
+	\				1: * - p1
+	\ out:	none
 	"params" m:@ a:clear rot a:push drop ;
+
+: __conn_push_two_param 	SED: * * a -- 
+	\ in:		0: m - empty message
+	\				1: * - p1
+	\				2: * - p2
+	\ out:	none
+	"params" m:@ a:clear rot a:push rot a:push drop ;
 	
 \ ========================================
-\ Messages with zero or one parameters, same SED: -- s (a Json encoded string)
+\ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
 : __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
 : __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
@@ -141,8 +151,17 @@ ns: sdr
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_tx_freq_msg { "cmd" : "set_tx_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_mode_msg { "cmd" : "set_rx1_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r1_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
 
-\ Messages with multiple parameters	
+\ Complex messages
 \ ----------------------------------	
 : __conn_default_route_msg	SED: s s -- s
 	\ in:		0: s - audio api i.e. "MME"
@@ -317,7 +336,11 @@ ns: sdr
 			"Timeout!"
 		then
 	fr:response! ;
-	
+
+\ Do exchange
+: __con_do_exchange	SED: -- 
+	__conn_send_cmd_msg __con_do_response ;
+
 \ ========================================
 \ Basic radio functions
 \ Execute discover protocol
@@ -325,7 +348,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_discover_msg __conn_send_cmd_msg __con_do_response ;
+	__conn_discover_msg __con_do_exchange ;
 
 \ ----------------------------------
 \ Set a default route for RX1 to Speaker output both channels
@@ -333,7 +356,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_get_default_route __conn_default_route_msg __conn_send_cmd_msg __con_do_response ;
+	__conn_get_default_route __conn_default_route_msg __con_do_exchange ;
 
 \ ----------------------------------
 \ Start the server 
@@ -341,7 +364,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_server_start_msg __conn_send_cmd_msg __con_do_response ;
+	__conn_server_start_msg __con_do_exchange ;
 
 \ ----------------------------------
 \ Start the radio
@@ -350,7 +373,7 @@ ns: sdr
 	\ in: 	0: s - sender (task name)
 	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_radio_start_msg __conn_send_cmd_msg __con_do_response ;
+	swap __conn_radio_start_msg __con_do_exchange ;
 
 \ ========================================
 \ Receiver functions
@@ -360,7 +383,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_freq_msg __conn_send_cmd_msg __con_do_response ;
+	swap __conn_r1_freq_msg __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R2 frequency
@@ -369,7 +392,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r2_freq_msg __conn_send_cmd_msg __con_do_response ;
+	swap __conn_r2_freq_msg __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R3 frequency
@@ -378,7 +401,83 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R3 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r3_freq_msg __conn_send_cmd_msg __con_do_response ;
+	swap __conn_r3_freq_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set TX frequency
+: do_conn_tx_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - TX freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_tx_freq_msg __con_do_exchange ;
+
+\ ----------------------------------
+\ Set R1 mode
+: do_conn_r1_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 mode id
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r1_mode_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set R2 mode
+: do_conn_r2_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 mode id
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r2_mode_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set R3 mode
+: do_conn_r3_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 mode id
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r3_mode_msg __con_do_exchange ;
+
+\ ----------------------------------
+\ Set R1 filter
+: do_conn_r1_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 filter high
+	\				2: s - R1 filter low
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r1_filt_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set R2 filter
+: do_conn_r2_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 filter high
+	\				2: s - R2 filter low
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r2_filt_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set R3 filter
+: do_conn_r3_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 filter high
+	\				2: s - R3 filter low
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r3_filt_msg __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set TX filter
+: do_conn_tx_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - TX filter high
+	\				2: s - TX filter low
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_tx_filt_msg __con_do_exchange ;
 	
 \ ===========================================================================================
 \ MAIN CODE
@@ -470,6 +569,70 @@ ns: sdr
 	a:new swap a:push  fr:+sender
 	"Connector_TASK" ' do_conn_r3_freq rot fr:msg! 
 	fr:response@ ;
+
+\ ----------------------------------
+\ Mode change
+: conn_r1_mode	SED: n -- *
+	\ in: 	0: n - mode id
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r1_mode rot fr:msg! 
+	fr:response@ ;
+
+: conn_r2_mode	SED: n -- *
+	\ in: 	0: n - mode id
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r2_mode rot fr:msg! 
+	fr:response@ ;
+	
+: conn_r3_mode	SED: n -- *
+	\ in: 	0: n - mode id
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r3_mode rot fr:msg! 
+	fr:response@ ;
+
+: conn_tx_mode	SED: n -- *
+	\ in: 	0: n - mode id
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_tx_mode rot fr:msg! 
+	fr:response@ ;
+
+\ ----------------------------------
+\ Filter change
+: conn_r1_filter	SED: n n -- *
+	\ in: 	0: n - filter high
+	\				1: n - filter low
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r1_filter rot fr:msg! 
+	fr:response@ ;
+	
+: conn_r2_filter	SED: n n -- *
+	\ in: 	0: n - filter high
+	\				1: n - filter low
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r2_filter rot fr:msg! 
+	fr:response@ ;
+	
+: conn_r3_filter	SED: n n -- *
+	\ in: 	0: n - filter high
+	\				1: n - filter low
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r3_filter rot fr:msg! 
+	fr:response@ ;
+	
+: conn_tx_filter	SED: n n -- *
+	\ in: 	0: n - filter high
+	\				1: n - filter low
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
+	fr:response@ ;
 	
 \ ========================================
 \ Reset namespace
@@ -542,9 +705,21 @@ connector_test_2 @ #if
 		2 sleep
 		3700000 sdr:conn_r1_freq "Freq 3.7: " . . cr
 		2 sleep
+		"AM" mode_for_name sdr:conn_r1_mode "Mode AM: " . . cr
+		2 sleep
+		0 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 6.1KHz: " . . cr
+		2 sleep
 		7180000 sdr:conn_r1_freq "Freq 7.18: " . . cr
 		2 sleep
+		"LSB" mode_for_name sdr:conn_r1_mode "Mode LSB: " . . cr
+		2 sleep
+		2 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 2.7KHz: " . . cr
+		2 sleep
 		3800000 sdr:conn_r1_freq "Freq 3.8: " . . cr ;
+		2 sleep
+		"FM" mode_for_name sdr:conn_r1_mode "Mode FM: " . . cr
+		2 sleep
+		5 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr
 	
 	\ Run one test iteration
 	: runtest
