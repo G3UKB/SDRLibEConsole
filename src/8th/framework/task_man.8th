@@ -184,10 +184,10 @@ ns: fr
 \ ===============================================================================
 \ Message response to sender
 \ Add sender to message
-: +sender	SED:	-- a
-	\ in: 	none
+: +sender	SED:	a -- a
+	\ in: 	0: a - message array
 	\ out: 	0: a - [sender name for response]
-	a:new t:name@ a:push ;
+	t:name@ a:push ;
 	
 \ ----------------------------------
 \ Get task response
@@ -201,7 +201,20 @@ ns: fr
 			"???"
 		then
 	then ;
-	
+
+\ ----------------------------------
+\ Push response data to sender
+: response!	SED: s * --
+	\ in: 	0: * - response data
+	\				1: s - sender (task name)
+	\ out: 	none
+	swap fr:task_reg@ swap 
+	\ Clone opaque response data
+	clone nip
+	\ Push to given q and notify caller
+	2dup t:push drop t:notify
+;
+
 \ ========================================
 \ Reset namespace
 ns: user

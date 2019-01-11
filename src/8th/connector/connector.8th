@@ -94,6 +94,8 @@ ns: sdr
 \ ===========================================================================================
 \ TASK LEVEL CODE
 \ PRIVATE
+\ Convention:
+\		__conn_...	=	private, not externally callable
 
 \ ===============================================================================
 \ Initialisation
@@ -125,52 +127,29 @@ ns: sdr
 	"b_resp_buffer" t:@ ;
 	
 \ ===============================================================================
-\ Json encoded request messages
-\ Return the discover message
-: __conn_discover_msg 			SED: -- s
-	\ in: 	none
-	\ out:	s0 - json encoded discover message
-	{ "cmd" : "radio_discover" , "params" : [] } >json ;
-
-\ ----------------------------------
-\ Return the server start message
-: __conn_server_start_msg 	SED: -- s
-	\ in: 	none
-	\ out:	s0 - json encoded server start message
-	{ "cmd" : "server_start" , "params" : [] } >json ;
-
-\ ----------------------------------
-\ Return the 	radio start message
-: __conn_radio_start_msg 	SED: n -- s
-	\ in: 	s0 - 0 = start without WBS else start with WBS
-	\ out:	s0 - json encoded radio start message
-	>r
-	{ "cmd" : "radio_start" , "params" : [] } 
-	"params" m:@ r> a:push drop >json ;
-
-\ ----------------------------------
-\ Return the enum audio inputs message
-: __conn_enum_inputs_msg 	SED: -- s
-	\ in: 	none
-	\ out:	s0 - json encoded enum audio inputs message
-	{ "cmd" : "enum_inputs" , "params" : [] } >json ;
-
-\ ----------------------------------
-\ Return the enum audio outputs message
-: __conn_enum_outputs_msg 	SED: -- s
-	\ in: 	none
-	\ out:	s0 - json encoded enum audo outputs message
-	{ "cmd" : "enum_outputs" , "params" : [] } >json ;
+\ Json encoded request messages	
+: __conn_push_one_param 	SED: n a -- 
+	"params" m:@ a:clear rot a:push drop ;
 	
+\ ========================================
+\ Messages with zero or one parameters, same SED: -- s (a Json encoded string)
+: __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
+: __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
+: __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
+: __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
+: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
+
+\ Messages with multiple parameters	
 \ ----------------------------------	
-\ Return the default route message i.e. receiver1 -> speaker audio
 : __conn_default_route_msg	SED: s s -- s
-	\ in:		s0 - audio api i.e. "MME"
-	\				s1 - audio device name string
-	\ out:	s0 - json encoded default route message
-	>p >p
-	{ "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
-	"params" m:@ 3 p> a:! 4 p> a:! drop >json ;
+	\ in:		0: s - audio api i.e. "MME"
+	\				1: s - audio device name string
+	\ out:	0: s - json encoded default route message
+	>r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
+	"params" m:@ 3 r> a:! 4 r> a:! drop >json ;
 	
 \ ===============================================================================
 \ Net
@@ -281,8 +260,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	s0 - true if successful
 	\ out:	s1 - the audio info map
-	__conn_enum_outputs_msg __conn_send_cmd_msg
-	__conn_wait_resp_with_timeout ;
+	__conn_enum_outputs_msg __conn_send_cmd_msg __conn_wait_resp_with_timeout ;
 
 \ ----------------------------------	
 \ Return the default route audio parameters
@@ -304,8 +282,8 @@ ns: sdr
 \ Message Handlers
 \ Called only by app model gen-server
 \ Convention:
-\		__app_...		=	local word, not externally callable
-\		do_app_...	=	Message handler
+\		__conn_...	=	private, not externally callable
+\		do_conn_...	=	message handler
 \ ========================================
 
 \ ========================================
@@ -333,32 +311,21 @@ ns: sdr
 	drop ;
 
 \ ========================================
-\ Basic receiver scripting
-
-\ Push response data to sender
-: __conn_do_response	SED: s * --
-	\ in: 	0: * - response data
-	\				1: s - sender (task name)
-	\ out: 	none
-	swap fr:task_reg@ swap 
-	\ Clone response data (probably unnecessary as all scalers
-	clone nip
-	\ Push to given q and notify caller
-	2dup t:push drop t:notify
-;
-
-\ ----------------------------------
+\ Do response
+: __con_do_response	SED: -- 
+	__conn_wait_resp_with_timeout not if
+			"Timeout!"
+		then
+	fr:response! ;
+	
+\ ========================================
+\ Basic radio functions
 \ Execute discover protocol
 : do_conn_discover	SED: a --
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_discover_msg __conn_send_cmd_msg
-	__conn_wait_resp_with_timeout not if
-		"Timeout!"
-	then
-	__conn_do_response
-;
+	__conn_discover_msg __conn_send_cmd_msg __con_do_response ;
 
 \ ----------------------------------
 \ Set a default route for RX1 to Speaker output both channels
@@ -366,12 +333,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_get_default_route __conn_default_route_msg __conn_send_cmd_msg
-	__conn_wait_resp_with_timeout not if	
-		"Timeout!"
-	then
-	__conn_do_response
-;
+	__conn_get_default_route __conn_default_route_msg __conn_send_cmd_msg __con_do_response ;
 
 \ ----------------------------------
 \ Start the server 
@@ -379,26 +341,45 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_server_start_msg __conn_send_cmd_msg
-	__conn_wait_resp_with_timeout not if 	
-		"Timeout!"
-	then
-	__conn_do_response
-;
+	__conn_server_start_msg __conn_send_cmd_msg __con_do_response ;
 
 \ ----------------------------------
 \ Start the radio
 : do_conn_start_radio	SED: a --
 	a:open
 	\ in: 	0: s - sender (task name)
+	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
-	0 __conn_radio_start_msg __conn_send_cmd_msg
-	__conn_wait_resp_with_timeout not if 	
-		"Timeout!"
-	then
-	__conn_do_response
-;
+	swap __conn_radio_start_msg __conn_send_cmd_msg __con_do_response ;
 
+\ ========================================
+\ Receiver functions
+\ Set R1 frequency
+: do_conn_r1_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r1_freq_msg __conn_send_cmd_msg __con_do_response ;
+
+\ ----------------------------------
+\ Set R2 frequency
+: do_conn_r2_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r2_freq_msg __conn_send_cmd_msg __con_do_response ;
+
+\ ----------------------------------
+\ Set R3 frequency
+: do_conn_r3_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r3_freq_msg __conn_send_cmd_msg __con_do_response ;
+	
 \ ===========================================================================================
 \ MAIN CODE
 
@@ -434,29 +415,60 @@ ns: sdr
 \ ===============================================================================
 \ Execute discover protocol
 : conn_discover	SED:  -- *
-	fr:+sender
-		"Connector_TASK" ' do_conn_discover rot fr:msg! 
+	\ in: 	none
+	\ out:	0: * - response
+	a:new fr:+sender
+	"Connector_TASK" ' do_conn_discover rot fr:msg! 
 	fr:response@ ;
 
 \ ----------------------------------
 \ Set a default route for RX1 to Speaker output both channels
 : conn_set_default_route	SED:  -- *
-	fr:+sender
-		"Connector_TASK" ' do_conn_set_default_route rot fr:msg! 
+	\ in: 	none
+	\ out:	0: * - response
+	a:new fr:+sender
+	"Connector_TASK" ' do_conn_set_default_route rot fr:msg! 
 	fr:response@ ;
 
 \ ----------------------------------
 \ Start the server 
 : conn_start_server	SED:  -- *
-	fr:+sender
+	\ in: 	none
+	\ out:	0: * - response
+	a:new fr:+sender
 	"Connector_TASK" ' do_conn_start_server rot fr:msg! 
 	fr:response@ ;
 
 \ ----------------------------------
 \ Start the radio
-: conn_start_radio	SED:  -- *
-	fr:+sender
+: conn_start_radio	SED: n -- *
+	\ in: 	0: n - 1 if start WBS
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_start_radio rot fr:msg! 
+	fr:response@ ;
+
+\ ----------------------------------
+\ Freq change
+: conn_r1_freq	SED: n -- *
+	\ in: 	0: n - freq in Hz
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r1_freq rot fr:msg! 
+	fr:response@ ;
+	
+: conn_r2_freq	SED: n -- *
+	\ in: 	0: n - freq in Hz
+	\ out:	0: * - response
+	a:new swap a:push  fr:+sender
+	"Connector_TASK" ' do_conn_r2_freq rot fr:msg! 
+	fr:response@ ;
+	
+: conn_r3_freq	SED: n -- *
+	\ in: 	0: n - freq in Hz
+	\ out:	0: * - response
+	a:new swap a:push  fr:+sender
+	"Connector_TASK" ' do_conn_r3_freq rot fr:msg! 
 	fr:response@ ;
 	
 \ ========================================
@@ -526,7 +538,13 @@ connector_test_2 @ #if
 		sdr:conn_discover "Discover: " . . cr
 		sdr:conn_set_default_route "Route: " . . cr
 		sdr:conn_start_server "Server start: " . . cr
-		sdr:conn_start_radio "Radio start: " . . cr ;
+		0 sdr:conn_start_radio "Radio start: " . . cr
+		2 sleep
+		3700000 sdr:conn_r1_freq "Freq 3.7: " . . cr
+		2 sleep
+		7180000 sdr:conn_r1_freq "Freq 7.18: " . . cr
+		2 sleep
+		3800000 sdr:conn_r1_freq "Freq 3.8: " . . cr ;
 	
 	\ Run one test iteration
 	: runtest
