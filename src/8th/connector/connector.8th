@@ -98,26 +98,32 @@ ns: sdr
 \ ===============================================================================
 \ Initialisation
 \ Create UDP socket
-{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, udp_cmd_sock
+: __conn_create_socket	SED: --
+	\ in: 	none
+	\ out:	none
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! ;
 	
 \ Get command socket
 : __conn_cmd_sock@	SED: -- net
 	\ in: 	none
 	\ out:	s0 - command socket
-	udp_cmd_sock @ ;
+	"udp_cmd_sock" t:@ ;
 
 \ ===============================================================================
 \ Buffers
-\ Response buffer
-5000 b:new 0x0 b:fill var, b_resp_buffer
+\ Create response buffer
+: __conn_create_resp_buf	SED: --
+	\ in: 	none
+	\ out:	none
+	5000 b:new 0x0 b:fill "b_resp_buffer" t:! ;
 
 \ ----------------------------------	
 \ Get response buffer
-: __conn_resp_buff@	SED: -- b
+: __conn_resp_buf@	SED: --
 	\ in: 	none
-	\ out:	0: b - response buffer
-	b_resp_buffer @ ;
- 
+	\ out:	none	
+	"b_resp_buffer" t:@ ;
+	
 \ ===============================================================================
 \ Json encoded request messages
 \ Return the discover message
@@ -250,7 +256,7 @@ ns: sdr
 	\ in: 	s0 - socket
 	\ out:	s0 - true if receive successful
 	\ pre: 	read data ready condition true
-	__conn_resp_buff@ 0 net:recvfrom null? if 
+	__conn_resp_buf@ 0 net:recvfrom null? if 
 		"Error in read!" log 2drop {} false
 	else
 		drop nip nip nip json> true
@@ -305,21 +311,23 @@ ns: sdr
 \ ========================================
 \ General management
 \ Initialise the connector at task level
-: do_app_init	SED: m --
+: do_conn_init	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop ;
+	drop 
+	__conn_create_socket 
+	__conn_create_resp_buf ;
 
 \ ----------------------------------
 \ Run SOD
-: do_conn_start_of_day	SED: m --
+: do_conn_start_of_day	SED: a --
 	\ in: 	message
 	\ out:	none
 	drop ;
 
 \ ----------------------------------
 \ Close the app model at task level
-: do_app_close	SED: m --
+: do_conn_close	SED: m --
 	\ in: 	message
 	\ out:	none
 	drop ;
@@ -424,53 +432,32 @@ ns: sdr
 \ ===============================================================================
 \ Public procedural interface
 \ ===============================================================================
-
-\ Add sender to message
-: __conn_plus_sender	SED:	-- a
-	\ in: 	none
-	\ out: 	0: a - [new q id for response]
-	a:new t:name@ a:push ;
-	
-\ ----------------------------------
-\ Get task response
-: __conn_get_response	SED: -- *
-	\ in: 	none
-	\ out: 	0: * - response
-	t:pop null? if
-		\ Nothing yet, so wait a while
-		drop -1 sleep t:pop null? if 
-			drop "Timeout waiting for task response!" log 
-			"???"
-		then
-	then ;
-	
-\ ----------------------------------
 \ Execute discover protocol
 : conn_discover	SED:  -- *
-	__conn_plus_sender
+	fr:+sender
 		"Connector_TASK" ' do_conn_discover rot fr:msg! 
-	__conn_get_response ;
+	fr:response@ ;
 
 \ ----------------------------------
 \ Set a default route for RX1 to Speaker output both channels
 : conn_set_default_route	SED:  -- *
-	__conn_plus_sender
+	fr:+sender
 		"Connector_TASK" ' do_conn_set_default_route rot fr:msg! 
-	__conn_get_response ;
+	fr:response@ ;
 
 \ ----------------------------------
 \ Start the server 
 : conn_start_server	SED:  -- *
-	__conn_plus_sender
+	fr:+sender
 	"Connector_TASK" ' do_conn_start_server rot fr:msg! 
-	__conn_get_response ;
+	fr:response@ ;
 
 \ ----------------------------------
 \ Start the radio
 : conn_start_radio	SED:  -- *
-	__conn_plus_sender
+	fr:+sender
 	"Connector_TASK" ' do_conn_start_radio rot fr:msg! 
-	__conn_get_response ;
+	fr:response@ ;
 	
 \ ========================================
 \ Reset namespace
