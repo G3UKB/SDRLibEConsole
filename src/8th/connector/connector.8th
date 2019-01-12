@@ -1,5 +1,5 @@
 (* 
-	client
+	connector.8th
  
   Script client to SDRLibE SDR library
  
@@ -34,6 +34,7 @@ connector_test_1 @ #if
 	"../framework/struct_manip.8th" f:include
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
+	"../common/radio_defs.8th" f:include
 	"../framework/pub_sub.8th"  f:include
 
 	\ needs debug/sed
@@ -70,6 +71,7 @@ connector_test_2 @ #if
 	"../framework/struct_manip.8th" f:include
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
+	"../common/radio_defs.8th" f:include
 	"../framework/pub_sub.8th"  f:include
 
 	\ needs debug/sed
@@ -159,7 +161,7 @@ ns: sdr
 : __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r1_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
 
 \ Complex messages
 \ ----------------------------------	
@@ -246,7 +248,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	s0 - true if wait successful
 	\				s1 - the target socket
-	__conn_cmd_sock@ true 2000 net:wait ;
+	__conn_cmd_sock@ true 5000 net:wait ;
 
 \ ----------------------------------	
 \ Receive data from the given socket
@@ -255,9 +257,9 @@ ns: sdr
 	\ out:	s0 - true if receive successful
 	\ pre: 	read data ready condition true
 	__conn_resp_buf@ 0 net:recvfrom null? if 
-		"Error in read!" log 2drop {} false
+		"Error in read from device!" throw
 	else
-		drop nip nip nip json> true
+		drop nip nip nip json>
 	then ;
 
 \ ----------------------------------			
@@ -269,7 +271,7 @@ ns: sdr
 	__conn_net_wait_recv_cmd if
 		__conn_recv_from
 	else
-		"Timeout waiting for response!" log drop {} false
+		"Timeout waiting for response from device!" throw
 	then ;
 	
 \ ===============================================================================
@@ -287,15 +289,12 @@ ns: sdr
 	\ in: 	none
 	\ out:	s0 - the audio api
 	\				s1 - the audio device
-	__conn_get_audio_output_info if
-		\ Return api and dev for the default device
-		\ Note, we should select for this aka gui interface
-		"outputs" m:@ nip 1 a:@ nip
-		"api" m:@ swap "name" m:@ nip 
-	else
-		\ Something went wrong
-		"Error getting audio info!" log drop "" ""
-	then ;
+	__conn_get_audio_output_info
+	\ Return api and dev for the default device
+	\ Note, we should select for this aka gui interface
+	"outputs" m:@ nip 1 a:@ nip
+	"api" m:@ swap "name" m:@ nip ; 
+	
 
 \ ========================================
 \ Message Handlers
@@ -332,14 +331,12 @@ ns: sdr
 \ ========================================
 \ Do response
 : __con_do_response	SED: -- 
-	__conn_wait_resp_with_timeout not if
-			"Timeout!"
-		then
+	__conn_wait_resp_with_timeout
 	fr:response! ;
 
 \ Do exchange
 : __con_do_exchange	SED: -- 
-	__conn_send_cmd_msg __con_do_response ;
+	__conn_send_cmd_msg  __con_do_response ;
 
 \ ========================================
 \ Basic radio functions
@@ -702,24 +699,27 @@ connector_test_2 @ #if
 		sdr:conn_set_default_route "Route: " . . cr
 		sdr:conn_start_server "Server start: " . . cr
 		0 sdr:conn_start_radio "Radio start: " . . cr
+		
 		2 sleep
 		3700000 sdr:conn_r1_freq "Freq 3.7: " . . cr
 		2 sleep
-		"AM" mode_for_name sdr:conn_r1_mode "Mode AM: " . . cr
+		"AM" sdr:mode_for_name sdr:conn_r1_mode "Mode AM: " . . cr
 		2 sleep
-		0 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 6.1KHz: " . . cr
+		0 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 6.1KHz: " . . cr
 		2 sleep
 		7180000 sdr:conn_r1_freq "Freq 7.18: " . . cr
 		2 sleep
-		"LSB" mode_for_name sdr:conn_r1_mode "Mode LSB: " . . cr
+		"LSB" sdr:mode_for_name sdr:conn_r1_mode "Mode LSB: " . . cr
 		2 sleep
-		2 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 2.7KHz: " . . cr
+		2 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 2.7KHz: " . . cr
 		2 sleep
-		3800000 sdr:conn_r1_freq "Freq 3.8: " . . cr ;
+		3800000 sdr:conn_r1_freq "Freq 3.8: " . . cr
 		2 sleep
-		"FM" mode_for_name sdr:conn_r1_mode "Mode FM: " . . cr
+		"FM" sdr:mode_for_name sdr:conn_r1_mode "Mode FM: " . . cr
 		2 sleep
-		5 filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr
+		5 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr
+		
+	;
 	
 	\ Run one test iteration
 	: runtest
