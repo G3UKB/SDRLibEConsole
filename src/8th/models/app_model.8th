@@ -30,7 +30,7 @@ true var, app_model_test
 app_model_test @ #if
 	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
 	"../framework/param_st.8th" f:include
-	"../framework/task_man.8th" f:include
+	"../framework/gen_server.8th" f:include
 	"../framework/struct_manip.8th" f:include
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
@@ -677,7 +677,7 @@ ns: sdr
 	"AppModel_TASK" ' do_app_close a:new fr:msg!
 	2.0 sleep
 	\ Ask the model to exit
-	"AppModel_TASK" ' fr:do_term a:new fr:msg! ;
+	"AppModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
 \ ----------------------------------
 \ Ask task to run internal tests
@@ -977,7 +977,7 @@ app_model_test @ #if
 		\ Close app model to clean up for next iteration
 		"Closing model" log
 		sdr:app_model_term 
-		"AppModel_TASK" fr:wait_single_task 
+		"AppModel_TASK" fr:gs_wait_single_task 
 		"Done closing model" log
 		1 sleep
 	;
@@ -995,7 +995,7 @@ app_model_test @ #if
 		fr:pubsub_term		
 		\ Wait for P/S to terminate
 		\ AppModel_TASK already terminated
-		"P/S_TASK" fr:wait_single_task 
+		"P/S_TASK" fr:gs_wait_single_task 
 		"TEST_TASK exiting..." log
 	;
 	

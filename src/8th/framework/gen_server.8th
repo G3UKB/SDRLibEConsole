@@ -1,7 +1,8 @@
 (* 
-	task_man.8th
+	gen_server.8th
  
-  Task management
+  A general purpose server to be used for all tasks that require the
+  messaging infrastructure.
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -24,10 +25,10 @@
 
 \ ========================================
 \ Testing only
-true var, task_man_test
+false var, gen_server_test
 
 \ ----------------------------------
-task_man_test @ #if
+gen_server_test @ #if
 	\ Includes
 	"param_st.8th"  f:include
 	\ needs debug/sed
@@ -38,44 +39,64 @@ task_man_test @ #if
 \ Set namespace
 ns: fr
 
+(*
+	This modulle is loosly based on the erlang gen-server in that it emulates a 
+	process oriented message passing concurrency model.
+	
+	It is part of the generic framework in the namespace fr:.
+*)
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start __
+\ ===============================================================================
+
 \ ===============================================================================
 \ Task reference and termination management
 
 \ Holder for task references
+\ Global var, requires lock semantics
 {} var, __task_dict
 
 \ ----------------------------------
 \ Locked var
-: locked_task_dict@
+: __gs_lock@
 	__task_dict lock @ ;
 
 \ ----------------------------------
 \ Unlocked var	
-: unlock_task_dict
+: __gs_unlock
 	__task_dict unlock drop ;
 
 \ ----------------------------------	
 \ Store task referance
-: task_reg!	SED: t s --
+: __gs_reg!	SED: t s --
 	\ in: 	t - task object
 	\				s - task name
 	\ out:	none
-	locked_task_dict@
+	__gs_lock@
 	swap rot  m:! drop 
-	unlock_task_dict ;
+	__gs_unlock ;
 
 \ ----------------------------------	
 \ Get task referance
-: task_reg@	SED: s -- t
+: __gs_reg@	SED: s -- t
 	\ in: 	0: s - task name
 	\ out:	0: t - task ref
-	locked_task_dict@
+	__gs_lock@
 	swap m:@ nip 
-	unlock_task_dict ;
-	
+	__gs_unlock ;
+
+
+\ ===============================================================================
+\ PUBLIC
+\ Generic task for implementing messaging passing concurrency
+\ Convention: any private words used as helpers start __
+\ ===============================================================================
+
 \ ----------------------------------
 \ Wait for task to terminate
-: wait_task SED: s t --
+: __gs_wait_task SED: s t --
 	\ in:		t - task ref 	(item from dict) 	
 	\				s - task name (key from dict)
 	\ out:	none
@@ -84,36 +105,35 @@ ns: fr
 
 \ ----------------------------------
 \ Wait for all tasks to terminate
-: wait_all	SED: --
-	locked_task_dict@
-	' wait_task m:each
+: gs_wait_all	SED: --
+	__gs_lock@
+	' __gs_wait_task m:each
 	1 sleep
 	m:clear
-	unlock_task_dict drop ;
+	__gs_unlock drop ;
 
 \ ----------------------------------
 \ Wait for task to terminate
-: wait_single_task	SED: s --
+: gs_wait_single_task	SED: s --
 	dup >r "Waiting for task: " swap s:+ log
-	locked_task_dict@
+	__gs_lock@
 	r@ m:@ t:wait
 	r> m:-
-	unlock_task_dict drop ;
+	__gs_unlock drop ;
 	
-\ ===============================================================================
-\ Generic task for implementing messaging passing concurrency 
-
 \ ----------------------------------
 \ Terminate task
-: do_term  SED: m --
-	\ in: 	{ "type" : "term" }
+\ This is called from the task to terminate itself
+\ It sets the run task var to false which is then tested within gen_server
+: gs_do_term  SED: a --
+	\ in: 	0: []
 	\ out:	none
 	drop false t:name@ "_run" s:+ t:!
 ;
 
 \ ----------------------------------
 \ Process 1 item from task Q	
-: proc_q	SED: --
+: __gs_proc_q	SED: --
 	t:pop null? if
 		"Warning, p/s q returned null!" log drop
 	else
@@ -121,14 +141,14 @@ ns: fr
 		"data" m:@ swap "cb" m:@ nip w:exec
 	then ;
 	
-\ ----------------------------------
-\ Task entry point for generic servers
+\ ===============================================================================
+\ Task entry point for all generic servers
 : gen_server	 SED: s t --
 	\ in: 	0 t: calling task
 	\				1 s: this task name
 	\ out:	none
 	\ Assign name and store in registry
-	>r dup t:name! t:curtask swap task_reg!
+	>r dup t:name! t:curtask swap __gs_reg!
 	
 	\ Set us in the run state using a task variable
 	true t:name@ "_run" s:+ t:!
@@ -145,7 +165,7 @@ ns: fr
 	repeat
 		\ Wait for a wake up notify
 		-1 sleep
-		' proc_q t:qlen 
+		' __gs_proc_q t:qlen 
 		\ Check q length
 		dup 1 n:> if "Q: " . t:qlen . cr cr then 
 		times
@@ -159,8 +179,11 @@ ns: fr
 	t:name@ " - exiting..." s:+ log ;
 
 \ ===============================================================================
-\ Message send to a given task
-\ NOTE: leave p stack as we found it
+\ Message management
+\ Words are kept minimal, no gs prefix as they are used frequently
+
+\ ----------------------------------
+\ Message send to a given word on a given task name queue
 : msg!	SED: s w * --
 	\ in:		* - opaque data to send 	
 	\				w - word to invoke in task
@@ -174,15 +197,16 @@ ns: fr
 	\ Clone the whole message structure and push to the task q
 	clone nip
 	\ Get task for name and lock task-dict
-	r> locked_task_dict@ swap m:@ nip 
+	r> __gs_lock@ swap m:@ nip 
 	\ Push message to task q
 	dup >r swap t:push r> t:notify 
 	\ Release lock
-	unlock_task_dict 
+	__gs_unlock 
 	0.01 sleep ;
 
-\ ===============================================================================
+\ ----------------------------------
 \ Message response to sender
+
 \ Add sender to message
 : +sender	SED:	a -- a
 	\ in: 	0: a - message array
@@ -190,7 +214,7 @@ ns: fr
 	t:name@ a:push ;
 	
 \ ----------------------------------
-\ Get task response
+\ Get task response for synchronous sends
 : response@	SED: -- *
 	\ in: 	none
 	\ out: 	0: * - opaque response data
@@ -208,7 +232,7 @@ ns: fr
 	\ in: 	0: * - response data
 	\				1: s - sender (task name)
 	\ out: 	none
-	swap fr:task_reg@ swap 
+	swap fr:__gs_reg@ swap 
 	\ Clone opaque response data
 	clone nip
 	\ Push to given q and notify caller
@@ -222,9 +246,9 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-task_man_test @ #if
+gen_server_test @ #if
 
-	: iterations 500 ;
+	: iterations 10 ;
 	
 	: make_task	\ n --
 		"t" swap >s s:+ t:curtask 2 ' fr:gen_server t:task-n
@@ -236,7 +260,7 @@ task_man_test @ #if
 	;
 
 	: term_task	\ n --
-		"t" swap >s s:+ ' fr:do_term a:new fr:msg!
+		"t" swap >s s:+ ' fr:gs_do_term a:new fr:msg!
 		\ Memory creeps up between terminating and creating a new batch of tasks
 		\ This is about the minimal sleep required. However it still increases.
 		\ 0.2 sleep
@@ -249,16 +273,17 @@ task_man_test @ #if
 	: runtest
 		"Run: " swap >s s:+ log
 		make_tasks
+		1 sleep
 		term_all
 		\ fr:__task_dict @ . cr
-		fr:wait_all
+		fr:gs_wait_all
 		fr:__task_dict @ m:clear
 		0.2 sleep
 		\ depth . " " . dstack st:len nip . " " . pdepth . cr
 	;
 	
 	param_st_alloc
-	' runtest 1 500 loop
+	' runtest 1 5 loop
 		
 	bye
 #then	

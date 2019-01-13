@@ -32,64 +32,76 @@ param_st_test @ #if
 	\ true SED-CHECK
 #then
 
+(*
+	Provides an extra stack per task to offload parameters.
+	Theis leaves the data stack and the r stack for local manipulation.
+	Be very careful to leave the P stack exactly as found after each word in a
+	hierarchy of calls as pervious words may be using the parameters. In any
+	event do not clear the stack except at the end of a call sequence.
+	
+	It is part of the generic framework in the namespace user:.
+*)
+
 \ ========================================
 
 \ Max params per stack (depth)
 : PS_MAX_PARAMS 20 ;
 	
 \ ===============================================================================
-\ Private
+\ PRIVATE
+\ Convention: private words start __
+\ This is left in the user namepace rather than fr: for ease of use
 \ ===============================================================================
 
 \ Return the stack associated with the calling task
-: pss@	 SED: -- *
+: __pss@	 SED: -- *
 	\ in: 	none
 	\ out:	s0 - stack | null 
 	"p_st" t:@ ;
 
 \ ----------------------------------
 \ Store the given stack for the current task
-: pss!	 SED: st --
+: __pss!	 SED: st --
 	\ in: 	stack
 	\ out:	none
 	"p_st" t:! ;
 
 \ ----------------------------------
 \ Pop TOS from the task param stack
-: ps>	 SED: -- *
+: __ps>	 SED: -- *
 	\ in: 	none
 	\ out:	item of any type
-	pss@ null? if
-		"ps> attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	__pss@ null? if
+		"__ps> attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then
 	st:pop nip ;
 
 \ ----------------------------------
 \ Copy TOS from the task param stack 
-: ps@	 SED: -- *
+: __ps@	 SED: -- *
 	\ in: 	none
 	\ out:	item of any type
-	pss@ null? if
+	__pss@ null? if
 		"pa@ attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then
 	0 st:pick nip ;
 
 \ ----------------------------------
 \ Pick item n from the task param stack 	
-: pps@	 SED: n -- *
+: __pps@	 SED: n -- *
 	\ in: 	item index
 	\ out:	item of any type
-	pss@ null? if
-		"pps@ attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
+	__pss@ null? if
+		"p__ps@ attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then
 	swap st:pick nip ;
 
 \ ----------------------------------
 \ Push the given item to the task param stack
-: ps!	 SED: * --
+: __ps!	 SED: * --
 	\ in: 	item of any type
 	\ out:	none
-	pss@ null? if
+	__pss@ null? if
 		"ps! attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then
 	swap st:push drop ;
@@ -97,15 +109,15 @@ param_st_test @ #if
 \ ----------------------------------
 \ Check if initialised for current task
 \ Throw exception if not initialised
-: param_st_check  SED: --
+: __param_st_check  SED: --
 	\ in: 	none
 	\ out:	none
-	pss@ null? if
+	__pss@ null? if
 		"param_st_check attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then drop ;
 
 \ ===============================================================================
-\ Public	
+\ PUBLIC	
 \ ===============================================================================
 
 \ Allocate a parameter stack for the given task
@@ -113,10 +125,10 @@ param_st_test @ #if
 : param_st_alloc	 SED: --
 	\ in: 	none
 	\ out:	none
-	pss@ null? if
+	__pss@ null? if
 		\ No previous allocation for this task
 		\ Create a new entry
-		drop PS_MAX_PARAMS st:new pss!
+		drop PS_MAX_PARAMS st:new __pss!
 	else
 		drop "Param stack already initialised for task [" t:name@ s:+ "]. Ignoring!" s:+ log
 	then ;
@@ -125,7 +137,7 @@ param_st_test @ #if
 : param_st_free	SED: --
 	\ in: 	none
 	\ out:	none
-	pss@ null? if
+	__pss@ null? if
 			"param_st_free attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
 	then free ;
 
@@ -137,52 +149,52 @@ param_st_test @ #if
 : >p	 SED: * --
 	\ in: 	any type
 	\ out:	none
-	param_st_check
-	ps! ;
+	__param_st_check
+	__ps! ;
 
 \ ----------------------------------
 \ Retrieve TOS from task param stack
 : p>  SED: -- *
 	\ in: 	none
 	\ out:	any type
-	param_st_check
-	ps> ;
+	__param_st_check
+	__ps> ;
 
 \ ----------------------------------
 \ Copy TOS from task param stack
 : p@	 SED: -- *
 	\ in: 	none
 	\ out:	any type
-	param_st_check
-	ps@ ;
+	__param_st_check
+	__ps@ ;
 
 \ ----------------------------------
 \ Copy item n from task param stack
 : pp@ SED: n -- *
 	\ in: 	none
 	\ out:	any type
-	param_st_check
-	pps@ ;
+	__param_st_check
+	__pps@ ;
 
 \ ----------------------------------
 \ Drop n items from task param stack
 : pndrop SED: n -- 
 	\ in: 	none
 	\ out:	any type
-	param_st_check
-	pss@ swap st:ndrop drop ;
+	__param_st_check
+	__pss@ swap st:ndrop drop ;
 	
 \ ----------------------------------	
 \ Clear task param stack
 : pclear SED:  -- 
-	param_st_check
-	pss@ st:clear drop ;
+	__param_st_check
+	__pss@ st:clear drop ;
 
 \ ----------------------------------
 \ Stack depth
 : pdepth SED:  -- n
-	param_st_check
-	pss@ st:len nip ;
+	__param_st_check
+	__pss@ st:len nip ;
 	
 \ ----------------------------------	
 \ Print the task stack

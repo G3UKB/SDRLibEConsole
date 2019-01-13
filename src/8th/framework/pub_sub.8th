@@ -34,7 +34,7 @@ pub_sub_test @ #if
 	\ true SED-CHECK
 	\ Includes
 	"param_st.8th"  f:include
-	"task_man.8th"  f:include
+	"gen_server.8th"  f:include
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 #then
@@ -256,7 +256,7 @@ ns: fr
 : pubsub_term	SED: --
 	\ in: 	none
 	\ out:	none
-	"P/S_TASK" ' do_term a:new msg! ;
+	"P/S_TASK" ' gs_do_term a:new msg! ;
 
 \ ----------------------------------
 \ Subscribe to an event
@@ -325,7 +325,7 @@ pub_sub_test @ #if
 	run_tests
 	fr:pubsub_term 
 	\ Wait for all tasks to exit
-	fr:wait_all
+	fr:gs_wait_all
 
 	\ allow log to flush...
 	0.2 sleep
