@@ -475,39 +475,13 @@ ns: sdr
 	\				2: s - TX filter low
 	\ out: 	q: * - "Timeout" or response data
 	rot rot  __conn_tx_filt_msg __con_do_exchange ;
-	
-\ ===========================================================================================
-\ MAIN CODE
-
-\ Call level interface from all modules, may be called by any task.
-\ The connector both subscribes to events and is called directly.
-\ It may publish data events or make direct calls for efficiency.
-
-\ ----------------------------------
-\ Module initialisation
-: conn_init	SED: --
-	\ in: 	none
-	\ out:	none
-	\ Create the app model gen-server
-	"Connector_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
-	\ Ask the model to initialise itself
-	"Connector_TASK" ' do_conn_init a:new fr:msg!
-	"Connector initialised sent" log
-	"Connector_TASK" ' do_conn_start_of_day a:new fr:msg! ;
-
-\ ----------------------------------
-\ Module close
-: conn_term	SED: --
-	\ in: 	none
-	\ out:	none
-	\ Tidy close the model
-	"Connector_TASK" ' do_conn_close a:new fr:msg!
-	2.0 sleep
-	\ Ask the model to exit
-	"Connector_TASK" ' fr:do_term a:new fr:msg! ;
 
 \ ===============================================================================
-\ Public procedural interface
+\ ===============================================================================
+\ PUBLIC procedural interface
+\ Call level interface from all modules, may be called by any task.
+\ The connector both subscribes to events and may be called directly.
+\ It may publish data events or make direct calls for efficiency.
 \ ===============================================================================
 \ Execute discover protocol
 : conn_discover	SED:  -- *
@@ -630,11 +604,80 @@ ns: sdr
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
 	fr:response@ ;
+
+\ ===============================================================================
+\ EVENT HANDLERS
+
+\ Not implemented subscribe
+: __conn_not_implemented	SED: * --
+	"Not implemented!" log ;
+
+\ ===============================================================================
+\ INITIALISATION and TERMINATION
+
+\ Subscribe to system events that need to be forwarded to the server
+: __conn_subscribe	SED: --
+	SYS_R1_FREQ ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_FREQ ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_FREQ ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_MODE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_MODE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_MODE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_MOX ' test_call__conn_not_implementedback fr:pubsub_subscribe
+	SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_MICGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_TX_FREQ ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_TX_MODE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_TX_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_RUN_STATE ' __conn_not_implemented fr:pubsub_subscribe ;
+	
+\ ----------------------------------
+\ Module initialisation
+: conn_init	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Do subscription
+	__conn_subscribe
+	\ Create the connector gen-server
+	"Connector_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
+	\ Ask the connector to initialise itself
+	"Connector_TASK" ' do_conn_init a:new fr:msg!
+	"Connector initialised sent" log
+	"Connector_TASK" ' do_conn_start_of_day a:new fr:msg! ;
+
+\ ----------------------------------
+\ Module close
+: conn_term	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Tidy close the connector
+	"Connector_TASK" ' do_conn_close a:new fr:msg!
+	2.0 sleep
+	\ Ask the connector to exit
+	"Connector_TASK" ' fr:do_term a:new fr:msg! ;
 	
 \ ========================================
 \ Reset namespace
 ns: user
 
+
+\ ===============================================================================
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
@@ -717,8 +760,7 @@ connector_test_2 @ #if
 		2 sleep
 		"FM" sdr:mode_for_name sdr:conn_r1_mode "Mode FM: " . . cr
 		2 sleep
-		5 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr
-		
+		5 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr	
 	;
 	
 	\ Run one test iteration
