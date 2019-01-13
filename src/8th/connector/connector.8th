@@ -158,7 +158,7 @@ ns: sdr
 : __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
 : __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param .s >json ;
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
@@ -444,7 +444,7 @@ ns: sdr
 	\				1: s - R1 filter high
 	\				2: s - R1 filter low
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_filt_msg __con_do_exchange ;
+	rot rot __conn_r1_filt_msg __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R2 filter
@@ -454,7 +454,7 @@ ns: sdr
 	\				1: s - R2 filter high
 	\				2: s - R2 filter low
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r2_filt_msg __con_do_exchange ;
+	rot rot  __conn_r2_filt_msg __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R3 filter
@@ -464,7 +464,7 @@ ns: sdr
 	\				1: s - R3 filter high
 	\				2: s - R3 filter low
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r3_filt_msg __con_do_exchange ;
+	rot rot  __conn_r3_filt_msg __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set TX filter
@@ -474,7 +474,7 @@ ns: sdr
 	\				1: s - TX filter high
 	\				2: s - TX filter low
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_tx_filt_msg __con_do_exchange ;
+	rot rot  __conn_tx_filt_msg __con_do_exchange ;
 	
 \ ===========================================================================================
 \ MAIN CODE
@@ -738,6 +738,7 @@ connector_test_2 @ #if
 		"Done basic tests" log
 		sdr:conn_term 
 		"Connector_TASK" fr:wait_single_task 
+		fr:pubsub_term
 		"P/S_TASK" fr:wait_single_task 
 		"TEST_TASK exiting..." log
 		1 sleep
