@@ -40,7 +40,7 @@ gen_server_test @ #if
 ns: fr
 
 (*
-	This modulle is loosly based on the erlang gen-server in that it emulates a 
+	This module is loosly based on the erlang gen-server in that it emulates a 
 	process oriented message passing concurrency model.
 	
 	It is part of the generic framework in the namespace fr:.
@@ -261,9 +261,6 @@ gen_server_test @ #if
 
 	: term_task	\ n --
 		"t" swap >s s:+ ' fr:gs_do_term a:new fr:msg!
-		\ Memory creeps up between terminating and creating a new batch of tasks
-		\ This is about the minimal sleep required. However it still increases.
-		\ 0.2 sleep
 	;
 
 	: term_all
@@ -275,7 +272,6 @@ gen_server_test @ #if
 		make_tasks
 		1 sleep
 		term_all
-		\ fr:__task_dict @ . cr
 		fr:gs_wait_all
 		fr:__task_dict @ m:clear
 		0.2 sleep

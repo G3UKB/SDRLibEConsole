@@ -43,6 +43,19 @@ pub_sub_test @ #if
 \ Set namespace
 ns: fr
 
+(*
+	GEN_SERVER application -
+	This is a publish/subscribe system.
+	1. A number of events are registered. Events are strings. 
+	2. Once registered and event may be subscribed to by any number of recipients.
+	3. Once registered an event may be published with an opaque data structure and
+	will be dispatched to all subscribers [if any].
+	4. Dispatch wis on the P/S_THREAD for SYS events and on the main thread for UI events.
+	This is convention but the registration includes a flag which is the actua indicator.
+	
+	It is part of the generic framework in the namespace fr:.
+*)
+
 \ =============================================================================================
 \ Publish / Subscribe gen_server handlers
 \ ========================================
@@ -51,7 +64,7 @@ ns: fr
 
 \ ----------------------------------
 \ Return the pub/sub store	
-: store@	 SED: -- m
+: __ps_store@	 SED: -- m
 	\ in: 	none
 	\ out:	pub/sub store
 	"ps_s" t:@ ;
@@ -77,7 +90,7 @@ ns: fr
 : ps_exists?	 SED: a -- F
 	\ in: 	[evnt-name, f]
 	\ out:	flag
-	evnt_name@ store@ swap m:exists? nip ;
+	evnt_name@ __ps_store@ swap m:exists? nip ;
 
 \ ----------------------------------
 \ Return default event data
@@ -92,7 +105,7 @@ ns: fr
 	\ in: 	[evnt-name, f]
 	\				[f, []]
 	\ out:	[evnt_flg, []]
-	evnt_name@ store@ swap rot m:! drop ;
+	evnt_name@ __ps_store@ swap rot m:! drop ;
 
 \ ----------------------------------
 \ Register a new entry	
@@ -119,7 +132,7 @@ ns: fr
 	\ in: 	[w]
 	\ out:	w
 	\ [f,[w,w,..]]
-	evnt_name@ store@ swap m:@ nip ;
+	evnt_name@ __ps_store@ swap m:@ nip ;
 
 \ ----------------------------------
 \ Retrieve the event data	
@@ -164,7 +177,7 @@ ns: fr
 	ps_exists? if
 		\ Add a new subscriber to the event
 		\ Get the callback array
-		store@ r@ evnt_name@ m:@ nip
+		__ps_store@ r@ evnt_name@ m:@ nip
 		\ Get the callback word array [f,[w,w, ..]]
 		1 a:@ nip
 		\ Append the new callback word to the array
