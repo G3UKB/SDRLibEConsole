@@ -39,14 +39,19 @@ persist_test @ #if
 ns: sdr
 
 \ ===============================================================================
+\ PRIVATE
+\ Convention: private words start __persist_
+\ ===============================================================================
+
+\ ===============================================================================
 \ File names
 : APP_MODEL_FILENAME "app-model.cfg" ;
 : OPTION_MODEL_FILENAME "option-model.cfg" ;
 
 \ ----------------------------------
-\ Step path back n directory levels
-: pbk	SED: s n -- s
-	\ in: 	0: n - number of levels to step back
+\ Step path back n directory __persist_levels
+: __persist_pbk	SED: s n -- s
+	\ in: 	0: n - number of __persist_levels to step back
 	\ 			1: s - given path
 	\ out:	new path
 	repeat
@@ -58,7 +63,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Find 8th directory index in path components array
-: levels	\ SED: n s -- s n | empty SED: can't cope with this
+: __persist_levels	\ SED: n s -- s n | empty SED: can't cope with this
 	\ in: 	0: s - directory
 	\ 			1: n - idx
 	\ out:	0: s - directory	(match)
@@ -68,6 +73,11 @@ ns: sdr
 	else 2drop then
 ;
 
+\ ===============================================================================
+\ PUBLIC
+\ Public procedural interface
+\ ===============================================================================
+
 \ ----------------------------------
 \ Create fully qualified path
 : create_model_path	SED: s -- *
@@ -76,12 +86,12 @@ ns: sdr
 	\ Separate the current working directory into a path component array
 	getcwd "" f:sep s:+ s:/ 
 	\ Iterate the array and return the level idx of /8th in the array
-	' levels a:each							\ filename idx directory array
+	' __persist_levels a:each										\ filename idx directory array
 	1 pick "8th" s:= if
-		\ Calc number of levels /8th is back from the current directory
-		a:len nip nip swap n:- 1 n:-	 	\ filename	n-levels
+		\ Calc number of __persist_levels /8th is back from the current directory
+		a:len nip nip swap n:- 1 n:-	 	\ filename	n-__persist_levels
 		\ Get relative path back to 8th
-		"" swap pbk											\ e.g. "..\..\"
+		"" swap __persist_pbk						\ e.g. "..\..\"
 		\ Get fully qualified path to conf file
 		"conf" s:+ f:sep s:+ swap s:+		\ qualified-path
 	else
@@ -119,6 +129,7 @@ ns: sdr
 \ Restore namespace	
 ns: user
 
+\ ===============================================================================
 \ ===============================================================================
 \ Testing
 \ ===============================================================================

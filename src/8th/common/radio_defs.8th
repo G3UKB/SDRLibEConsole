@@ -1,5 +1,5 @@
 (* 
-	radio_defs
+	radio_defs.8th
  
   Modes, filters etc
  
@@ -27,7 +27,7 @@ needs utils/enums
 \ Define our SDR namespace
 ns: sdr
 
-\ ===============================================================================
+\ ========================================
 \  RX modes
 0 enum:
 	CH_LSB

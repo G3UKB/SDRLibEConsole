@@ -25,6 +25,7 @@
 \ Set namespace
 ns: sdr
 
+\ Perform application level registrations
 : do_registrations	SED: w --
 	\ in:		0: w - registration word to call
 	\ out:	none
