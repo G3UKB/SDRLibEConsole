@@ -43,7 +43,7 @@ ns: fr
 	This module is loosly based on the erlang gen-server in that it emulates a 
 	process oriented message passing concurrency model.
 	
-	It is part of the generic framework in the namespace fr:.
+	This is part of the generic framework in the namespace fr:.
 *)
 
 \ ===============================================================================
@@ -86,7 +86,6 @@ ns: fr
 	__gs_lock@
 	swap m:@ nip 
 	__gs_unlock ;
-
 
 \ ===============================================================================
 \ PUBLIC

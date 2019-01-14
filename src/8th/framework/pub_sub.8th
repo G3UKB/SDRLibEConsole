@@ -47,21 +47,23 @@ ns: fr
 	GEN_SERVER application -
 	This is a publish/subscribe system.
 	1. A number of events are registered. Events are strings. 
-	2. Once registered and event may be subscribed to by any number of recipients.
+	2. Once registered, events may be subscribed to by any number of recipients.
 	3. Once registered an event may be published with an opaque data structure and
 	will be dispatched to all subscribers [if any].
-	4. Dispatch wis on the P/S_THREAD for SYS events and on the main thread for UI events.
-	This is convention but the registration includes a flag which is the actua indicator.
+	4. Dispatch is on the P/S_THREAD for SYS events and on the main thread for UI events.
+	This is convention but the registration includes a flag which is the actual indicator.
 	
-	It is part of the generic framework in the namespace fr:.
+	This is part of the generic framework in the namespace fr:.
 *)
 
-\ =============================================================================================
-\ Publish / Subscribe gen_server handlers
-\ ========================================
-\ General Helpers
-\
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start __ps
+\ 						message handlers start do_ps_
+\ ===============================================================================
 
+\ ========================================
+\ General helper words
 \ ----------------------------------
 \ Return the pub/sub store	
 : __ps_store@	 SED: -- m
@@ -71,80 +73,82 @@ ns: fr
 
 \ ----------------------------------	
 \ Retrieve the event name
-: evnt_name@  SED: a -- s
+: __ps_evnt_name@  SED: a -- s
 	\ in: 	[evnt-name, f]
 	\ out:	evnt-name
 	0 a:@ nip ;
 	
 \ ========================================
-\ Registration helpers
+\ Registration helper words
 \
 \ Retrieve the event flag
-: evnt_flg@  SED: a -- T
+: __ps_evnt_flg@  SED: a -- T
 	\ in: 	[evnt-name, f]
 	\ out:	flag	
 	1 a:@ nip ;	
 
 \ ----------------------------------
 \ Does the event name already exist
-: ps_exists?	 SED: a -- F
+: __ps_exists?	 SED: a -- F
 	\ in: 	[evnt-name, f]
 	\ out:	flag
-	evnt_name@ __ps_store@ swap m:exists? nip ;
+	__ps_evnt_name@ __ps_store@ swap m:exists? nip ;
 
 \ ----------------------------------
 \ Return default event data
-: ps_make_evnt_data	 SED: a -- a
+: __ps_make_evnt_data	 SED: a -- a
 	\ in: 	[evnt-name, f]
 	\ out:	[evnt_flg, []]
-	a:new 0 rot evnt_flg@ a:! 1 a:new a:! ; 
+	a:new 0 rot __ps_evnt_flg@ a:! 1 a:new a:! ; 
 
 \ ----------------------------------
 \ Store initial event data
-: ps_store_new	 SED: a a -- 
+: __ps_store_new	 SED: a a -- 
 	\ in: 	[evnt-name, f]
 	\				[f, []]
 	\ out:	[evnt_flg, []]
-	evnt_name@ __ps_store@ swap rot m:! drop ;
+	__ps_evnt_name@ __ps_store@ swap rot m:! drop ;
 
 \ ----------------------------------
 \ Register a new entry	
-: ps_reg_new	 SED: a --
+: __ps_reg_new	 SED: a --
 	\ in: 	[evnt-name, f]
 	\ out:	none
-	dup ps_make_evnt_data
-	swap ps_store_new ;
+	dup __ps_make_evnt_data
+	swap __ps_store_new ;
 
 \ ========================================
-\ Subscribe helpers
+\ Subscribe helper words
 \
 \ Retrieve the callback word
-: evnt_callback@  SED: a -- w
+: __ps_evnt_callback@  SED: a -- w
 	\ in: 	[w]
 	\ out:	w
 	1 a:@ nip ;
 
 \ ========================================
-\ Publish helpers
+\ Publish helper words
 \
 \ Retrieve the subscriber list
-: sub_list@  SED: a -- a
+: __ps_sub_list@  SED: a -- a
 	\ in: 	[w]
 	\ out:	w
 	\ [f,[w,w,..]]
-	evnt_name@ __ps_store@ swap m:@ nip ;
+	__ps_evnt_name@ __ps_store@ swap m:@ nip ;
 
 \ ----------------------------------
 \ Retrieve the event data	
-: evnt_data@  SED: a -- *
+: __ps_evnt_data@  SED: a -- *
 	\ in: 	[w]
 	\ out:	event-data
 	1 a:@ nip ;
 
 \ ========================================
 \ Message handlers
+\ ========================================
+
 \ Initialise the p/s structure
-: do_init  SED: a --
+: do_ps_init  SED: a --
 	\ in: 	[]
 	\ out:	none
 	\
@@ -155,42 +159,42 @@ ns: fr
 
 \ ----------------------------------
 \ Register a new event
-: do_reg	 SED: a --
+: do_ps_reg	 SED: a --
 	\ in: 	[evnt-name, f]
 	\ out:	none
 	\ data: [evnt-name, f] where f==true if dispatch on main thread
 	dup >r
-	ps_exists? if
+	__ps_exists? if
 		\ Problem
-		"The registration " r> evnt_name@ s:+ " already exists!" s:+ throw  
+		"The registration " r> __ps_evnt_name@ s:+ " already exists!" s:+ throw  
 	else
 		\ Create a new registration
-		r> ps_reg_new
+		r> __ps_reg_new
 	then ;
 
 \ ----------------------------------
 \ Subscribe to an event
-: do_sub	 SED: a --
+: do_ps_sub	 SED: a --
 	\ in: 	[event-name, w]
 	\ out:	none
 	dup >r
-	ps_exists? if
+	__ps_exists? if
 		\ Add a new subscriber to the event
 		\ Get the callback array
-		__ps_store@ r@ evnt_name@ m:@ nip
+		__ps_store@ r@ __ps_evnt_name@ m:@ nip
 		\ Get the callback word array [f,[w,w, ..]]
 		1 a:@ nip
 		\ Append the new callback word to the array
-		r@ evnt_callback@ a:push drop
+		r@ __ps_evnt_callback@ a:push drop
 	else
 		\ Problem
-		"No registration " r> evnt_name@ s:+ " to subscribe to!" s:+ throw 
+		"No registration " r> __ps_evnt_name@ s:+ " to subscribe to!" s:+ throw 
 	then ;
 
 \ ----------------------------------
 \ Dispatch to subscriber on main thread
 \ Callee must consume 'data' on TOS
-: main_thd_dispatch	  SED: m --
+: __ps_main_thd_dispatch	  SED: m --
 	\ in: 	{"cb" : w, "to" : w, "data" : Opaque}
 	\ out:	none
 	"data" m:@ swap "to" m:@ nip w:exec ;
@@ -198,7 +202,7 @@ ns: fr
 \ ----------------------------------
 \ Dispatch to subscriber
 \ Callee must consume 'data' on TOS
-: pubsub_dispatch		  SED: n w -- 
+: __ps__dispatch		  SED: n w -- 
 	\ in: 	0: w - word to dispatch to
 	\				1: T - true if dispatch on main thread
 	\ out:	none
@@ -206,7 +210,7 @@ ns: fr
 	1 pp@ if
 		\ Dispatch on main thread
 		\ Word to invoke on main thread
-		{ "cb" : ' main_thd_dispatch }
+		{ "cb" : ' __ps_main_thd_dispatch }
 		\ Word 'to' dispatch 'data' to
 		\ Note we clone the data again to ensure no conflicts
 		"to" r> m:! "data" p@ m:! clone nip
@@ -219,25 +223,26 @@ ns: fr
 
 \ ----------------------------------
 \ Publish an event	
-: do_pub	 SED: a --
+: do_ps_pub	 SED: a --
 	\ in: 	[event-name, event-data]
 	\ out:	none
 	dup >r
-	ps_exists? if
+	__ps_exists? if
 		\ Get the subscriber list and dispatch flag
 		\ Push the dispatch flag to the p stack
-		r@ sub_list@ a:open swap >p
+		r@ __ps_sub_list@ a:open swap >p
 		\ For each subscriber send data to the subscribers callback word
 		\ Push the data to the p stack as we need to retain a copy
-		r> evnt_data@ >p ' pubsub_dispatch a:each drop
+		r> __ps_evnt_data@ >p ' __ps__dispatch a:each drop
 	else
 		\ Problem
-		"No registration " r> evnt_name@ s:+ " to publish to" s:+ throw 
+		"No registration " r> __ps_evnt_name@ s:+ " to publish to" s:+ throw 
 	then 
 	2 pndrop ;
 
 \ ===============================================================================
-\ Main code may be called from any thread
+\ PUBLIC
+\ Public procedural interface, call from any thread
 \ ===============================================================================
 
 \ ----------------------------------	
@@ -249,8 +254,8 @@ ns: fr
 	\				f - true if to be dispatched on main thread else p/s thread
 	\ out:	none
 	a:new 0 rot a:! 1 rot a:!
-	"P/S_TASK" ' do_reg rot msg! ;
-
+	"P/S_TASK" ' do_ps_reg rot msg! ;
+	
 \ ----------------------------------
 \ Initialise publish/subscribe system
 : pubsub_init	SED: w --
@@ -260,8 +265,13 @@ ns: fr
 	\ Create and start the gen-server
 	"P/S_TASK" t:curtask 2 ' gen_server t:task-n -1 sleep drop
 	\ Initialise the server
-	"P/S_TASK" ' do_init a:new msg! 
+	"P/S_TASK" ' do_ps_init a:new msg! 
 	\ Register all events
+	\ To keep pub_sub generic the registered events are part of the application and
+	\ not part of the framework. This works by passing in the word to call to perform
+	\ registrations. We then call this word passing the pubsub_regiater word to call
+	\ to register each event. This mechanism prevents circular references reqiring
+	\ defers and code refactoring.
 	' pubsub_register r> w:exec ;
 
 \ ----------------------------------
@@ -269,6 +279,7 @@ ns: fr
 : pubsub_term	SED: --
 	\ in: 	none
 	\ out:	none
+	\ Note gen-server performs termination
 	"P/S_TASK" ' gs_do_term a:new msg! ;
 
 \ ----------------------------------
@@ -278,7 +289,7 @@ ns: fr
 	\				w - callback word 	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	"P/S_TASK" ' do_sub rot msg! ;
+	"P/S_TASK" ' do_ps_sub rot msg! ;
 
 \ ----------------------------------
 \ Publish an event to subscribers
@@ -287,14 +298,15 @@ ns: fr
 	\				s - event-name	
 	\ out:	none
 	a:new 1 rot a:! 0 rot a:!
-	"P/S_TASK" ' do_pub rot msg! 
-	\ BC - sleep required else fails quickly
+	"P/S_TASK" ' do_ps_pub rot msg! 
+	\ BC - 18.08 sleep required else fails quickly
 	0.005 sleep ;
 
 \ ========================================
 \ Reset namespace
 ns: user
 
+\ ===============================================================================
 \ ===============================================================================
 \ Testing
 \ ===============================================================================

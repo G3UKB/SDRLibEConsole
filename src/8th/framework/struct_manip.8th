@@ -1,8 +1,7 @@
 (* 
 	struct_manip.8th
  
-  Parameter storage
- 
+ Structure manipulation
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,7 +23,7 @@
 
 \ ========================================
 \ Testing only
-false var, struct_manip_test
+true var, struct_manip_test
 
 struct_manip_test @ #if
 	\ Includes
@@ -37,14 +36,25 @@ struct_manip_test @ #if
 \ Set namespace
 ns: fr
 
+(*
+	This module provides a data driven way to get/set fields in any structure consisting
+	of arbitrary nested arrays and maps. This prevents a stream of m:@, a:@, m:! etc with
+	stack manipulations which gets very hard to follow. The alternative to this generic method
+	is a set of words to get/set specific fields in specific structures.
+	
+	These words are used a lot so are kept short without any prefix.
+	This is part of the generic framework in the namespace fr:.
+*)
+
 \ ===============================================================================
-\ Private
+\ PRIVATE
+\ Convention: private words start __
 \ ===============================================================================
 
-\ =========================================================================
+\ ========================================
 \ Helpers
 \ Dereference the next level in the structure
-: level@	SED: * n * -- *
+: __level@	SED: * n * -- *
 	\ in:		* - key or index to the next element 		
 	\				n - index into path array
 	\				* - arbitrary structure
@@ -62,25 +72,25 @@ ns: fr
 	then ;
 
 \ ===============================================================================
-\ Public
+\ PUBLIC
+\ Convention: any private words used as helpers start __
 \ ===============================================================================
 
 \ ========================================
-\
 \ Getter words
-\
+
 \ Dereference the structure from a path descriptor, returning a field
 : val@	SED: * a -- *
 	\ in:		a - path to an element [s|n, s|n, s|n ...] 	
 	\				* - arbitrary structure	
 	\ out:	* - arbitrary element, scalar or structure
-	' level@ a:each
+	' __level@ a:each
 	drop ;
 
 \ ----------------------------------
 \	1. Dereference the structure from path-2 to obtain an index value then
 \ 2. Dereference the structure from path-1 descriptor then
-\ 3. Return the index element
+\ 3. Return the indexed element
 \ NOTE: leave p stack as we found it
 : idx_val@	SED: * a a -- *
 	\ in:		a - path-2 to an element to yield an index or an index 	
@@ -99,9 +109,7 @@ ns: fr
 	nip 3 pndrop ;
 
 \ ========================================
-\
 \ Setter words
-\
 
 \ Update a value in the given struct with value,ix at path descriptor
 \ NOTE: leave p stack as we found it
@@ -130,6 +138,7 @@ ns: fr
 \ Reset namespace
 ns: user
 
+\ ===============================================================================
 \ ===============================================================================
 \ Testing
 \ ===============================================================================

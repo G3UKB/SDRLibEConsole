@@ -39,7 +39,7 @@ param_st_test @ #if
 	hierarchy of calls as pervious words may be using the parameters. In any
 	event do not clear the stack except at the end of a call sequence.
 	
-	It is part of the generic framework in the namespace user:.
+	This is part of the generic framework in the namespace user:.
 *)
 
 \ ========================================
