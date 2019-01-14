@@ -94,6 +94,11 @@ ns: fr
 \ ===============================================================================
 
 \ ----------------------------------
+\ Register an external task
+: gs_reg!	SED: t s --
+	__gs_reg! ;
+	
+\ ----------------------------------
 \ Wait for task to terminate
 : __gs_wait_task SED: s t --
 	\ in:		t - task ref 	(item from dict) 	

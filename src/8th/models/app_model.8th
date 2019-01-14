@@ -1,7 +1,7 @@
 (*
 	app_model.8th
  
-  radio state model for the SDRLibEConsole application
+  Radio state model for the SDRLibEConsole application
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -48,16 +48,25 @@ app_model_test @ #if
 \ Define our SDR namespace
 ns: sdr
 
+(*
+	GEN_SERVER application -
+	Model for application -
+		1. The model has a default which is used if there is no persisted model. If there is a persisted
+		model this is restored and used as the current model.
+		2. The model is saved at end of day and may be saved at other times as a precaution.
+		3. This model contains all the data and settings for the radio state. It is used to both populate the
+		UI and to set the current values.
+*)
+
 \ ===============================================================================
-\ TASK LEVEL CODE
 \ PRIVATE
-\ Convention:
-\		__app_...		=	private, not externally callable
+\ Convention: private words start __app_
+\ 						message handlers start do_app_
 \ ===============================================================================
 
+\ ----------------------------------
 \ Default app model structure
 \ Model data which is used as default when there is no saved model.
-
 : __app_model_default
 	{
 		\ HPSDR Protocol-1 only supports 3 radios
@@ -144,8 +153,8 @@ ns: sdr
 	}
 ;
 
-\ ========================================
-\ Model management
+\ ===============================================================================
+\ Model Management
 
 \ ----------------------------------
 \ Get model
@@ -257,10 +266,6 @@ ns: sdr
 
 \ ========================================
 \ Message Handlers
-\ Called only by app model gen-server
-\ Convention:
-\		__app_...		=	private, not externally callable
-\		do_app_...	=	message handler
 \ ========================================
 
 \ Initialise the app model at task level
@@ -440,7 +445,7 @@ ns: sdr
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "filter" 3 pick val!
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "filter" 3 pick val!
 	SYS_R1_FILT __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ pubsub_publish drop
+	SYS_TX_FILT __app_model@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish drop
 ;
 
 \ ----------------------------------
@@ -647,14 +652,13 @@ ns: sdr
 	\ Tests go here
 ;
 
-\ ===========================================================================================
-\ MAIN CODE
+\ ===============================================================================
+\ PUBLIC
+\ Public procedural interface, call from any thread
+\ ===============================================================================
 
-\ Call level interface from all modules, may be called by any task.
-\ The app model does not subscribe to any events, it is called directly usually off an 
-\ event fielded by another module. However it does publish events where others may be 
-\ interested in updates to the model. 
-
+\ ========================================
+\ Initialise /destroy
 \ ----------------------------------
 \ Module initialisation
 : app_model_init	SED: --
@@ -679,14 +683,9 @@ ns: sdr
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
-\ ----------------------------------
-\ Ask task to run internal tests
-: app_model_tests SED: --
-	"AppModel_TASK" ' do_app_tests a:new fr:msg! ;
 
-\ ===============================================================================
-\ Public procedural interface
-\ ===============================================================================
+\ ========================================
+\ Radio functions
 
 \ ========================================
 \ Frequency
@@ -723,7 +722,6 @@ ns: sdr
 	
 \ ========================================
 \ Modes
-
 : app_model_r1_set_mode	SED: n --
 	\ in: 	0: n - new R1 mode
 	\ out: 	none
@@ -753,7 +751,6 @@ ns: sdr
 
 \ ========================================
 \ Filters
-
 : app_model_r1_set_filter	SED: n --
 	\ in: 	0: n - new R1 filter
 	\ out: 	none
@@ -783,7 +780,6 @@ ns: sdr
 
 \ ========================================
 \ AGC
-
 : app_model_r1_set_agc	SED: n --
 	\ in: 	0: n - new R1 AGC
 	\ out: 	none
@@ -806,7 +802,6 @@ ns: sdr
 
 \ ========================================
 \ AF Gain
-
 : app_model_r1_set_afgain	SED: n --
 	\ in: 	0: n - new R1 AF gain
 	\ out: 	none
@@ -829,7 +824,6 @@ ns: sdr
 
 \ ========================================
 \ TX Attributes
-
 : app_model_tx_set_duplex SED: T --
 	\ in: 	0: T - true if duplex
 	\ out: 	none
@@ -913,6 +907,7 @@ ns: sdr
 ns: user	
 
 \ ===============================================================================
+\ ===============================================================================
 \ Testing
 \ ===============================================================================
 app_model_test @ #if
@@ -986,7 +981,7 @@ app_model_test @ #if
 	: run_tests
 		t:getq false q:throwing drop
 		"TEST_TASK" t:name!
-		t:curtask "TEST_TASK" fr:task_reg!
+		t:curtask "TEST_TASK" fr:gs_reg!
 		setup	
 		2 sleep
 		' runtest 1 5000 loop
