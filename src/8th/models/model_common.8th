@@ -1,9 +1,8 @@
 (*
 	model_common
  
-  All constant and common definitions for the program
-  Also anything that needs to be defined up front
- 
+  All constant and common definitions for the program models
+  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -26,7 +25,7 @@
 \ Set namespace
 ns: sdr
 
-\ ===========================================
+\ ========================================
 \ General Model index constants
 : src_idx 0 ;
 : dyn_idx 1 ;
@@ -35,16 +34,19 @@ ns: sdr
 : lst_idx 2 ;
 : data_idx 2 ;
 
+\ ========================================
 \ Option Model Route constants
 : sink_idx 0 ;
 : rx_idx 1 ;
 : dev_idx 2 ;
 : ch_idx 3 ;
 
+\ ========================================
 \ App model radios
 : radio_1 0 ;
 : radio_2 1 ;
 : radio_3 2 ;
 
+\ ========================================
 \ Restore namespace	
 ns: user
