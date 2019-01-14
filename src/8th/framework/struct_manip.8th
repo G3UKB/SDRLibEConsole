@@ -23,7 +23,7 @@
 
 \ ========================================
 \ Testing only
-true var, struct_manip_test
+false var, struct_manip_test
 
 struct_manip_test @ #if
 	\ Includes
@@ -33,9 +33,6 @@ struct_manip_test @ #if
 #then
 \ ========================================
 
-\ Set namespace
-ns: fr
-
 (*
 	This module provides a data driven way to get/set fields in any structure consisting
 	of arbitrary nested arrays and maps. This prevents a stream of m:@, a:@, m:! etc with
@@ -43,7 +40,7 @@ ns: fr
 	is a set of words to get/set specific fields in specific structures.
 	
 	These words are used a lot so are kept short without any prefix.
-	This is part of the generic framework in the namespace fr:.
+	This is part of the generic framework in the namespace user:.
 *)
 
 \ ===============================================================================
@@ -134,10 +131,6 @@ ns: fr
 	\ Clean up
 	drop 4 pndrop ;
 
-\ ========================================
-\ Reset namespace
-ns: user
-
 \ ===============================================================================
 \ ===============================================================================
 \ Testing
@@ -215,32 +208,32 @@ struct_manip_test @ #if
 	\ Getter examples
 	: getter_examples
 		\ Block size option list
-		struct @ ["general","blksz",1,2] fr:val@ . cr
+		struct @ ["general","blksz",1,2] val@ . cr
 		\ Numrx value
-		struct @ ["general","numrx",1,0] fr:val@ . cr
+		struct @ ["general","numrx",1,0] val@ . cr
 		\ Duplex SoD flag
-		struct @ ["general","duplex",1,1] fr:val@ . cr
+		struct @ ["general","duplex",1,1] val@ . cr
 		\ Samplerate value
-		struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] fr:idx_val@ . cr
+		struct @ ["general","smplrate",1,2] ["general","smplrate",1,0] idx_val@ . cr
 		\ Part structure as delivered by some listeners
-		[0, false, ["48000", "96000", "192000"]] [2] fr:val@ . cr
-		[0, false, ["48000", "96000", "192000"]] [0] fr:val@ . cr
-		[0, false, ["48000", "96000", "192000"]] [2] [0] fr:idx_val@ . cr
+		[0, false, ["48000", "96000", "192000"]] [2] val@ . cr
+		[0, false, ["48000", "96000", "192000"]] [0] val@ . cr
+		[0, false, ["48000", "96000", "192000"]] [2] [0] idx_val@ . cr
 	;
 
 	\ =========================================================================
 	\ Setter examples
 	: setter_examples
 		\ Sample rate SoD flag
-		struct @ ["general","smplrate",1] 1 true fr:val! struct @ ["general","smplrate"] fr:val@ . cr
-		struct @ ["general","numrx",1] 1 true fr:val! struct @ ["general","numrx"] fr:val@ . cr
-		struct @ ["general","blksz",1] 1 true fr:val! struct @ ["general","blksz"] fr:val@ . cr
-		struct @ ["general","duplex",1] 1 true fr:val! struct @ ["general","duplex"] fr:val@ . cr
-		struct @ ["general","enabletx",1] 1 true fr:val! struct @ ["general","enabletx"] fr:val@ . cr
+		struct @ ["general","smplrate",1] 1 true val! struct @ ["general","smplrate"] val@ . cr
+		struct @ ["general","numrx",1] 1 true val! struct @ ["general","numrx"] val@ . cr
+		struct @ ["general","blksz",1] 1 true val! struct @ ["general","blksz"] val@ . cr
+		struct @ ["general","duplex",1] 1 true val! struct @ ["general","duplex"] val@ . cr
+		struct @ ["general","enabletx",1] 1 true val! struct @ ["general","enabletx"] val@ . cr
 
-		struct1 @ ["radio-state", 0 ] 0 true fr:val!
-		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 fr:val!	
-		struct1 @ ["radio-state", 0 , 1 ] 1 true fr:val!
+		struct1 @ ["radio-state", 0 ] 0 true val!
+		struct1 @ ["radio-state", 0 , 1 , 2 ] "freq" 8000000 val!	
+		struct1 @ ["radio-state", 0 , 1 ] 1 true val!
 		struct1 @ . cr
 	;
 

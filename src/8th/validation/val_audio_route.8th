@@ -113,7 +113,7 @@
 \ ----------------------------------
 \ Is the route already defined
 : __option_route_in_use	\	new-route	-- new-route true|false
-		false swap __option_model@ ["audio","routes" ] fr:val@ a:len 0 n:>
+		false swap __option_model@ ["audio","routes" ] val@ a:len 0 n:>
 		if
 			\ Entries to compare
 			' __option_compare_routes a:each

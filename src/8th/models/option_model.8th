@@ -220,7 +220,7 @@ ns: sdr
 : __option_get_db_num_rx	SED: -- n
 	\ in: 	none
 	\ out:	0: n - num rx
-	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@ >n
+	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] idx_val@ >n
 ;
 
 \ ----------------------------------
@@ -289,7 +289,7 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> fr:val! drop
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -300,7 +300,7 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> fr:val! drop
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop
 ;
 
 \ ========================================
@@ -315,34 +315,34 @@ ns: sdr
 	\ __option_set_input_device_list
 	\ __option_set_output_device_list
 	
-	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_RECEIVER r@ ["audio", "receiver", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_OUTPUT_DEV r@ ["audio", "outputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_CHANNEL r@ ["audio", "channel", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	UI_TUNE_LEVEL r@ ["transmitter", "tunelevel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_RECEIVER r@ ["audio", "receiver", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_OUTPUT_DEV r@ ["audio", "outputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_TUNE_LEVEL r@ ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
-	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_NUM_RX r@ ["general", "numrx", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_AUDIO_ROUTE r@ ["audio", "routes"] fr:val@ fr:pubsub_publish
-	SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] fr:val@ fr:pubsub_publish
-	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] fr:val@ fr:pubsub_publish
+	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_AUDIO_ROUTE r@ ["audio", "routes"] val@ fr:pubsub_publish
+	SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
 	"Options Start-of-Day complete " log
 ;
@@ -401,7 +401,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - num rx
 	\ out: 	none
-	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -410,7 +410,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - sample rate
 	\ out: 	none
-	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -419,7 +419,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - block size
 	\ out: 	none
-	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ============================================
@@ -429,7 +429,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input source name
 	\ out: 	none
-	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -438,7 +438,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input device name
 	\ out: 	none
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -447,7 +447,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output sink name
 	\ out: 	none
-	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -456,7 +456,7 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - output sink index
-	__option_model@ ["audio","outputsnk", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputsnk", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+	__option_model@ ["audio","outputsnk", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputsnk", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
 	fr:response!
 ;
 
@@ -466,7 +466,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - receiver index number as s
 	\ out: 	none
-	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -474,7 +474,7 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - receiver index
-	__option_model@ ["audio","receiver", ` dyn_idx ` , ` lst_idx ` ] ["audio","receiver", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+	__option_model@ ["audio","receiver", ` dyn_idx ` , ` lst_idx ` ] ["audio","receiver", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
 	fr:response!
 ;
 
@@ -484,7 +484,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output device name
 	\ out: 	none
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -493,7 +493,7 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: s - output device name
-	__option_model@ ["audio","outputdev", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputdev", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+	__option_model@ ["audio","outputdev", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputdev", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
 	fr:response!
 ;
 
@@ -503,7 +503,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - set channel L/R/Both
 	\ out: 	none
-	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -512,7 +512,7 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: s - channel name
-	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] fr:idx_val@
+	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
 ;
 
 \ ========================================
@@ -524,7 +524,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - route index
 	\ out: 	none
-	__option_model@ ["audio","routes" ] fr:val@ swap a:-
+	__option_model@ ["audio","routes" ] val@ swap a:-
 ;
 
 \ ----------------------------------
@@ -532,7 +532,7 @@ ns: sdr
 : __option_get_routes	SED:  -- a
 	\ in: 	none
 	\ out: 	0: a - route array
-	__option_model@ ["audio","routes" ] fr:val@
+	__option_model@ ["audio","routes" ] val@
 ;
 
 \ ----------------------------------
@@ -562,9 +562,9 @@ ns: sdr
 	\ in: 	0: a - new route
 	\ out: 	none
 	\ pre:	route must have been validated
-	__option_model@ ["audio","routes" ] fr:val@ swap a:push
+	__option_model@ ["audio","routes" ] val@ swap a:push
 	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] fr:val@ pubsub_publish
+	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ pubsub_publish
 ;
 
 \ ============================================
@@ -574,7 +574,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - av mode index
 	\ out: 	none
-	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -583,7 +583,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - average over n cycles
 	\ out: 	none
-	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -592,7 +592,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - window type
 	\ out: 	none
-	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ----------------------------------
@@ -601,7 +601,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - fft size
 	\ out: 	none
-	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ============================================
@@ -611,7 +611,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - tune level 0-100
 	\ out: 	none
-	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> fr:val! drop
+	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> val! drop
 ;
 
 \ ===========================================================================================
