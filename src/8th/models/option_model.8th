@@ -41,7 +41,7 @@ option_model_test @ #if
 	"model_common.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
-	
+	\ 4 json-pretty
 	\ Test audio data (normally supplied by server)
 	: c_i_server_enum_audio_inputs
 		{
@@ -212,8 +212,7 @@ ns: sdr
 : __option_get_db_num_rx	SED: -- n
 	\ in: 	none
 	\ out:	0: n - num rx
-	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] idx_val@ >n
-;
+	__option_model@ ["general", "numrx", ` dyn_idx ` , ` lst_idx ` ] ["general", "numrx", ` dyn_idx ` , ` val_or_idx ` ] idx_val@ >n ;
 
 \ ----------------------------------
 \ Copy db fields to local value holders
@@ -221,8 +220,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Only need num-rx at present as we must give the current number and not the new number as restart required
-	__option_get_db_num_rx "curr_numrx" t:!
-;
+	__option_get_db_num_rx "curr_numrx" t:! ;
 
 \ ----------------------------------
 \ Restore model else use the default
@@ -250,16 +248,14 @@ ns: sdr
 		__option_model!
 	then
 	\ Copy current values into holding vars
-	__option_copy_to_holding_vars
-;
+	__option_copy_to_holding_vars ;
 
 \ ----------------------------------
 \ Save current model 
 : __option_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	__option_model@ OPTION_MODEL_FILENAME create_model_path save_model_data drop
-;
+	__option_model@ OPTION_MODEL_FILENAME create_model_path save_model_data drop ;
 
 \ ===============================================================================
 \ Audio device management
@@ -271,8 +267,7 @@ ns: sdr
 	"name" m:@ 
 	swap "index" m:@  
 	swap "api" m:@ nip
-	"%s:%d:%s" s:strfmt a:push
-;
+	"%s:%d:%s" s:strfmt a:push ;
 
 \ ----------------------------------
 \ Populate input device list
@@ -282,8 +277,7 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> val! drop
-;
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
 
 \ ----------------------------------
 \ Populate output device list
@@ -293,8 +287,7 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop
-;
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
 
 \ ----------------------------------
 \ Start-of-day. Send restored/default data to all subscribers
@@ -337,8 +330,7 @@ ns: sdr
 	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
-	"Options Start-of-Day complete " log
-;
+	"Options Start-of-Day complete " log ;
 
 \ ========================================
 \ Message Handlers
@@ -348,32 +340,28 @@ ns: sdr
 : do_option_init	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop __option_model_restore
-;
+	drop __option_model_restore ;
 
 \ ----------------------------------
 \ Run SOD
 : do_option_start_of_day	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop __option_start_of_day
-;
+	drop __option_start_of_day ;
 
 \ ----------------------------------
 \ Close the app model at task level
 : do_option_close	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop __option_model_save
-;
+	drop __option_model_save ;
 
 \ ============================================
 \ Get/Set general section value holders
 : __option_get_num_rx	SED: -- n
 	\ in: 	none
 	\ out: 	0: n - current num rx (not saved db value if different)
-	"curr_numrx" t:@
-;
+	"curr_numrx" t:@ ;
 
 \ ----------------------------------
 \ Number of receivers
@@ -382,16 +370,14 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - num rx
 	__option_get_num_rx
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 : do_option_set_num_rx	SED: a --
 	a:open
 	\ in: 	0: n - num rx
 	\ out: 	none
-	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Sample rate
@@ -399,8 +385,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - sample rate
 	\ out: 	none
-	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Block size
@@ -408,8 +393,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - block size
 	\ out: 	none
-	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ============================================
 \ Get/Set audio section value holders
@@ -418,8 +402,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input source name
 	\ out: 	none
-	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Set audio input device if local
@@ -427,8 +410,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input device name
 	\ out: 	none
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Set output sink index
@@ -436,8 +418,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output sink name
 	\ out: 	none
-	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Get the output sink index
@@ -446,8 +427,7 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - output sink index
 	__option_model@ ["audio","outputsnk", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputsnk", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 \ Set receiver index
@@ -455,8 +435,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - receiver index number as s
 	\ out: 	none
-	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 : do_option_get_receiver	SED: a --
@@ -464,8 +443,7 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: n - receiver index
 	__option_model@ ["audio","receiver", ` dyn_idx ` , ` lst_idx ` ] ["audio","receiver", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 \ Set output device name
@@ -473,8 +451,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output device name
 	\ out: 	none
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Get output device name
@@ -483,8 +460,7 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: s - output device name
 	__option_model@ ["audio","outputdev", ` dyn_idx ` , ` lst_idx ` ] ["audio","outputdev", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 \ Set channel type
@@ -492,8 +468,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - set channel L/R/Both
 	\ out: 	none
-	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Get channel name
@@ -501,8 +476,7 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: s - channel name
-	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
-;
+	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] idx_val@ ;
 
 \ ========================================
 \ Audio Route Management
@@ -513,16 +487,14 @@ ns: sdr
 	a:open
 	\ in: 	0: n - route index
 	\ out: 	none
-	__option_model@ ["audio","routes" ] val@ swap a:-
-;
+	__option_model@ ["audio","routes" ] val@ swap a:- ;
 
 \ ----------------------------------
 \ Get all current routes
 : __option_get_routes	SED:  -- a
 	\ in: 	none
 	\ out: 	0: a - route array
-	__option_model@ ["audio","routes" ] val@
-;
+	__option_model@ ["audio","routes" ] val@ ;
 
 \ ----------------------------------
 \ Get all current routes
@@ -531,8 +503,7 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: a - route array
 	__option_get_routes
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 \ Get route count
@@ -541,8 +512,7 @@ ns: sdr
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: a - route array
 	__option_get_routes a:len
-	fr:response!
-;
+	fr:response! ;
 
 \ ----------------------------------
 \ Push route to the model
@@ -553,8 +523,7 @@ ns: sdr
 	\ pre:	route must have been validated
 	__option_model@ ["audio","routes" ] val@ swap a:push
 	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish
-;
+	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
 
 \ ============================================
 \ Get/Set receiver section value holders
@@ -563,8 +532,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - av mode index
 	\ out: 	none
-	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Set the number of cycles to average over
@@ -572,8 +540,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - average over n cycles
 	\ out: 	none
-	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Set the window type for averaging
@@ -581,8 +548,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - window type
 	\ out: 	none
-	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ----------------------------------
 \ Set display FFT size
@@ -590,8 +556,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - fft size
 	\ out: 	none
-	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ============================================
 \ Get/Set transmitter section value holders
@@ -600,8 +565,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - tune level 0-100
 	\ out: 	none
-	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> val! drop
-;
+	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> val! drop ;
 
 \ ===============================================================================
 \ PUBLIC
@@ -649,9 +613,9 @@ option_model_test @ #if
 		\ Param stack alloc
 		param_st_alloc
 		\ Pub/sub init
-		' sdr:do_registrations fr:pubsub_init
+		\ ' sdr:do_registrations fr:pubsub_init
 		\ Set up test sink subscriptions
-		sdr:test_registrations
+		\ sdr:test_registrations
 		"Setup complete" log
 	;
 	
