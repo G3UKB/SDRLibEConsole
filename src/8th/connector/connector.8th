@@ -650,28 +650,34 @@ ns: sdr
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_filter SED: m --
-	"filter" m:@ conn_r1_filter "r1 filter" __conn_evnt_resp ;
+	"filter" m:@ 
+	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
+	conn_r1_filter "r1 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_filter SED: m --
-	"filter" m:@ conn_r2_filter "r2 filter" __conn_evnt_resp ;
+	"filter" m:@
+	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
+	conn_r2_filter "r2 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_filter SED: m --
-	"filter" m:@ conn_r3_filter "r3 filter" __conn_evnt_resp ;
+	"filter" m:@
+	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
+	conn_r3_filter "r3 filter" __conn_evnt_resp ;
 	
 \ ===============================================================================
 \ INITIALISATION and TERMINATION
 
 \ Subscribe to system events that need to be forwarded to the server
 : __conn_subscribe	SED: --
-	SYS_R1_FREQ ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_FREQ ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_FREQ ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R1_MODE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_MODE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_MODE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R1_FILT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_FILT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_FREQ ' __conn_evnt_r1_freq fr:pubsub_subscribe
+	SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
+	SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe
+	SYS_R1_MODE ' __conn_evnt_r1_mode fr:pubsub_subscribe
+	SYS_R2_MODE ' __conn_evnt_r2_mode fr:pubsub_subscribe
+	SYS_R3_MODE ' __conn_evnt_r3_mode fr:pubsub_subscribe
+	SYS_R1_FILT ' __conn_evnt_r1_filter fr:pubsub_subscribe
+	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
+	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
 	SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
 	SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
 	SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
@@ -780,6 +786,20 @@ connector_test_2 @ #if
 		"Setup complete" log
 	;
 	
+	: testdata
+		{
+			"display-width": 0,
+			"display-height": 0,
+			"freq": 7150000,
+			"mode": ` sdr:CH_LSB ` ,
+			"filter": ` sdr:CH_2K4 ` ,
+			"agc": ` sdr:CH_AGC_MED ` ,
+			"attn": ` sdr:ATTN_NONE ` ,
+			"hf-preamp": ` sdr:PRE_OFF ` ,
+			"6m-preamp": ` sdr:PRE_OFF ` ,
+			"audio-gain": 50
+		} ;
+				
 	\ Runs a basic script to start radio with one receiver on the dafault audio route
 	: basic_script	SED: --
 		\ in: 	none
@@ -789,6 +809,8 @@ connector_test_2 @ #if
 		sdr:conn_start_server "Server start: " . . cr
 		0 sdr:conn_start_radio "Radio start: " . . cr
 		
+		\ Toggle some functions using direct action
+		"Direct calls:" log
 		2 sleep
 		3700000 sdr:conn_r1_freq "Freq 3.7: " . . cr
 		2 sleep
@@ -807,6 +829,16 @@ connector_test_2 @ #if
 		"FM" sdr:mode_for_name sdr:conn_r1_mode "Mode FM: " . . cr
 		2 sleep
 		5 sdr:filter_lookup 0 a:@ swap 1 a:@ nip sdr:conn_r1_filter "Filter 1.0KHz: " . . cr	
+		
+		\ Repeat using events
+		"Event calls:" log
+		2 sleep
+		sdr:SYS_R1_FREQ testdata fr:pubsub_publish "Freq 7.15: " . . cr
+		2 sleep
+		sdr:SYS_R1_MODE testdata fr:pubsub_publish "Mode LSB: " . . cr
+		2 sleep
+		sdr:SYS_R1_FILT testdata fr:pubsub_publish "Filter 2.4KHz: " . . cr
+		2 sleep
 	;
 	
 	\ Run one test iteration
