@@ -603,6 +603,7 @@ ns: sdr
 
 \ ===============================================================================
 \ EVENT HANDLERS for Publish/Subscribe system
+\ Never call directly, only via pubsub_publish
 
 \ Not implemented subscribe
 : __conn_not_implemented	SED: * --

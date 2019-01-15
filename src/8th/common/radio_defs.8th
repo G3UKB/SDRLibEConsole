@@ -24,11 +24,22 @@
 
 needs utils/enums
 
+\ ========================================
+\ Testing only
+false var, radio_defs_test
+radio_defs_test @ #if
+	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
+\ ========================================
 \ Define our SDR namespace
 ns: sdr
 
 \ ========================================
 \  RX modes
+\ Mode id's as understood by the DSP
 0 enum:
 	CH_LSB
 	CH_USB
@@ -44,12 +55,23 @@ ns: sdr
 	CH_DRM
 enum;
 
-: name_for_mode	\ mode-id -- name
+\ ----------------------------------
+\ Translate a mode id as understood by the DSP to a mode name as understood by the app
+: name_for_mode	SED: n -- s
+	\ in: 	0: n - mode id
+	\ out: 	0: s - mode name
+	dup >r
 	["LSB","USB","DSB","CW-L","CW-U","FM","AM","DIGU","SPEC","DIGL","SAM","DRM"]
-	swap a:@ nip
-;
+	swap a:@ nip null? if
+		"Invalid mode - name_for_mode:" r> >s s:+ throw
+	then rdrop ;
 
-: mode_for_name	\ name -- mode-id
+\ ----------------------------------
+\ Translate a mode name as understood by the app to a mode id as understood by the DSP
+: mode_for_name	SED: s -- n
+	\ in: 	0: s - mode name
+	\ out: 	0: n - mode id
+	dup >r
 	{
 		"LSB" : 	` CH_LSB `,
 		"USB" : 	` CH_USB `,
@@ -63,11 +85,13 @@ enum;
 		"DIGL" : 	` CH_DIGL `,
 		"SAM" : 	` CH_SAM `,
 		"DRM" : 	` CH_DRM `
-	} swap m:@ nip
-;
+	} swap m:@ nip null? if
+		"Invalid mode - mode_for_name:" r> >s s:+ throw
+	then rdrop ;
 
 \ ========================================
 \ Filters
+\ Filter id's used to index the lookup table
 0 enum:
 	CH_6K0
 	CH_4K0
@@ -80,7 +104,12 @@ enum;
 	CH_100
 enum;
 
-: filter_lookup	\ filter-id -- a[low, high, name]
+\ ----------------------------------
+\ Translate a filter id to high/low limits and filter name
+: filter_lookup	SED: n -- a
+	\ in: 	0: n - filter id
+	\ out: 	0: a - [ low, high, name]
+	dup >r
 	[
 		[ 100, 6100, "6.0KHz"],
 		[ 100, 4100, "4.0KHz"],
@@ -91,10 +120,16 @@ enum;
 		[ 500, 1000, "500Hz"],
 		[ 600, 850, "250Hz"],
 		[ 700, 800, "100Hz"]
-	] swap a:@ nip
-;
+	] swap a:@ nip null? if
+		"Invalid filter - filter_lookup:" r> >s s:+ throw
+	then rdrop ;
 
-: filter_for_name	\ name -- mode-id
+\ ----------------------------------
+\ Translate a filter name to a filter id
+: filter_for_name	SED: s -- n
+	\ in: 	0: s - filter name
+	\ out: 	0: n - filter id
+	dup >r
 	{
 		"6.0KHz" : ` CH_6K0 `,
 		"4.0KHz" : ` CH_4K0 `,
@@ -105,11 +140,13 @@ enum;
 		"500Hz" : ` CH_500 `,
 		"250Hz" : ` CH_250 `,
 		"100Hz" : ` CH_100 `
-	} swap m:@ nip
-;
+	} swap m:@ nip null? if
+		"Invalid filter - filter_for_name:" r> >s s:+ throw
+	then rdrop ;
 
 \ ========================================
 \ AGC
+\ AGC id's as understood by the DSP
 0 enum:
 	CH_AGC_OFF
 	CH_AGC_LONG
@@ -118,32 +155,69 @@ enum;
 	CH_AGC_FAST
 enum;
 
-: name_for_agc	\ agc-id -- name
+\ ----------------------------------
+\ Translate an AGC id as understood by the DSP to an AGC name as understood by the app
+: name_for_agc	SED: n -- s
+	\ in: 	0: n - AGC id
+	\ out: 	0: s - AGC name
+	dup >r
 	["Off","Long","Slow","Med","Fast"]
-	swap a:@ nip
-;
+	swap a:@ nip null? if
+		"Invalid AGC - name_for_agc:" r> >s s:+ throw
+	then rdrop ;
 
-: agc_for_name	\ name -- agc-id
+\ ----------------------------------
+\ Translate an AGC name as understood by the app to an AGC id as understood by the DSP
+: agc_for_name	SED: s -- n
+	\ in: 	0: s - AGC name
+	\ out: 	0: n - AGC id
+	dup >r
 	{
 		"Off" : 	` CH_AGC_OFF `,
 		"Long" : 	` CH_AGC_LONG `,
 		"Slow" : 	` CH_AGC_SLOW `,
 		"Med" : 	` CH_AGC_MED `,
 		"Fast" : 	` CH_AGC_FAST `
-	} swap m:@ nip
-;
+	} swap m:@ nip null? if
+		"Invalid AGC - agc_for_name:" r> >s s:+ throw
+	then rdrop ;
 
 \ ========================================
-\ Attenuator
+\ Attenuator id to corresponding db attenuation
 : ATTN_NONE 0 ;
 : ATTN_10 10 ;
 : ATTN_20 20 ;
 : ATTN_30 30 ;
 
-\ Preamps
+\ ========================================
+\ Preamp on/off id's
 : PRE_OFF 0 ;
 : PRE_ON 1 ;
 
 \ ========================================
 \ Restore namespace	
 ns: user	
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+radio_defs_test @ #if
+
+	sdr:CH_LSB sdr:name_for_mode . cr
+	\ 20 sdr:name_for_mode
+	"LSB" sdr:mode_for_name . cr
+	\ "LLSB" sdr:mode_for_name
+	
+	sdr:CH_2K4 sdr:filter_lookup . cr
+	\ 20 sdr:filter_lookup
+	"2.7KHz" sdr:filter_for_name . cr
+	\ "22.7KHz" sdr:filter_for_name
+
+	sdr:CH_AGC_LONG sdr:name_for_agc . cr
+	\ 20 sdr:name_for_agc
+	"Long" sdr:agc_for_name . cr
+	\ "Longish" sdr:agc_for_name
+	
+	bye
+#then
