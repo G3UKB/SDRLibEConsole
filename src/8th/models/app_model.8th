@@ -175,35 +175,15 @@ ns: sdr
 : __app_model_restore	SED: --
 	\ in: 	none
 	\ out:	none
-	\ Attempt to restore the model
-	\ Get the path to the conf app file
-	\ BC: why do I need a sleep, else fails and crashes
-	APP_MODEL_FILENAME create_model_path 0.1 sleep null? if
-		"Failed to locate directory. Please create a conf directory under /8th." throw
-	then
-	\ Attempt to restore the options model
-	restore_model_data null?
-	if
-		"No app model found, using app default" log
-		drop
-		\ No persisted model so use default and save to task var
-		__app_model_default dup __app_model!
-		\ Save the default model
-		APP_MODEL_FILENAME create_model_path create_model_file 0.1 sleep save_model_data
-		2drop
-	else
-		\ Save the restored model to a task var
-		__app_model!
-	then
-;
+	\ Restore the application model or use default if no saved model
+	__app_model_default APP_MODEL_FILENAME restore_model_data __app_model! ;
 
 \ ----------------------------------
 \ Save current model 
 : __app_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	__app_model@ APP_MODEL_FILENAME create_model_path save_model_data drop
-;
+	__app_model@ APP_MODEL_FILENAME save_model_data drop ;
 
 \ ----------------------------------
 \ Start-of-day. Send restored/default data to all subscribers

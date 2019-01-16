@@ -26,7 +26,7 @@
 
 \ ========================================
 \ Testing only
-true var, persist_test
+false var, persist_test
 
 persist_test @ #if
 	\ Includes
@@ -79,8 +79,10 @@ ns: sdr
 : __persist_create	SED: s -- s
 	\ in: 	0: s - model path
 	\ out:	0: s - model path
-	dup f:create f:close
-;
+	dup f:create null? if
+		"Failed to create the model file!" throw
+	then	
+	f:close ;
 
 \ ----------------------------------
 \ Save model data as a Json string
@@ -99,20 +101,27 @@ ns: sdr
 	\ Separate the current working directory into a path component array
 	getcwd "" f:sep s:+ s:/ 
 	\ Iterate the array and return the level idx of /8th in the array
-	' __persist_levels a:each										\ filename idx directory array
+	a:rev ' __persist_levels a:each	
 	1 pick "8th" s:= if
-		\ Calc number of __persist_levels /8th is back from the current directory
-		a:len nip nip swap n:- 1 n:-	 	\ filename	n-__persist_levels
+		\ Found, so leave number of levels back on TOS
+		2drop
 		\ Get relative path back to 8th
-		"" swap __persist_pbk						\ e.g. "..\..\"
-		\ Get fully qualified path to conf file
-		"conf" s:+ f:sep s:+ swap s:+		\ qualified-path
+		"" swap __persist_pbk
+		\ Get fully qualified path to conf directory and check if directory exists
+		"conf" s:+ dup f:exists? not if
+			\ No, so make directory
+			dup f:mkdir not if 
+				"Failed to make /conf directory!" throw
+			then
+		then
+		\ Add the target filename to the path
+		f:sep s:+ swap s:+
+		\ Check if it exists and create if not
 		dup f:exists? not if "Creating model file" log __persist_create then
 	else
 		\ Failed to find /8th directory
 		2drop "Failed to locate /8th directory working backwards from current directory." throw
-	then
-;
+	then ;
 
 \ ===============================================================================
 \ PUBLIC

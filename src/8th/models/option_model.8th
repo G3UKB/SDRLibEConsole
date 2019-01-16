@@ -227,27 +227,9 @@ ns: sdr
 : __option_model_restore	SED: --
 	\ in: 	none
 	\ out:	none
-	\ Attempt to restore the model
-	\ Get the path to the conf app file
-	\ BC: why do I need a sleep, else fails and crashes
-	OPTION_MODEL_FILENAME create_model_path 0.1 sleep null? if
-		"Failed to locate directory. Please create a conf directory under /8th." throw
-	then
-	\ Attempt to restore the options model
-	restore_model_data null?
-	if
-		"No options model found, using options default" log
-		drop
-		\ No persisted model so use default and save to task var
-		__option_model_default dup __option_model!
-		\ Save the default model
-		OPTION_MODEL_FILENAME create_model_path create_model_file 0.1 sleep save_model_data
-		2drop
-	else
-		\ Save the restored model to a task var
-		__option_model!
-	then
-	\ Copy current values into holding vars
+	\ Restore the option model or use default if no saved model
+	__option_model_default OPTION_MODEL_FILENAME restore_model_data __option_model!
+	\ Copy any required current values into holding vars
 	__option_copy_to_holding_vars ;
 
 \ ----------------------------------
@@ -255,7 +237,8 @@ ns: sdr
 : __option_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	__option_model@ OPTION_MODEL_FILENAME create_model_path save_model_data drop ;
+	\ Save the option model
+	__option_model@ OPTION_MODEL_FILENAME save_model_data drop ;
 
 \ ===============================================================================
 \ Audio device management
@@ -613,9 +596,9 @@ option_model_test @ #if
 		\ Param stack alloc
 		param_st_alloc
 		\ Pub/sub init
-		\ ' sdr:do_registrations fr:pubsub_init
+		' sdr:do_registrations fr:pubsub_init
 		\ Set up test sink subscriptions
-		\ sdr:test_registrations
+		sdr:test_registrations
 		"Setup complete" log
 	;
 	
