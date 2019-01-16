@@ -48,3 +48,7 @@
 \ ========================================
 \ Connector
 "../connector/connector.8th" f:include
+
+\ ========================================
+\ UI
+"../ui/main_window.8th" f:include

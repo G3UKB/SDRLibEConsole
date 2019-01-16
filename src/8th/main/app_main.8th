@@ -1,5 +1,5 @@
 (*
-	app_main
+	app_main.8th
  
   Models save/restore for the SDRLibEConsole application
  
@@ -27,6 +27,10 @@
 \ Include all include files
 "includes.8th" f:include
 
+\ Make this a gui app
+true app:isgui !
+\ true log-async
+
 \ Set namespace
 ns: sdr
 
@@ -38,13 +42,13 @@ ns: sdr
 
 \ ----------------------------------
 \ Called on application exit
-: sdr:cleanup
+: cleanup
 	"Shutdown in progress" log
 	\ Close connector
-	conn_term
+	\ conn_term
 	\ Close models
-	option_model_term
-	app_model_term
+	\ option_model_term
+	\ app_model_term
 ;
 
 \ ----------------------------------
@@ -55,11 +59,29 @@ ns: sdr
 	\ This has to be done in the correct order as events will
 	\ start flying around the system and we want the subscribers
 	\ to be ready before the publishers else events will be missed.
+	\ Set our task in the task registry
+	"INIT_TASK" t:name!
+	t:curtask "INIT_TASK" fr:gs_reg!
+	
+	\ Allocate param stack for this thread
+	param_st_alloc
+	
+	"Create gen-server tasks..." log
+	\ Initialise publish/subscribe
+	' do_registrations fr:pubsub_init
+	\ Testing only
+	test_registrations
 	\ Connector
-	conn_init
+	\ conn_init
 	\ Models
 	option_model_init
-	app_model_init ;
+	2 sleep
+	app_model_init
+	2 sleep
+	\ Connector - here until sequence sorted out
+	conn_init
+	"Created gen-server tasks" log
+;
 
 \ ===============================================================================
 \ Application entry point  
@@ -72,26 +94,30 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Pretty print Json
-	2 G:json-pretty
+	\ 2 G:json-pretty
+	
+	\ ----------------------------------
+	\ Create test main window
+	create_main
 	
 	\ ----------------------------------
 	\ General initialisation
 	\ Allocate param stack fot main thread
 	param_st_alloc
-	\ Initialise publish/subscribe
-	' do_registrations fr:pubsub_init
-	\ Set up test sink subscriptions
-	\ Testing only
-	test_registrations
 	"Initial setup complete" log
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks
-	' startup_task t:task t:wait
+	' startup_task t:task
 
 	\ ----------------------------------
   \ Set our cleanup word
   ' sdr:cleanup onexit
   
   \ On exit from app:main the GUI event loop is started
+  "Exiting app_main" log
 ;
+
+\ ========================================
+\ Reset namespace
+ns: user
