@@ -26,7 +26,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, app_model_test
+false var, app_model_test
 app_model_test @ #if
 	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
 	"../framework/param_st.8th" f:include

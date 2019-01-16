@@ -44,3 +44,7 @@
 "../models/model_common.8th" f:include
 "../models/app_model.8th" f:include
 "../models/option_model.8th" f:include
+
+\ ========================================
+\ Connector
+"../connector/connector.8th" f:include

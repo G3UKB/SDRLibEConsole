@@ -36,3 +36,62 @@ ns: sdr
 	loop is entered. 
 *)
 
+\ ----------------------------------
+\ Called on application exit
+: sdr:cleanup
+	"Shutdown in progress" log
+	\ Close connector
+	conn_term
+	\ Close models
+	option_model_term
+	app_model_term
+;
+
+\ ----------------------------------
+\ We run all startup tasks from here and wait for them to complete
+: startup_task
+	\ ----------------------------------
+	\ Start the gen_server tasks
+	\ This has to be done in the correct order as events will
+	\ start flying around the system and we want the subscribers
+	\ to be ready before the publishers else events will be missed.
+	\ Connector
+	conn_init
+	\ Models
+	option_model_init
+	app_model_init ;
+
+\ ===============================================================================
+\ Application entry point  
+: app:main	\ --
+
+	\ ----------------------------------
+	\ Set our task name
+	"MainThrd" t:name!
+	t:curtask . cr
+	
+	\ ----------------------------------
+	\ Pretty print Json
+	2 G:json-pretty
+	
+	\ ----------------------------------
+	\ General initialisation
+	\ Allocate param stack fot main thread
+	param_st_alloc
+	\ Initialise publish/subscribe
+	' do_registrations fr:pubsub_init
+	\ Set up test sink subscriptions
+	\ Testing only
+	test_registrations
+	"Initial setup complete" log
+	
+	\ ----------------------------------
+	\ Start the gen_server tasks
+	' startup_task t:task t:wait
+
+	\ ----------------------------------
+  \ Set our cleanup word
+  ' sdr:cleanup onexit
+  
+  \ On exit from app:main the GUI event loop is started
+;
