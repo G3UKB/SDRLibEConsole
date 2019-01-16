@@ -72,14 +72,16 @@ ns: sdr
 	\ Testing only
 	test_registrations
 	\ Connector
-	\ conn_init
-	\ Models
-	option_model_init
-	2 sleep
-	app_model_init
-	2 sleep
-	\ Connector - here until sequence sorted out
 	conn_init
+	conn_discover "resp" m:@ "NAK" s:= if
+		"No hardware, waiting for instructions" log
+	then
+	
+	\ Models
+	\ option_model_init
+	\ 2 sleep
+	\ app_model_init
+	2 sleep
 	"Created gen-server tasks" log
 ;
 

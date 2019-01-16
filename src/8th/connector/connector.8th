@@ -258,7 +258,7 @@ ns: sdr
 	\ out:	s0 - true if receive successful
 	\ pre: 	read data ready condition true
 	__conn_resp_buf@ 0 net:recvfrom null? if 
-		"Error in read from device!" throw
+		2drop "Error in read from device!" log {"resp":"NAK"}
 	else
 		drop nip nip nip json>
 	then ;
@@ -806,6 +806,7 @@ connector_test_2 @ #if
 		\ in: 	none
 		\ out:	none
 		sdr:conn_discover "Discover: " . . cr
+		(*
 		sdr:conn_set_default_route "Route: " . . cr
 		sdr:conn_start_server "Server start: " . . cr
 		0 sdr:conn_start_radio "Radio start: " . . cr
@@ -840,6 +841,7 @@ connector_test_2 @ #if
 		2 sleep
 		sdr:SYS_R1_FILT testdata fr:pubsub_publish "Filter 2.4KHz: " . . cr
 		2 sleep
+		*)
 	;
 	
 	\ Run one test iteration
