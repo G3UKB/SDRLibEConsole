@@ -35,7 +35,7 @@ app_model_test @ #if
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
-	"../common/test_sink.8th" f:include
+	"../testing/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"model_common.8th" f:include

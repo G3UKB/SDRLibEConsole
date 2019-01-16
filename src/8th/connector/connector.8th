@@ -25,7 +25,7 @@
 \ ========================================
 \ Testing only
 false var, connector_test_1
-true var, connector_test_2
+false var, connector_test_2
 connector_test_1 @ #if
 
 	\ includes

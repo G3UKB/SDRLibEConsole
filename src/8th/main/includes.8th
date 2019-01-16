@@ -30,14 +30,14 @@
 "../common/radio_defs.8th" f:include
 "../common/events.8th" f:include
 "../common/registrations.8th" f:include
-"../common/test_sink.8th" f:include
 
 \ ========================================
 \ Framework
 "../framework/param_st.8th" f:include
 "../framework/struct_manip.8th" f:include
-"../framework/pub_sub.8th"  f:include
 "../framework/gen_server.8th" f:include
+"../framework/pub_sub.8th"  f:include
+"../testing/test_sink.8th" f:include
 
 \ ========================================
 \ Models

@@ -35,7 +35,7 @@ option_model_test @ #if
 	"../common/events.8th" f:include
 	"../common/registrations.8th" f:include
 	"../framework/pub_sub.8th"  f:include
-	"../common/test_sink.8th" f:include
+	"../testing/test_sink.8th" f:include
 	"../common/persist.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"model_common.8th" f:include
@@ -252,6 +252,7 @@ ns: sdr
 	swap "api" m:@ nip
 	"%s:%d:%s" s:strfmt a:push ;
 
+(*
 \ ----------------------------------
 \ Populate input device list
 : __option_set_input_device_list	\	 --
@@ -271,6 +272,7 @@ ns: sdr
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
 	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
+*)
 
 \ ----------------------------------
 \ Start-of-day. Send restored/default data to all subscribers
