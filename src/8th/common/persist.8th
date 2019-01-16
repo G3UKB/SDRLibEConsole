@@ -39,6 +39,12 @@ persist_test @ #if
 \ Set namespace
 ns: sdr
 
+(*
+	Save and restore 8th structures representing the various models.
+	Format is Json strings. The models will reside in .../8th/conf
+	relative to the current directory.
+*)
+
 \ ===============================================================================
 \ PRIVATE
 \ Convention: private words start __persist_
