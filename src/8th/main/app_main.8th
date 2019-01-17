@@ -43,9 +43,10 @@ ns: sdr
 \ ----------------------------------
 \ Called on application exit
 : cleanup
+	false log-async
 	"Shutdown in progress" log
 	\ Close connector
-	conn_term
+	conn_term 
 	\ Close models
 	option_model_term
 	app_model_term
@@ -53,6 +54,7 @@ ns: sdr
 	fr:pubsub_term
 	\ Wait for all tasks to terminate
 	fr:gs_wait_all
+	"Shutdown complete" log
 ;
 
 \ ----------------------------------
@@ -77,13 +79,13 @@ ns: sdr
 	\ Initialise
 	' do_registrations fr:pubsub_init
 	\ Testing only
-	test_registrations
+	\ test_registrations
 	
 	\ ----------------------------------
 	\ Models
 	option_model_init
 	option_model_ui_evnts
-	2 sleep
+	\ 2 sleep
 	app_model_init
 	app_model_ui_evnts
 		
@@ -128,9 +130,9 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks
-	' startup_task t:task
+	' startup_task t:task t:wait
 	\ Wait for the startup task to complete
-	"STARTUP_TASK" fr:gs_wait_single_task
+	\ "STARTUP_TASK" fr:gs_wait_single_task
 	
 	\ ----------------------------------
   \ Set our cleanup word

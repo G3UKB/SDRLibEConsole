@@ -75,7 +75,7 @@ ns: fr
 	\				s - task name
 	\ out:	none
 	__gs_lock@
-	swap rot  m:! drop 
+	swap rot m:! drop 
 	__gs_unlock ;
 
 \ ----------------------------------	

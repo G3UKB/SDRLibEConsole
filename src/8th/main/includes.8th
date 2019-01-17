@@ -38,7 +38,7 @@
 "../framework/struct_manip.8th" f:include
 "../framework/gen_server.8th" f:include
 "../framework/pub_sub.8th"  f:include
-"../testing/test_sink.8th" f:include
+\ "../testing/test_sink.8th" f:include
 
 \ ========================================
 \ Models

@@ -682,7 +682,7 @@ ns: sdr
 	\ out:	none
 	\ Tidy close the model
 	"AppModel_TASK" ' do_app_close a:new fr:msg!
-	2.0 sleep
+	0.5 sleep
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 

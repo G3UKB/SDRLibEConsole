@@ -605,7 +605,7 @@ ns: sdr
 	\ out:	none
 	\ Tidy close the model
 	"OptionsModel_TASK" ' do_option_close a:new fr:msg!
-	2.0 sleep
+	0.5 sleep
 	\ Ask the model to exit
 	"OptionsModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
