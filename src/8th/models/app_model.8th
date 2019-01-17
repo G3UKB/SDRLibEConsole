@@ -186,8 +186,8 @@ ns: sdr
 	__app_model@ APP_MODEL_FILENAME save_model_data drop ;
 
 \ ----------------------------------
-\ Start-of-day. Send restored/default data to all subscribers
-: __app_start_of_day	SED: --
+\ Send restored/default UI data to all subscribers
+: __app_ui_evnts	SED: --
 	\ in: 	none
 	\ out:	none
 	__app_model@ >r
@@ -214,8 +214,17 @@ ns: sdr
 	UI_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	UI_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	UI_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	UI_R3_AFGAIN r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	UI_R3_AFGAIN r> ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish 
 	
+	"App sent UI events " log 
+;
+
+\ ----------------------------------
+\ Send restored/default SYS data to all subscribers
+: __app_sys_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+	__app_model@ >r	
 	SYS_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
 	SYS_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
 	SYS_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
@@ -241,7 +250,7 @@ ns: sdr
 	SYS_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_AFGAIN r> ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 
-	"App Start-of-Day complete " log
+	"App sent SYS events " log
 ;
 
 \ ========================================
@@ -256,11 +265,17 @@ ns: sdr
 ;
 
 \ ----------------------------------
-\ Run SOD
-: do_app_start_of_day	SED: m --
+\ Send events
+: do_app_ui_evnts	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __app_start_of_day
+	drop __app_ui_evnts
+;
+
+: do_app_sys_evnts	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __app_sys_evnts
 ;
 
 \ ----------------------------------
@@ -648,10 +663,18 @@ ns: sdr
 	"AppModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
 	"AppModel_TASK" ' do_app_init a:new fr:msg!
-	"App model initialised sent" log
-	"AppModel_TASK" ' do_app_start_of_day a:new fr:msg!
-	"App model start of day sent" log ;
+	"App model initialised sent" log ;
 
+\ ----------------------------------
+\ UI events
+: app_model_ui_evnts	SED: --
+	"AppModel_TASK" ' do_app_ui_evnts a:new fr:msg! ;
+
+\ ----------------------------------
+\ SYS events
+: app_model_sys_evnts	SED: --
+	"AppModel_TASK" ' do_app_sys_evnts a:new fr:msg! ;
+	
 \ ----------------------------------
 \ Module close
 : app_model_term	SED: --

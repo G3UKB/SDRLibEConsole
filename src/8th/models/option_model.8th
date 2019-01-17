@@ -275,8 +275,8 @@ ns: sdr
 *)
 
 \ ----------------------------------
-\ Start-of-day. Send restored/default data to all subscribers
-: __option_start_of_day	SED: --
+\ Send restored/default UI data to all subscribers
+: __option_ui_evnts	SED: --
 	\ in: 	none
 	\ out:	none
 	__option_model@ >r
@@ -299,8 +299,18 @@ ns: sdr
 	UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
 	UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
 	UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
-	UI_TUNE_LEVEL r@ ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
+	
+	"Options sent UI events " log 
+;
 
+\ ----------------------------------
+\ Send restored/default SYS data to all subscribers
+: __option_sys_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+	__option_model@ >r
+	
 	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
@@ -315,7 +325,8 @@ ns: sdr
 	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
-	"Options Start-of-Day complete " log ;
+	"Options Start-of-Day complete " log 
+;
 
 \ ========================================
 \ Message Handlers
@@ -328,11 +339,18 @@ ns: sdr
 	drop __option_model_restore ;
 
 \ ----------------------------------
-\ Run SOD
-: do_option_start_of_day	SED: a --
+\ Send events
+: do_option_ui_evnts	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __option_start_of_day ;
+	drop __option_ui_evnts
+;
+
+: do_option_sys_evnts	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __option_sys_evnts
+;
 
 \ ----------------------------------
 \ Close the app model at task level
@@ -568,10 +586,18 @@ ns: sdr
 	"OptionsModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
 	"OptionsModel_TASK" ' do_option_init a:new fr:msg!
-	"Options model initialised sent" log
-	"OptionsModel_TASK" ' do_option_start_of_day a:new fr:msg!
-	"Options model start of day sent" log ;
+	"Options model initialised sent" log ;
 
+\ ----------------------------------
+\ UI events
+: option_model_ui_evnts	SED: --
+	"OptionsModel_TASK" ' do_option_ui_evnts a:new fr:msg! ;
+
+\ ----------------------------------
+\ SYS events
+: option_model_sys_evnts	SED: --
+	"OptionsModel_TASK" ' do_option_sys_evnts a:new fr:msg! ;
+	
 \ ----------------------------------
 \ Module close
 : option_model_term	SED: --

@@ -80,6 +80,14 @@ ns: sdr
 	test_registrations
 	
 	\ ----------------------------------
+	\ Models
+	option_model_init
+	option_model_ui_evnts
+	2 sleep
+	app_model_init
+	app_model_ui_evnts
+		
+	\ ----------------------------------
 	\ Connector
 	\ Initialise
 	conn_init
@@ -93,12 +101,6 @@ ns: sdr
 		"No radio hardware found!" log
 	then
 	
-	\ ----------------------------------
-	\ Models
-	option_model_init
-	2 sleep
-	app_model_init
-	\ 2 sleep
 	"Created gen-server tasks" log
 ;
 
