@@ -1,7 +1,7 @@
 (*
 	app_main.8th
  
-  Models save/restore for the SDRLibEConsole application
+  Main application for SDRLibEConsole
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -63,20 +63,31 @@ ns: sdr
 	"INIT_TASK" t:name!
 	t:curtask "INIT_TASK" fr:gs_reg!
 	
+	\ ----------------------------------
 	\ Allocate param stack for this thread
 	param_st_alloc
 	
-	"Create gen-server tasks..." log
-	\ Initialise publish/subscribe
+	"Creating gen-server tasks..." log
+	\ ----------------------------------
+	\ Publish/Subscribe
+	\ Initialise
 	' do_registrations fr:pubsub_init
 	\ Testing only
 	test_registrations
+	
+	\ ----------------------------------
 	\ Connector
+	\ Initialise
 	conn_init
+	\ Try discover to see if we have hardware
 	conn_discover "resp" m:@ "NAK" s:= if
-		"No hardware, waiting for instructions" log
+		\ Nothing found
+		\ We set the radio state to 'not found' 
+		\ The main window then takes responsibility for this
+		"No hardware found!" log
 	then
 	
+	\ ----------------------------------
 	\ Models
 	\ option_model_init
 	\ 2 sleep

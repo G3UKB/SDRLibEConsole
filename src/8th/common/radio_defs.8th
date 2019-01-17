@@ -28,7 +28,7 @@ needs utils/enums
 \ Testing only
 false var, radio_defs_test
 radio_defs_test @ #if
-	\ Includes```````````````````````````````````````````````````````````````````````````````````````````````````````````
+	\ Includes
 	\ needs debug/sed
 	\ true SED-CHECK
 #then
