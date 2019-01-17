@@ -45,14 +45,18 @@ ns: sdr
 : cleanup
 	"Shutdown in progress" log
 	\ Close connector
-	\ conn_term
+	conn_term
 	\ Close models
-	\ option_model_term
-	\ app_model_term
+	option_model_term
+	app_model_term
+	\ Close pub/sub
+	fr:pubsub_term
+	\ Wait for all tasks to terminate
+	fr:gs_wait_all
 ;
 
 \ ----------------------------------
-\ We run all startup tasks from here and wait for them to complete
+\ We start all gen-server tasks from the startup task
 : startup_task
 	\ ----------------------------------
 	\ Start the gen_server tasks
@@ -60,8 +64,8 @@ ns: sdr
 	\ start flying around the system and we want the subscribers
 	\ to be ready before the publishers else events will be missed.
 	\ Set our task in the task registry
-	"INIT_TASK" t:name!
-	t:curtask "INIT_TASK" fr:gs_reg!
+	"STARTUP_TASK" t:name!
+	t:curtask "STARTUP_TASK" fr:gs_reg!
 	
 	\ ----------------------------------
 	\ Allocate param stack for this thread
@@ -80,19 +84,21 @@ ns: sdr
 	\ Initialise
 	conn_init
 	\ Try discover to see if we have hardware
-	conn_discover "resp" m:@ "NAK" s:= if
-		\ Nothing found
-		\ We set the radio state to 'not found' 
-		\ The main window then takes responsibility for this
-		"No hardware found!" log
+	conn_discover "resp" m:@ "ACK" s:= if
+		\ We have radio hardware
+		"Radio hardware found!" log
+		\ Set state to on-line
+		true st_online!
+	else
+		"No radio hardware found!" log
 	then
 	
 	\ ----------------------------------
 	\ Models
-	\ option_model_init
-	\ 2 sleep
-	\ app_model_init
+	option_model_init
 	2 sleep
+	app_model_init
+	\ 2 sleep
 	"Created gen-server tasks" log
 ;
 
@@ -107,25 +113,26 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Pretty print Json
+	\ Note: this messes up save/restore so use only for debug
 	\ 2 G:json-pretty
+	
+	\ Allocate param stack fot main thread
+	param_st_alloc
 	
 	\ ----------------------------------
 	\ Create test main window
+	\ We must create all windows up front so everything gets populated by the models.
 	create_main
-	
-	\ ----------------------------------
-	\ General initialisation
-	\ Allocate param stack fot main thread
-	param_st_alloc
-	"Initial setup complete" log
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks
 	' startup_task t:task
-
+	\ Wait for the startup task to complete
+	"STARTUP_TASK" fr:gs_wait_single_task
+	
 	\ ----------------------------------
   \ Set our cleanup word
-  ' sdr:cleanup onexit
+  ' cleanup onexit
   
   \ On exit from app:main the GUI event loop is started
   "Exiting app_main" log

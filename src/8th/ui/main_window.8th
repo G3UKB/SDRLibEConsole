@@ -33,6 +33,7 @@ ns: sdr
 	"bg" : "gray10",
 	"resize-corner" : 20,
 	"font" : "Arial 10",
+	"close" : "sdr:main_win_close",
 	"children" :
 	[]
 } var, main_window_obj
@@ -41,6 +42,9 @@ var g_main
 
 : create_main
 	main_window_obj @ g:new g:show g_main ! ;
+
+: main_win_close \	--
+	g:quit ;
 	
 \ ========================================
 \ Reset namespace

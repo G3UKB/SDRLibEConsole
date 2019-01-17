@@ -28,6 +28,7 @@
 \ Common files
 "../common/persist.8th" f:include
 "../common/radio_defs.8th" f:include
+"../common/state.8th" f:include
 "../common/events.8th" f:include
 "../common/registrations.8th" f:include
 

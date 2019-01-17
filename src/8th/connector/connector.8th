@@ -25,7 +25,7 @@
 \ ========================================
 \ Testing only
 false var, connector_test_1
-true var, connector_test_2
+false var, connector_test_2
 connector_test_1 @ #if
 
 	\ includes
@@ -253,13 +253,13 @@ ns: sdr
 
 \ ----------------------------------	
 \ Receive data from the given socket
-: __conn_recv_from	SED:  T net -- m T
+: __conn_recv_from	SED:  net -- m T
 	\ in: 	0: s - socket
-	\				1: T - if true throw on error
-	\ out:	s0 - true if receive successful
+	\ out:	0: T - true if response received
+	\				1: m - the response structure (map in this case)
 	\ pre: 	read data ready condition true
-	swap >r __conn_resp_buf@ 0 net:recvfrom null? if 
-		2drop "Error in read from device!" r> if throw else log {"resp":"NAK"} then
+	__conn_resp_buf@ 0 net:recvfrom null? if 
+		2drop "Error in read from device!" r@ if throw else log {"resp":"NAK"} then
 	else
 		rdrop drop nip nip nip json>
 	then ;
@@ -270,10 +270,10 @@ ns: sdr
 	\ in: 	0: T - if true throw on error
 	\ out:	0: T - true if response received
 	\				1: m - the response structure (map in this case)
-	__conn_net_wait_recv_cmd if
+	>r __conn_net_wait_recv_cmd if
 		__conn_recv_from
 	else
-		"Timeout waiting for response from device!" throw
+		"Timeout waiting for response from device!" r> if throw else log {"resp":"NAK"} then
 	then ;
 	
 \ ===============================================================================
@@ -283,7 +283,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	s0 - true if successful
 	\ out:	s1 - the audio info map
-	__conn_enum_outputs_msg __conn_send_cmd_msg true __conn_wait_resp_with_timeout ;
+	__conn_enum_outputs_msg __conn_send_cmd_msg false __conn_wait_resp_with_timeout ;
 
 \ ----------------------------------	
 \ Return the default route audio parameters
@@ -333,7 +333,9 @@ ns: sdr
 	fr:response! ;
 
 \ Do exchange
-: __con_do_exchange	SED: T -- 
+: __con_do_exchange	SED: T --
+	\ in: 	0: T - if true then throw on error
+	\ out: 	none
 	__conn_send_cmd_msg  __con_do_response ;
 
 \ ========================================
@@ -351,7 +353,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_get_default_route __conn_default_route_msg true swap __con_do_exchange ;
+	__conn_get_default_route __conn_default_route_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Start the server 
@@ -359,7 +361,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_server_start_msg true swap __con_do_exchange ;
+	__conn_server_start_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Start the radio
@@ -368,7 +370,7 @@ ns: sdr
 	\ in: 	0: s - sender (task name)
 	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_radio_start_msg true swap __con_do_exchange ;
+	swap __conn_radio_start_msg false swap __con_do_exchange ;
 
 \ ========================================
 \ Receiver functions
@@ -378,7 +380,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_freq_msg true swap __con_do_exchange ;
+	swap __conn_r1_freq_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R2 frequency
@@ -387,7 +389,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r2_freq_msg true swap __con_do_exchange ;
+	swap __conn_r2_freq_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R3 frequency
@@ -396,7 +398,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R3 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r3_freq_msg true swap __con_do_exchange ;
+	swap __conn_r3_freq_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set TX frequency
@@ -405,7 +407,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - TX freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_tx_freq_msg true swap __con_do_exchange ;
+	swap __conn_tx_freq_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R1 mode
@@ -414,7 +416,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 mode id
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_mode_msg true swap __con_do_exchange ;
+	swap __conn_r1_mode_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R2 mode
@@ -423,7 +425,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 mode id
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r2_mode_msg true swap __con_do_exchange ;
+	swap __conn_r2_mode_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R3 mode
@@ -432,7 +434,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R3 mode id
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r3_mode_msg true swap __con_do_exchange ;
+	swap __conn_r3_mode_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Set R1 filter
@@ -442,7 +444,7 @@ ns: sdr
 	\				1: s - R1 filter high
 	\				2: s - R1 filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot __conn_r1_filt_msg true swap __con_do_exchange ;
+	rot rot __conn_r1_filt_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R2 filter
@@ -452,7 +454,7 @@ ns: sdr
 	\				1: s - R2 filter high
 	\				2: s - R2 filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot  __conn_r2_filt_msg true swap __con_do_exchange ;
+	rot rot  __conn_r2_filt_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R3 filter
@@ -462,7 +464,7 @@ ns: sdr
 	\				1: s - R3 filter high
 	\				2: s - R3 filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot  __conn_r3_filt_msg true swap __con_do_exchange ;
+	rot rot  __conn_r3_filt_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set TX filter
@@ -472,7 +474,7 @@ ns: sdr
 	\				1: s - TX filter high
 	\				2: s - TX filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot  __conn_tx_filt_msg true swap __con_do_exchange ;
+	rot rot  __conn_tx_filt_msg false swap __con_do_exchange ;
 
 \ ===============================================================================
 \ PUBLIC
@@ -608,7 +610,7 @@ ns: sdr
 
 \ Not implemented subscribe
 : __conn_not_implemented	SED: * --
-	"Not implemented!" log ;
+	drop "Not implemented!" log ;
 
 \ ----------------------------------
 \ Decode response
@@ -618,7 +620,7 @@ ns: sdr
 	\ out: 	none
 	\ Throws exception on error
 	swap "resp" m:@ nip "NAK" s:= if
-		"Server 'NAK' from [" swap s:+ "]" s:+ throw
+		"Server 'NAK' from [" swap s:+ "]" s:+ log
 	then drop ;
 
 \ ----------------------------------
@@ -807,7 +809,6 @@ connector_test_2 @ #if
 		\ in: 	none
 		\ out:	none
 		sdr:conn_discover "Discover: " . . cr
-		(*
 		sdr:conn_set_default_route "Route: " . . cr
 		sdr:conn_start_server "Server start: " . . cr
 		0 sdr:conn_start_radio "Radio start: " . . cr
@@ -842,7 +843,6 @@ connector_test_2 @ #if
 		2 sleep
 		sdr:SYS_R1_FILT testdata fr:pubsub_publish "Filter 2.4KHz: " . . cr
 		2 sleep
-		*)
 	;
 	
 	\ Run one test iteration
