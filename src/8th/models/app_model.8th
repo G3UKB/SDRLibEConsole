@@ -967,6 +967,8 @@ app_model_test @ #if
 		\ Initialise and do SOD etc
 		"Initialising" log
 		sdr:app_model_init
+		sdr:app_model_ui_evnts
+		sdr:app_model_sys_evnts
 		"Done initialise" log
 		\ Run proc tests
 		"Running proc tests" log
