@@ -67,6 +67,11 @@ ns: fr
 \ Unlocked var	
 : __gs_unlock
 	__task_dict unlock drop ;
+	
+\ ----------------------------------
+\ Is locked	
+: __gs_islocked
+	__task_dict locked? nip ;
 
 \ ----------------------------------	
 \ Store task referance
@@ -87,6 +92,15 @@ ns: fr
 	swap m:@ nip 
 	__gs_unlock ;
 
+\ ----------------------------------	
+\ Remove task referance
+: __gs_reg_rm	SED: s -- t
+	\ in: 	0: s - task name
+	\ out:	none
+	__gs_lock@
+	swap m:- nip 
+	__gs_unlock ;
+	
 \ ===============================================================================
 \ PUBLIC
 \ Generic task for implementing messaging passing concurrency
@@ -113,7 +127,6 @@ ns: fr
 	__gs_lock@
 	' __gs_wait_task m:each
 	1 sleep
-	m:clear
 	__gs_unlock drop ;
 
 \ ----------------------------------
@@ -171,7 +184,7 @@ ns: fr
 		-1 sleep
 		' __gs_proc_q t:qlen 
 		\ Check q length
-		dup 1 n:> if "Q: " . t:qlen . cr cr then 
+		\ dup 1 n:> if "Q: " . t:qlen . cr cr then 
 		times
 		\ Check for exit
 		t:name@ "_run" s:+ t:@

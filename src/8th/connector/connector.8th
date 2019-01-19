@@ -767,10 +767,17 @@ ns: sdr
 
 \ ----------------------------------
 \ Try to connect and start the radio hardware
-: conn_try_connect	SED: T --
+: conn_try_connect	SED: T -- T
 	\ in: 	0: T - if true then run radio if possible else just give a status
 	\ out:	0: T - if true the radio was successfully run up
-	>r 
+	>r
+	"TRY_CONNECT_TASK" t:name!
+	t:curtask "TRY_CONNECT_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Allocate param stack for this thread
+	param_st_alloc
+	
 	conn_poll if
 		\ Set server running
 		true st_svr_running!
@@ -791,14 +798,14 @@ ns: sdr
 				0 conn_start_radio "Radio start: " . . cr
 				true
 			else
-				false
+				rdrop false
 			then
 		else
 			"****" log
 			"No radio hardware found!" log
 			"To try again use the 'Discover' button." log
 			"****" log
-			false
+			rdrop false
 		then
 	else
 		\ No server or no network connectivity to the server
@@ -806,8 +813,12 @@ ns: sdr
 		"The SDRLibE Server is not running!" log 
 		"To try again use the 'Discover' button." log
 		"****" log
-		false
-	then ;
+		rdrop false
+	then 
+	\ Get rid of our reference as we are exiting
+	"TRY_CONNECT_TASK" fr:__gs_reg_rm
+	
+	"TRY_CONNECT_TASK exiting" log ;
 	
 \ ========================================
 \ Reset namespace

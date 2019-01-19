@@ -29,6 +29,8 @@ ns: sdr
 	"kind" : "win",
 	"title" : "SDRLibEConsole",
 	"visible" : true,
+	"wide" : 300,
+	"heigh" : 100,
 	"ontop" : false,
 	"bg" : "gray10",
 	"resize-corner" : 20,
@@ -39,12 +41,14 @@ ns: sdr
 		{
 			"kind" : "btn",
 			"label" : "Close",
-			"click" : "sdr:close"
+			"click" : "sdr:close",
+			"bounds" : "0,0,parent.width/2,parent.height"
 		},
 		{
 			"kind" : "btn",
 			"label" : "Discover",
-			"click" : "sdr:discover"
+			"click" : "sdr:discover",
+			"bounds" : "parent.width/2,0,parent.width,parent.height"
 		}
 	]
 		
@@ -62,7 +66,10 @@ var g_main
 	g:quit ;
 	
 : discover
-	conn_try_connect ;
+	\ ToDo: Fails, never gets to task
+	\ Why is task STARTUP_TASK on the event stack?
+	false 1 ' conn_try_connect t:task-n
+;
 
 	
 \ ========================================

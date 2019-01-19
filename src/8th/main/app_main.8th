@@ -78,25 +78,52 @@ ns: sdr
 	\ Connector
 	\ Initialise
 	conn_init
-	conn_try_connect
+	\ Attempt connection but do not start anything
+	false 1 ' conn_try_connect t:task-n 2 sleep
 	
-	"Created gen-server tasks" log ;
+	\ Get rid of our reference as we are exiting
+	"STARTUP_TASK" fr:__gs_reg_rm
+	
+	"STARTUP_TASK exiting" log ;
 
 \ ----------------------------------
-\ Called on application exit
-: cleanup
+\ We cleanup all gen-server tasks
+\ Has to be a separate task so we can reeceive responses
+: cleanup_task
+	\ Otherwise messages are lost in closedown
 	false log-async
+	\ Allocate param stack for this thread
+	param_st_alloc
+	
 	"Shutdown in progress" log
 	\ Close connector
-	conn_term 
+	conn_term
 	\ Close models
 	option_model_term
 	app_model_term
 	\ Close pub/sub
 	fr:pubsub_term
+	"Cleanup task exiting" log ;
+	
+\ ----------------------------------
+\ Called on application exit
+: cleanup
+	\ Otherwise messages are lost in closedown
+	false log-async
+	' cleanup_task t:task 
+	\ We have to wait a good time here because
+	\ 1. The cleanup task kicks off multiple other tasks to terminat...
+	\ 2. The cleanup task exits long before those tasks actually complete.
+	\ 3. We have to wait for everything to close down before we can wait for the tasks.
+	\ 4. Waiting too early means the wait can take the lock on the task array and then
+	\ 	deadlocks the tasks that are trying to close. We should be able to find out
+	\		when it is safe but havn't figured that yet.
+	7.0 sleep
 	\ Wait for all tasks to terminate
 	fr:gs_wait_all
-	"Shutdown complete" log ;
+	"Shutdown complete" log
+	\ Wait for messages to flush
+	1.0 sleep ;
 
 \ ===============================================================================
 \ Application entry point  
@@ -122,7 +149,7 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks
-	' startup_task t:task t:wait
+	' startup_task t:task
 	\ Wait for the startup task to complete
 	\ "STARTUP_TASK" fr:gs_wait_single_task
 	
