@@ -22,6 +22,8 @@
      bob@bobcowdery.plus.com
 *)
 
+needs stack/3drop
+
 \ ========================================
 \ Testing only
 false var, connector_test_1
@@ -145,6 +147,7 @@ ns: sdr
 	
 \ ========================================
 \ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
+: __conn_poll_msg { "cmd" : "poll" , "params" : [] } >json ;
 : __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
 : __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
@@ -333,11 +336,36 @@ ns: sdr
 	fr:response! ;
 
 \ Do exchange
-: __con_do_exchange	SED: T --
-	\ in: 	0: T - if true then throw on error
+: __con_do_exchange	SED: T m --
+	\ in: 	0: m - message to send	
+	\				1: T - if true then throw on error
 	\ out: 	none
 	__conn_send_cmd_msg  __con_do_response ;
 
+\ ========================================
+\ Poll - is there anybody there
+: do_conn_poll	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_poll_msg
+	false swap __conn_send_cmd_msg
+	__conn_cmd_sock@ __conn_resp_buf@ 0 net:recvfrom null? if
+		\ No server running or communications problem
+		"SDRLibE server is not running or cannot be contacted!" log
+		3drop false
+	else
+		\ Got a response, should only be an ACK
+		drop json> "resp" m:@ "ACK" s:= if
+			"SDRLibE server is running..." log
+			3drop 2drop true
+		else
+			"SDRLibE server gave a bad poll response!" log
+			3drop false
+		then
+	then
+	fr:response! ;
+	
 \ ========================================
 \ Basic radio functions
 \ Execute discover protocol
@@ -481,6 +509,15 @@ ns: sdr
 \ Public procedural interface, call from any thread
 \ ===============================================================================
 
+\ ----------------------------------
+\ Execute poll
+: conn_poll	SED:  -- *
+	\ in: 	none
+	\ out:	0: * - response
+	a:new fr:+sender
+	"Connector_TASK" ' do_conn_poll rot fr:msg! 
+	fr:response@ ;
+	
 \ ----------------------------------
 \ Execute discover protocol
 : conn_discover	SED:  -- *
@@ -857,7 +894,11 @@ connector_test_2 @ #if
 		"Initialising" log
 		sdr:conn_init
 		"Done initialise" log
+		1 sleep
+		sdr:conn_poll "Poll: " swap >s s:+ log
+		1 sleep
 		\ Run basic tests
+		(*
 		basic_script
 		"Done basic tests" log
 		sdr:conn_term 
@@ -866,6 +907,7 @@ connector_test_2 @ #if
 		"P/S_TASK" fr:gs_wait_single_task 
 		"TEST_TASK exiting..." log
 		1 sleep
+		*)
 	;
 
 	\ Test sequence

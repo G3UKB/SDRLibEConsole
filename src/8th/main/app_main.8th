@@ -68,13 +68,15 @@ ns: sdr
 	\ Set our task in the task registry
 	"STARTUP_TASK" t:name!
 	t:curtask "STARTUP_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
 	
 	\ ----------------------------------
 	\ Allocate param stack for this thread
 	param_st_alloc
 	
-	"Creating gen-server tasks..." log
 	\ ----------------------------------
+	"Creating gen-server tasks..." log
 	\ Publish/Subscribe
 	\ Initialise
 	' do_registrations fr:pubsub_init
@@ -93,15 +95,29 @@ ns: sdr
 	\ Connector
 	\ Initialise
 	conn_init
-	\ Try discover to see if we have hardware
-	conn_discover "resp" m:@ "ACK" s:= if
-		\ We have radio hardware
-		"Radio hardware found!" log
-		\ Set state to on-line
-		true st_online!
+	\ First see if we have a server running by sending it a poll message
+	conn_poll if
+		\ Try discover to see if we have hardware
+		conn_discover "resp" m:@ "ACK" s:= if
+			\ We have radio hardware
+			"Radio hardware found!" log
+			\ Set state to on-line
+			true st_online!
+		else
+			"****" log
+			"No radio hardware found!" log
+			"To try again use the 'Discovery' button." log
+			"****" log
+		then
 	else
-		"No radio hardware found!" log
+		\ No server or no network connectivity to the server
+		"****" log
+		"The SDRLibE Server is not running!" log 
+		"The application will start and continue to poll for the server." log
+		"When a server is detected hardware discovery will run." log
+		"****" log
 	then
+	
 	
 	"Created gen-server tasks" log
 ;

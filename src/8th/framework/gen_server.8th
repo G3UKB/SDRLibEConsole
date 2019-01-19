@@ -139,7 +139,7 @@ ns: fr
 \ Process 1 item from task Q	
 : __gs_proc_q	SED: --
 	t:pop null? if
-		"Warning, p/s q returned null!" log drop
+		"Error gen-server queue returned null!" throw
 	else
 		\ Message to process, just send data part
 		"data" m:@ swap "cb" m:@ nip w:exec
