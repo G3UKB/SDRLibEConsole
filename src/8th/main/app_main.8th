@@ -41,23 +41,6 @@ ns: sdr
 *)
 
 \ ----------------------------------
-\ Called on application exit
-: cleanup
-	false log-async
-	"Shutdown in progress" log
-	\ Close connector
-	conn_term 
-	\ Close models
-	option_model_term
-	app_model_term
-	\ Close pub/sub
-	fr:pubsub_term
-	\ Wait for all tasks to terminate
-	fr:gs_wait_all
-	"Shutdown complete" log
-;
-
-\ ----------------------------------
 \ We start all gen-server tasks from the startup task
 : startup_task
 	\ ----------------------------------
@@ -95,32 +78,25 @@ ns: sdr
 	\ Connector
 	\ Initialise
 	conn_init
-	\ First see if we have a server running by sending it a poll message
-	conn_poll if
-		\ Try discover to see if we have hardware
-		conn_discover "resp" m:@ "ACK" s:= if
-			\ We have radio hardware
-			"Radio hardware found!" log
-			\ Set state to on-line
-			true st_online!
-		else
-			"****" log
-			"No radio hardware found!" log
-			"To try again use the 'Discovery' button." log
-			"****" log
-		then
-	else
-		\ No server or no network connectivity to the server
-		"****" log
-		"The SDRLibE Server is not running!" log 
-		"The application will start and continue to poll for the server." log
-		"When a server is detected hardware discovery will run." log
-		"****" log
-	then
+	conn_try_connect
 	
-	
-	"Created gen-server tasks" log
-;
+	"Created gen-server tasks" log ;
+
+\ ----------------------------------
+\ Called on application exit
+: cleanup
+	false log-async
+	"Shutdown in progress" log
+	\ Close connector
+	conn_term 
+	\ Close models
+	option_model_term
+	app_model_term
+	\ Close pub/sub
+	fr:pubsub_term
+	\ Wait for all tasks to terminate
+	fr:gs_wait_all
+	"Shutdown complete" log ;
 
 \ ===============================================================================
 \ Application entry point  
@@ -155,8 +131,7 @@ ns: sdr
   ' cleanup onexit
   
   \ On exit from app:main the GUI event loop is started
-  "Exiting app_main" log
-;
+  "Exiting app_main" log ;
 
 \ ========================================
 \ Reset namespace

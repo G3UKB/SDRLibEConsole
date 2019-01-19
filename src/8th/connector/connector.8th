@@ -764,6 +764,50 @@ ns: sdr
 	0.5 sleep
 	\ Ask the connector to exit
 	"Connector_TASK" ' fr:gs_do_term a:new fr:msg! ;
+
+\ ----------------------------------
+\ Try to connect and start the radio hardware
+: conn_try_connect	SED: T --
+	\ in: 	0: T - if true then run radio if possible else just give a status
+	\ out:	0: T - if true the radio was successfully run up
+	>r 
+	conn_poll if
+		\ Set server running
+		true st_svr_running!
+		\ Try discover to see if we have hardware
+		conn_discover "resp" m:@ "ACK" s:= if
+			\ We have radio hardware
+			"Radio hardware found!" log
+			r> if
+				\ Set state to on-line
+				true st_rad_online!
+				app_model_sys_evnts
+				option_model_sys_evnts
+				\ Run the server and radio
+				\ ToDo: This is temporary until we fix the audio routing.
+				conn_set_default_route "Route: " . . cr
+				\ ToDo check responses
+				conn_start_server "Server start: " . . cr
+				0 conn_start_radio "Radio start: " . . cr
+				true
+			else
+				false
+			then
+		else
+			"****" log
+			"No radio hardware found!" log
+			"To try again use the 'Discover' button." log
+			"****" log
+			false
+		then
+	else
+		\ No server or no network connectivity to the server
+		"****" log
+		"The SDRLibE Server is not running!" log 
+		"To try again use the 'Discover' button." log
+		"****" log
+		false
+	then ;
 	
 \ ========================================
 \ Reset namespace
@@ -895,19 +939,18 @@ connector_test_2 @ #if
 		sdr:conn_init
 		"Done initialise" log
 		1 sleep
-		sdr:conn_poll "Poll: " swap >s s:+ log
-		1 sleep
-		\ Run basic tests
-		(*
-		basic_script
-		"Done basic tests" log
-		sdr:conn_term 
-		"Connector_TASK" fr:gs_wait_single_task 
-		fr:pubsub_term
-		"P/S_TASK" fr:gs_wait_single_task 
-		"TEST_TASK exiting..." log
-		1 sleep
-		*)
+		sdr:conn_poll if
+			1 sleep
+			\ Run basic tests
+			basic_script
+			"Done basic tests" log
+			sdr:conn_term 
+			"Connector_TASK" fr:gs_wait_single_task 
+			fr:pubsub_term
+			"P/S_TASK" fr:gs_wait_single_task 
+			"TEST_TASK exiting..." log
+			1 sleep
+		then
 	;
 
 	\ Test sequence

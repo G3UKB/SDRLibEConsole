@@ -59,6 +59,10 @@ enum;
 		\ internal calls which cause event loops.
 		"inhibit" : false
 	},
+	"server" : {
+		\ Server is on-line
+		"running" : false
+	},
 	"radio" : {
 		\ Radio is online i.e. discovery was successful	
 		"online" : false,
@@ -86,53 +90,64 @@ enum;
 : st_app@	SED: m -- m
 	"app" m:@ ;
 
+: st_server@	SED: m -- m
+	"server" m:@ ;
+
 : st_radio@	SED: m -- m
 	"radio" m:@ ;
 	
 \ ----------------------------------	
 \ Application
-: st_run@	SED: -- T
+: st_app_run@	SED: -- T
 	st_lock@ st_app@ "run" m:@ nip nip st_unlock ; 
 	
-: st_run!	SED: T --
+: st_app_run!	SED: T --
 	st_lock@ st_app@ nip "run" rot m:! drop st_unlock ; 
 
-: st_sod@	SED: -- T
+: st_app_sod@	SED: -- T
 	st_lock@ st_app@ "sod" m:@ nip nip st_unlock ; 
 	
-: st_sod!	SED: T --
+: st_app_sod!	SED: T --
 	st_lock@ st_app@ nip "sod" rot m:! drop st_unlock ;
 	
-: st_inhibit@	SED: -- T
+: st_app_inhibit@	SED: -- T
 	st_lock@ st_app@ "inhibit" m:@ nip nip st_unlock ; 
 	
-: st_inhibit!	SED: T --
+: st_app_inhibit!	SED: T --
 	st_lock@ st_app@ nip "inhibit" rot m:! drop st_unlock ; 
 
 \ ----------------------------------	
+\ Server
+: st_svr_running@	SED: -- T
+	st_lock@ st_server@ "running" m:@ nip nip st_unlock ; 
+	
+: st_svr_running!	SED: T --
+	st_lock@ st_server@ nip "running" rot m:! drop st_unlock ; 
+
+\ ----------------------------------	
 \ Radio
-: st_online@	SED: -- T
+: st_rad_online@	SED: -- T
 	st_lock@ st_radio@ "online" m:@ nip nip st_unlock ; 
 	
-: st_online!	SED: T --
+: st_rad_online!	SED: T --
 	st_lock@ st_radio@ nip "online" rot m:! drop st_unlock ; 
 
-: st_running@	SED: -- T
+: st_rad_running@	SED: -- T
 	st_lock@ st_radio@ "running" m:@ nip nip st_unlock ; 
 	
-: st_running!	SED: T --
+: st_rad_running!	SED: T --
 	st_lock@ st_radio@ nip "running" rot m:! drop st_unlock ;
 
-: st_tx@	SED: -- T
+: st_rad_tx@	SED: -- T
 	st_lock@ st_radio@ "tx" m:@ nip nip st_unlock ; 
 	
-: st_tx!	SED: T --
+: st_rad_tx!	SED: T --
 	st_lock@ st_radio@ nip "tx" rot m:! drop st_unlock ;
 
-: st_type@	SED: -- n
+: st_rad_type@	SED: -- n
 	st_lock@ st_radio@ "type" m:@ nip nip st_unlock ; 
 	
-: st_type!	SED: n --
+: st_rad_type!	SED: n --
 	st_lock@ st_radio@ nip "type" rot m:! drop st_unlock ;
 	
 \ Restore namespace	
@@ -146,37 +161,49 @@ state_test @ #if
 	
 	: run_test
 	
-		false sdr:st_run!
-		false sdr:st_sod!
-		false sdr:st_inhibit!
-		false sdr:st_online!
-		false sdr:st_running!
-		false sdr:st_tx!
-		sdr:TYPE_HPSDR sdr:st_type!
+		false sdr:st_app_run!
+		false sdr:st_app_sod!
+		false sdr:st_app_inhibit!
 		
-		sdr:st_run@ "Run: " swap >s s:+ log
-		sdr:st_sod@ "SOD: " swap >s s:+ log
-		sdr:st_inhibit@ "Inhibit: " swap >s s:+ log
-		sdr:st_online@ "Online: " swap >s s:+ log
-		sdr:st_running@ "Running: " swap >s s:+ log
-		sdr:st_tx@ "TX: " swap >s s:+ log
-		sdr:st_type@ "Type: " swap >s s:+ log
+		false sdr:st_svr_running!
+		
+		false sdr:st_rad_online!
+		false sdr:st_rad_running!
+		false sdr:st_rad_tx!
+		sdr:TYPE_HPSDR sdr:st_rad_type!
+		
+		sdr:st_app_run@ "Run: " swap >s s:+ log
+		sdr:st_app_sod@ "SOD: " swap >s s:+ log
+		sdr:st_app_inhibit@ "Inhibit: " swap >s s:+ log
+		
+		sdr:st_svr_running@ "Server: " swap >s s:+ log
+		
+		sdr:st_rad_online@ "Online: " swap >s s:+ log
+		sdr:st_rad_running@ "Running: " swap >s s:+ log
+		sdr:st_rad_tx@ "TX: " swap >s s:+ log
+		sdr:st_rad_type@ "Type: " swap >s s:+ log
 
-		true sdr:st_run!
-		true sdr:st_sod!
-		true sdr:st_inhibit!
-		true sdr:st_online!
-		true sdr:st_running!
-		true sdr:st_tx!
-		sdr:TYPE_FCD sdr:st_type!
+		true sdr:st_app_run!
+		true sdr:st_app_sod!
+		true sdr:st_app_inhibit!
+		
+		true sdr:st_svr_running!
+		
+		true sdr:st_rad_online!
+		true sdr:st_rad_running!
+		true sdr:st_rad_tx!
+		sdr:TYPE_FCD sdr:st_rad_type!
 
-		sdr:st_run@ "Run: " swap >s s:+ log
-		sdr:st_sod@ "SOD: " swap >s s:+ log
-		sdr:st_inhibit@ "Inhibit: " swap >s s:+ log
-		sdr:st_online@ "Online: " swap >s s:+ log
-		sdr:st_running@ "Running: " swap >s s:+ log
-		sdr:st_tx@ "TX: " swap >s s:+ log
-		sdr:st_type@ "Type: " swap >s s:+ log
+		sdr:st_app_run@ "Run: " swap >s s:+ log
+		sdr:st_app_sod@ "SOD: " swap >s s:+ log
+		sdr:st_app_inhibit@ "Inhibit: " swap >s s:+ log
+		
+		sdr:st_svr_running@ "Server: " swap >s s:+ log
+		
+		sdr:st_rad_online@ "Online: " swap >s s:+ log
+		sdr:st_rad_running@ "Running: " swap >s s:+ log
+		sdr:st_rad_tx@ "TX: " swap >s s:+ log
+		sdr:st_rad_type@ "Type: " swap >s s:+ log
 	;
 	
 	: run_tests
@@ -184,7 +211,7 @@ state_test @ #if
 		' run_test t:task
 	;
 	
-	' run_tests 1 500 loop
+	' run_tests 1 50 loop
  	10 sleep
  	
 	bye

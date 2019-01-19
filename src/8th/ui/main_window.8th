@@ -40,6 +40,11 @@ ns: sdr
 			"kind" : "btn",
 			"label" : "Close",
 			"click" : "sdr:close"
+		},
+		{
+			"kind" : "btn",
+			"label" : "Discover",
+			"click" : "sdr:discover"
 		}
 	]
 		
@@ -55,6 +60,10 @@ var g_main
 
 : close
 	g:quit ;
+	
+: discover
+	conn_try_connect ;
+
 	
 \ ========================================
 \ Reset namespace
