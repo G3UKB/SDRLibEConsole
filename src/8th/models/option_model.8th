@@ -325,7 +325,7 @@ ns: sdr
 	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
-	"Options Start-of-Day complete " log 
+	"Options sent SYS events" log 
 ;
 
 \ ========================================

@@ -665,43 +665,43 @@ ns: sdr
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_freq SED: m --
-	"freq" m:@ conn_r1_freq "r1 frequency" __conn_evnt_resp ;
+	"freq" m:@ nip conn_r1_freq "r1 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_freq SED: m --
-	"freq" m:@ conn_r2_freq "r2 frequency" __conn_evnt_resp ;
+	"freq" m:@ nip conn_r2_freq "r2 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_freq SED: m --
-	"freq" m:@ conn_r3_freq "r3 frequency" __conn_evnt_resp ;
+	"freq" m:@ nip conn_r3_freq "r3 frequency" __conn_evnt_resp ;
 
 \ ----------------------------------
 \ Mode update
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_mode SED: m --
-	"mode" m:@ conn_r1_mode "r1 mode" __conn_evnt_resp ;
+	"mode" m:@ nip conn_r1_mode "r1 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_mode SED: m --
-	"mode" m:@ conn_r2_mode "r2 mode" __conn_evnt_resp ;
+	"mode" m:@ nip conn_r2_mode "r2 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_mode SED: m --
-	"mode" m:@ conn_r3_mode "r3 mode" __conn_evnt_resp ;
+	"mode" m:@ nip conn_r3_mode "r3 mode" __conn_evnt_resp ;
 
 \ ----------------------------------
 \ Filter update
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_filter SED: m --
-	"filter" m:@ 
+	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r1_filter "r1 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_filter SED: m --
-	"filter" m:@
+	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r2_filter "r2 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_filter SED: m --
-	"filter" m:@
+	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r3_filter "r3 filter" __conn_evnt_resp ;
 	
@@ -711,34 +711,35 @@ ns: sdr
 \ Subscribe to system events that need to be forwarded to the server
 : __conn_subscribe	SED: --
 	SYS_R1_FREQ ' __conn_evnt_r1_freq fr:pubsub_subscribe
-	SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
-	SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe
+	\ SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
+	\ SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe
 	SYS_R1_MODE ' __conn_evnt_r1_mode fr:pubsub_subscribe
-	SYS_R2_MODE ' __conn_evnt_r2_mode fr:pubsub_subscribe
-	SYS_R3_MODE ' __conn_evnt_r3_mode fr:pubsub_subscribe
+	\ SYS_R2_MODE ' __conn_evnt_r2_mode fr:pubsub_subscribe
+	\ SYS_R3_MODE ' __conn_evnt_r3_mode fr:pubsub_subscribe
 	SYS_R1_FILT ' __conn_evnt_r1_filter fr:pubsub_subscribe
-	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
-	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
+	\ SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
+	\ SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
 	SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_MICGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_TX_FREQ ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_TX_MODE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_TX_FILT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R1_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_RUN_STATE ' __conn_not_implemented fr:pubsub_subscribe ;
+	\ SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_MICGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_TX_FREQ ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_TX_MODE ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_TX_FILT ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R1_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R2_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R3_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_RUN_STATE ' __conn_not_implemented fr:pubsub_subscribe 
+;
 	
 \ ----------------------------------
 \ Module initialisation
@@ -766,6 +767,7 @@ ns: sdr
 	"Connector_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
 \ ----------------------------------
+\ This must br run as a task and not called directly
 \ Try to connect and start the radio hardware
 : conn_try_connect	SED: T -- T
 	\ in: 	0: T - if true then run radio if possible else just give a status
@@ -777,35 +779,39 @@ ns: sdr
 	t:getq false q:throwing drop
 	\ Allocate param stack for this thread
 	param_st_alloc
-	
 	conn_poll if
-		\ Set server running
-		true st_svr_running!
-		\ Try discover to see if we have hardware
-		conn_discover "resp" m:@ "ACK" s:= if
-			\ We have radio hardware
-			"Radio hardware found!" log
-			r> if
+		"SDRLibE server is on-line..." log
+		r> if
+			\ Set server running
+			true st_svr_running!
+			\ Try discover to see if we have radio hardware
+			conn_discover "resp" m:@ "ACK" s:= if
+				\ We have radio hardware
+				"Radio hardware found!" log
 				\ Set state to on-line
 				true st_rad_online!
-				app_model_sys_evnts
-				option_model_sys_evnts
-				\ Run the server and radio
+				\ ***
+				\ ToDo - response processing and multi-radio
+				\ Set the default route
 				\ ToDo: This is temporary until we fix the audio routing.
 				conn_set_default_route "Route: " . . cr
-				\ ToDo check responses
+				\ Start the server processes (this starts the DSP etc)
 				conn_start_server "Server start: " . . cr
+				\ Now update the server with the current values
+				option_model_sys_evnts
+				app_model_sys_evnts
+				\ Finally start the radio
 				0 conn_start_radio "Radio start: " . . cr
+				\ End ToDo
+				\ ***
 				true
 			else
-				rdrop false
+				"****" log
+				"No radio hardware found!" log
+				"To try again use the 'Discover' button." log
+				"****" log
+				false
 			then
-		else
-			"****" log
-			"No radio hardware found!" log
-			"To try again use the 'Discover' button." log
-			"****" log
-			rdrop false
 		then
 	else
 		\ No server or no network connectivity to the server
@@ -813,10 +819,9 @@ ns: sdr
 		"The SDRLibE Server is not running!" log 
 		"To try again use the 'Discover' button." log
 		"****" log
-		rdrop false
+		rdrop  false
 	then 
-	\ Get rid of our reference as we are exiting
-	"TRY_CONNECT_TASK" fr:__gs_reg_rm
+	param_st_free
 	
 	"TRY_CONNECT_TASK exiting" log ;
 	

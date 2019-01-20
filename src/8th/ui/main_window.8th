@@ -64,11 +64,10 @@ var g_main
 
 : close
 	g:quit ;
-	
+
 : discover
-	\ ToDo: Fails, never gets to task
-	\ Why is task STARTUP_TASK on the event stack?
-	false 1 ' conn_try_connect t:task-n
+	\ We should be able to wait with -1 sleep but does not work
+	true 1 ' conn_try_connect t:task-n 0.1 sleep
 ;
 
 	

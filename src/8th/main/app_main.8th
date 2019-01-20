@@ -42,7 +42,9 @@ ns: sdr
 
 \ ----------------------------------
 \ We start all gen-server tasks from the startup task
-: startup_task
+: startup_task	SED: --
+	\ in: 	none
+	\ out:	none
 	\ ----------------------------------
 	\ Start the gen_server tasks
 	\ This has to be done in the correct order as events will
@@ -79,17 +81,16 @@ ns: sdr
 	\ Initialise
 	conn_init
 	\ Attempt connection but do not start anything
-	false 1 ' conn_try_connect t:task-n 2 sleep
-	
-	\ Get rid of our reference as we are exiting
-	"STARTUP_TASK" fr:__gs_reg_rm
+	false 1 ' conn_try_connect t:task-n \ 2 sleep
 	
 	"STARTUP_TASK exiting" log ;
 
 \ ----------------------------------
 \ We cleanup all gen-server tasks
 \ Has to be a separate task so we can reeceive responses
-: cleanup_task
+: cleanup_task	SED: --
+	\ in: 	none
+	\ out:	none
 	\ Otherwise messages are lost in closedown
 	false log-async
 	\ Allocate param stack for this thread
@@ -107,7 +108,9 @@ ns: sdr
 	
 \ ----------------------------------
 \ Called on application exit
-: cleanup
+: cleanup	SED: --
+	\ in: 	none
+	\ out:	none
 	\ Otherwise messages are lost in closedown
 	false log-async
 	' cleanup_task t:task 
@@ -127,8 +130,9 @@ ns: sdr
 
 \ ===============================================================================
 \ Application entry point  
-: app:main	\ --
-
+: app:main	SED: --
+	\ in: 	none
+	\ out:	none
 	\ ----------------------------------
 	\ Set our task name
 	"MainThrd" t:name!
@@ -150,8 +154,6 @@ ns: sdr
 	\ ----------------------------------
 	\ Start the gen_server tasks
 	' startup_task t:task
-	\ Wait for the startup task to complete
-	\ "STARTUP_TASK" fr:gs_wait_single_task
 	
 	\ ----------------------------------
   \ Set our cleanup word
