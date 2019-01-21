@@ -220,7 +220,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Only need num-rx at present as we must give the current number and not the new number as restart required
-	__option_get_db_num_rx "curr_numrx" t:! ;
+	__option_get_db_num_rx st_rad_num_rx!
 
 \ ----------------------------------
 \ Restore model else use the default
@@ -361,21 +361,9 @@ ns: sdr
 
 \ ============================================
 \ Get/Set general section value holders
-: __option_get_num_rx	SED: -- n
-	\ in: 	none
-	\ out: 	0: n - current num rx (not saved db value if different)
-	"curr_numrx" t:@ ;
 
 \ ----------------------------------
 \ Number of receivers
-: do_option_get_num_rx SED: a --
-	a:open
-	\ in: 	0: q - sender (task name)
-	\ out: 	q: n - num rx
-	__option_get_num_rx
-	fr:response! ;
-
-\ ----------------------------------
 : do_option_set_num_rx	SED: a --
 	a:open
 	\ in: 	0: n - num rx

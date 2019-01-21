@@ -53,6 +53,7 @@ ns: sdr
 	\ Set our task in the task registry
 	"STARTUP_TASK" t:name!
 	t:curtask "STARTUP_TASK" fr:gs_reg!
+	
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
 	

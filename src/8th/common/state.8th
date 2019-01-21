@@ -71,7 +71,8 @@ enum;
 		\ We are currently in TX mode
 		"tx" : false,
 		\ Radio attributes
-		"type" : ` TYPE_HPSDR `
+		"type" : ` TYPE_HPSDR `,
+		"num-rx" : 1
 	}
 } var, current_state
 
@@ -149,6 +150,12 @@ enum;
 	
 : st_rad_type!	SED: n --
 	st_lock@ st_radio@ nip "type" rot m:! drop st_unlock ;
+
+: st_rad_num_rx@	SED: -- n
+	st_lock@ st_radio@ "num-rx" m:@ nip nip st_unlock ; 
+	
+: st_rad_num_rx!	SED: n --
+	st_lock@ st_radio@ nip "num-rx" rot m:! drop st_unlock ;
 	
 \ Restore namespace	
 ns: user 
