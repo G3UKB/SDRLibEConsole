@@ -52,4 +52,5 @@
 
 \ ========================================
 \ UI
+"../ui/common/win_common.8th" f:include
 "../ui/main_window/main_window.8th" f:include

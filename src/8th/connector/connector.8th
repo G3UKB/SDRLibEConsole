@@ -153,6 +153,7 @@ ns: sdr
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
 : __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
+: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
@@ -399,6 +400,14 @@ ns: sdr
 	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
 	swap __conn_radio_start_msg false swap __con_do_exchange ;
+	
+\ ----------------------------------
+\ Stop the radio
+: do_conn_stop_radio	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_radio_stop_msg false swap __con_do_exchange ;
 
 \ ========================================
 \ Receiver functions
@@ -554,6 +563,15 @@ ns: sdr
 	"Connector_TASK" ' do_conn_start_radio rot fr:msg! 
 	fr:response@ ;
 
+\ ----------------------------------
+\ Stop the radio
+: conn_stop_radio	SED:  -- *
+	\ in: 	none
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_stop_radio rot fr:msg! 
+	fr:response@ ;
+	
 \ ----------------------------------
 \ Freq change
 : conn_r1_freq	SED: n -- *
@@ -800,8 +818,6 @@ ns: sdr
 				\ Now update the server with the current values
 				option_model_sys_evnts
 				app_model_sys_evnts
-				\ Finally start the radio
-				0 conn_start_radio "Radio start: " . . cr
 				\ End ToDo
 				\ ***
 				true

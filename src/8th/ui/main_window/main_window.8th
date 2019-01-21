@@ -482,6 +482,8 @@ ns: sdr
 	"resize-corner" : 20,
 	"close" : "sdr:w_close",
 	"font" : "Arial 10",
+	"timer-period" : 200,
+	"timer" : "sdr:w_timer"
 	"children" :
 	[
 		{
@@ -511,7 +513,7 @@ ns: sdr
 				},
 				{
 					"kind" : "btn",
-					"name" : "metis-state",
+					"name" : "radio-state",
 					"label" : "Start",
 					"bg0" : "gray10",
 					"fg0" : "green3",
@@ -520,8 +522,8 @@ ns: sdr
 					"font" : 16,
 					"autotoggle" : true,
 					"bounds" : "95,5,180,40",
-					"running" : false,
-					"click" : "sdr:w_state"
+					"enabled" : false
+					"click" : "sdr:w_radio_run"
 				},
 				{
 					"kind" : "group",
@@ -687,6 +689,7 @@ ns: sdr
 
 \ ===============================================================================
 \ Window management
+
 \ Quit button pressed so just exit
 : w_quit	SED: g --
 	g:quit
@@ -713,6 +716,29 @@ ns: sdr
 		"resize-border" : 0
 	} g:msgdlg 
 ;
+
+\ ===============================================================================
+\ GUI idle timer
+
+: __set_run_state	SDE: T --
+	if
+	\ Disable discovery
+		main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
+		\ Enable start
+		"radio-state" g:child true g:enable drop
+	else
+		\ Enable discovery
+		main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
+		\ Disable start
+		"radio-state" g:child false g:enable drop
+	then
+;
+
+\ ----------------------------------
+\ The timer is used to maintain the GUI state
+: w_timer	SED: g --
+	\ Radio on-line status
+	st_rad_online@ __set_run_state ;
 
 \ ===============================================================================
 \ Menu management
@@ -780,40 +806,53 @@ ns: sdr
 ;
 
 \ ========================================
-\ Control
+\ Radio Control
 \ Should discovery fail then this button will be enabled to re-discover
-: evt_metis_discover	\ gui --
-	' sdr:metis_control t:task
-	sdr:task_dict @ "metis-task" rot m:!
-  drop
-  2 sleep
-  \ See if we succeded and set button state
-  sdr:metis_online sdr:set_metis_state	
+
+\ This button is enabled when discovery failed at startup
+\ Discovery will be run again which will set the state variables
+\ The button is state adjusted in the idle timer event
+: w_discover	\ gui --
+	true 1 ' conn_try_connect t:task-n 0.1 sleep
 ;
 
-\ Start/stop metis depending on current state
-: evt_metis_state	\ gui --
-	"running" g:m@ if
-		\ Already running so stop
-		"running" false g:m!
+\ ----------------------------------
+\ Start/stop radio depending on current state
+\ The button is state adjusted in the idle timer event
+: w_radio_run	SED: g --
+	\ Check radio state
+	st_rad_running@ if
+		\ Running, so stop radio
+		\ Set button label to "Start"
 		"Start" g:text
-		sdr:task_dict @ "metis-task" m:@ nip dup "stop" t:push t:notify
-		state_model locked@ "metis" m:@ "running" false m:!
+		\ Stop the radio
+		\ ToDo: better checking of response
+		conn_stop_radio "resp" m:@ "ACK" s:+ if
+			\ Set radio running flag
+			false st_rad_running!
+		then
+		\ ToDo: WBS stuff
 		\ Stop WBS if its running
-		true inhibit_wbs !
-		wbs_window @ g:hide drop main_window @ "button-box" g:child "m-wbs" g:child false g:on
+		\ true inhibit_wbs !
+		\ wbs_window @ g:hide drop main_window @ "button-box" g:child "m-wbs" g:child false g:on
 	else
-		\ Start metis
-		"running" true g:m!
+		\ Stopped so start radio
+		\ Set button label to "Stop"
 		"Stop" g:text
-		\ Always start with just IQ
-		sdr:task_dict @ "metis-task" m:@ nip dup "start-iq" t:push t:notify
-		state_model locked@ "metis" m:@ "running" true m:!
+		\ ToDo: better checking of response
+		\ Always start without WBS
+		NO_WBS conn_start_radio "resp" m:@ "ACK" s:+ if
+			\ Set radio running flag
+			true st_rad_running!
+		then
 	then
 ;
 
+\ ToDo: Sort other windows
+(*
+\ ----------------------------------
 \ Show/hide the TX window
-: evt_tx_win	\ g --
+: w_tx_win	\ g --
 	g:on? if
 		\ Show the window
 		tx_window @ g:show
@@ -823,8 +862,9 @@ ns: sdr
 	then
 ;
 
+\ ----------------------------------
 \ Show/hide the WBS window
-: evt_wbs_win	\ g --
+: w_wbs_win	\ g --
 	inhibit_wbs @ if false inhibit_wbs ! ;; then
 	g:on? if
 		\ Show the window
@@ -852,104 +892,105 @@ ns: sdr
 		false wbs_run !
 	then
 ;
+*)
 
 \ ========================================
 \ Mode select
-: r1_mode_select	\ g --
+: w_r1_mode_select	\ g --
 	"radio-1" "MODE-R1" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r2_mode_select	\ g --
+: w_r2_mode_select	\ g --
 	"radio-2" "MODE-R2" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r3_mode_select	\ g --
+: w_r3_mode_select	\ g --
 	"radio-3" "MODE-R3" get_window_target
 	swap toggle_popup_panel drop
 ;	
 
 \ ========================================
 \ Filter select
-: r1_filter_select	\ g --
+: w_r1_filter_select	\ g --
 	"radio-1" "FILTER-R1" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r2_filter_select	\ g --
+: w_r2_filter_select	\ g --
 	"radio-2" "FILTER-R2" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r3_filter_select	\ g --
+: w_r3_filter_select	\ g --
 	"radio-3" "FILTER-R3" get_window_target
 	swap toggle_popup_panel drop
 ;
 
 \ ======================================
 \ Band select
-: r1_band_select	\ g --
+: w_r1_band_select	\ g --
 	"radio-1" "BAND-R1" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r2_band_select	\ g --
+: w_r2_band_select	\ g --
 	"radio-2" "BAND-R2" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r3_band_select	\ g --
+: w_r3_band_select	\ g --
 	"radio-3" "BAND-R3" get_window_target
 	swap toggle_popup_panel drop
 ;
 
 \ ========================================
 \ AGC select
-: r1_agc_select	\ g --
+: w_r1_agc_select	\ g --
 	"radio-1" "AGC-R1" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r2_agc_select	\ g --
+: w_r2_agc_select	\ g --
 	"radio-2" "AGC-R2" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r3_agc_select	\ g --
+: w_r3_agc_select	\ g --
 	"radio-3" "AGC-R3" get_window_target
 	swap toggle_popup_panel drop
 ;
 
 \ ========================================
 \ AF-GAIN
-: r1_af_gain	\ g --
+: w_r1_af_gain	\ g --
 	"radio-1" "AFGAIN-R1" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r2_af_gain	\ g --
+: w_r2_af_gain	\ g --
 	"radio-2" "AFGAIN-R2" get_window_target
 	swap toggle_popup_panel drop
 ;
 
-: r3_af_gain	\ g --
+: w_r3_af_gain	\ g --
 	"radio-3" "AFGAIN-R3" get_window_target
 	swap toggle_popup_panel drop
 ;
 
 \ ========================================
 \ Temporarily redirect audio outputs from a radio to both channels on first device
-: r1_audio_select
-	0 "both" c_i_server_change_audio_outputs
+: w_r1_audio_select
+	\ 0 "both" c_i_server_change_audio_outputs
 ;
 
-: r2_audio_select
-	1 "both" c_i_server_change_audio_outputs
+: w_r2_audio_select
+	\ 1 "both" c_i_server_change_audio_outputs
 ;
 
-: r3_audio_select
-	2 "both" c_i_server_change_audio_outputs
+: w_r3_audio_select
+	\ 2 "both" c_i_server_change_audio_outputs
 ;
 
 \ ============================================================================

@@ -38,6 +38,11 @@ radio_defs_test @ #if
 ns: sdr
 
 \ ========================================
+\  WBS start modes
+: WITH_WBS 1 ;
+: NO_WBS 0 ;
+
+\ ========================================
 \  RX modes
 \ Mode id's as understood by the DSP
 0 enum:
