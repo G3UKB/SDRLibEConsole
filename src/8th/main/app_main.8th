@@ -72,15 +72,18 @@ ns: sdr
 	\ ----------------------------------
 	\ Models
 	option_model_init
-	option_model_ui_evnts
-	\ 2 sleep
 	app_model_init
-	app_model_ui_evnts
 	
+	\ ----------------------------------
 	\ Main UI subscribes to SYS_RUN_STATE only
 	main_window_subscribe
 	\ Gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
+	2 sleep
+	
+	\ Once UI is stable we can populate it with the UI events
+	option_model_ui_evnts
+	app_model_ui_evnts
 	
 	\ ----------------------------------
 	\ Connector
@@ -88,6 +91,9 @@ ns: sdr
 	conn_init
 	\ Attempt connection but do not start anything
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
+	
+	\ Done SOD
+	false st_app_sod!
 	
 	"STARTUP_TASK exiting" log ;
 

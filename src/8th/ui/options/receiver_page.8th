@@ -127,7 +127,7 @@ ns: sdr
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : r_average_mode				\ combo index rate --
-	is_run if
+	st_app_run@ if
 		\ Allow the event
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
@@ -139,19 +139,19 @@ ns: sdr
 ;
 
 : r_over	\ combo index num-rx --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_over
 	else 2drop drop then
 ;
 
 : r_window_type	\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_window_type
 	else 2drop drop then
 ;
 
 : r_fft_size	\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_fft_size
 	else 2drop drop then
 ;

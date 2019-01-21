@@ -70,7 +70,7 @@ var options
 
 \ Iff start-of-day clear the combo and add all items from the model
 : update_combo_items 			\	g-target-widget array_obj_ref -- array_obj_ref
-	sdr:is_sod 							\ g-target-widget array_obj_ref flag
+	st_app_sod@ 						\ g-target-widget array_obj_ref flag
 	if
 		\ Start of day
 		\ Populate the combo

@@ -35,7 +35,7 @@ ns: sdr
     m:new																			\ m
       "kind" "btn" m:!												\ m[+ "kind"]
       "label" r> dup >r name_for_mode m:!			\ m[+ "label"] r:ix mode
-      "mode-id" r> mode_for_name m:!					\ m[+ "mode_id"]
+      "mode-id" r> name_for_mode m:!					\ m[+ "mode_id"]
       "font" 14 m:!														\ etc
       "bg" "lightcyan4" m:!
       "fg" "blue" m:!
@@ -95,19 +95,19 @@ ns: sdr
 ;
 
 : set_mode_model_r1	\ mode-id --
-	mode_for_name model_r1_set_mode
+	\ mode_for_name model_r1_set_mode
 ;
 
 : set_mode_model_r2	\ mode-id --
-	mode_for_name model_r2_set_mode
+	\ mode_for_name model_r2_set_mode
 ;
 
 : set_mode_model_r3	\ mode-id --
-	mode_for_name model_r3_set_mode
+	\ mode_for_name model_r3_set_mode
 ;
 
 : set_mode_model_tx	\ mode-id --
-	mode_for_name model_tx_set_mode
+	\ mode_for_name model_tx_set_mode
 ;
 
 : mode_set_model	\ mode mode-id --
@@ -204,24 +204,24 @@ ns: sdr
 
 \ Subscribe to available radios
 : mode_subscribe_radios_1
-	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
-	UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
-	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	UI_R1_MODE ' mode_evt_r1_mode fr:pubsub_subscribe
+	UI_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
 ;
 
 : mode_subscribe_radios_2
-	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
-	UI_R2_MODE ' mode_evt_r2_modee pubsub_subscribe
-	UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
-	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	UI_R1_MODE ' mode_evt_r1_mode fr:pubsub_subscribe
+	UI_R2_MODE ' mode_evt_r2_modee fr:pubsub_subscribe
+	UI_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
 ;
 
 : mode_subscribe_radios_3
-	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
-	UI_R2_MODE ' mode_evt_r2_mode pubsub_subscribe
-  UI_R3_MODE ' mode_evt_r3_mode pubsub_subscribe
-  UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
-	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	UI_R1_MODE ' mode_evt_r1_mode fr:pubsub_subscribe
+	UI_R2_MODE ' mode_evt_r2_mode fr:pubsub_subscribe
+  UI_R3_MODE ' mode_evt_r3_mode fr:pubsub_subscribe
+  UI_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
 ;
 
 : mode_subscribe	\  --

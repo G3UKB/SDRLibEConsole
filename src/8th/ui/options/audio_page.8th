@@ -207,7 +207,7 @@ needs gui/msgdlg
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : a_input_source				\ combo index rate --
-	is_run if
+	st_app_run@ if
 		\ Allow the event
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
@@ -219,31 +219,31 @@ needs gui/msgdlg
 ;
 
 : a_input_device				\ combo index num-rx --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_input_device
 	else 2drop drop then
 ;
 
 : a_output_sink					\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_output_sink
 	else 2drop drop then
 ;
 
 : a_receiver						\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_receiver
 	else 2drop drop then
 ;
 
 : a_output_device				\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_output_device
 	else 2drop drop then
 ;
 
 : a_channel							\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_channel
 	else 2drop drop then
 ;

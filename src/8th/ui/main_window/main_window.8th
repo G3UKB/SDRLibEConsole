@@ -725,12 +725,12 @@ ns: sdr
 : __set_run_state	SED: T --
 	if
 	\ Disable discovery
-		g_main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
+		main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
 		\ Enable start
 		"radio-state" g:child true g:enable drop
 	else
 		\ Enable discovery
-		g_main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
+		main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
 		\ Disable start
 		"radio-state" g:child false g:enable drop
 	then
@@ -997,6 +997,7 @@ ns: sdr
 
 \ ============================================================================
 \ Initialise window dependent on number of radios
+
 : add_child_common			\ radio_id ?-id bounds --
 	main_window @					\ radio_id ?-id bounds gui 
 	"concertina" g:child 	\ radio_id ?-id bounds concertina-gui
@@ -1004,7 +1005,7 @@ ns: sdr
 	g:child								\ ?-id bounds radio-gui
 	2 pick rot						\ ?-id radio-gui ?-id bounds
 ;
-	
+(*
 \ Add child VFO
 : add_child_vfo					\ radio_id vfo-id bounds --
 	add_child_common
@@ -1014,7 +1015,7 @@ ns: sdr
 	g:child 							\ radio-gui vfo-gui
 	vfo_init 2drop				\ --
 ;
-
+*)
 \ Add child mode panel
 : add_child_mode-panel	\ gui radio_id mode_id bounds --
 	add_child_common
@@ -1022,7 +1023,7 @@ ns: sdr
 	g:+child							\ mode_id radio-gui
 	2drop									\ --
 ;
-
+(*
 \ Add child band panel
 : add_child_band-panel	\ gui radio_id band_id bounds --
 	add_child_common
@@ -1072,10 +1073,11 @@ ns: sdr
 	g:+child								\ radio-gui
 	drop										\ --
 ;
-
+*)
 \ ========================================
 \ Create num-radios widgets
 \ VFO panels
+(*
 : vfo_radios_1	\ --
 	"radio-1" "VFO-R1" "80,0,330,50" add_child_vfo
 ;
@@ -1090,7 +1092,7 @@ ns: sdr
 	"radio-2" "VFO-R2" "80,0,330,50" add_child_vfo
 	"radio-3" "VFO-R3" "80,0,330,50" add_child_vfo
 ;
-
+*)
 \ Mode panels
 : mode_radios_1	\ --
 	"radio-1" "MODE-R1" "85,50,385,70" add_child_mode-panel
@@ -1106,7 +1108,7 @@ ns: sdr
 	"radio-2" "MODE-R2" "85,50,385,70" add_child_mode-panel
 	"radio-3" "MODE-R3" "85,50,385,70" add_child_mode-panel
 ;
-
+(*
 \ Filter panels
 : filter_radios_1	\ --
 	"radio-1" "FILTER-R1" "85,70,535,90" add_child_filter_panel
@@ -1202,38 +1204,38 @@ ns: sdr
 	"radio-2" "DISP-R2" "50,50,parent.width,parent.height" add_child_disp_panel
 	"radio-3" "DISP-R3" "50,50,parent.width,parent.height" add_child_disp_panel
 ;
-
+*)
 \ ========================================
 \ Called when run mode is entered
 : evt_main_window	\ a -- 
 	
-	drop	\ Dont need data array its empty for this event
+	\ drop	\ Dont need data array its empty for this event
 	
 	\ Get the number of radios 
-	get_num_rx n:1- >r
+	st_rad_num_rx@ n:1- >r
 	
 	\ Do dependent subscribes
-	r@ vfo_subscribe
+	\ r@ vfo_subscribe
 	r@ mode_subscribe
-	r@ band_subscribe
-  r@ filter_subscribe
-  r@ agc_subscribe
-  r@ afgain_subscribe
-  r@ rx_meter_subscribe
-  r@ disp_subscribe
+	\ r@ band_subscribe
+  \ r@ filter_subscribe
+  \ r@ agc_subscribe
+  \ r@ afgain_subscribe
+  \ r@ rx_meter_subscribe
+  \ r@ disp_subscribe
 	
 	\ Set the main window size and position
-	main_window @ model_win_get_size dup 0 n:> if
-		\ Probably ok to use from model
-		g:size
-		model_win_get_pos g:xy
-	else 
-		\ Set the window size and position to default values
-		main_window @ [ ( 610 350 g:size ) , ( 610 600 g:size ) , ( 610 900 g:size ) ] 
-		r@ caseof 
-		200 20 g:xy
-		drop
-	then
+	\ main_window @ model_win_get_size dup 0 n:> if
+	\ 	\ Probably ok to use from model
+	\ 	g:size
+	\ 	model_win_get_pos g:xy
+	\ else 
+	\ 	\ Set the window size and position to default values
+	\ 	main_window @ [ ( 610 350 g:size ) , ( 610 600 g:size ) , ( 610 900 g:size ) ] 
+	\ 	r@ caseof 
+	\ 	200 20 g:xy
+	\ 	drop
+	\ then
 	
 	\ Add the concertina panels
 	main_window @	
@@ -1243,51 +1245,51 @@ ns: sdr
 	\ Now good to show
 	g:show
 	\ Clean up
-	2drop 2drop
+	2drop drop
 	
 	\ At this point stack has one data item (not part of our SED) and rstack has num-radios
 	\ Add num-radios instances of vfo, band, mode, filters, agc
-	[ ' vfo_radios_1 , ' vfo_radios_2 , ' vfo_radios_3 ]
-	r@ caseof
-	[ ' meter_radios_1 , ' meter_radios_2 , ' meter_radios_3 ]
-	r@ caseof 
-	[ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
-	r@ caseof 
+	\ [ ' vfo_radios_1 , ' vfo_radios_2 , ' vfo_radios_3 ]
+	\ r@ caseof
+	\ [ ' meter_radios_1 , ' meter_radios_2 , ' meter_radios_3 ]
+	\ r@ caseof 
+	\ [ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
+	\ r@ caseof 
 	[ ' mode_radios_1 , ' mode_radios_2 , ' mode_radios_3 ]
 	r@ caseof 
-	[ ' filter_radios_1 , ' filter_radios_2 , ' filter_radios_3 ]
-	r@ caseof 
-	[ ' band_radios_1 , ' band_radios_2 , ' band_radios_3 ]
-	r@ caseof 
-	[ ' agc_radios_1 , ' agc_radios_2 , ' agc_radios_3 ]
-	r@ caseof 
-	[ ' afgain_radios_1 , ' afgain_radios_2 , ' afgain_radios_3 ]
-	r@ caseof 
+	\ [ ' filter_radios_1 , ' filter_radios_2 , ' filter_radios_3 ]
+	\ r@ caseof 
+	\ [ ' band_radios_1 , ' band_radios_2 , ' band_radios_3 ]
+	\ r@ caseof 
+	\ [ ' agc_radios_1 , ' agc_radios_2 , ' agc_radios_3 ]
+	\ r@ caseof 
+	\ [ ' afgain_radios_1 , ' afgain_radios_2 , ' afgain_radios_3 ]
+	\ r@ caseof 
 	rdrop
 	
 	\ Adjust visability
-	radio_fcd? if
-		\ We disable a few things for FCD mode
-		main_window @ "button-box" g:child dup "m-tx" g:child false g:enable drop
-		main_window @ "button-box" g:child dup "m-wbs" g:child false g:enable drop
-		main_window @ "common-box" g:child dup "m-HF-PRE" g:child false g:enable drop
-		main_window @ "common-box" g:child dup "m-6M-PRE" g:child false g:enable drop
-		main_window @ "common-box" g:child dup "m-attn" g:child false g:enable drop
-	then
+	\ radio_fcd? if
+	\ 	\ We disable a few things for FCD mode
+	\ 	main_window @ "button-box" g:child dup "m-tx" g:child false g:enable drop
+	\ 	main_window @ "button-box" g:child dup "m-wbs" g:child false g:enable drop
+	\ 	main_window @ "common-box" g:child dup "m-HF-PRE" g:child false g:enable drop
+	\ 	main_window @ "common-box" g:child dup "m-6M-PRE" g:child false g:enable drop
+	\ 	main_window @ "common-box" g:child dup "m-attn" g:child false g:enable drop
+	\ then
 ;
 
 \ ============================================================================
 \ Window subscribe
 : main_window_init	\ --
-	main_window_obj @ g:new
+	main_window_obj @ g:new g:show
 	\ This must be set after new and before showing
 	"Arial 14" g:set-popup-font
 	\ Store main window GUI
-	g_main_window ! ;
+	main_window ! ;
 
 : main_window_subscribe	\ --
 	\ Subscribe to events
-	SYS_RUN_STATE ' evt_main_window pubsub_subscribe ;
+	SYS_RUN_STATE ' evt_main_window fr:pubsub_subscribe ;
 
 \ ============================================================================		
 \ Restore namespace	

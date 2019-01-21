@@ -51,39 +51,42 @@
 "../connector/connector.8th" f:include
 
 \ ========================================
+\ UI common
+"../ui/common/win_common.8th" f:include
+
+\ ========================================
 \ Options
-"../ui/options/option_common.8th"  f:include
-"../ui/options/general_page.8th"  f:include
-"../ui/options/audio_page.8th"  f:include
-"../ui/options/antenna_page.8th"  f:include
-"../ui/options/receiver_page.8th"  f:include
-"../ui/options/transmitter_page.8th"  f:include
-"../ui/options/option_dialog.8th"  f:include
+\ "../ui/options/option_common.8th"  f:include
+\ "../ui/options/general_page.8th"  f:include
+\ "../ui/options/audio_page.8th"  f:include
+\ "../ui/options/antenna_page.8th"  f:include
+\ "../ui/options/receiver_page.8th"  f:include
+\ "../ui/options/transmitter_page.8th"  f:include
+\ "../ui/options/option_dialog.8th"  f:include
 
 \ ========================================
 \ UI components
-"../ui/components/vfo.8th"  f:include
+\ "../ui/components/vfo.8th"  f:include
 "../ui/components/mode.8th"  f:include
-"../ui/components/band.8th"  f:include
-"../ui/components/filters.8th"  f:include
-"../ui/components/agc.8th"  f:include
-"../ui/components/af_gain.8th"  f:include
-"../ui/components/rf_gain.8th"  f:include
-"../ui/components/mic_gain.8th"  f:include
-"../ui/components/meter_defs.8th"  f:include
-"../ui/components/rx_meter.8th"  f:include
-"../ui/components/tx_meter.8th"  f:include
+\ "../ui/components/band.8th"  f:include
+\ "../ui/components/filters.8th"  f:include
+\ "../ui/components/agc.8th"  f:include
+\ "../ui/components/af_gain.8th"  f:include
+\ "../ui/components/rf_gain.8th"  f:include
+\ "../ui/components/mic_gain.8th"  f:include
+\ "../ui/components/meter_defs.8th"  f:include
+\ "../ui/components/rx_meter.8th"  f:include
+\ "../ui/components/tx_meter.8th"  f:include
 
 \ ========================================
 \ UI displays
-"../ui/display/disp_render.8th"  f:include
-"../ui/display/disp_builder.8th"  f:include
-"../ui/display/disp.8th"  f:include
+\ "../ui/display/disp_render.8th"  f:include
+\ "../ui/display/disp_builder.8th"  f:include
+\ "../ui/display/disp.8th"  f:include
 
 \ ========================================
 \ UI
-"../ui/common/win_common.8th" f:include
-"../ui/tx_window/tx_window.8th"  f:include
-"../ui/alex_window/alex_window.8th"  f:include
-"../ui/wbs_window/wbs_window.8th"  f:include
+\ "../ui/tx_window/tx_window.8th"  f:include
+\ "../ui/alex_window/alex_window.8th"  f:include
+\ "../ui/wbs_window/wbs_window.8th"  f:include
 "../ui/main_window/main_window.8th" f:include

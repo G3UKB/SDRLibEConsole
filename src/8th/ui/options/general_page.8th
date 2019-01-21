@@ -111,7 +111,7 @@ ns: sdr
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : g_sample_rate					\ combo index rate --
-	is_run if
+	st_app_run@ if
 		\ Allow the event
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
@@ -123,13 +123,13 @@ ns: sdr
 ;
 
 : g_num_rx							\ combo index num-rx --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_num_rx
 	else 2drop drop then
 ;
 
 : g_block_sz						\ combo index blk-sz --
-	is_run if
+	st_app_run@ if
 		drop swap drop set_blk_sz
 	else 2drop drop then
 ;
