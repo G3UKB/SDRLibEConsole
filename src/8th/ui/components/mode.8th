@@ -95,19 +95,19 @@ ns: sdr
 ;
 
 : set_mode_model_r1	\ mode-id --
-	\ mode_for_name model_r1_set_mode
+	mode_for_name app_model_r1_set_mode
 ;
 
 : set_mode_model_r2	\ mode-id --
-	\ mode_for_name model_r2_set_mode
+	mode_for_name app_model_r2_set_mode
 ;
 
 : set_mode_model_r3	\ mode-id --
-	\ mode_for_name model_r3_set_mode
+	mode_for_name app_model_r3_set_mode
 ;
 
 : set_mode_model_tx	\ mode-id --
-	\ mode_for_name model_tx_set_mode
+	mode_for_name app_model_tx_set_mode
 ;
 
 : mode_set_model	\ mode mode-id --
@@ -134,15 +134,15 @@ ns: sdr
 \ Common GUI event for mode click
 : new_mode	\ g --
 	\ Get the button text
-	g:text? >r					\ g r:mode
+	g:text? >r				\ g r:mode
 	\ Hide the button box
-	g:parent g:hide			\ g r:mode
+	g:parent g:hide		\ g r:mode
 	\ Get the radio/tx id
-	"id" g:m@ >r				\ g r:mode mode-id
-	1 rpick 0 rpick 		\ g mode mode_id r:mode mode-id
-	mode_set_text				\ g  r:mode mode-id
-	r> r> 1 pick  			\ g mode-id mode mode-id
-	mode_set_model			\ g mode-id
+	"id" g:m@ >r			\ g r:mode mode-id
+	1 rpick 0 rpick 	\ g mode mode_id r:mode mode-id
+	mode_set_text			\ g  r:mode mode-id
+	r> r> 1 pick  		\ g mode-id mode mode-id
+	mode_set_model		\ g mode-id
 	\ Set toggle off on master mode button
 	swap g:parent swap  \ parent mode-id
 	{ "MODE-R1": ' toggle_mode_off_r1 , "MODE-R2": ' toggle_mode_off_r2 , "MODE-R3": ' toggle_mode_off_r3 , "MODE-TX": ' toggle_mode_off_tx }

@@ -676,7 +676,9 @@ ns: sdr
 	\ Throws exception on error
 	swap "resp" m:@ nip "NAK" s:= if
 		"Server 'NAK' from [" swap s:+ "]" s:+ log
-	then drop ;
+	else
+		drop
+	then ;
 
 \ ----------------------------------
 \ Frequency update

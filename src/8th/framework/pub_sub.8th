@@ -177,6 +177,7 @@ ns: fr
 : do_ps_sub	 SED: a --
 	\ in: 	[event-name, w]
 	\ out:	none
+	
 	dup >r
 	__ps_exists? if
 		\ Add a new subscriber to the event
@@ -189,7 +190,7 @@ ns: fr
 	else
 		\ Problem
 		"No registration " r> __ps_evnt_name@ s:+ " to subscribe to!" s:+ throw 
-	then ;
+	then rdrop ;
 
 \ ----------------------------------
 \ Dispatch to subscriber on main thread
