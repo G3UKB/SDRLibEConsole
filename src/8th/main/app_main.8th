@@ -39,7 +39,7 @@ ns: sdr
 	and then hands control over to the GUI by exiting app:main whereupon the GUI event
 	loop is entered. 
 *)
-
+	
 \ ----------------------------------
 \ We start all gen-server tasks from the startup task
 : startup_task	SED: --
@@ -76,7 +76,12 @@ ns: sdr
 	\ 2 sleep
 	app_model_init
 	app_model_ui_evnts
-		
+	
+	\ Main UI subscribes to SYS_RUN_STATE only
+	main_window_subscribe
+	\ Gets pushed onto main thread for UI to build
+	SYS_RUN_STATE [] fr:pubsub_publish
+	
 	\ ----------------------------------
 	\ Connector
 	\ Initialise
@@ -148,8 +153,8 @@ ns: sdr
 	param_st_alloc
 	
 	\ ----------------------------------
-	\ Create main window
-	create_main
+	\ Initialise main window
+	main_window_init
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks

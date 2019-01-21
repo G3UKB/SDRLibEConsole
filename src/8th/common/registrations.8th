@@ -130,7 +130,7 @@ ns: sdr
 	false SYS_R3_DISP_UPDT r@ w:exec
 
 	\ End of init
-	false SYS_RUN_STATE r> w:exec
+	true SYS_RUN_STATE r> w:exec
 ;
 
 \ ========================================

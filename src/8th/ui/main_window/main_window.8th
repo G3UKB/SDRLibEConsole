@@ -24,6 +24,8 @@
 
 \ ============================================================================
 
+needs gui/msgdlg
+
 \ Define our SDR namespace
 ns: sdr
 
@@ -483,7 +485,7 @@ ns: sdr
 	"close" : "sdr:w_close",
 	"font" : "Arial 10",
 	"timer-period" : 200,
-	"timer" : "sdr:w_timer"
+	"timer" : "sdr:w_timer",
 	"children" :
 	[
 		{
@@ -522,7 +524,7 @@ ns: sdr
 					"font" : 16,
 					"autotoggle" : true,
 					"bounds" : "95,5,180,40",
-					"enabled" : false
+					"enabled" : false,
 					"click" : "sdr:w_radio_run"
 				},
 				{
@@ -720,15 +722,15 @@ ns: sdr
 \ ===============================================================================
 \ GUI idle timer
 
-: __set_run_state	SDE: T --
+: __set_run_state	SED: T --
 	if
 	\ Disable discovery
-		main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
+		g_main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
 		\ Enable start
 		"radio-state" g:child true g:enable drop
 	else
 		\ Enable discovery
-		main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
+		g_main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
 		\ Disable start
 		"radio-state" g:child false g:enable drop
 	then
@@ -745,13 +747,13 @@ ns: sdr
 
 \ Show options window
 : do_options	SED: g --
-	options @ g:show drop
+	\ options @ g:show drop
 ;
 
 \ ----------------------------------
 \ Show Alex window
 : do_alex	SED: g --
-	alex_window @ g:show drop
+	\ alex_window @ g:show drop
 ;
 
 \ ----------------------------------
@@ -774,7 +776,7 @@ ns: sdr
 	else
 		PRE_OFF 
 	then
-	cco_preamp
+	\ cco_preamp
 ;
 
 \ ----------------------------------
@@ -901,7 +903,6 @@ ns: sdr
 	swap toggle_popup_panel drop
 ;
 
-(*
 : w_r2_mode_select	\ g --
 	"radio-2" "MODE-R2" get_window_target
 	swap toggle_popup_panel drop
@@ -993,9 +994,7 @@ ns: sdr
 : w_r3_audio_select
 	\ 2 "both" c_i_server_change_audio_outputs
 ;
-*)
 
-(*
 \ ============================================================================
 \ Initialise window dependent on number of radios
 : add_child_common			\ radio_id ?-id bounds --
@@ -1279,19 +1278,16 @@ ns: sdr
 
 \ ============================================================================
 \ Window subscribe
+: main_window_init	\ --
+	main_window_obj @ g:new
+	\ This must be set after new and before showing
+	"Arial 14" g:set-popup-font
+	\ Store main window GUI
+	g_main_window ! ;
+
 : main_window_subscribe	\ --
 	\ Subscribe to events
-  SYS_RUN_STATE ' evt_main_window pubsub_subscribe
-;
-*)
-
-: create_main
-	\ Add the concertina panels
-	main_window_obj @ g:new g:show g_main_window !
-	g_main_window @	
-	concertina_panel_radios_1 @
-	g:new g:+child
-;
+	SYS_RUN_STATE ' evt_main_window pubsub_subscribe ;
 
 \ ============================================================================		
 \ Restore namespace	

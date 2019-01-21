@@ -51,6 +51,21 @@
 "../connector/connector.8th" f:include
 
 \ ========================================
+\ UI components
+"../ui/components/vfo.8th"  f:include
+"../ui/components/mode.8th"  f:include
+"../ui/components/band.8th"  f:include
+"../ui/components/filters.8th"  f:include
+"../ui/components/agc.8th"  f:include
+"../ui/components/af_gain.8th"  f:include
+"../ui/components/rf_gain.8th"  f:include
+"../ui/components/mic_gain.8th"  f:include
+"../ui/components/meter_defs.8th"  f:include
+"../ui/components/rx_meter.8th"  f:include
+"../ui/components/tx_meter.8th"  f:include
+
+\ ========================================
 \ UI
+"../ui/components/mode.8th" f:include
 "../ui/common/win_common.8th" f:include
 "../ui/main_window/main_window.8th" f:include

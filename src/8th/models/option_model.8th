@@ -220,7 +220,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Only need num-rx at present as we must give the current number and not the new number as restart required
-	__option_get_db_num_rx st_rad_num_rx!
+	__option_get_db_num_rx st_rad_num_rx! ;
 
 \ ----------------------------------
 \ Restore model else use the default

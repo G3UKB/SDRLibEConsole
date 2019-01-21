@@ -55,7 +55,7 @@ var g_main_window
 	\				1: s - radio panel name
 	\ out:	0: g - the target gui element
 	\ Get the concertina (only one of these
-	main_window @ dup "concertina" g:child \ main concertina
+	g_main_window @ dup "concertina" g:child \ main concertina
 	\ Get the radio panel gui
 	3 pick g:child \ main radio-panel
 	\ Get the button id within the radio panel
