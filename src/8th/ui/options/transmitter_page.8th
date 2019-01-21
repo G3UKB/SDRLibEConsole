@@ -1,0 +1,111 @@
+(*
+	transmitter_page.8th
+ 
+  Preference setting dialog for the DynamicSDR application
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: sdr
+
+\ ============================================================================
+\ Transmitter page of the options dialog
+{
+	"kind" : "box",	
+	"bounds" : ` 0 0 25 100 sdr:do_bounds `,
+	"flex" : ` "col" sdr:flex_do_box `,
+	"children" :
+	[
+		{
+			"kind" : "label",
+			"label" : "Tune level",
+			"flex" : ` 100 22 sdr:flex_do_widget `
+		}
+	]
+} var, transmitter_flex_box_labels
+
+{
+	"kind" : "box",	
+	"bounds" : ` 25 0 100 100 do_bounds `,
+	"flex" : ` "col" flex_do_box `,
+	"children" :
+	[
+		{
+			"kind" : "slider",
+			"name" : "t-tune-level",
+			"style" : "LinearHorizontal",
+			"text-pos" : 2,
+			"min" : 0,
+			"max" : 100,
+			"interval" : 10,
+			"value" : 20,
+			"popup-display" : true,
+			"flex" : ` 200 22 flex_do_widget `,
+			"value-changed" : "sdr:ui_set_tune_level"
+		}
+	]
+} var, transmitter_flex_box_widgets
+
+\ Transmitter general options
+{
+	"label" : "Transmitter",
+	"kind" : "box",	
+	"bounds" : ` 0 8 100 100 do_bounds `,
+	"bg" : "cornsilk2",
+	"flex" : ` "row" flex_do_box `,
+	"children" :
+	[
+		` transmitter_flex_box_labels @ `,
+		` transmitter_flex_box_widgets @ `
+	]
+} var, transmitter_options
+
+\ =====================================================================================================
+\ UI Event Handlers
+\ These simply update the model (options_model_controllr.8th) which takes any necessary action
+: ui_set_tune_level					\ slider value --
+	is_run if
+		\ Allow the event
+		nip									\ slider value -- value
+		\ Update the model
+		set_tune_level			\ value -- 
+	else 
+		2drop								\ slider value --
+	then
+;
+
+\ ================================================================================	
+\ UI Widget Update
+\ These are called from the model listeners via deferred words
+\ Helper words in options_common.8th
+
+\ Update words
+: tx_evt_tune_level																		\	array-obj-ref value -- array-obj-ref
+	0 a:@ tx_tab "t-tune-level" sdr:update_slider	drop 	\ array_obj_ref value tab "r-average-mode" -- array-obj-ref
+	\ "tx_evt_tune_level" log
+;
+
+: opt_tx_subscribe	\ --
+  \ Subscribe to events
+  UI_TUNE_LEVEL ' tx_evt_tune_level pubsub_subscribe 
+;
+
+\ Restore namespace	
+ns: user

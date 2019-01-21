@@ -1,0 +1,39 @@
+(*
+	option_common.8th
+ 
+  References and helper words that must be included first in the UI area
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: sdr
+
+\ ============================================================================
+\ Widget update helper words
+
+\ Option tabs
+: gen_tab 0 ;
+: audio_tab 1 ;
+: ant_tab 2 ;
+: rx_tab 3 ;
+: tx_tab 4 ;
+
+\ Restore namespace	
+ns: user

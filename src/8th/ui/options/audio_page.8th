@@ -1,0 +1,365 @@
+(*
+	audio_page.8th
+ 
+  Preference setting dialog for the DynamicSDR application
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: sdr
+
+\ needs (18.04)
+needs gui/msgdlg
+
+\ ============================================================================
+\ Audio page of the options dialog
+{
+	"kind" : "box",	
+	"bounds" : ` 0 0 25 50 do_bounds `,
+	"flex" : ` "col" flex_do_box `,
+	"children" :
+	[
+		{
+			"kind" : "label",
+			"label" : "Input source",
+			"flex" : ` 100 22 flex_do_widget `
+		},
+		{
+			"kind" : "label",
+			"label" : "Input device",
+			"flex" : ` 100 22 flex_do_widget `
+		},
+		{
+			"kind" : "label",
+			"label" : "Output sink",
+			"flex" : ` 100 22 flex_do_widget `
+		},
+		{
+			"kind" : "label",
+			"label" : "Receiver",
+			"flex" : ` 100 22 flex_do_widget `
+		},
+		{
+			"kind" : "label",
+			"label" : "Output device",
+			"flex" : ` 100 22 flex_do_widget `
+		},
+		{
+			"kind" : "label",
+			"label" : "Channel",
+			"flex" : ` 100 22 flex_do_widget `
+		}
+	]
+} var, audio_flex_box_labels
+
+{
+	"kind" : "box",	
+	"bounds" : ` 25 0 100 50 do_bounds `,
+	"flex" : ` "col" flex_do_box `,
+	"children" :
+	[
+		{
+			"kind" : "combo",
+			"name" : "a-input-source",
+			"editable" : 0,
+			"empty-text" : "Please select",
+			"no_choices" : "Empty",
+			"items" : [],
+			"selected" : 0,
+			"flex" : ` 250 22 flex_do_widget `,
+			"changed" : "sdr:a_input_source"
+		},
+		{
+			"kind" : "combo",
+			"name" : "a-input-device",
+			"editable" : 0,
+			"empty-text" : "Please select",
+			"no_choices" : "Empty",
+			"items" : [],
+			"selected" : 0,
+			"flex" : ` 250 22 flex_do_widget `,
+			"changed" : "sdr:a_input_device"
+		},
+		{
+			"kind" : "combo",
+			"name" : "a-output-sink",
+			"editable" : 0,
+			"empty-text" : "Please select",
+			"no_choices" : "Empty",
+			"items" : [],
+			"selected" : 0,
+			"flex" : ` 250 22 flex_do_widget `,
+			"changed" : "sdr:a_output_sink"
+		},
+		{
+				"kind" : "combo",
+				"name" : "a-receiver",
+				"editable" : 0,
+				"empty-text" : "Please select",
+				"no_choices" : "Empty",
+				"items" : [],
+				"selected" : 0,
+				"flex" : ` 250 22 flex_do_widget `,
+				"changed" : "sdr:a_receiver"
+		},
+		{
+				"kind" : "combo",
+				"name" : "a-output-device",
+				"editable" : 0,
+				"empty-text" : "Please select",
+				"no_choices" : "Empty",
+				"items" : [],
+				"selected" : 0,
+				"flex" : ` 250 22 flex_do_widget `,
+				"changed" : "sdr:a_output_device"
+		},
+		{
+				"kind" : "combo",
+				"name" : "a-channel",
+				"editable" : 0,
+				"empty-text" : "Please select",
+				"no_choices" : "Empty",
+				"items" : [],
+				"selected" : 0,
+				"flex" : ` 250 22 flex_do_widget `,
+				"changed" : "sdr:a_channel"
+		}
+	]
+} var, audio_flex_box_widgets
+
+{
+	"kind" : "box",	
+	"bounds" : ` 0 50 100 100 do_bounds `,
+	"flex" : ` "col" flex_do_box `,
+	"children" :
+	[
+		{
+			"kind" : "btn",
+			"name" : "a-add-btn",
+			"label" : "Add",
+			"flex" : ` 100 22 flex_do_widget `,
+			"click" : "sdr:a_add_route"
+		},
+		{
+				"kind" : "table",
+				"name" : "a-route-table",
+				"header" : [
+											{	"name" : "Sink"
+											},
+											{	"name" : "nRX"
+											},
+											{	"name" : "Device",
+												"width" : 210,
+												"min-width" : 210
+											},
+											{	"name" : "nCh"
+											}
+										],
+				"items" : [],
+				"flex" : ` 390 120 flex_do_widget `,
+				"list-row-count" : "sdr:a_get_row_count",
+				"list-get-item" : "sdr:a_get_item",
+				"list-clicked" : "sdr:a_item_clicked"
+		},
+		{
+				"kind" : "btn",
+				"name" : "a-remove-btn",
+				"label" : "Remove",
+				"flex" : ` 100 22 flex_do_widget `,
+				"click" : "sdr:a_remove_route"
+		}
+	]
+} var, audio_flex_box_dyn
+
+\ Main general options
+{
+	"label" : "Audio routing",
+	"kind" : "box",	
+	"bounds" : ` 0 8 100 100 do_bounds `,
+	"bg" : "cornsilk2",
+	"flex" : ` "row" flex_do_box `,
+	"children" :
+	[
+		` audio_flex_box_labels @ `,
+		` audio_flex_box_widgets @ `,
+		` audio_flex_box_dyn @ `
+	]
+} var, audio_options
+	
+\ =====================================================================================================
+\ UI Event Handlers
+\ These simply update the model (options_model_controllr.8th) which takes any necessary action
+: a_input_source				\ combo index rate --
+	is_run if
+		\ Allow the event
+		drop 								\ combo index rate -- combo index
+		nip									\ combo index -- index
+		\ Update the model
+		set_input_source		\ index -- 
+	else 
+		2drop drop					\ combo index rate --
+	then
+;
+
+: a_input_device				\ combo index num-rx --
+	is_run if
+		drop swap drop set_input_device
+	else 2drop drop then
+;
+
+: a_output_sink					\ combo index blk-sz --
+	is_run if
+		drop swap drop set_output_sink
+	else 2drop drop then
+;
+
+: a_receiver						\ combo index blk-sz --
+	is_run if
+		drop swap drop set_receiver
+	else 2drop drop then
+;
+
+: a_output_device				\ combo index blk-sz --
+	is_run if
+		drop swap drop set_output_device
+	else 2drop drop then
+;
+
+: a_channel							\ combo index blk-sz --
+	is_run if
+		drop swap drop set_channel
+	else 2drop drop then
+;
+
+null var, selected_item
+: a_item_clicked	\ gui col row
+	selected_item !
+;
+
+\ Add route button click
+: a_add_route	\ gui --
+	\ Add an output sink route
+	\ Collect data for the route
+	a:new
+	get_output_sink a:push
+	get_receiver a:push
+	get_output_device a:push
+	get_channel a:push
+	\ Update the model
+	nip push_route if
+		\ Update the table
+		\ Get a reference to the table
+		audio_tab "a-route-table" get_tab_target
+		\ Force update
+		g:update
+	else
+		{
+			"type" : 2,
+			"title" : "Audio Route Conflict",
+			"msg" : "There is a channel conflict on that device",
+			"buttons" : ["OK"]
+		} g:msgdlg
+	then
+;
+
+\ Remove route button click
+: a_remove_route	\ gui --
+	\ Remove the last row clicked
+	selected_item @
+	null? not if
+		remove_route
+	then
+	\ Update the table
+	\ Get a reference to the table
+	audio_tab "a-route-table" get_tab_target
+	\ Force update
+	g:update
+;
+
+\ This fires when the new number of rows as returned in a_get_row_count
+\ is != to the current number of rows.
+\ The exect number of rows must be set here or an exception will be thrown.
+: a_get_item \ gui col row -- 
+	\ Return the item in the col/row requested
+	get_routes swap 
+	a:@ nip
+	swap a:@
+;
+
+\ This fires after the g:update call
+\ It must return the new number of rows for the table
+: a_get_row_count	\	gui --
+	get_route_count
+;
+
+\ Not right but a demo
+: a_paint_list_item	\ gui col row wide high select? --
+	if "red" 5 pick swap .s g:fillall drop
+	else "blue" 5 pick swap .s g:fillall drop then
+;
+
+\ ================================================================================	
+\ UI Widget Update
+\ These are called from the model listeners via deferred words
+\ Helper words in options_common.8th
+
+\ Update words
+: audio_evt_input_source															\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-input-source" update_combo drop	\ array_obj_ref value tab "g-sample-rate" -- array-obj-ref
+	\ "audio_update_input_source" log
+;
+
+: audio_evt_input_device															\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-input-device" update_combo drop	\ array_obj_ref value tab "g-num-rx" -- array-obj-ref
+	\ "audio_evt_input_device" log
+;
+
+: audio_evt_output_sink																\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-output-sink" update_combo drop		\ array_obj_ref value tab "g-blk-sz" -- array-obj-ref
+	\ "audio_evt_output_sink" log
+;
+
+: audio_evt_receiver															\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-receiver" update_combo	drop	\ array_obj_ref value tab "g-duplex" -- array-obj-ref
+	\ "audio_evt_receiver" log
+;
+
+: audio_evt_output_device															\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-output-device" update_combo drop	\ array_obj_ref value tab "g-enabletx" -- array-obj-ref
+	\ "audio_evt_output_device" log
+;
+
+: audio_evt_channel																\	array-obj-ref value -- array-obj-ref
+	0 a:@ audio_tab "a-channel" update_combo drop		\ array_obj_ref value tab "g-enabletx" -- array-obj-ref
+	\ "audio_evt_channel" log
+;
+
+: opt_audio_subscribe	\ --
+  \ Subscribe to events
+  UI_INPUT_SRC ' audio_evt_input_source pubsub_subscribe
+  UI_INPUT_DEV ' audio_evt_input_device pubsub_subscribe
+  UI_OUTPUT_SINK ' audio_evt_output_sink pubsub_subscribe
+  UI_RECEIVER ' audio_evt_receiver pubsub_subscribe
+  UI_OUTPUT_DEV ' audio_evt_output_device pubsub_subscribe
+  UI_CHANNEL ' audio_evt_channel pubsub_subscribe
+;
+
+\ Restore namespace	
+ns: user

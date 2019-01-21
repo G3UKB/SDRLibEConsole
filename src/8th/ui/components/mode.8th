@@ -1,0 +1,234 @@
+(*
+	mode.8th
+ 
+  Mode buttons component for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+needs stack/rstack
+
+\ Use SDR namespace
+ns: sdr
+
+\ Create each child using the table above
+: mode-children \ -- arr
+  a:new
+  (
+    >r																				\ --	r:ix
+    m:new																			\ m
+      "kind" "btn" m:!												\ m[+ "kind"]
+      "label" r> dup >r name_for_mode m:!			\ m[+ "label"] r:ix mode
+      "mode-id" r> mode_for_name m:!					\ m[+ "mode_id"]
+      "font" 14 m:!														\ etc
+      "bg" "lightcyan4" m:!
+      "fg" "blue" m:!
+      "alpha" 0.8 m:!
+      "click" "sdr:new_mode" m:!
+    a:push
+    \ Loop size must agree with the grid space
+  ) 0 6 loop 
+;
+
+\ Be nice to use a new kind but layouts not supported yet 
+{
+	"kind" : "box",
+	"alpha" : 0.5,
+	"bg" : "lightcyan4",
+	"visible" : false,
+	"grid" : {"cols" : 7 , "rows" : 1 },
+	"children" : ` mode-children `
+} var, mode_panel
+
+\ ============================================================================
+\ GUI Events
+\ Set the mode text in the status area
+: set_mode_text_r1			\ parent mode -- parent g.mode
+	1 pick g:parent  			\ parent mode g.radio
+	0 g:child 0 g:child		\ parent mode g.container
+	"r1-mode-lbl" g:child \ parent mode g.mode
+	swap g:text						\ parent g.mode 
+;
+
+: set_mode_text_r2			\ parent mode -- parent g.mode
+	1 pick g:parent  			\ parent mode g.radio
+	0 g:child 0 g:child		\ parent mode g.container
+	"r2-mode-lbl" g:child \ parent mode g.mode
+	swap g:text						\ parent g.mode 
+;
+
+: set_mode_text_r3			\ parent mode -- parent g.mode
+	1 pick g:parent  			\ parent mode g.radio
+	0 g:child 0 g:child		\ parent mode g.container
+	"r3-mode-lbl" g:child \ parent mode g.mode
+	swap g:text						\ parent g.mode 
+;
+
+: set_mode_text_tx			\ parent mode -- parent g.mode
+	1 pick g:parent  			\ parent mode g.radio
+	0 g:child 0 g:child		\ parent mode g.container
+	"tx-mode-lbl" g:child \ parent mode g.mode
+	swap g:text						\ parent g.mode
+;
+
+\ Set the text after a mode selection
+: mode_set_text	\ parent mode mode-id --
+	{"MODE-R1": ' set_mode_text_r1 , "MODE-R2": ' set_mode_text_r2 , "MODE-R3": ' set_mode_text_r3 , "MODE-TX": ' set_mode_text_tx }
+	case
+	drop
+;
+
+: set_mode_model_r1	\ mode-id --
+	mode_for_name model_r1_set_mode
+;
+
+: set_mode_model_r2	\ mode-id --
+	mode_for_name model_r2_set_mode
+;
+
+: set_mode_model_r3	\ mode-id --
+	mode_for_name model_r3_set_mode
+;
+
+: set_mode_model_tx	\ mode-id --
+	mode_for_name model_tx_set_mode
+;
+
+: mode_set_model	\ mode mode-id --
+	{"MODE-R1": ' set_mode_model_r1 , "MODE-R2": ' set_mode_model_r2 , "MODE-R3": ' set_mode_model_r3 , "MODE-TX": ' set_mode_model_tx }
+	case
+;
+
+: toggle_mode_off_r1	\ parent --
+	"r1-mode-btn" g:child false g:on
+;
+
+: toggle_mode_off_r2	\ parent --
+	"r2-mode-btn" g:child false g:on
+;
+
+: toggle_mode_off_r3	\ parent --
+	"r3-mode-btn" g:child false g:on
+;
+
+: toggle_mode_off_tx	\ parent --
+	"tx-mode-btn" g:child false g:on
+;
+
+\ Common GUI event for mode click
+: new_mode	\ g --
+	\ Get the button text
+	g:text? >r					\ g r:mode
+	\ Hide the button box
+	g:parent g:hide			\ g r:mode
+	\ Get the radio/tx id
+	"id" g:m@ >r				\ g r:mode mode-id
+	1 rpick 0 rpick 		\ g mode mode_id r:mode mode-id
+	mode_set_text				\ g  r:mode mode-id
+	r> r> 1 pick  			\ g mode-id mode mode-id
+	mode_set_model			\ g mode-id
+	\ Set toggle off on master mode button
+	swap g:parent swap  \ parent mode-id
+	{ "MODE-R1": ' toggle_mode_off_r1 , "MODE-R2": ' toggle_mode_off_r2 , "MODE-R3": ' toggle_mode_off_r3 , "MODE-TX": ' toggle_mode_off_tx }
+	case
+;
+
+\ ============================================================================
+\ Subscriber Events
+: mode_evt_r1_mode	\ a --
+	\ "mode_evt_r1_mode" log
+	"radio-1" "MODE-R1" get_window_target swap
+	"mode" m:@ nip name_for_mode
+	"MODE-R1" mode_set_text drop
+;
+
+: mode_evt_r2_mode	\ a --
+	\ "mode_evt_r2_modee" log
+	"radio-2" "MODE-R2" get_window_target swap
+	"mode" m:@ nip name_for_mode
+	"MODE-R2" mode_set_text drop
+;
+
+: mode_evt_r3_mode	\ a --
+	\ "mode_evt_r3_mode" log
+	"radio-3" "MODE-R3" get_window_target swap
+	"mode" m:@ nip name_for_mode
+	"MODE-R3" mode_set_text drop
+;
+
+: mode_evt_tx_mode	\ a --
+	\ Switch on the duplex state
+	"state" m:@ "duplex" m:@ nip if
+		\ Duplex - TX mode independent
+		"duplex" m:@
+	else
+		\ Simplex - TX mode follows radio 1
+		"simplex" m:@ 
+	then
+	\ Update GUI and set the mode
+	nip nip dup
+	tx_window @ "tx-box" g:child "MODE-TX" g:child swap
+	"mode" m:@ nip name_for_mode
+	"MODE-TX" mode_set_text drop
+;
+
+\ ============================================================================
+\ Create a mode button panel
+: mode_panel_new						\ id bounds -- new-mode-gui
+	mode_panel @ G:clone nip	\ id bounds mode-clone
+	"id" 3 pick m:!
+	"name" 3 pick m:! 
+	"bounds" 2 pick m:! 
+	nip nip g:new
+;
+
+\ Initialise a mode panel instance
+: mode_panel_init	\  gui -- gui
+;
+
+\ Subscribe to available radios
+: mode_subscribe_radios_1
+	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
+	UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+;
+
+: mode_subscribe_radios_2
+	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
+	UI_R2_MODE ' mode_evt_r2_modee pubsub_subscribe
+	UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+;
+
+: mode_subscribe_radios_3
+	UI_R1_MODE ' mode_evt_r1_mode pubsub_subscribe
+	UI_R2_MODE ' mode_evt_r2_mode pubsub_subscribe
+  UI_R3_MODE ' mode_evt_r3_mode pubsub_subscribe
+  UI_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+	SYS_TX_MODE ' mode_evt_tx_mode pubsub_subscribe
+;
+
+: mode_subscribe	\  --
+  \ Subscribe to events
+	[ ' mode_subscribe_radios_1 , ' mode_subscribe_radios_2 , ' mode_subscribe_radios_3 ]
+	swap caseof
+;
+
+\ Restore namespace	
+ns: user	

@@ -1,0 +1,303 @@
+(*
+	disp_builder.8th
+ 
+  Display array builder for the DynamicSDR application
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ===============================================================================
+\ Array builder words
+\ Return task var
+: get_disp_id	\ -- disp-id
+	"this-disp-id" t:@
+;
+
+\ Add one vertical label
+: add_v_label											\ y_start idx -- y_start 
+	inter_db a:new swap 						\ y_start [] "idx"
+	a:push													\ y_start ["idx"]
+	5 a:push												\ y_start ["idx",x]
+	1 pick y_v_label_adj n:+ a:push	\ y_start ["idx",x,y]
+	get_disp_id v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
+	drop														\ y_start 
+;
+
+\ Add one horizontal line
+: add_h_line		  					\ wide high fixed_data idx -- wide high fixed_data 
+	swap >r	>r r@							\ wide high idx r:fixed_data idx
+	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
+	a:new l_margin a:push			\ wide high wide high idx [x_start]
+	-rot											\ wide high wide [0] high idx 
+	\ (((high - 2*margin)/divs)*idx) + margin
+	swap t_margin b_margin n:+ n:- divs n:/ n:* t_margin n:+ \ wide high wide [x-start] y-start
+	r> add_v_label						\ wide high wide [x-start] y-start
+	a:push 										\ wide high wide [x-start, y-start] 
+	swap r_margin n:- a:push	\ wide high [x-start, y-start, x-stop] 
+	1 a:@ a:push							\ wide high [x-start, y-start, x-stop, y-stop] 
+	r> swap a:push 						\ wide high fixed_data
+;
+
+\ Add one horizontal label
+: add_h_label											\ high x_start idx -- high x_start
+	get_disp_id freq_str a:new swap \ high x_start [] "idx"
+	a:push													\ high x_start ["idx"]
+	1 pick x_h_label_adj n:+ a:push	\ high x_start ["idx",x]
+	2 pick y_h_label_adj n:+ a:push	\ high x_start ["idx",x,y]
+	get_disp_id h_label_data_ref swap a:push  	\ high x_start h_label_data
+	drop														\ high x_start
+;
+
+\ Add one vertical line
+: add_v_line								\ wide high fixed_data idx -- wide high fixed_data
+	swap >r	>r r@							\ wide high idx r:fixed_data idx
+	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
+	\ (((wide - 2*margin)/divs)*idx) + margin
+	2 pick l_margin r_margin n:+ n:- divs n:/ n:* l_margin n:+  \ wide high wide high x_start
+	r>	add_h_label						\ wide high wide high x_start
+	a:new swap a:push					\ wide high wide high [x_start]
+	t_margin a:push						\ wide high wide high [x-start, y-start]
+	0 a:@ a:push							\ wide high wide high [x-start, y-start, x-stop]
+	swap b_margin n:- a:push	\ wide high wide [x-start, y-start, x-stop, y-stop]
+	r> swap a:push nip 				\ wide high fixed_data
+;
+
+\ Convert a dBm value to a y-coord
+: db_to_y									\ dBm height -- y-coord
+	\ rel-dBm = abs(low-dBm) - abs(dBm)
+	swap n:int n:abs 				\ height abs(dBm)
+	low_db n:int n:abs 			\ height abs(dBm) abs(low-dBm)
+	swap n:-								\ height rel-dBm
+	swap b_margin n:- swap	\ height-margin rel-dBm
+	\ y-coord = height - (rel-dBm * dBm_pp)
+	get_disp_id dBm_pp n:* n:- n:int		\ y-coord
+;
+
+\ Color check words
+: M160-M135  \ dbM	-- dbM f
+	dup -160 -135 n:between
+;
+
+: M135-M130  \ dbM	-- dbM f
+	dup -135 -130  n:between
+;
+
+: M130-M125  \ dbM	-- dbM f
+	dup -130 -125  n:between
+;
+
+: M125-M120  \ dbM	-- dbM f
+	dup -125 -120  n:between
+;
+
+: M120-M115  \ dbM	-- dbM f
+	dup -120 -115  n:between
+;
+
+: M115-M110  \ dbM	-- dbM f
+	dup -115 -110  n:between
+;
+
+: M110-M100  \ dbM	-- dbM f
+	dup -110 -100  n:between
+;
+
+: M100+  \ dbM	-- dbM f
+	dup -100 0  n:between
+;
+
+: M200-M+40  \ dbM	-- dbM f
+	dup -200 40  n:between
+;
+
+: color-1 [ 0.0,0.0,0.2,1.0 ] ;
+: color-2 [ 0.1,0.0,0.3,1.0 ] ;
+: color-3 [ 0.2,0.0,0.4,1.0 ] ;
+: color-4 [ 0.3,0.0,0.5,1.0 ] ;
+: color-5 [ 0.5,0.0,0.4,1.0 ] ;
+: color-6 [ 0.7,0.0,0.2,1.0 ] ;
+: color-7 [ 0.9,0.0,0.1,1.0 ] ;
+: color-8 [ 1.0,0.0,0.0,1.0 ] ;
+
+[
+	' M160-M135 , ' color-1 ,
+	' M135-M130 , ' color-2 , 
+	' M130-M125 , ' color-3 ,
+	' M125-M120 , ' color-4 ,
+	' M120-M115 , ' color-5 , 
+	' M115-M110 , ' color-6 ,
+	' M110-M100 , ' color-7 ,
+	' M100+ 		, ' color-8 ,
+	' M200-M+40 , ' color-1 ,
+	' color-1
+] var, clookup
+
+: db_to_colour						\ dBm -- colour
+	\ Must lock read-only structures!
+	clookup lock @
+	a:when
+	clookup unlock drop	
+;
+
+\ Add one pan point
+\ Note that the data array is ordered high freq to low freq so indexing is reversed
+: add_pan_point								\ disp-data height width x-coord -- disp-data height width 
+	\ We want the corresponding dBm value for the x offset
+	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
+	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
+	3 pick swap n:- n:1-				\ disp-data height width  x-coord disp-data width-x-coord-l_margin
+	a:@ nip											\ disp-data height width  x-coord dBm 
+	3 pick											\ disp-data height width  x-coord dBm height
+	db_to_y											\ disp-data height width  x-coord y-coord
+	a:new 											\ disp-data height width  x-coord y-coord [] 
+	rot													\ disp-data height width  y-coord [] x-coord  
+	a:push											\ disp-data height width  y-coord [x-coord]
+	swap a:push									\ disp-data height width  [x-coord, y-coord]
+	get_disp_id pan_data_ref 		\ disp-data height width  [x-coord, y-coord] pan-data
+	swap 												\ disp-data height width  spec-data [x-coord, y-coord]
+	a:push drop  								\ disp-data height width
+;
+
+\ Add one waterfall point
+\ Note that the data array is ordered high freq to low freq so indexing is reversed
+: add_wf_point								\ disp-data height width x-coord -- disp-data height width
+	\ We want the corresponding dBm value for the x offset
+	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
+	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
+	3 pick swap n:- n:1-				\ disp-data height width  x-coord disp-data width-x-coord-l_margin
+	a:@ nip											\ disp-data height width  x-coord dBm 
+	db_to_colour nip						\ disp-data height width  x-coord colour
+	a:new 											\ disp-data height width  x-coord colour [] 
+	rot													\ disp-data height width  colour [] x-coord  
+	a:push											\ disp-data height width  colour [x-coord]
+	swap a:push									\ disp-data height width  [x-coord, colour]
+	get_disp_id wf_data_ref			\ disp-data height width  [x-coord, colour] wf-data
+	swap 												\ disp-data height width  spec-data [x-coord, colour]
+	a:push drop  								\ disp-data height width
+;
+
+\ ========================================
+\ Build grid array
+: make_grid_array	\ --
+	\ Get current widow size
+	get_disp_id get_disp_win_metrics a:open
+	\ Make grid and label arrays
+	get_disp_id v_label_data_ref a:clear drop
+	get_disp_id h_label_data_ref a:clear drop
+	get_disp_id fixed_data_ref a:clear
+	' add_h_line 0 divs loop
+	' add_v_line 0 divs loop
+	3drop
+;
+
+\ ========================================
+\ Use to calibrate the display db range
+: add_float
+	[-119.0, -109.0, -131.0, -50.0, -101.0, -141.0, -135.0, -111.0] a:shuffle
+	0 a:@ nip a:push
+;
+: make_float_array
+	a:new ' add_float 1024 times
+;
+
+\ ========================================
+\ Build pan array
+: make_pan_array															\ --
+	\ Get current widow size
+	get_disp_id get_disp_win_metrics a:open			\ width height
+	\ Clear the data array
+	get_disp_id pan_data_ref a:clear drop				\ width height
+	\ Get display data for the instance
+	"this-disp-id" t:@ disp_id_to_inst					\ width height disp-id
+	c_i_get_disp_data														\ width height disp-data(float array)
+	\ ... or calibrate
+	\ make_float_array
+	a:len 0 n:> if
+		\ We seem to have a good response
+		\ DSP data is a float array of db values which must be converted to y coordinates
+		\ The number of points is the width of the display area and is passed to the display proc
+		\ The array is therefore 1 y value per display area pixel in the x plane
+		\ We repeat on the x plane from the left-margin to the width - right-margin
+		-rot swap dup	l_margin n:- r_margin n:- swap	\ disp-data height width width-l_margin-r_margin
+		' add_pan_point swap													\ disp-data height width add_spec_points width
+		l_margin swap																	\ disp-data height width add_spec_points left-margin width
+		r_margin n:- n:1-															\ disp-data height width add_spec_points x-start x-end
+		loop 3drop
+	else
+		3drop
+	then
+;
+
+\ ========================================
+\ Build wf array
+: make_wf_array	\ --
+\ Get current widow size
+	get_disp_id get_disp_win_metrics a:open					\ width height
+	\ Clear the data array
+	get_disp_id wf_data_ref a:clear drop						\ width height
+	\ Get display data for the instance
+	"this-disp-id" t:@ disp_id_to_inst c_i_get_disp_data 	\ width height disp-data(float array)
+	\ ... or calibrate
+	\ make_float_array
+	a:len 0 n:> if
+		\ We seem to have a good response
+		\ DSP data is a float array of db values which must be converted to a colour
+		\ The number of points is the width of the display area and is passed to the display proc
+		\ The array is therefore 1 colour value per display area pixel in the x plane
+		\ We repeat on the x plane from the left-margin to the width - right-margin
+		-rot swap dup	l_margin n:- r_margin n:- swap	\ disp-data height width width-l_margin-r_margin
+		' add_wf_point swap														\ disp-data height width add_spec_points width
+		l_margin swap																	\ disp-data height width add_spec_points left-margin width
+		r_margin n:- n:1-															\ disp-data height width add_spec_points x-start x-end
+		loop 3drop
+	else
+		3drop
+	then
+;
+
+\ Make and render the display on a separate thread
+\ Runs every 100ms
+: disp_task			\ disp-id --
+	\ This task is an instance of the display
+	\ Name this thread
+	dup t:name!
+	t:curtask . cr
+	\ Store the disp-id in a task var
+	"this-disp-id" t:!
+	\ Do until terminated
+	repeat
+		\ Check for terminate
+		\ Note - do not use break as this terminates on the next iteration
+		\ which allows the lock to be taken and possibly not released.
+		disp_term @ if ;; then
+		"this-disp-id" t:@ wait_disp_s4
+		make_grid_array
+		make_pan_array
+		make_wf_array
+		"this-disp-id" t:@ rel_disp_s4
+		0.1 sleep
+	again
+	"Display task exiting..." log
+;
+
+\ Restore namespace	
+ns: user	

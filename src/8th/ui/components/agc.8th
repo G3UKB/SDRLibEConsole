@@ -1,0 +1,195 @@
+(*
+	agc.8th
+ 
+  AGC buttons component for the DynamicSDR application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+needs stack/rstack
+
+\ Use SDR namespace
+ns: sdr
+
+\ Create each child using the table above
+: agc-children \ -- arr
+  a:new
+  (
+    >r																				\ --	r:ix
+    m:new																			\ m
+      "kind" "btn" m:!												\ m[+ "kind"]
+      "label" r> dup >r name_for_agc m:!			\ m[+ "label"] r:ix agc
+      "agc-id" r> agc_for_name m:!						\ m[+ "agc_id"]
+      "font" 14 m:!														\ etc
+      "bg" "lightcyan4" m:!
+      "fg" "blue" m:!
+      "alpha" 0.8 m:!
+      "click" "sdr:new_agc" m:!
+    a:push
+    \ Loop size must agree with the grid space
+  ) 0 4 loop 
+;
+
+\ Be nice to use a new kind but layouts not supported yet 
+{
+	"kind" : "box",
+	"alpha" : 0.5,
+	"bg" : "lightcyan4",
+	"visible" : false,
+	"grid" : {"cols" : 5 , "rows" : 1 },
+	"children" : ` agc-children `
+} var, agc_panel
+
+\ ============================================================================
+\ GUI Events
+\ Set the agc text in the status area
+: set_agc_text_r1				\ parent agc -- parent g.agc
+	1 pick g:parent  			\ parent agc g.radio
+	0 g:child 0 g:child		\ parent agc g.container
+	"r1-agc-lbl" g:child 	\ parent agc g.agc
+	swap g:text						\ parent g.agc
+;
+
+: set_agc_text_r2				\ parent agc -- parent g.agc
+	1 pick g:parent  			\ parent agc g.radio
+	0 g:child 0 g:child		\ parent agc g.container
+	"r2-agc-lbl" g:child 	\ parent agc g.agc
+	swap g:text						\ parent g.agc
+;
+
+: set_agc_text_r3				\ parent agc -- parent g.agc
+	1 pick g:parent  			\ parent agc g.radio
+	0 g:child 0 g:child		\ parent agc g.container
+	"r3-agc-lbl" g:child 	\ parent agc g.agc
+	swap g:text						\ parent g.agc
+;
+
+\ Set the text after an agc selection
+: agc_set_text	\ parent agc id --
+	{"AGC-R1": ' set_agc_text_r1 , "AGC-R2": ' set_agc_text_r2 , "AGC-R3": ' set_agc_text_r3 }
+	case
+	drop
+;
+
+: set_agc_model_r1
+	agc_for_name model_r1_set_agc
+;
+
+: set_agc_model_r2
+	agc_for_name model_r2_set_agc
+;
+
+: set_agc_model_r3
+	agc_for_name model_r3_set_agc
+;
+
+: agc_set_model	\ parent agc id --
+	{"AGC-R1": ' set_agc_model_r1 , "AGC-R2": ' set_agc_model_r2 , "AGC-R3": ' set_agc_model_r3 }
+	case
+;
+
+: toggle_agc_off_r1	\ parent --
+	"r1-agc-btn" g:child false g:on
+;
+
+: toggle_agc_off_r2	\ parent --
+	"r2-agc-btn" g:child false g:on
+;
+
+: toggle_agc_off_r3	\ parent --
+	"r3-agc-btn" g:child false g:on
+;
+
+\ Common GUI event for agc click
+: new_agc	\ g --
+	\ Get the button text
+	g:text? >r
+	\ Hide the button box
+	g:parent g:hide
+	\ Get the radio id
+	"id" g:m@ >r
+	1 rpick 0 rpick agc_set_text
+	r> r> 1 pick agc_set_model
+	\ Set toggle off on master agc button
+	swap g:parent swap
+	{ "AGC-R1": ' toggle_agc_off_r1 , "AGC-R2": ' toggle_agc_off_r2 , "AGC-R3": ' toggle_agc_off_r3 }
+	case
+;
+
+\ ============================================================================
+\ Subscriber Events
+: agc_evt_r1_agc	\ a --
+	\ "agc_evt_r1_agc" log
+	"radio-1" "AGC-R1" get_window_target swap
+	"agc" m:@ nip name_for_agc
+	"AGC-R1" agc_set_text drop
+;
+
+: agc_evt_r2_agc	\ a --
+	\ "mode_evt_r2_modee" log
+	"radio-2" "AGC-R2" get_window_target swap
+	"agc" m:@ nip name_for_agc
+	"AGC-R2" agc_set_text drop
+;
+
+: agc_evt_r3_agc	\ a --
+	\ "agc_evt_r3_agc" log
+	"radio-3" "AGC-R3" get_window_target swap
+	"agc" m:@ nip name_for_agc
+	"AGC-R3" agc_set_text drop
+;
+
+\ ============================================================================
+\ Create a agc button panel
+: agc_panel_new						\ id bounds -- new-agc-gui
+	agc_panel @ G:clone nip	\ id bounds agc-clone
+	"id" 3 pick m:!
+	"name" 3 pick m:! 
+	"bounds" 2 pick m:! 
+	nip nip g:new
+;
+
+\ Initialise a agc panel instance
+: agc_panel_init	\  gui -- gui
+;
+
+\ Subscribe to available radios
+: agc_subscribe_radios_1
+	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
+;
+
+: agc_subscribe_radios_2
+	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
+	UI_R2_AGC ' agc_evt_r2_agc pubsub_subscribe
+;
+
+: agc_subscribe_radios_3
+	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
+	UI_R2_AGC ' agc_evt_r2_agc pubsub_subscribe
+  UI_R3_AGC ' agc_evt_r3_agc pubsub_subscribe
+;
+
+: agc_subscribe	\  --
+  \ Subscribe to events
+	[ ' agc_subscribe_radios_1 , ' agc_subscribe_radios_2 , ' agc_subscribe_radios_3 ]
+	swap caseof
+;
+
+\ Restore namespace	
+ns: user	

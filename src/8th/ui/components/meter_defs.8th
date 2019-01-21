@@ -1,0 +1,127 @@
+(*
+	meter_defs.8th
+ 
+  TX Meter components common definitions
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ===============================================================================
+\ General constants
+\ Baselines
+: M_BASE 45 ;	\ Static base
+: M_DYN_BASE M_BASE 25 n:- ;	\ Dynamic base (level indicator)
+
+\ Tick type
+: M_TICK1 0 ;	\ Short tick
+: M_TICK2 1 ;	\ Long tick
+
+\ Y-coord
+: M_TOP1 M_BASE 7 n:- ;	\ For top M_TICK1
+: M_TOP2 M_BASE 9 n:- ;	\ For top M_TICK2
+: M_TEXT M_BASE 16 n:- ;	\ For text
+
+\ Horizontal separation(s) between ticks
+: M_DIV1 6 ;
+: M_DIV2 10 ;
+: M_DIV3 19 ;
+
+\ Inset from left margin of container
+: M_INSET  30 ;	\ Graphics
+: M_TINSET 30 ;	\ Text
+
+\ ===============================================================================
+\ ===============================================================================
+\ RX specific constants and calculations
+\ Calculations for next tick x-coord
+\ For DIV-1
+: M_DIV1_NEXT \ n --
+	M_DIV1 n:* ;
+\ For DIV-2
+: M_DIV2_NEXT \ n --
+	M_DIV1 9 n:* swap M_DIV2 n:* n:+ ;
+\ End of line for S 0-9 
+: M_DIV 
+	M_INSET 9 M_DIV1_NEXT n:+ ;
+\ End of line for S meter
+: M_END 
+	M_INSET 6 M_DIV2_NEXT  n:+ ;
+
+\ X-span avaiable for the level indicator
+: M_X_SPAN 
+	M_END M_INSET n:- ;
+	
+\ DBm calculations
+: M_S_0 -127 ; \ DBm for S0
+: M_S_+60 -13 ; \ DBm for S9+60
+: M_DBM_SPAN M_S_0 n:abs M_S_+60 n:abs n:- ;
+: X_PER_DBM M_X_SPAN M_DBM_SPAN n:/ ;
+	
+\ ========================================
+\ RX meter structure definitions
+\ Scale definition
+: meter_sig_scale
+	[
+		[ ` M_TICK1 ` , ` 0 M_DIV1_NEXT ` ,"white:70",""],[ ` M_TICK2 ` , ` 1 M_DIV1_NEXT ` ,"white:70","1"],
+		[ ` M_TICK1 ` , ` 2 M_DIV1_NEXT ` ,"white:70",""],[ ` M_TICK2 ` , ` 3 M_DIV1_NEXT ` ,"white:70","3"],
+		[ ` M_TICK1 ` , ` 4 M_DIV1_NEXT ` ,"white:70",""],[ ` M_TICK2 ` , ` 5 M_DIV1_NEXT ` ,"white:70","5"],
+		[ ` M_TICK1 ` , ` 6 M_DIV1_NEXT ` ,"white:70",""],[ ` M_TICK2 ` , ` 7 M_DIV1_NEXT ` ,"white:70","7"],
+		[ ` M_TICK1 ` , ` 8 M_DIV1_NEXT ` ,"white:70",""],[ ` M_TICK2 ` , ` 9 M_DIV1_NEXT ` ,"white:70","9"],
+		[ ` M_TICK1 ` , ` 1 M_DIV2_NEXT ` ,"red:70",""],[ ` M_TICK2 ` , ` 2 M_DIV2_NEXT ` ,"red:70","+20"],
+		[ ` M_TICK1 ` , ` 3 M_DIV2_NEXT ` ,"red:70",""],[ ` M_TICK2 ` , ` 4 M_DIV2_NEXT ` ,"red:70","+40"],
+		[ ` M_TICK1 ` , ` 5 M_DIV2_NEXT ` ,"red:70",""],[ ` M_TICK2 ` , ` 6 M_DIV2_NEXT ` ,"red:70","+60"]
+	]
+;
+
+\ ===============================================================================
+\ ===============================================================================
+\ TX specific constants and calculations
+\ Calculations for next tick x-coord
+\ For DIV-1
+: M_DIV3_NEXT \ n --
+	M_DIV3 n:* ;
+
+\ End of line for pwr 0-80 
+: M_DIV_PWR 
+	M_INSET 4 M_DIV3_NEXT n:+ ;
+\ End of line for pwr meter
+: M_END_PWR
+	M_INSET 6 M_DIV3_NEXT  n:+ ;
+
+\ Power calculations
+: M_X_PWR_SPAN ;
+: X_PER_WATT M_X_PWR_SPAN 20 ;	
+
+\ TX meter structure definitions
+\ Scale definition
+: meter_pwr_scale
+	[
+		\		
+		[ ` M_TICK1 ` , ` 0 M_DIV3_NEXT ` ,"white:70","0"],
+		[ ` M_TICK1 ` , ` 1 M_DIV3_NEXT ` ,"white:70","20"],
+		[ ` M_TICK1 ` , ` 2 M_DIV3_NEXT ` ,"white:70","40"],
+		[ ` M_TICK1 ` , ` 3 M_DIV3_NEXT ` ,"white:70","60"],
+		[ ` M_TICK1 ` , ` 4 M_DIV3_NEXT ` ,"white:70","80"],
+		[ ` M_TICK1 ` , ` 5 M_DIV3_NEXT ` ,"red:70","100"],
+		[ ` M_TICK1 ` , ` 6 M_DIV3_NEXT ` ,"red:70","120"]
+	]
+;

@@ -1,0 +1,380 @@
+(*
+	tx_window.8th
+ 
+  Transmission window for the DynamicSDR application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ============================================================================
+
+\ Define our SDR namespace
+ns: sdr
+
+\ ========================================
+\ TX window
+{
+	"kind" : "win",
+	"title" : "Dynamic SDR - TX",
+	"visible" : false,
+	"bg" : "gray10",
+	"resize-corner" : 20,
+	"wide" : 360,
+	"high" : 180,
+	"center" : true,
+	"ontop" : false,
+	"buttons" : 0,
+	"font" : "Arial 10",
+	"children" :
+	[
+		{
+			"kind" : "box",
+			"name" : "button-box",
+			"bounds" : "0,0,parent.width,75",
+			"bg" : "gray10",
+			"children" :
+			[
+				{
+					"kind" : "btn",
+					"name" : "m-MOX",
+					"label" : "MOX",
+					"bg" : "green3",
+					"fg" : "white",
+					"font" : 16,
+					"bounds" : "5,5,90,40",
+					"click" : "sdr:evt_tx_mox"
+				},
+				{
+					"kind" : "toggle",
+					"label" : "Duplex",
+					"fg" : "white",
+					"name" : "tx-duplex",
+					"bounds" : "120,5,190,40",
+					"click" : "sdr:tx_duplex"
+				}
+			]
+		},
+		{
+			"kind" : "box",
+			"name" : "tx-box",
+			"bounds" : "0,45,parent.width, parent.height",
+			"bg" : "gray10",
+			"children" : 
+			[
+				{
+					"kind" : "box",
+					"name" : "tx-lbl-box",
+					"bg" : "gray10",
+					"fg" : "gold3",
+					"bounds" : "0,0,80,50",
+					"children" : [
+						{
+							"kind" : "box",
+							"name" : "tx-lbl-box1",
+							"bg" : "gray17",
+							"fg" : "gold3",
+							"grid" : {"cols" : 2 , "rows" : 2 , "defmargin" : 3},
+							"children" : [
+								{
+									"kind" : "label",
+									"name" : "tx-mode-lbl",
+									"label" : "123",
+									"fg" : "green3",
+									"bg" : "gray17",
+									"font" : 12
+								},
+								{
+									"kind" : "label",
+									"name" : "tx-filt-lbl",
+									"label" : "",
+									"fg" : "green3",
+									"bg" : "gray17",
+									"font" : 12
+								},
+								{
+									"kind" : "label",
+									"name" : "tx-rfgain-lbl",
+									"label" : "",
+									"fg" : "green3",
+									"bg" : "gray17",
+									"font" : 12
+								},
+								{
+									"kind" : "label",
+									"name" : "tx-micgain-lbl",
+									"label" : "",
+									"fg" : "green3",
+									"bg" : "gray17",
+									"font" : 12
+								}
+							]
+						}
+					]
+				},
+				{
+					"kind" : "btn",
+					"name" : "tx-mode-btn",
+					"autotoggle" : true,
+					"label" : "Mode",
+					"bg" : "gray10",
+					"fg" : "gold3",
+					"font" : 13,
+					"bounds" : "0,50,50,70",
+					"click" : "sdr:tx_mode_select"
+				},
+				{
+					"kind" : "btn",
+					"name" : "tx-filter-btn",
+					"autotoggle" : true,
+					"label" : "Filter",
+					"bg" : "gray10",
+					"fg" : "gold3",
+					"font" : 13,
+					"bounds" : "0,70,50,90",
+					"click" : "sdr:tx_filter_select"
+				},
+				{
+					"kind" : "btn",
+					"name" : "tx_rfgain-btn",
+					"autotoggle" : true,
+					"label" : "RF Gn",
+					"bg" : "gray10",
+					"fg" : "gold3",
+					"font" : 13,
+					"bounds" : "0,90,50,110",
+					"click" : "sdr:tx_rf_gain"
+				},
+				{
+					"kind" : "btn",
+					"name" : "tx_micgain-btn",
+					"autotoggle" : true,
+					"label" : "Mic Gn",
+					"bg" : "gray10",
+					"fg" : "gold3",
+					"font" : 13,
+					"bounds" : "0,110,50,130",
+					"click" : "sdr:tx_mic_gain"
+				}
+			]
+		}
+	]
+} var, tx_window_obj
+
+{
+	"kind" : "label",
+	"name" : "overlay",
+	"bg" : "gray:5",
+	\ "bounds" : "0,45,parent.width, parent.height"
+	"bounds" : "80,45,parent.width, 95"
+} var, overlay
+
+\ ===============================================================================
+\ ============================================================================
+\ Window management
+
+\ Adjust buttons
+: tx_set_enabled	\ f --
+	if
+		\ Duplex mode
+		tx_window @ dup "overlay" g:child g:-child
+		"tx-box" g:child dup
+		"tx-mode-btn" g:child true g:enable drop
+		"tx-filter-btn" g:child true g:enable 2drop
+	else
+		\ Simplex mode
+		tx_window @  overlay @ g:new g:+child
+		"tx-box" g:child dup
+		"tx-mode-btn" g:child false g:enable drop
+		"tx-filter-btn" g:child false g:enable 2drop
+	then
+;
+
+\ ========================================
+\ Control
+
+\ Manual TX on/off
+: evt_tx_mox	\ g --
+	"tx" g:m@ if
+		\ Already TX so go to RX
+		"tx" false g:m!
+		"MOX" g:text
+		"green3" g:bg
+		"white" g:fg
+		state_model locked@ "metis" m:@ "tx" false m:!
+		drop SYS_MOX false pubsub_publish
+		\ Set HPSDR to RX
+		false cco_mox
+	else
+		\ Go to TX
+		"tx" true g:m!
+		"MOX" g:text
+		"red2" g:bg
+		"white" g:fg
+		state_model locked@ "metis" m:@ "tx" true m:!
+		drop SYS_MOX true pubsub_publish
+		\ Set HPSDR to TX
+		true cco_mox
+	then
+;
+
+: tx_duplex	\ g	--
+	\ Note, we overlay a label to do the enable/disable as 
+	\ disable does not g:enable events
+	is_run if
+		g:on? if
+			true tx_set_enabled
+			true model_tx_set_duplex
+			model_tx_get_duplex_freq false model_tx_set_duplex_freq
+			model_tx_get_duplex_mode model_tx_set_duplex_mode
+			model_tx_get_duplex_filter model_tx_set_duplex_filter
+		else
+			false tx_set_enabled
+			false model_tx_set_duplex
+			model_tx_get_simplex_freq false model_tx_set_simplex_freq
+			model_tx_get_simplex_mode model_tx_set_simplex_mode
+			model_tx_get_simplex_filter model_tx_set_simplex_filter
+		then
+	then
+;
+
+: get_tx_window_target \ -- id
+	tx_window @ "tx-box" g:child swap g:child
+;
+
+\ ========================================
+\ Mode select
+: tx_mode_select	\ g --
+	"MODE-TX" get_tx_window_target
+	swap toggle_popup_panel drop
+;
+\ Filter select
+: tx_filter_select	\ g --
+	"FILTER-TX" get_tx_window_target
+	swap toggle_popup_panel drop
+;
+\ RF gain adjust
+: tx_rf_gain	\ g --
+	"RFGAIN-TX" get_tx_window_target
+	swap toggle_popup_panel drop
+;
+\ Mic gain adjust
+: tx_mic_gain \ g --
+	"MICGAIN-TX" get_tx_window_target
+	swap toggle_popup_panel drop
+;
+
+\ ============================================================================
+\ Initialise window
+: add_child_tx_box_common						\ ?-id bounds --
+	tx_window @ "tx-box" g:child			\ ?-id bounds gui 
+	-rot															\  gui ?-id bounds 
+;
+
+: add_child_tx_top_common						\ ?-id bounds --
+	tx_window @ "button-box" g:child	\ ?-id bounds gui 
+	-rot															\  gui ?-id bounds 
+;	
+
+\ Add child VFO
+: add_child_tx_vfo					\ vfo-id bounds --
+	add_child_tx_box_common		\ gui vfo-id bounds 
+	vfo_new 									\ vfo-id gui vfo-obj
+	dup -rot									\ vfo-id vfo-obj gui vfo-obj
+	g:+child drop 						\ vfo-id vfo-obj
+	vfo_init drop							\ --
+;
+
+\ Add child mode panel
+: add_child_tx_mode-panel			\ mode_id bounds --
+	add_child_tx_box_common			\ gui mode_id bounds
+	mode_panel_new 							\ mode_id gui mode-obj
+	g:+child										\ mode_id radio-gui
+	drop												\ --
+;
+
+\ Add child filter panel
+: add_child_tx_filter_panel			\ filter_id bounds --
+	add_child_tx_box_common				\ gui filter_id bounds
+	filter_panel_new 							\ filter_id gui filter-obj
+	g:+child											\ filter_id gui
+	drop													\ --
+;
+
+\ Add child RF-GAIN panel
+: add_child_tx_rfgain_panel	\ gui rfgain_id bounds --
+	add_child_tx_box_common
+	rfgain_panel_new 					\ rfgain_id radio-gui afgain-obj
+	g:+child									\ rfgain_id radio-gui
+	drop											\ --
+;
+
+\ Add child MIC-GAIN panel
+: add_child_tx_micgain_panel	\ gui micgain_id bounds --
+	add_child_tx_box_common
+	micgain_panel_new 					\ micgain_id radio-gui afgain-obj
+	g:+child										\ micgain_id radio-gui
+	drop												\ --
+;
+
+\ Add child meter panel
+: add_child_tx_meter_panel	\ gui meter_id bounds --
+ 	add_child_tx_top_common
+ 	tx_meter_panel_new				\ meter_id radio-gui meter-obj
+ 	g:+child									\ meter_id radio-gui
+ 	drop											\ --
+;
+
+\ ========================================
+\ Pub/sub events
+: evt_tx_duplex	\ a --
+	"state" m:@ "duplex" m:@
+	\ Toggle the state so the event always fires to set enabled state
+	if
+		\ Set duplex on
+		tx_window @ "button-box" g:child "tx-duplex" g:child false g:on true g:on 2drop drop
+	else
+		\ Set duplex off
+		tx_window @ "button-box" g:child "tx-duplex" g:child true g:on false g:on 2drop drop
+	then 
+;
+
+\ ========================================
+\ Called at start of day
+: init_tx_window	\ --
+	
+	\ Do dependent subscribes
+  rfgain_subscribe
+  micgain_subscribe
+	
+	\ Add dynamic panels
+	"VFO-TX" "80,5,330,55" add_child_tx_vfo
+	"MODE-TX" "50,50,350,70" add_child_tx_mode-panel
+	"FILTER-TX"  "50,70,460,90" add_child_tx_filter_panel
+	"RFGAIN-TX"  "50,90,350,110" add_child_tx_rfgain_panel
+	"MICGAIN-TX"  "50,110,350,130" add_child_tx_micgain_panel
+	"METER-TX"  "190,0,340,60" add_child_tx_meter_panel
+	
+	\ Subscribe to events
+	UI_DUPLEX ' evt_tx_duplex pubsub_subscribe
+  SYS_DUPLEX ' evt_tx_duplex pubsub_subscribe
+;
+
+\ ============================================================================		
+\ Restore namespace	
+ns: user	

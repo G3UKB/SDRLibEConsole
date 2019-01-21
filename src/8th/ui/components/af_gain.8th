@@ -1,0 +1,178 @@
+(*
+	af-gain.8th
+ 
+  AF-GAIN slider component for the DynamicSDR application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+needs stack/rstack
+needs stack/utils
+
+\ Use SDR namespace
+ns: sdr
+
+\ Be nice to use a new kind but layouts not supported yet 
+{
+	"kind" : "box",
+	"alpha" : 0.5,
+	"bg" : "lightcyan4",
+	"visible" : false,
+	"children" : [
+		{
+			"kind" : "slider",
+			"alpha" : 0.5,
+			"bg" : "lightcyan4",
+			"min" : 0,
+			"max" : 100,
+			"interval" : 1,
+			"popup-display" : true,
+			"value-changed" : "sdr:new_afgain"
+		}
+	]
+} var, afgain_panel
+
+\ ============================================================================
+\ GUI Events
+\ Set the gain text in the status area
+: set_afgain_text_r1			\ parent gain -- parent g.afgain
+	1 pick g:parent  				\ parent gain g.radio
+	0 g:child 0 g:child			\ parent gain g.container
+	"r1-afgain-lbl" g:child \ parent gain g.afgain
+	swap n:int >s "%" s:+ g:text		\ parent g.afgain
+;
+
+: set_afgain_text_r2			\ parent gain -- parent g.afgain
+	1 pick g:parent  				\ parent gain g.radio
+	0 g:child 0 g:child			\ parent gain g.container
+	"r2-afgain-lbl" g:child \ parent gain g.afgain
+	swap n:int >s "%" s:+ g:text		\ parent g.afgain
+;
+
+: set_afgain_text_r3			\ parent gain -- parent g.afgain
+	1 pick g:parent  				\ parent gain g.radio
+	0 g:child 0 g:child			\ parent gain g.container
+	"r3-afgain-lbl" g:child \ parent gain g.afgain
+	swap n:int >s "%" s:+ g:text		\ parent g.afgain
+;
+
+\ Set the text after an afgain selection
+: afgain_set_text	\ parent afgain id --
+	{"AFGAIN-R1": ' set_afgain_text_r1 , "AFGAIN-R2": ' set_afgain_text_r2 , "AFGAIN-R3": ' set_afgain_text_r3 }
+	case
+	drop
+;
+
+: set_afgain_model_r1
+	model_r1_set_afgain
+;
+
+: set_afgain_model_r2
+	model_r2_set_afgain
+;
+
+: set_afgain_model_r3
+	model_r3_set_afgain
+;
+
+: afgain_set_model	\ parent afgain id --
+	{"AFGAIN-R1": ' set_afgain_model_r1 , "AFGAIN-R2": ' set_afgain_model_r2 , "AFGAIN-R3": ' set_afgain_model_r3 }
+	case
+;
+
+\ Common GUI event for afgain click
+: new_afgain	\ g value --
+\ Get parent
+	null -rot	swap					\ null value g 
+	dup g:parent 	 					\ null value g parent 
+	\ Get the radio id and stash in the null hole
+	"id" g:m@ 3 swap poke		\ afgain-id value g parent 
+	\ rot 3 pick 						\ afgain-id g parent value afgain-id
+	\ afgain_set_model			\ afgain-id g parent
+	2 pick 4 pick 					\ afgain-id value g parent value afgain-id
+	afgain_set_model				\ afgain-id value g parent
+	rot											\ afgain-id g parent value
+	3 roll									\ g parent value afgain-id
+	afgain_set_text
+;
+
+\ ============================================================================
+\ Subscriber Events
+: afgain_evt_r1_afgain	\ a --
+	\ "afgain_evt_r1_afgain" log
+	"radio-1" "AFGAIN-R1" get_window_target swap 	\ parent a
+	"audio-gain" m:@ 															\ parent a gain
+	rot	"AFGAIN-R1" g:child 0 g:child							\ a gain slider
+	swap  g:set-value 2drop
+;
+
+: afgain_evt_r2_afgain	\ a --
+	\ "mode_evt_r2_modee" log
+	"radio-2" "AFGAIN-R2" get_window_target swap 	\ a parent
+	"audio-gain" m:@ 															\ a parent gain
+	rot	"AFGAIN-R2" g:child 0 g:child 						\ a gain slider
+	swap g:set-value 2drop
+;
+
+: afgain_evt_r3_afgain	\ a --
+	\ "afgain_evt_r3_afgain" log
+	"radio-3" "AFGAIN-R3" get_window_target swap 	\ a parent
+	"audio-gain" m:@ 															\ a parent gain
+	rot	"AFGAIN-R3" g:child 0 g:child 						\ a gain slider
+	swap g:set-value 2drop
+;
+
+\ ============================================================================
+\ Create a afgain button panel
+: afgain_panel_new						\ id bounds -- new-afgain-gui
+	afgain_panel @ G:clone nip	\ id bounds afgain-clone
+	"id" 3 pick m:!
+	"name" 3 pick m:! 
+	"bounds" 2 pick m:! 
+	nip nip g:new
+;
+
+\ Initialise a afgain panel instance
+: afgain_panel_init	\  gui -- gui
+;
+
+\ Subscribe to available radios
+: afgain_subscribe_radios_1
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
+;
+
+: afgain_subscribe_radios_2
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
+	UI_R2_AFGAIN ' afgain_evt_r2_afgain pubsub_subscribe
+;
+
+: afgain_subscribe_radios_3
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
+	UI_R2_AFGAIN ' afgain_evt_r2_afgain pubsub_subscribe
+  UI_R3_AFGAIN ' afgain_evt_r3_afgain pubsub_subscribe
+;
+
+: afgain_subscribe	\  --
+  \ Subscribe to events
+	[ ' afgain_subscribe_radios_1 , ' afgain_subscribe_radios_2 , ' afgain_subscribe_radios_3 ]
+	swap caseof
+;
+
+\ Restore namespace	
+ns: user	

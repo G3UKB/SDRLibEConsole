@@ -1,0 +1,262 @@
+(*
+	disp.8th
+ 
+  Display component for the DynamicSDR application
+ 
+ Copyright C 2017 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+{
+	"kind" : "box",
+	"name" : "display",
+	"bounds" : "0,0,parent.width, parent.height",
+	"bg" : "gray10",
+	"draw" : "sdr:disp_draw",
+	"size" : "sdr:disp_size",
+	"mouse-moved" : "sdr:mouse_move",
+	"mouse-down" : "sdr:mouse_down",
+	"mouse-enter" : "sdr:mouse_enter",
+	"mouse-exit" : "sdr:mouse_exit",
+	"timer-period" : 100,
+	"timer" : "sdr:disp-timer"
+	
+} var, disp_panel
+
+\ ===============================================================================
+\ GUI event handlers
+
+\ On resize save the new panel width and height and display width and height
+: disp_size													\ gui width height --
+	rot "id" g:m@ nip -rot						\ disp-id width height
+	2dup															\ disp-id width height width height
+	t_margin n:- b_margin n:- 				\ disp-id width height width disp-height
+	swap l_margin n:- r_margin n:- 		\ disp-id width height disp-height disp-width
+	4 pick dup >r wait_disp_s4
+	swap 4 pick set_disp_disp_metrics	\ disp-id width height
+	rot set_disp_win_metrics					\ --
+	r> rel_disp_s4
+;
+
+\ Drawing
+: disp_draw	\ gui --
+	draw_all
+	drop
+;
+
+\ Mouse management
+: mouse_enter	\ gui --
+	true swap "id" g:m@ nip mouse_valid
+;
+
+: mouse_exit	\ gui --
+	false swap "id" g:m@ nip mouse_valid
+;
+
+: mouse_move	\ gui x y --
+	2 pick "id" g:m@ nip
+	dup wait_disp_s4
+	set_mouse_pos
+	"id" g:m@ rel_disp_s4
+;
+
+: click_freq_r1 \ spec-id -- 
+	dup "DISP-R1" s:= if drop true true else false then
+;
+
+: click_freq_r2 \ spec-id --
+	dup "DISP-R2" s:= if drop true true else false then
+;
+
+: click_freq_r3 \ spec-id --
+	dup "DISP-R3" s:= if drop true true else false then 
+;
+
+: mouse_down									\ gui x y --
+	drop over 									\ x gui
+	"id" g:m@ nip  							\ x id
+	swap l_margin n:- 					\ id x-l_margin
+	over  											\ id x-l_margin id
+	x_to_freq 1000000 n:* swap 	\ freq id  
+	[ ' click_freq_r1 , ' model_r1_set_freq , ' click_freq_r2 , ' model_r2_set_freq ,  ' click_freq_r3 , ' model_r3_set_freq ]
+		a:when
+	drop
+;
+
+\ Render
+: disp-timer	\ g --
+	g:invalidate
+;
+
+\ ============================================================================
+\ Create a display panel
+: disp_panel_new						\ id bounds -- new-disp-gui
+	disp_panel @ G:clone nip	\ id bounds disp-clone
+	"id" 3 pick m:!						\ id bounds disp-clone
+	"name" 3 pick m:! 				\ id bounds disp-clone
+	"bounds" 2 pick m:! 			\ id bounds disp-clone
+	nip 											\ id spec-clone
+	g:new dup 								\ id new-disp-gui new-disp-gui
+	rot set_gui_disp_instance	\ new-disp-gui
+;
+
+\ Initialise a display panel instance
+: disp_panel_init								\ disp_id -- 
+	\ Start a task for this instance
+	dup 1 ' disp_task t:task-n		\ disp-id t
+	\ FIXME
+	\ Does not exit properly so we wait for ever
+	task_dict @ swap 							\ disp-id task-dict t
+	rot swap											\ task-dict disp-id t
+	m:! drop
+;
+
+\ ============================================================================
+\ Subscriber Events
+\ Obey the SED and consume the data
+\ Potentially a freq update
+
+: disp_evt_r1_vfo						\ a --
+	"DISP-R1" swap						\ DISP-ID a
+	"freq" m:@								\ DISP-ID a f
+	2 pick wait_disp_s4				\ DISP-ID a f
+	2 pick set_disp_mid_freq 	\ DISP-ID a f
+	swap rel_disp_s4					\ a f
+	drop											\ a
+;
+
+: disp_evt_r2_vfo						\ a --
+	"DISP-R2" swap						\ DISP-ID a
+	"freq" m:@								\ DISP-ID a f
+	2 pick wait_disp_s4				\ DISP-ID a f
+	2 pick set_disp_mid_freq 	\ DISP-ID a f
+	swap rel_disp_s4					\ a f
+	drop		
+;
+
+: disp_evt_r3_vfo						\ a --
+	"DISP-R3" swap						\ DISP-ID a
+	"freq" m:@								\ DISP-ID a f
+	2 pick wait_disp_s4				\ DISP-ID a f
+	2 pick set_disp_mid_freq 	\ DISP-ID a f
+	swap rel_disp_s4					\ a f
+	drop
+;
+
+: disp_evt_r1_mode	\ a --
+	"mode" m:@
+	"DISP-R1" set_disp_mode
+	drop
+;
+
+: disp_evt_r2_mode	\ a --
+	"mode" m:@
+	"DISP-R2" set_disp_mode
+	drop
+;
+
+: disp_evt_r3_mode	\ a --
+	"mode" m:@
+	"DISP-R3" set_disp_mode
+	drop
+;
+
+: disp_evt_r1_filt	\ a --
+	"filter" m:@
+	"DISP-R1" set_disp_filt
+	drop
+;
+
+: disp_evt_r2_filt	\ a --
+	"filter" m:@
+	"DISP-R2" set_disp_filt
+	drop
+;
+
+: disp_evt_r3_filt	\ a --
+	"filter" m:@
+	"DISP-R3" set_disp_filt
+	drop
+;
+
+\ Subscribe to available radios
+: disp_subscribe_radios_1
+	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+	
+	UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+	
+	SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+	
+	SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+;
+
+: disp_subscribe_radios_2
+	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+	UI_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
+	
+	UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+	UI_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
+	UI_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
+	
+	SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+	SYS_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
+	
+	SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+	SYS_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
+	SYS_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
+;
+
+: disp_subscribe_radios_3
+	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+	UI_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
+  UI_R3_FREQ ' disp_evt_r3_vfo pubsub_subscribe
+  
+  UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+	UI_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
+	UI_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
+	UI_R3_MODE ' disp_evt_r3_mode pubsub_subscribe 
+	UI_R3_FILT ' disp_evt_r3_filt pubsub_subscribe
+	
+  SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
+  SYS_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
+  SYS_R3_FREQ ' disp_evt_r3_vfo pubsub_subscribe
+  
+  SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
+	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
+	SYS_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
+	SYS_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
+	SYS_R3_MODE ' disp_evt_r3_mode pubsub_subscribe 
+	SYS_R3_FILT ' disp_evt_r3_filt pubsub_subscribe
+;
+
+: disp_subscribe	\  --
+  \ Subscribe to events
+	[ ' disp_subscribe_radios_1 , ' disp_subscribe_radios_2 , ' disp_subscribe_radios_3 ]
+	swap caseof
+;
+
+\ Restore namespace	
+ns: user	
