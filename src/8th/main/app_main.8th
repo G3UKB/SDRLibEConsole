@@ -148,8 +148,7 @@ ns: sdr
 	param_st_alloc
 	
 	\ ----------------------------------
-	\ Create test main window
-	\ We must create all windows up front so everything gets populated by the models.
+	\ Create main window
 	create_main
 	
 	\ ----------------------------------

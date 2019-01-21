@@ -901,6 +901,7 @@ ns: sdr
 	swap toggle_popup_panel drop
 ;
 
+(*
 : w_r2_mode_select	\ g --
 	"radio-2" "MODE-R2" get_window_target
 	swap toggle_popup_panel drop
@@ -992,7 +993,9 @@ ns: sdr
 : w_r3_audio_select
 	\ 2 "both" c_i_server_change_audio_outputs
 ;
+*)
 
+(*
 \ ============================================================================
 \ Initialise window dependent on number of radios
 : add_child_common			\ radio_id ?-id bounds --
@@ -1280,24 +1283,17 @@ ns: sdr
 	\ Subscribe to events
   SYS_RUN_STATE ' evt_main_window pubsub_subscribe
 ;
+*)
+
+: create_main
+	\ Add the concertina panels
+	main_window_obj @ g:new g:show g_main_window !
+	g_main_window @	
+	concertina_panel_radios_1 @
+	g:new g:+child
+;
 
 \ ============================================================================		
 \ Restore namespace	
 ns: user	
 
-
-\ ============================================================================
-\ External interface
-: set_metis_state	\ f --
-	if
-	\ Disable discovery
-		main_window @ "button-box" g:child dup "discover" g:child false g:enable drop
-		\ Enable start
-		"metis-state" g:child true g:enable drop
-	else
-		\ Enable discovery
-		main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
-		\ Disable start
-		"metis-state" g:child false g:enable drop
-	then
-;
