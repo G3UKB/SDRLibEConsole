@@ -50,8 +50,11 @@ ns: fr
 	2. Once registered, events may be subscribed to by any number of recipients.
 	3. Once registered an event may be published with an opaque data structure and
 	will be dispatched to all subscribers [if any].
-	4. Dispatch is on the P/S_THREAD for SYS events and on the main thread for UI events.
-	This is convention but the registration includes a flag which is the actual indicator.
+	4. Dispatch is on the DISPATCHER_TASK thread for SYS events and on the main thread for 
+	UI events. This is convention but the registration includes a flag which is the 
+	actual indicator, true = main thread.
+	5. The P/S_TASK does not leak outside of P/S so there is no danger of stack corruption
+	with the use of the d/r/p stacks.
 	
 	This is part of the generic framework in the namespace fr:.
 *)
@@ -176,8 +179,7 @@ ns: fr
 \ Subscribe to an event
 : do_ps_sub	 SED: a --
 	\ in: 	[event-name, w]
-	\ out:	none
-	
+	\ out:	none	
 	dup >r
 	__ps_exists? if
 		\ Add a new subscriber to the event
@@ -186,11 +188,11 @@ ns: fr
 		\ Get the callback word array [f,[w,w, ..]]
 		1 a:@ nip
 		\ Append the new callback word to the array
-		r@ __ps_evnt_callback@ a:push drop
+		r> __ps_evnt_callback@ a:push drop
 	else
 		\ Problem
 		"No registration " r> __ps_evnt_name@ s:+ " to subscribe to!" s:+ throw 
-	then rdrop ;
+	then ;
 
 \ ----------------------------------
 \ Dispatch to subscriber on main thread
@@ -200,6 +202,15 @@ ns: fr
 	\ out:	none
 	"data" m:@ swap "to" m:@ nip w:exec ;
 
+\ ----------------------------------
+\ Dispatch to subscriber on dispatcher thread
+\ Callee must consume 'data' on TOS
+: __ps_disp_thd_dispatch	  SED: * w --
+	\ in: 	0: w - word to dispatch to
+	\				1: * - data to dispatch
+	\ out:	none
+	"DISPATCHER_TASK" swap rot fr:msg! ;
+	
 \ ----------------------------------
 \ Dispatch to subscriber
 \ Callee must consume 'data' on TOS
@@ -213,13 +224,12 @@ ns: fr
 		\ Word to invoke on main thread
 		{ "cb" : ' __ps_main_thd_dispatch }
 		\ Word 'to' dispatch 'data' to
-		\ Note we clone the data again to ensure no conflicts
+		\ Note we clone the data again to pass it to the main thread
 		"to" r> m:! "data" p@ m:! clone nip
 		g:do
 	else
-		\ Dispatch on this thread, no clone as ownership is this thread
-		\ The subscriber callback must not dispatch again on another thread!
-		p@ r> w:exec
+		\ Dispatch on the dispatcher thread
+		p@ r> __ps_disp_thd_dispatch
 	then ;
 
 \ ----------------------------------
@@ -266,17 +276,24 @@ ns: fr
 	\ in: 	0: w - do_registrations	(call to do registrations for app namespace)
 	\ out:	none
 	>r
-	\ Create and start the gen-server
+	
+	\ ----------------------------------
+	\ Create and start the dispatcher task as we keep the P/S thread contained.
+	"DISPATCHER_TASK" t:curtask 2 ' gen_server t:task-n -1 sleep drop
+	
+	\ ----------------------------------
+	\ Create and start the P/S gen-server
 	"P/S_TASK" t:curtask 2 ' gen_server t:task-n -1 sleep drop
 	\ Initialise the server
 	"P/S_TASK" ' do_ps_init a:new msg! 
 	\ Register all events
 	\ To keep pub_sub generic the registered events are part of the application and
 	\ not part of the framework. This works by passing in the word to call to perform
-	\ registrations. We then call this word passing the pubsub_regiater word to call
+	\ registrations. We then call this word passing the pubsub_register word to call
 	\ to register each event. This mechanism prevents circular references reqiring
 	\ defers and code refactoring.
-	' pubsub_register r> w:exec ;
+	' pubsub_register r> w:exec 
+	;
 
 \ ----------------------------------
 \ Terminate publish/subscribe system
@@ -284,6 +301,7 @@ ns: fr
 	\ in: 	none
 	\ out:	none
 	\ Note gen-server performs termination
+	"DISPATCHER_TASK" ' gs_do_term a:new msg!
 	"P/S_TASK" ' gs_do_term a:new msg! ;
 
 \ ----------------------------------
@@ -300,11 +318,11 @@ ns: fr
 : pubsub_publish	 SED: s * -- 
 	\ in:		* - event-data 
 	\				s - event-name	
-	\ out:	none
+	\ out:	none 
 	a:new 1 rot a:! 0 rot a:!
-	"P/S_TASK" ' do_ps_pub rot msg! 
+	"P/S_TASK" ' do_ps_pub rot msg!
 	\ BC - 18.08 sleep required else fails quickly
-	0.005 sleep ;
+	0.005 sleep  ;
 
 \ ========================================
 \ Reset namespace

@@ -27,6 +27,8 @@
 \ Include all include files
 "includes.8th" f:include
 
+\ needs debug/trace
+
 \ Make this a gui app
 true app:isgui !
 \ true log-async
@@ -76,7 +78,7 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Main UI subscribes to SYS_RUN_STATE only
-	main_window_subscribe
+	main_window_subscribe 0.2 sleep
 	\ Gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
 	2 sleep
@@ -91,6 +93,7 @@ ns: sdr
 	conn_init
 	\ Attempt connection but do not start anything
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
+	
 	
 	\ Done SOD
 	false st_app_sod!

@@ -220,20 +220,22 @@ ns: fr
 	\				w - word to invoke in task
 	\				s - task name
 	\ out:	none
-	\ Push params and copy task name to r
-	>p >p >r
+	\ t:name@ null? if .s "Got null " throw then
+	\ cr "1:" . t:name@ . ":" . 1 pick . cr
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
-	m:new "cb" p> m:! "data" p> m:!
+	m:new "cb" 3 pick m:! "data" 2 pick m:! nip nip
 	\ Clone the whole message structure and push to the task q
 	clone nip
 	\ Get task for name and lock task-dict
-	r> __gs_lock@ swap m:@ nip 
+	swap __gs_lock@ swap m:@ nip
 	\ Push message to task q
-	dup >r swap t:push r> t:notify 
+	dup rot t:push t:notify
 	\ Release lock
-	__gs_unlock 
-	0.01 sleep ;
+	__gs_unlock
+	0.01 sleep 
+	\ cr "2:" . t:name@ . cr
+;
 
 \ ----------------------------------
 \ Message response to sender
@@ -298,9 +300,75 @@ gen_server_test @ #if
 		' term_task 1 iterations loop
 	;
 
+	: t1_w1
+		cr . cr ;
+	
+	: t2_w1
+		cr . cr ;
+	
+	: t3_w1
+		cr . cr ;
+		
+	: t4_w1
+		cr . cr ;
+		
+	: t5_w1
+		cr . cr ;
+		
+	: t6_w1
+		cr . cr ;
+		
+	: t7_w1
+		cr . cr ;
+		
+	: t8_w1
+		cr . cr ;
+		
+	: t9_w1
+		cr . cr ;
+		
+	: t10_w1
+		cr . cr ;
+	
+	: t_sender
+		t:name!
+		param_st_alloc
+		"t1" ' t1_w1 "Message to t1-w1" fr:msg!
+		"t2" ' t2_w1 "Message to t2-w1" fr:msg!
+		"t3" ' t2_w1 "Message to t3-w1" fr:msg!
+		"t4" ' t2_w1 "Message to t4-w1" fr:msg!
+		"t5" ' t2_w1 "Message to t5-w1" fr:msg!
+		"t6" ' t2_w1 "Message to t6-w1" fr:msg!
+		"t7" ' t2_w1 "Message to t7-w1" fr:msg!
+		"t8" ' t2_w1 "Message to t8-w1" fr:msg!
+		"t9" ' t2_w1 "Message to t9-w1" fr:msg!
+		"t10" ' t2_w1 "Message to t10-w1" fr:msg!
+	;
+		
 	: runtest
 		"Run: " swap >s s:+ log
 		make_tasks
+		\ Now send some messages
+		"Sender-1" 1 ' t_sender t:task-n
+		"Sender-2" 1 ' t_sender t:task-n
+		"Sender-3" 1 ' t_sender t:task-n
+		"t1" ' t1_w1 "Message to t1-w1" fr:msg!
+		"t2" ' t2_w1 "Message to t2-w1" fr:msg!
+		"t3" ' t2_w1 "Message to t3-w1" fr:msg!
+		"t4" ' t2_w1 "Message to t4-w1" fr:msg!
+		"t5" ' t2_w1 "Message to t5-w1" fr:msg!
+		"Sender-4" 1 ' t_sender t:task-n
+		"Sender-5" 1 ' t_sender t:task-n
+		"Sender-6" 1 ' t_sender t:task-n
+		"t6" ' t2_w1 "Message to t6-w1" fr:msg!
+		"t7" ' t2_w1 "Message to t7-w1" fr:msg!
+		"t8" ' t2_w1 "Message to t8-w1" fr:msg!
+		"t9" ' t2_w1 "Message to t9-w1" fr:msg!
+		"t10" ' t2_w1 "Message to t10-w1" fr:msg!
+		"Sender-7" 1 ' t_sender t:task-n
+		"Sender-8" 1 ' t_sender t:task-n
+		"Sender-9" 1 ' t_sender t:task-n
+		
 		1 sleep
 		term_all
 		fr:gs_wait_all
@@ -310,7 +378,7 @@ gen_server_test @ #if
 	;
 	
 	param_st_alloc
-	' runtest 1 5 loop
-		
+	' runtest 1 10 loop
+	
 	bye
 #then	

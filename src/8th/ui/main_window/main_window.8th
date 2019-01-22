@@ -1256,7 +1256,7 @@ ns: sdr
 	\ [ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
 	\ r@ caseof 
 	[ ' mode_radios_1 , ' mode_radios_2 , ' mode_radios_3 ]
-	r@ caseof 
+	r@ caseof
 	\ [ ' filter_radios_1 , ' filter_radios_2 , ' filter_radios_3 ]
 	\ r@ caseof 
 	\ [ ' band_radios_1 , ' band_radios_2 , ' band_radios_3 ]

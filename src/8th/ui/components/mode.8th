@@ -203,8 +203,16 @@ ns: sdr
 ;
 
 \ Subscribe to available radios
-: mode_subscribe_radios_1
+: t_mode_subscribe_radios_1
+	param_st_alloc
 	UI_R1_MODE ' mode_evt_r1_mode fr:pubsub_subscribe
+	\ UI_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
+	\ SYS_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
+;
+
+: mode_subscribe_radios_1
+	' t_mode_subscribe_radios_1 t:task
+	\ UI_R1_MODE ' mode_evt_r1_mode fr:pubsub_subscribe
 	\ UI_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
 	\ SYS_TX_MODE ' mode_evt_tx_mode fr:pubsub_subscribe
 ;

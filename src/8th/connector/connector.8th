@@ -601,7 +601,7 @@ ns: sdr
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
 	a:new swap a:push fr:+sender
-	"Connector_TASK" ' do_conn_r1_mode rot fr:msg! 
+	"Connector_TASK" ' do_conn_r1_mode rot fr:msg!
 	fr:response@ ;
 
 : conn_r2_mode	SED: n -- *
@@ -675,7 +675,7 @@ ns: sdr
 	\ out: 	none
 	\ Throws exception on error
 	swap "resp" m:@ nip "NAK" s:= if
-		"Server 'NAK' from [" swap s:+ "]" s:+ log
+		"Server 'NAK' from [" swap s:+ "]" s:+ . cr \  log
 	else
 		drop
 	then ;
