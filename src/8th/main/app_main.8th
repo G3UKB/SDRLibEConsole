@@ -86,7 +86,7 @@ ns: sdr
 	\ Once UI is stable we can populate it with the UI events
 	option_model_ui_evnts
 	app_model_ui_evnts
-	
+	2 sleep
 	\ ----------------------------------
 	\ Connector
 	\ Initialise

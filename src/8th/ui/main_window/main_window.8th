@@ -1214,16 +1214,6 @@ ns: sdr
 	\ Get the number of radios 
 	st_rad_num_rx@ n:1- >r
 	
-	\ Do dependent subscribes
-	\ r@ vfo_subscribe
-	r@ mode_subscribe
-	\ r@ band_subscribe
-  \ r@ filter_subscribe
-  \ r@ agc_subscribe
-  \ r@ afgain_subscribe
-  \ r@ rx_meter_subscribe
-  \ r@ disp_subscribe
-	
 	\ Set the main window size and position
 	\ main_window @ model_win_get_size dup 0 n:> if
 	\ 	\ Probably ok to use from model
@@ -1287,9 +1277,21 @@ ns: sdr
 	\ Store main window GUI
 	main_window ! ;
 
-: main_window_subscribe	\ --
+: main_window_subscribe	\  --
 	\ Subscribe to events
-	SYS_RUN_STATE ' evt_main_window fr:pubsub_subscribe ;
+	st_rad_num_rx@ n:1- >r
+	SYS_RUN_STATE ' evt_main_window fr:pubsub_subscribe 
+	\ Do dependent subscribes
+	\ r@ vfo_subscribe
+	r@ mode_subscribe
+	\ r@ band_subscribe
+	\ r@ filter_subscribe
+	\ r@ agc_subscribe
+	\ r@ afgain_subscribe
+	\ r@ rx_meter_subscribe
+  \ r@ disp_subscribe
+  rdrop
+;
 
 \ ============================================================================		
 \ Restore namespace	
