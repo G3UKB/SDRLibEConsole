@@ -24,12 +24,17 @@
 
 \ Use SDR namespace
 ns: sdr
-  
+
+(*
+	This component can be multi-instanced to provide a 9 digit VFO that can be
+	scrolled with the mouse wheel. It publishes frequency events as it goes.
+*)
+
 \ ============================================================================
 \ User draw components
 \
 \ ========================================
-\ VFO digit
+\ A single VFO digit
 {
   "kind" : "Digit",
   "fg" : "gray96",
@@ -39,7 +44,7 @@ ns: sdr
 } var, vfo_digit
 
 \ ========================================
-\ VFO spacer
+\ Spacer to add between VFO digits
 {
   "kind" : "Separator",
   "fg" : "lightcoral",
@@ -49,14 +54,16 @@ ns: sdr
 } var, vfo_separator
 
 \ ========================================
-\ Composite component
-\ VFO panel
+\ VFO panel consisting og 9 digits
+\ There are additional fields to hold data for the instance
 {
   "kind" : "VFO",
+  \ Additional state
   "freq" : 7000000,
   "low-limit" : 100000,
   "high-limit" : 500000000,
   "digits" : [],
+  \ End additional state
   "fg" : "gray96",
   "bg" : "gray10",
   "rot" : 0,
@@ -184,10 +191,16 @@ ns: sdr
 	]
 } var, vfo_panel
 
+\ Register our custom component parts as additional kinds of widget
 vfo_panel @ g:+kind
 vfo_digit @ g:+kind
 vfo_separator @ g:+kind
-	
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+
 \ ============================================================================
 \ VFO implementation
 
@@ -196,25 +209,38 @@ vfo_separator @ g:+kind
 \ easier as separators need to be skipped
 \ Enumerate digits into an array in parent
 
-: append_child	\ parent digit_array ix child_index -- parent digit_array
+\ ----------------------------------
+\ Append an index to the digit array
+: __append_child	\ parent digit_array ix child_index -- parent digit_array
 	3 pick swap		\ parent digit_array ix parent child_index
 	g:child				\ parent digit_array ix digit-gui
 	a:!						\ parent digit_array
 ;
 
-: enumerate_digits	\ parent -- parent
+\ ----------------------------------
+\ Write the list of indexes which correspond to actual digits to the digit array
+: __enumerate_digits	\ parent -- parent
 	\ Get array
 	"digits" g:m@
 	\ Indexes of digit children
 	\ Note 3 & 7 are separators
 	[0,1,2,4,5,6,8,9,10]
-	' append_child a:each
+	' __append_child a:each
 	2drop
 ;	
 
-\ ===============================================================
+\ ===============================================================================
+\ Action helpers and implementation
+\ ACTION_INCREMENT 0 ;		\ Allowed so just Inc/Dec the digit
+\ ACTION_REPAINT 1 ;			\ Allowed but digit rolledover/under so a full adjust and repaint is required
+\ ACTION_OUT_OF_RANGE 2 
+\ ===============================================================================
+
+\ ========================================
 \ Action helper words
-: set_digit \ array-children ix freq-digit -- array-children
+
+\ ----------------------------------
+: __set_digit \ array-children ix freq-digit -- array-children
 	\ Set the freq-digit in array-children[ix]
 	-rot 								\ freq-digit array-children ix 
 	a:@ 								\ freq-digit array-children child-digit-ob 
@@ -224,11 +250,8 @@ vfo_separator @ g:+kind
 	drop nip						\ array-children
 ;
 
-: repaint_child	\ gui --
-	g:invalidate
-;
-
-: reset_all_digits						\ parent-gui -- parent-gui
+\ ----------------------------------
+: __reset_all_digits						\ parent-gui -- parent-gui
 	\ Get the frequency in Hz
 	"freq" g:m@	n:int								\ parent-gui freq-in-hz
 	\ Make it a 9 digit array with leading 0's
@@ -237,25 +260,35 @@ vfo_separator @ g:+kind
 	swap 												\ array-freq-in-hz parent-gui
 	"digits" g:m@ 							\ array-freq-in-hz parent-gui array-digit-obj
 	rot													\ parent-gui array-digit-obj array-freq-in-hz
-	' set_digit a:each 2drop		\ parent-gui
+	' __set_digit a:each 2drop		\ parent-gui
 ;
 
+\ ----------------------------------
+: __repaint_child	\ gui --
+	g:invalidate
+;
+
+\ ----------------------------------
 : vfo_r1 \ vfo-id -- 
 	dup "VFO-R1" s:= if drop false true else false then
 ;
 
+\ ----------------------------------
 : vfo_r2 \ vfo-id --
 	dup "VFO-R2" s:= if drop false true else false then
 ;
 
+\ ----------------------------------
 : vfo_r3 \ vfo-id --
 	dup "VFO-R3" s:= if drop false true else false then 
 ;
 
+\ ----------------------------------
 : vfo_tx \ vfo-id --
 	dup "VFO-TX" s:= if drop false true else false then 
 ;
 
+\ ----------------------------------
 \ Update the frequency on the appropriate radio model
 : update_model	\ new-freq parent --  
 	"id" g:m@ nip
@@ -264,6 +297,7 @@ vfo_separator @ g:+kind
 	drop
 ;
 
+\ ----------------------------------
 : update_freq_value 			\ increment(Hz) gui -- increment(Hz) gui
 	dup g:parent "freq"			\ increment(Hz) gui parent "freq"
 	g:m@								 		\ increment(Hz) gui parent freq-value
@@ -291,13 +325,13 @@ vfo_separator @ g:+kind
 
 \ Repaint all
 : do_repaint	 									\ gui value increment(MHz) -- gui
-	\ "Repaint" log .s
+	\ "Repaint" log
 	rot														\ gui value increment(MHz) -- value increment(MHz) gui
-	update_freq_value							\ value increment(MHz) gui -- value increment(MHz) gui
+	dup >r update_freq_value r>		\ value increment(MHz) gui -- value increment(MHz) gui
 	\ We now need to reset all the values in the digits for the new frequency
-	g:parent reset_all_digits							\ value increment(MHz) gui -- value increment(MHz) gui parent-gui
+	g:parent __reset_all_digits		\ value increment(MHz) gui -- value increment(MHz) gui parent-gui
 	\ Then we repaint all children
-	' repaint_child g:each	drop 	\ value increment(MHz) gui parent-gui -- value increment(MHz) gui
+	' __repaint_child g:each	drop \ value increment(MHz) gui parent-gui -- value increment(MHz) gui
 ;
 
 \ Ignore
@@ -678,7 +712,7 @@ vfo_separator @ g:+kind
 
 : update_vfo_tail \ freq g --
 	update_gui_vfo
-	reset_all_digits
+	__reset_all_digits
 	g:invalidate
 	2drop
 ;
@@ -720,7 +754,7 @@ vfo_separator @ g:+kind
 	tx_window @ "tx-box" g:child "VFO-TX" g:child
 	swap
 	"freq" swap g:m!
-	reset_all_digits
+	__reset_all_digits
 	g:invalidate
 	2drop
 ;
@@ -738,8 +772,8 @@ vfo_separator @ g:+kind
 
 \ Initialise a VFO instance
 : vfo_init	\  gui -- gui
-  enumerate_digits
-  reset_all_digits
+  __enumerate_digits
+  __reset_all_digits
 ;
 
 \ Subscribe to available radios
