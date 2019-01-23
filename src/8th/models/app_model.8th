@@ -300,11 +300,12 @@ ns: sdr
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick val! 
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick val!
 	SYS_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ fr:pubsub_publish
-	if
-		UI_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-		UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ fr:pubsub_publish
-	then drop
+	\ SYS_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ fr:pubsub_publish
+	\ if
+	\ 	UI_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ 	UI_TX_FREQ __app_model@ ["tx-state", ` dyn_idx `, ` data_idx ` ] val@ fr:pubsub_publish
+	\ then 2drop
+	2drop
 ;
 
 \ ----------------------------------
@@ -317,7 +318,7 @@ ns: sdr
 	SYS_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	if
 		UI_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	then  drop
+	then  2drop
 ;
 
 \ ----------------------------------
@@ -330,7 +331,7 @@ ns: sdr
 	SYS_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	if
 		UI_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	then  drop
+	then  2drop
 ;
 
 \ ----------------------------------
@@ -367,7 +368,7 @@ ns: sdr
 		__do_app_tx_set_duplex_freq
 	else
 		__do_app_tx_set_simplex_freq
-	then drop
+	then 2drop
 ;
 
 \ ========================================

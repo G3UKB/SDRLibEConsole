@@ -815,12 +815,13 @@ ns: sdr
 \ Discovery will be run again which will set the state variables
 \ The button is state adjusted in the idle timer event
 : w_discover	\ gui --
-	true 1 ' conn_try_connect t:task-n 0.1 sleep
+	true 1 ' conn_try_connect t:task-n t:wait
+	\ 0.1 sleep
 ;
 
 \ ----------------------------------
 \ Start/stop radio depending on current state
-\ The button is state adjusted in the idle timer event
+\ The button state is adjusted in the idle timer event
 : w_radio_run	SED: g --
 	\ Check radio state
 	st_rad_running@ if
@@ -828,11 +829,7 @@ ns: sdr
 		\ Set button label to "Start"
 		"Start" g:text
 		\ Stop the radio
-		\ ToDo: better checking of response
-		conn_stop_radio "resp" m:@ "ACK" s:+ if
-			\ Set radio running flag
-			false st_rad_running!
-		then
+		false 1 ' conn_try_radio t:task-n t:wait
 		\ ToDo: WBS stuff
 		\ Stop WBS if its running
 		\ true inhibit_wbs !
@@ -841,13 +838,9 @@ ns: sdr
 		\ Stopped so start radio
 		\ Set button label to "Stop"
 		"Stop" g:text
-		\ ToDo: better checking of response
-		\ Always start without WBS
-		NO_WBS conn_start_radio "resp" m:@ "ACK" s:+ if
-			\ Set radio running flag
-			true st_rad_running!
-		then
+		true 1 ' conn_try_radio t:task-n t:wait
 	then
+	\ 0.1 sleep
 ;
 
 \ ToDo: Sort other windows

@@ -153,7 +153,7 @@ ns: sdr
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
 : __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
-: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } __conn_push_one_param >json ;
+: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
@@ -568,7 +568,7 @@ ns: sdr
 : conn_stop_radio	SED:  -- *
 	\ in: 	none
 	\ out:	0: * - response
-	a:new swap a:push fr:+sender
+	a:new fr:+sender 
 	"Connector_TASK" ' do_conn_stop_radio rot fr:msg! 
 	fr:response@ ;
 	
@@ -745,7 +745,7 @@ ns: sdr
 	\ SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
@@ -842,7 +842,46 @@ ns: sdr
 	param_st_free
 	
 	"TRY_CONNECT_TASK exiting" log ;
-	
+
+\ ----------------------------------
+\ This must br run as a task and not called directly
+\ Try to start/stop the radio hardware
+: conn_try_radio	SED: T --
+	\ in: 	0: T - if true then start radio else stop radio
+	\ out:	none
+	\ state updated
+	>r
+	"TRY_RADIO_TASK" t:name!
+	t:curtask "TRY_RADIO_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Allocate param stack for this thread
+	\ param_st_alloc
+	r> if
+		\ Try to start the radio
+		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
+			\ Set radio running flag
+			true st_rad_running!
+		else
+			"****" log
+			"Radio did not start!" log
+			"To try again use the 'Start' button." log
+			"****" log
+		then
+	else
+		\ Try to stop the radio
+		conn_stop_radio "resp" m:@ "ACK" s:= if
+			\ Set radio running flag
+			false st_rad_running!
+		else
+			"****" log
+			"Radio did not stop" log
+			"To try again use the 'Stop' button." log
+			"****" log
+		then
+	then
+	"TRY_RADIO_TASK exiting" log ;
+
 \ ========================================
 \ Reset namespace
 ns: user
