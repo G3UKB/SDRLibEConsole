@@ -1,9 +1,9 @@
 (*
 	band.8th
  
-  Band buttons component for the DynamicSDR application
+  Band buttons component for the SDRLibEConsole application
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -82,10 +82,10 @@ ns: sdr
 	g:child false g:on
 	\ Set the frequency
 	r> r> false
-	{"BAND-R1" : ' model_r1_set_freq , "BAND-R2" : ' model_r2_set_freq , "BAND-R3" : ' model_r3_set_freq }
+	{"BAND-R1" : ' app_model_r1_set_freq , "BAND-R2" : ' app_model_r2_set_freq , "BAND-R3" : ' app_model_r3_set_freq }
 	3 pick caseof
 	true
-	{"BAND-R1" : ' model_r1_set_freq , "BAND-R2" : ' model_r2_set_freq , "BAND-R3" : ' model_r3_set_freq }
+	{"BAND-R1" : ' app_model_r1_set_freq , "BAND-R2" : ' app_model_r2_set_freq , "BAND-R3" : ' app_model_r3_set_freq }
 	3 pick caseof
 ;
 

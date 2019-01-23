@@ -1,9 +1,9 @@
 (*
 	vfo.8th
  
-  VFO component for the DynamicSDR application
+  VFO component for the SDRLibEConsole application
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -259,7 +259,7 @@ vfo_separator @ g:+kind
 \ Update the frequency on the appropriate radio model
 : update_model	\ new-freq parent --  
 	"id" g:m@ nip
-	[ ' vfo_r1 , ' model_r1_set_freq , ' vfo_r2 , ' model_r2_set_freq ,  ' vfo_r3 , ' model_r3_set_freq ,  ' vfo_tx , ' model_tx_set_freq ]
+	[ ' vfo_r1 , ' app_model_r1_set_freq , ' vfo_r2 , ' app_model_r2_set_freq ,  ' vfo_r3 , ' app_model_r3_set_freq ,  ' vfo_tx , ' app_model_tx_set_freq ]
 	a:when
 	drop
 ;
@@ -744,24 +744,24 @@ vfo_separator @ g:+kind
 
 \ Subscribe to available radios
 : vfo_subscribe_radios_1
-	UI_R1_FREQ ' vfo_evt_r1_vfo pubsub_subscribe
-	UI_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
-	SYS_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
+	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
+	UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe_radios_2
-	UI_R1_FREQ ' vfo_evt_r1_vfo pubsub_subscribe
-	UI_R2_FREQ ' vfo_evt_r2_vfo pubsub_subscribe
-	UI_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
-	SYS_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
+	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
+	UI_R2_FREQ ' vfo_evt_r2_vfo fr:pubsub_subscribe
+	UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe_radios_3
-	UI_R1_FREQ ' vfo_evt_r1_vfo pubsub_subscribe
-	UI_R2_FREQ ' vfo_evt_r2_vfo pubsub_subscribe
-  UI_R3_FREQ ' vfo_evt_r3_vfo pubsub_subscribe
-  UI_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
-  SYS_TX_FREQ ' vfo_evt_tx_vfo pubsub_subscribe
+	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
+	UI_R2_FREQ ' vfo_evt_r2_vfo fr:pubsub_subscribe
+  UI_R3_FREQ ' vfo_evt_r3_vfo fr:pubsub_subscribe
+  UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+  SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe	\  --

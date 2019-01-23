@@ -31,7 +31,7 @@
 
 \ Make this a gui app
 true app:isgui !
-\ true log-async
+true log-async
 
 \ Set namespace
 ns: sdr

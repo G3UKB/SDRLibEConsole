@@ -1,7 +1,7 @@
 (*
 	agc.8th
  
-  AGC buttons component for the DynamicSDR application
+  AGC buttons component for the SDRLibEConsole application
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ ns: sdr
     m:new																			\ m
       "kind" "btn" m:!												\ m[+ "kind"]
       "label" r> dup >r name_for_agc m:!			\ m[+ "label"] r:ix agc
-      "agc-id" r> agc_for_name m:!						\ m[+ "agc_id"]
+      "agc-id" r> name_for_agc m:!						\ m[+ "agc_id"]
       "font" 14 m:!														\ etc
       "bg" "lightcyan4" m:!
       "fg" "blue" m:!
@@ -88,15 +88,15 @@ ns: sdr
 ;
 
 : set_agc_model_r1
-	agc_for_name model_r1_set_agc
+	agc_for_name app_model_r1_set_agc
 ;
 
 : set_agc_model_r2
-	agc_for_name model_r2_set_agc
+	agc_for_name app_model_r2_set_agc
 ;
 
 : set_agc_model_r3
-	agc_for_name model_r3_set_agc
+	agc_for_name app_model_r3_set_agc
 ;
 
 : agc_set_model	\ parent agc id --
@@ -171,18 +171,18 @@ ns: sdr
 
 \ Subscribe to available radios
 : agc_subscribe_radios_1
-	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
+	UI_R1_AGC ' agc_evt_r1_agc fr:pubsub_subscribe
 ;
 
 : agc_subscribe_radios_2
-	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
-	UI_R2_AGC ' agc_evt_r2_agc pubsub_subscribe
+	UI_R1_AGC ' agc_evt_r1_agc fr:pubsub_subscribe
+	UI_R2_AGC ' agc_evt_r2_agc fr:pubsub_subscribe
 ;
 
 : agc_subscribe_radios_3
-	UI_R1_AGC ' agc_evt_r1_agc pubsub_subscribe
-	UI_R2_AGC ' agc_evt_r2_agc pubsub_subscribe
-  UI_R3_AGC ' agc_evt_r3_agc pubsub_subscribe
+	UI_R1_AGC ' agc_evt_r1_agc fr:pubsub_subscribe
+	UI_R2_AGC ' agc_evt_r2_agc fr:pubsub_subscribe
+  UI_R3_AGC ' agc_evt_r3_agc fr:pubsub_subscribe
 ;
 
 : agc_subscribe	\  --

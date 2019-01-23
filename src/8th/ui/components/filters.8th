@@ -1,9 +1,9 @@
 (*
 	filters.8th
  
-  Filter buttons component for the DynamicSDR application
+  Filter buttons component for the SDRLibEConsole application
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -32,7 +32,7 @@ ns: sdr
     m:new																						\ m
       "kind" "btn" m:!															\ m[+ "kind"]
       "label" r> dup >r filter_lookup 2 a:@ nip m:!	\ m[+ "label"] r:ix mode
-      "mode-id" r> filter_for_name m:!							\ m[+ "filter_id"]
+      "filter-id" r> filter_lookup 2 a:@ nip m:!		\ m[+ "filter_id"]
       "font" 14 m:!																	\ etc
       "bg" "lightcyan4" m:!
       "fg" "blue" m:!
@@ -92,19 +92,19 @@ ns: sdr
 ;
 
 : set_filter_model_r1
-	filter_for_name model_r1_set_filter
+	filter_for_name app_model_r1_set_filter
 ;
 
 : set_filter_model_r2
-	filter_for_name model_r2_set_filter
+	filter_for_name app_model_r2_set_filter
 ;
 
 : set_filter_model_r3
-	filter_for_name model_r3_set_filter
+	filter_for_name app_model_r3_set_filter
 ;
 
 : set_filter_model_tx
-	filter_for_name model_tx_set_filter
+	filter_for_name app_model_tx_set_filter
 ;
 
 : filter_set_model	\ parent mode id --
@@ -199,24 +199,24 @@ ns: sdr
 
 \ Subscribe to available radios
 : filter_subscribe_radios_1
-	UI_R1_FILT ' filt_evt_r1_filt pubsub_subscribe
-	UI_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
-	SYS_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
+	UI_R1_FILT ' filt_evt_r1_filt fr:pubsub_subscribe
+	\ UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	\ SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
 ;
 
 : filter_subscribe_radios_2
-	UI_R1_FILT ' filt_evt_r1_filt pubsub_subscribe
-	UI_R2_FILT ' filt_evt_r2_filt pubsub_subscribe
-	UI_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
-	SYS_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
+	UI_R1_FILT ' filt_evt_r1_filt fr:pubsub_subscribe
+	UI_R2_FILT ' filt_evt_r2_filt fr:pubsub_subscribe
+	UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
 ;
 
 : filter_subscribe_radios_3
-	UI_R1_FILT ' filt_evt_r1_filt pubsub_subscribe
-	UI_R2_FILT ' filt_evt_r2_filt pubsub_subscribe
-  UI_R3_FILT ' filt_evt_r3_filt pubsub_subscribe
-  UI_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
-	SYS_TX_FILT ' filt_evt_tx_filt pubsub_subscribe
+	UI_R1_FILT ' filt_evt_r1_filt fr:pubsub_subscribe
+	UI_R2_FILT ' filt_evt_r2_filt fr:pubsub_subscribe
+  UI_R3_FILT ' filt_evt_r3_filt fr:pubsub_subscribe
+  UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
 ;
 
 : filter_subscribe	\  --

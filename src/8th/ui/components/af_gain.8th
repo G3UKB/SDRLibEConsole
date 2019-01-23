@@ -1,7 +1,7 @@
 (*
 	af-gain.8th
  
-  AF-GAIN slider component for the DynamicSDR application
+  AF-GAIN slider component for the SDRLibEConsole application
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -80,15 +80,15 @@ ns: sdr
 ;
 
 : set_afgain_model_r1
-	model_r1_set_afgain
+	app_model_r1_set_afgain
 ;
 
 : set_afgain_model_r2
-	model_r2_set_afgain
+	app_model_r2_set_afgain
 ;
 
 : set_afgain_model_r3
-	model_r3_set_afgain
+	app_model_r3_set_afgain
 ;
 
 : afgain_set_model	\ parent afgain id --
@@ -154,18 +154,18 @@ ns: sdr
 
 \ Subscribe to available radios
 : afgain_subscribe_radios_1
-	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain fr:pubsub_subscribe
 ;
 
 : afgain_subscribe_radios_2
-	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
-	UI_R2_AFGAIN ' afgain_evt_r2_afgain pubsub_subscribe
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain fr:pubsub_subscribe
+	UI_R2_AFGAIN ' afgain_evt_r2_afgain fr:pubsub_subscribe
 ;
 
 : afgain_subscribe_radios_3
-	UI_R1_AFGAIN ' afgain_evt_r1_afgain pubsub_subscribe
-	UI_R2_AFGAIN ' afgain_evt_r2_afgain pubsub_subscribe
-  UI_R3_AFGAIN ' afgain_evt_r3_afgain pubsub_subscribe
+	UI_R1_AFGAIN ' afgain_evt_r1_afgain fr:pubsub_subscribe
+	UI_R2_AFGAIN ' afgain_evt_r2_afgain fr:pubsub_subscribe
+  UI_R3_AFGAIN ' afgain_evt_r3_afgain fr:pubsub_subscribe
 ;
 
 : afgain_subscribe	\  --
