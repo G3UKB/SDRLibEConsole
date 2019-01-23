@@ -153,7 +153,7 @@ ns: sdr
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
 : __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
-: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
