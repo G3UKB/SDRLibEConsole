@@ -77,24 +77,25 @@ ns: sdr
 	app_model_init
 	
 	\ ----------------------------------
-	\ Main UI subscribes to SYS_RUN_STATE only
-	main_window_subscribe 0.2 sleep
-	\ Gets pushed onto main thread for UI to build
+	\ Main UI subscribes to SYS_RUN_STATE
+	\ Subscribe propogates down to all widgets which do own subscriptions
+	main_window_subscribe 
+	0.2 sleep
+	\ Publish SYS_RUN_STATE, gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
 	2 sleep
 	
-	\ Once UI is stable we can populate it with the UI events
+	\ Once UI is stable we can populate it with the UI event data
 	option_model_ui_evnts
 	app_model_ui_evnts
-	2 sleep
+	
 	\ ----------------------------------
 	\ Connector
 	\ Initialise
 	conn_init
 	\ Attempt connection but do not start anything
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
-	
-	
+		
 	\ Done SOD
 	false st_app_sod!
 	
@@ -106,6 +107,8 @@ ns: sdr
 : cleanup_task	SED: --
 	\ in: 	none
 	\ out:	none
+	\ So we know who we are
+	"CLEANUP_TASK" t:name!
 	\ Otherwise messages are lost in closedown
 	false log-async
 	\ Allocate param stack for this thread

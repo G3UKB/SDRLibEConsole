@@ -221,7 +221,7 @@ ns: fr
 	\				s - task name
 	\ out:	none
 	\ t:name@ null? if .s "Got null " throw then
-	\ cr "1:" . t:name@ . cr
+	\ cr "1:" t:name@ s:+ ":" s:+ 2 pick >s s:+ . cr
 	\ cr "1:" t:name@ s:+ . cr
 	\ Word to invoke under the "cb" key and data under the "data" key
 	\ The data is cloned before the send as it must be detached from the current task pool
@@ -229,16 +229,13 @@ ns: fr
 	\ Clone the whole message structure and push to the task q
 	clone nip
 	\ Get task for name and lock task-dict
-	swap __gs_lock@ 
-	\ cr "2:" . t:name@ . cr 
+	swap __gs_lock@  
 	\ cr "2:" t:name@ s:+ . cr
 	swap m:@ nip
 	\ Push message to task q
 	dup rot t:push 
-	\ cr "3:" . t:name@ . cr 
 	\ cr "3:" t:name@ s:+  . cr
 	t:notify 
-	\ cr "4:" . t:name@ . cr
 	\ cr "4:" t:name@ s:+ . cr
 	\ Release lock
 	__gs_unlock

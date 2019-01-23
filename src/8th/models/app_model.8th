@@ -296,7 +296,7 @@ ns: sdr
 	\ in: 	0: n - new R1 frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
-	a:open
+	drop ;; a:open
 	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "freq" 4 pick val! 
 	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "simplex"] "freq" 4 pick val!
 	SYS_R1_FREQ __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
@@ -363,7 +363,7 @@ ns: sdr
 	\ in: 	0: n - new simplex/duplex TX frequency in Hz
 	\				1: T - true if to be propogated to UI as well as SYS
 	\ out: 	none
-	__app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
+	drop ;; __app_model@ ["tx-state", ` dyn_idx ` , ` data_idx ` , "state", "duplex"] val@ if
 		__do_app_tx_set_duplex_freq
 	else
 		__do_app_tx_set_simplex_freq

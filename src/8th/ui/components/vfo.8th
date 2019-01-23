@@ -745,8 +745,8 @@ vfo_separator @ g:+kind
 \ Subscribe to available radios
 : vfo_subscribe_radios_1
 	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
-	UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
-	SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	\ UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	\ SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe_radios_2
