@@ -95,7 +95,7 @@ ns: sdr
 	conn_init
 	\ Attempt connection but do not start anything
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
-		
+	
 	\ Done SOD
 	false st_app_sod!
 	

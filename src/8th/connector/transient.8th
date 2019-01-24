@@ -1,0 +1,139 @@
+(* 
+	transient
+ 
+  Transient tasks to support connector
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Set namespace
+ns: sdr
+
+(*
+	Transient tasks are tasks started to complete a relatively short operation. They run to 
+	completion and exit. These are usually called from GUI event procs to get processing off
+	the GUI thread.
+*)
+
+\ ----------------------------------
+\ This must br run as a task and not called directly
+\ Try to connect and start the radio hardware
+: conn_try_connect	SED: T -- T
+	\ in: 	0: T - if true then run radio if possible else just give a status
+	\ out:	0: T - if true the radio was successfully run up
+	>r
+	"TRY_CONNECT_TASK" t:name!
+	t:curtask "TRY_CONNECT_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Allocate param stack for this thread
+	param_st_alloc
+	conn_poll if
+		"SDRLibE server is on-line..." log
+		r> if
+			\ Set server running
+			true st_svr_running!
+			\ Try discover to see if we have radio hardware
+			conn_discover "resp" m:@ "ACK" s:= if
+				\ We have radio hardware
+				"Radio hardware found!" log
+				\ Set state to on-line
+				true st_rad_online!
+				\ ***
+				\ ToDo - response processing and multi-radio
+				\ Set the default route
+				\ ToDo: This is temporary until we fix the audio routing.
+				conn_set_default_route "Route: " . . cr
+				\ Start the server processes (this starts the DSP etc)
+				conn_start_server "Server start: " . . cr
+				\ Now update the server with the current values
+				option_model_sys_evnts
+				app_model_sys_evnts
+				\ Connector events
+				\ Start the event services
+				svr_evnt_init
+				\ 200ms period
+				200 svr_evnt_set_disp_period
+				\ Just start radio 1 displays for now
+				true false false svr_evnt_set_disp_state			
+				\ End ToDo
+				\ ***
+				true
+			else
+				"****" log
+				"No radio hardware found!" log
+				"To try again use the 'Discover' button." log
+				"****" log
+				false
+			then
+		then
+	else
+		\ No server or no network connectivity to the server
+		"****" log
+		"The SDRLibE Server is not running!" log 
+		"To try again use the 'Discover' button." log
+		"****" log
+		rdrop  false
+	then 
+	param_st_free
+	
+	"TRY_CONNECT_TASK exiting" log ;
+
+\ ----------------------------------
+\ This must br run as a task and not called directly
+\ Try to start/stop the radio hardware
+: conn_try_radio	SED: T --
+	\ in: 	0: T - if true then start radio else stop radio
+	\ out:	none
+	\ state updated
+	>r
+	"TRY_RADIO_TASK" t:name!
+	t:curtask "TRY_RADIO_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Allocate param stack for this thread
+	\ param_st_alloc
+	r> if
+		\ Try to start the radio
+		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
+			\ Set radio running flag
+			true st_rad_running!
+		else
+			"****" log
+			"Radio did not start!" log
+			"To try again use the 'Start' button." log
+			"****" log
+		then
+	else
+		\ Try to stop the radio
+		conn_stop_radio "resp" m:@ "ACK" s:= if
+			\ Set radio running flag
+			false st_rad_running!
+		else
+			"****" log
+			"Radio did not stop" log
+			"To try again use the 'Stop' button." log
+			"****" log
+		then
+	then
+	"TRY_RADIO_TASK exiting" log ;
+
+\ ========================================
+\ Reset namespace
+ns: user

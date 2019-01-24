@@ -47,8 +47,14 @@
 "../models/option_model.8th" f:include
 
 \ ========================================
+\ UI displays data
+"../ui/display/disp_common.8th"  f:include
+
+\ ========================================
 \ Connector
 "../connector/connector.8th" f:include
+"../connector/events.8th" f:include
+"../connector/transient.8th" f:include
 
 \ ========================================
 \ UI common
@@ -80,9 +86,10 @@
 
 \ ========================================
 \ UI displays
+\ "../ui/display/disp.8th"  f:include
 \ "../ui/display/disp_render.8th"  f:include
 \ "../ui/display/disp_builder.8th"  f:include
-\ "../ui/display/disp.8th"  f:include
+
 
 \ ========================================
 \ UI
