@@ -1,5 +1,5 @@
 (* 
-	events
+	events.8th
  
   SDRLibEConnector server display event handler
  
@@ -23,8 +23,7 @@
 *)
 
 (*
-	This is the server event system task. It is not a gen-server as the overhead is too great. It is
-	registered in the task map such that we can reference it and close down correctly.
+	This is the server event system task. It is not a gen-server as the messaging overhead is too high
 	
 	Display dats for panadapter/waterfall and WBS is high volume with a frequency of no less
 	than 200ms, otherwise the display will be visibly jerky.
@@ -33,10 +32,15 @@
 	The connection is therefore direct...
 	
 	We tell the server what data is required i.e r1/r2/r3/wbs and the required frequency of that data. The
-	server will then send that data on a separate UDP channel at the requested frequency. We receive that data
-	in this module and callback the display builder system with the data. The builder does not do the rendering,
-	that is a separate GUI event driven module. The builder does not therefore have to run on the main thread, it
-	can run on the eb#vent thread.
+	server will then send that data on separate UDP channels for each display at the requested frequency. 
+	We start a reader thread for each display. These threads are enabled/disabled by the svr_evnt_set_disp_state
+	call. When a reader thread is active data received is shipped directly to the display instance data buffer 
+	[disp_common.8th]. Calls are then made to the builder to make the arrays for subsequent rendering. 
+	The builders are passed the display instance data id.
+	
+	The builders can operate on any thread as they do not render, that is handled by disp_rendered.8th which operates
+	off a GUI timer so the render can be at a different frequency to the data collection if required. This
+	of course must be on the main thread.
 *)
 
 \ Set namespace
@@ -48,14 +52,115 @@ ns: sdr
 \ ===============================================================================
 
 \ Initialisation
+: __svr_evnt_host	"localhost" ;
+: __svr_evnt_d1_port 10011 ;
+: __svr_evnt_d2_port 10012 ;
+: __svr_evnt_d3_port 10013 ;
+	
 \ Create UDP socket
-: __svr_evnt_create_socket	SED: --
+: __svr_evnt_create_d1_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d1_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d1_port net:getaddrinfo swap net:bind ;
+
+: __svr_evnt_create_d2_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d2_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d2_port net:getaddrinfo swap net:bind ;
+	
+: __svr_evnt_create_d3_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d3_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d3_port net:getaddrinfo swap net:bind ;
+	
+\ ----------------------------------	
+\ Get command socket
+: __svr_evnt_d1_sock@	"udp_d1_evnt_sock" t:@ ;
+: __svr_evnt_d2_sock@	"udp_d2_evnt_sock" t:@ ;
+: __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
+
+\ ========================================
+\ Reader Task
+\ ========================================
+
+\ Read event data while enabled and not terminated
+\ Write event data to the data-buffer in instance data
+: __svr_evnt_reader	SED n s --
+	\ in: 	0: n - reader instance
+	\				1: s - socket
+	\ out:	none
+	\ Save the task instance
+	dup "reader_inst" t:!
+	\ Register the task instance
+	"DISPLAY-" swap >s s:+ dup t:name!
+	t:curtask swap fr:gs_reg!
+	\ Save socket
+	"reader_skt" t:!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Wait for work
+	repeat
+		-1 t:q-wait
+		t:pop null? not if
+			break
+		else
+			drop
+		then
+	again
+	
+	"run" s:= if
+		repeat
+			t:qlen 0 n:> if 
+				t:pop null? not if
+				"term" s:= if break then
+			else
+				drop
+				\ See if we have data
+				"reader_skt" t:@ true 500 net:wait if
+					"reader_inst" t:@ disp_buf_ref 0 net:recvfrom null? not if
+						"Received:" swap s:+ log 4drop
+					then
+			then	
+		again
+	then
+	t:name@ " exiting..." s:+ log
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ ========================================
+\ General management
+\ Initialise the sockets
+: svr_evnt_init	SED:  --
 	\ in: 	none
 	\ out:	none
-	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_evnt_sock" t:! ;
+	\ Create sockets
+	__svr_evnt_create_d1_sock
+	__svr_evnt_create_d2_sock 
+	__svr_evnt_create_d3_sock 
+	\ Start tasks
+	"DISP-R1" __svr_evnt_d1_sock@ 2 __svr_evnt_reader t:task-n
+	"DISP-R2" __svr_evnt_d2_sock@ 2 __svr_evnt_reader t:task-n
+	"DISP-R3" __svr_evnt_d3_sock@ 2 __svr_evnt_reader t:task-n
+	;
+
+\ ----------------------------------	
+\ Set the display period in ms
+: svr_evnt_set_disp_period	SED n -- T
+	\ in: 	0: n - update period in ms
+	\ out:	0: T - true if success
+	conn_set_disp_period 
+	"resp" m:@ "ACK" if true else false then ;
+
+\ ----------------------------------
+\ Enable/disable displays
+: svr_evnt_set_disp_state	SED T T T -- T
+	\ in: 	0: T - true if enable R1 display
+	\				1: T - true if enable R2 display
+	\				2: T - true if enable R3 display
+	\ out:	0: T - true if success
+	conn_set_disp_state 
+	"resp" m:@ "ACK" if true else false then ;
 	
-\ Get command socket
-: ___svr_evnt_sock@	SED: -- net
-	\ in: 	none
-	\ out:	s0 - event socket
-	"udp_evnt_sock" t:@ ;
+\ ========================================
+\ Reset namespace
+ns: user

@@ -166,6 +166,7 @@ ns: sdr
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_two_param >json ;
 
 \ Complex messages
 \ ----------------------------------	
@@ -175,7 +176,12 @@ ns: sdr
 	\ out:	0: s - json encoded default route message
 	>r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
 	"params" m:@ 3 r> a:! 4 r> a:! drop >json ;
-	
+
+\ ----------------------------------		
+: __conn_disp_state_msg SED: T T T -- s
+	{ "cmd" : "set_disp_state" , "params" : [] }
+	"params" m:@ rot a:push rot a:push rot a:push drop >json ;
+
 \ ===============================================================================
 \ Net
 
@@ -513,6 +519,28 @@ ns: sdr
 	\ out: 	q: * - "Timeout" or response data
 	rot rot  __conn_tx_filt_msg false swap __con_do_exchange ;
 
+\ ========================================
+\ Display functions
+
+\ ----------------------------------
+\ Set display period
+: do_conn_disp_period
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - period in ms
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_disp_period_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set display state
+: do_conn_disp_state
+	a:open
+	\ in: 	0: T - true if enable R1 display
+	\				1: T - true if enable R2 display
+	\				2: T - true if enable R3 display
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_disp_state_msg false swap __con_do_exchange ;
+	
 \ ===============================================================================
 \ PUBLIC
 \ Public procedural interface, call from any thread
@@ -659,6 +687,27 @@ ns: sdr
 	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
 	fr:response@ ;
 
+\ ----------------------------------
+\ Displays
+
+\ Set the display update period
+: conn_set_disp_period	SED: n -- *
+	\ in: 	0: n - update period in ms
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_disp_period rot fr:msg! 
+	fr:response@ ;
+
+\ Set the display state
+: conn_set_disp_state	SED: T T T -- *
+	\ in: 	0: T - true if enable R1 display
+	\				1: T - true if enable R2 display
+	\				2: T - true if enable R3 display
+	\ out:	0: * - response
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_disp_state rot fr:msg! 
+	fr:response@ ;	
+	
 \ ===============================================================================
 \ EVENT HANDLERS for Publish/Subscribe system
 \ Never call directly, only via pubsub_publish
