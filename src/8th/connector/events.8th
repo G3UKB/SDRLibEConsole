@@ -1,0 +1,61 @@
+(* 
+	events
+ 
+  SDRLibEConnector server display event handler
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+(*
+	This is the server event system task. It is not a gen-server as the overhead is too great. It is
+	registered in the task map such that we can reference it and close down correctly.
+	
+	Display dats for panadapter/waterfall and WBS is high volume with a frequency of no less
+	than 200ms, otherwise the display will be visibly jerky.
+	In order to maintain this data rate we cannot aford to transition the data through the normal
+	channels which involves potentially multiply clones and several tasks aka gen-server management. 
+	The connection is therefore direct...
+	
+	We tell the server what data is required i.e r1/r2/r3/wbs and the required frequency of that data. The
+	server will then send that data on a separate UDP channel at the requested frequency. We receive that data
+	in this module and callback the display builder system with the data. The builder does not do the rendering,
+	that is a separate GUI event driven module. The builder does not therefore have to run on the main thread, it
+	can run on the eb#vent thread.
+*)
+
+\ Set namespace
+ns: sdr
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__svr_evnt_
+\ ===============================================================================
+
+\ Initialisation
+\ Create UDP socket
+: __svr_evnt_create_socket	SED: --
+	\ in: 	none
+	\ out:	none
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_evnt_sock" t:! ;
+	
+\ Get command socket
+: ___svr_evnt_sock@	SED: -- net
+	\ in: 	none
+	\ out:	s0 - event socket
+	"udp_evnt_sock" t:@ ;
