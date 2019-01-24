@@ -23,11 +23,11 @@
 *)
 
 (*
-	This is the server event system task. It is not a gen-server as the messaging overhead is too high
+	This is the server event system task[s]. It is not a gen-server as the messaging overhead is too high
 	
 	Display dats for panadapter/waterfall and WBS is high volume with a frequency of no less
 	than 200ms, otherwise the display will be visibly jerky.
-	In order to maintain this data rate we cannot aford to transition the data through the normal
+	In order to maintain this data rate we cannot afford to transition the data through the normal
 	channels which involves potentially multiply clones and several tasks aka gen-server management. 
 	The connection is therefore direct...
 	
@@ -38,8 +38,8 @@
 	[disp_common.8th]. Calls are then made to the builder to make the arrays for subsequent rendering. 
 	The builders are passed the display instance data id.
 	
-	The builders can operate on any thread as they do not render, that is handled by disp_rendered.8th which operates
-	off a GUI timer so the render can be at a different frequency to the data collection if required. This
+	The builders can operate on any thread as they do not render, that is handled by disp_renderer.8th which operates
+	off a GUI timer so the render can be at a different frequency to the data collection if required. Rendering
 	of course must be on the main thread.
 *)
 
