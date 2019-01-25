@@ -273,7 +273,7 @@ ns: sdr
 		3drop
 	then
 ;
-
+(*
 \ Make and render the display on a separate thread
 \ Runs every 100ms
 : disp_task			\ disp-id --
@@ -297,6 +297,19 @@ ns: sdr
 		0.1 sleep
 	again
 	"Display task exiting..." log
+;
+*)
+\ Make and render the display on a separate thread
+\ Runs every 100ms
+: disp_builder	SED: s --
+	
+	\ Store the disp-id in a task var
+	"this-disp-id" t:!
+	"this-disp-id" t:@ wait_disp_s4
+	make_grid_array
+	make_pan_array
+	make_wf_array
+	"this-disp-id" t:@ rel_disp_s4
 ;
 
 \ Restore namespace	
