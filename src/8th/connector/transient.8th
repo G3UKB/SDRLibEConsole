@@ -72,7 +72,7 @@ ns: sdr
 				\ 200ms period
 				200 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
 				\ Just start radio 1 displays for now
-				false false true svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
+				true false false svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
 				\ ***
 				true

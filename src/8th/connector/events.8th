@@ -104,7 +104,7 @@ ns: sdr
 	repeat
 		"reader_inst" t:@ "-waiting for work" s:+ log
 		-1 t:q-wait
-		"reader_inst" t:@ "-off wait" s:+ log
+		\ "reader_inst" t:@ "-off wait" s:+ log
 		t:pop null? not if
 			break
 		else
@@ -116,7 +116,7 @@ ns: sdr
 	\ ----------------------------------
 	\ Have we been told to run?
 	"run" s:= if
-		"reader_inst" t:@ "-running" s:+ log
+		\ "reader_inst" t:@ "-running" s:+ log
 		\ Yes, so enter the read loop
 		repeat
 			\ Check for termination at top of loop
@@ -127,9 +127,9 @@ ns: sdr
 			else
 				 \ drop
 				\ See if we have data
-				"reader_inst" t:@ "-waiting data" s:+ log
+				\ "reader_inst" t:@ "-waiting data" s:+ log
 				"reader_skt" t:@ true 500 net:wait if
-					"reader_inst" t:@ "-read data?" s:+ log
+					\ "reader_inst" t:@ "-read data?" s:+ log
 					\ Socket says yes
 					"reader_inst" t:@ disp_buf_ref 0 net:recvfrom null? not if
 						\ Read something
@@ -185,9 +185,9 @@ ns: sdr
 	2 pick 2 pick 2 pick conn_set_disp_state
 	"resp" m:@ "ACK" s:= nip if 
 		\ Enable the corresponding reader tasks
-		if "R1" . cr "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
-		if "R2" . cr "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
 		if "R3" . cr "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "R2" . cr "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "R1" . cr "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
 		true 
 	else 
 		false 
