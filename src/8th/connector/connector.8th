@@ -166,7 +166,7 @@ ns: sdr
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_two_param >json ;
+: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
 
 \ Complex messages
 \ ----------------------------------	
@@ -535,11 +535,12 @@ ns: sdr
 \ Set display state
 : do_conn_disp_state
 	a:open
-	\ in: 	0: T - true if enable R1 display
-	\				1: T - true if enable R2 display
-	\				2: T - true if enable R3 display
+	\ in: 	0: n - sender (task name)
+	\				1: T - true if enable R1 display
+	\				2: T - true if enable R2 display
+	\				3: T - true if enable R3 display
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_disp_state_msg false swap __con_do_exchange ;
+	3 pick 3 pick 3 pick __conn_disp_state_msg false swap __con_do_exchange 3drop ;
 	
 \ ===============================================================================
 \ PUBLIC
@@ -694,7 +695,7 @@ ns: sdr
 : conn_set_disp_period	SED: n -- *
 	\ in: 	0: n - update period in ms
 	\ out:	0: * - response
-	a:new swap a:push swap a:push fr:+sender
+	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_disp_period rot fr:msg! 
 	fr:response@ ;
 
@@ -704,7 +705,7 @@ ns: sdr
 	\				1: T - true if enable R2 display
 	\				2: T - true if enable R3 display
 	\ out:	0: * - response
-	a:new swap a:push swap a:push fr:+sender
+	a:new swap a:push swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_disp_state rot fr:msg! 
 	fr:response@ ;	
 	

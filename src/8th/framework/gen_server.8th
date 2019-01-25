@@ -80,8 +80,8 @@ ns: fr
 \ ----------------------------------	
 \ Store task referance
 : __gs_reg!	SED: t s --
-	\ in: 	t - task object
-	\				s - task name
+	\ in: 	o: s - task name
+	\				1: t - task object
 	\ out:	none
 	__gs_lock@
 	swap rot m:! drop 

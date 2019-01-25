@@ -116,6 +116,7 @@ ns: sdr
 	
 	"Shutdown in progress" log
 	\ Close connector
+	svr_evnt_term
 	conn_term
 	\ Close models
 	option_model_term

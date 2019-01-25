@@ -52,6 +52,7 @@ ns: sdr
 			\ Try discover to see if we have radio hardware
 			conn_discover "resp" m:@ "ACK" s:= if
 				\ We have radio hardware
+				drop
 				"Radio hardware found!" log
 				\ Set state to on-line
 				true st_rad_online!
@@ -67,7 +68,7 @@ ns: sdr
 				app_model_sys_evnts
 				\ Connector events
 				\ Start the event services
-				svr_evnt_init
+				svr_evnt_init 
 				\ 200ms period
 				200 svr_evnt_set_disp_period
 				\ Just start radio 1 displays for now
@@ -76,6 +77,7 @@ ns: sdr
 				\ ***
 				true
 			else
+				drop
 				"****" log
 				"No radio hardware found!" log
 				"To try again use the 'Discover' button." log
