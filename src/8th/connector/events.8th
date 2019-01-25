@@ -136,7 +136,7 @@ ns: sdr
 						"reader_inst" t:@ "-read data" s:+ log
 						\ "Received:" swap s:+ log 4drop
 						\ Call display builder to process the data
-						"reader_inst" t:@ disp_builder 
+						disp_builder 
 					then
 				then
 			then

@@ -27,9 +27,6 @@
 \ Set namespace
 ns: sdr
 
-\ Display termination
-false var, disp_term
-
 \ Display instance data for the 3 radios
 \ These are separate structures so we don't need locks
 {

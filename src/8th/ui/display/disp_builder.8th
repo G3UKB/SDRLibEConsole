@@ -27,10 +27,6 @@ ns: sdr
 
 \ ===============================================================================
 \ Array builder words
-\ Return task var
-: get_disp_id	\ -- disp-id
-	"this-disp-id" t:@
-;
 
 \ Add one vertical label
 : add_v_label											\ y_start idx -- y_start 
@@ -227,8 +223,8 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id pan_data_ref a:clear drop				\ width height
 	\ Get display data for the instance
-	"this-disp-id" t:@ disp_id_to_inst					\ width height disp-id
-	c_i_get_disp_data														\ width height disp-data(float array)
+	"reader_inst" t:@ disp_id_to_inst					\ width height disp-id
+	get_disp_id data_buffer_ref	"1024f" unpack drop													\ width height disp-data(float array)
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -255,7 +251,7 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id wf_data_ref a:clear drop						\ width height
 	\ Get display data for the instance
-	"this-disp-id" t:@ disp_id_to_inst c_i_get_disp_data 	\ width height disp-data(float array)
+	"reader_inst" t:@ disp_id_to_inst data_buffer_ref	"1024f" unpack drop	 	\ width height disp-data(float array)
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -304,12 +300,12 @@ ns: sdr
 : disp_builder	SED: s --
 	
 	\ Store the disp-id in a task var
-	"this-disp-id" t:!
-	"this-disp-id" t:@ wait_disp_s4
+	"reader_inst" t:!
+	"reader_inst" t:@ wait_disp_s4
 	make_grid_array
 	make_pan_array
 	make_wf_array
-	"this-disp-id" t:@ rel_disp_s4
+	"reader_inst" t:@ rel_disp_s4
 ;
 
 \ Restore namespace	
