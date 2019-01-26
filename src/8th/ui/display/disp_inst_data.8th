@@ -22,8 +22,6 @@
      bob@bobcowdery.plus.com
 *)
 
-
-
 \ ============================================================================
 
 \ ========================================
@@ -31,6 +29,11 @@
 false var, disp_inst_data_test
 
 disp_inst_data_test @ #if
+	"../../common/events.8th"  f:include
+	"../../framework/param_st.8th"  f:include
+	"../../framework/gen_server.8th"  f:include
+	"../../framework/pub_sub.8th"  f:include
+	"disp_defs.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 #then
@@ -156,7 +159,7 @@ ns: sdr
 : radio_ref	SED: s -- m
 	\ in: 	0: s - display name
 	\ out:	0: m - locked radio instance data
-	{ "DISP-R1": ` disp_instance_data_1 lock @ ` , "DISP-R2": ` disp_instance_data_2 lock @ ` , "DISP-R3": ` disp_instance_data_3 lock @ ` }
+	{ "DISP-R1": ( disp_instance_data_1 lock @ ) , "DISP-R2": ( disp_instance_data_2 lock @ ) , "DISP-R3": ( disp_instance_data_3 lock @ ) }
 	swap caseof ;
 
 \ ----------------------------------
@@ -164,7 +167,7 @@ ns: sdr
 : radio_ref_unlock	SED: s --
 	\ in: 	0: s - display name
 	\ out:	none
-	{ "DISP-R1": ` disp_instance_data_1 unlock drop ` , "DISP-R2": ` disp_instance_data_2 unlock drop ` , "DISP-R3": ` disp_instance_data_3 unlock drop ` }
+	{ "DISP-R1": ( disp_instance_data_1 unlock drop ) , "DISP-R2": ( disp_instance_data_2 unlock drop ) , "DISP-R3": ( disp_instance_data_3 unlock drop ) }
 	swap caseof ;	
 
 \ ----------------------------------
@@ -300,13 +303,16 @@ ns: sdr
 	\				1: n - height
 	\				2: n - width
 	\ out:	none
+	\ Save the params for image create
+	dup >p 2 pick >p
+	\ set the new disp metrics
 	"disp-metrics" m:@ nip
 	1 rot a:!
 	0 rot a:!
 	drop
-	\ Create and store the new image at the current width
-	1 pick wf_height img:new 	\ disp-id w h img 
-	3 pick "wf-img" rot m:! drop ;
+	\ Create and store the new image at the current width and height
+	p> wf_height img:new 			\ w h img 
+	p> "wf-img" rot m:! drop ;
 
 \ ========================================
 \ Mouse
@@ -335,7 +341,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Set mouse position
-: set_mouse_pos	\  x y disp-id -- 
+: set_mouse_pos	SED: n n m --
 	\ in: 	0: m - display instance data
 	\				1: n - Y coord
 	\				2: n - X coord
@@ -351,8 +357,7 @@ ns: sdr
 	\ in: 	0: m - display instance data
 	\				1: T - true|false
 	\	out:	none
-	"mouse-valid" rot m:!
-;
+	"mouse-valid" rot m:! drop ;
 
 \ ========================================
 \ Image
@@ -368,11 +373,10 @@ ns: sdr
 
 \ ----------------------------------
 \ Get the waterfall image
-: get_wf_img	\ disp-id -- img
+: get_wf_img	SED: m -- img
 	\ in: 	0: m - display instance data
 	\	out:	0: img - image
-	"wf-img" m:@ nip
-;
+	"wf-img" m:@ nip ;
 	
 \ ========================================
 \ Radio params
@@ -384,8 +388,7 @@ ns: sdr
 : get_disp_mid_freq	SED: m -- n
 	\ in: 	0: m - display instance data				
 	\	out:	0: n - mid frequency in Hz
-	"mid-freq" m:@ nip
-;
+	"mid-freq" m:@ nip ;
 
 \ ----------------------------------
 \ Set mid frequency of display area
@@ -393,16 +396,14 @@ ns: sdr
 	\ in: 	0: m - display instance data
 	\				1: n - mid frequency in Hz
 	\	out:	none
-	"mid-freq" rot m:! drop
-;
+	"mid-freq" rot m:! drop ;
 
 \ ----------------------------------
 \ Get radio mode
 : get_disp_mode	SED: m -- n
 	\ in: 	0: m - display instance data				
 	\	out:	0: n - radio mode
-	"mode" m:@ nip
-;
+	"mode" m:@ nip ;
 
 \ ----------------------------------
 \ Set radio mode
@@ -410,16 +411,14 @@ ns: sdr
 	\ in: 	0: m - display instance data
 	\				1: n - radio mode
 	\	out:	none
-	"mode" rot m:! drop
-;
+	"mode" rot m:! drop ;
 
 \ ----------------------------------
 \ Get radio filter
 : get_disp_filt	SED: m -- n
 	\ in: 	0: m - display instance data				
 	\	out:	0: n - radio filter
-	"filter" m:@ nip
-;
+	"filter" m:@ nip ;
 
 \ ----------------------------------
 \ Set radio filter
@@ -427,8 +426,7 @@ ns: sdr
 	\ in: 	0: m - display instance data
 	\				1: n - radio filter
 	\	out:	none
-	"filter" rot m:! drop
-;
+	"filter" rot m:! drop ;
 
 \ ========================================
 \ Restore namespace	
@@ -440,5 +438,55 @@ ns: user
 \ ===============================================================================
 disp_inst_data_test @ #if
 
+	: push_data
+		"DISP-R1" sdr:radio_ref >r
+		"A GUI" r@ sdr:set_gui_disp_instance
+		100 50 r@ sdr:set_disp_win_metrics
+		200 100 r@ sdr:set_disp_disp_metrics
+		150 180 r@ sdr:set_mouse_pos
+		true r@ sdr:mouse_valid
+		"An image" r@ sdr:set_wf_img
+		14000000 r@ sdr:set_disp_mid_freq
+		5 r@ sdr:set_disp_mode
+		6 r@ sdr:set_disp_filt
+		"DISP-R1" sdr:radio_ref_unlock
+	;
+	
+	: pull_data
+			"DISP-R1" sdr:radio_ref >r
+			r@ sdr:get_gui_disp_instance log
+			r@ sdr:get_disp_win_metrics >s log
+			r@ sdr:get_disp_disp_metrics >s log
+			r@ sdr:get_mouse_pos >s log
+			r@ sdr:get_wf_img log
+			r@ sdr:get_disp_mid_freq >s log
+			r@ sdr:get_disp_mode >s log
+			r@ sdr:get_disp_filt >s log
+			"DISP-R1" sdr:radio_ref_unlock
+	;
 
+	: tn
+		param_st_alloc
+		push_data
+		pull_data
+		param_st_free
+	;
+	
+	[] var, ps_tasks
+	
+	: run_task	\ n -- 
+		"Task-" swap >s s:+ 1 ' tn t:task-n ps_tasks @ swap a:push drop
+	;
+
+	: usage_test	\ --
+		' run_task 1 1 loop
+		0.1 sleep
+	;
+
+	cr cr "Running usage test..." . cr cr
+	usage_test
+	1 sleep
+	"Done usage test" . cr
+	
+	bye
 #then

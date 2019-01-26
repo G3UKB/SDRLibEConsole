@@ -48,6 +48,7 @@
 
 \ ========================================
 \ UI displays data
+"../ui/display/disp_defs.8th"  f:include
 "../ui/display/disp_common.8th"  f:include
 "../ui/display/disp_inst_data.8th"  f:include
 

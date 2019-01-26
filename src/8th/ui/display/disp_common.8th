@@ -27,37 +27,8 @@
 \ Set namespace
 ns: sdr
 
-
 \ ===============================================================================
-\ Definitions
-
-\ ===============================================================================
-\ Panadapter and waterfall definitions
-
-\ ----------------------------------
-\ Divisions and margins
-\ Paradapter grid divs
-: divs 6 ;
-\ Left, right, top, bottom margins (limits of grid and display)
-: l_margin 35 ;
-: r_margin 15 ;
-: t_margin 10 ;
-: b_margin 100 ;
-\ Adjustments for label data to correctly align
-: x_h_label_adj -20 ;
-: y_h_label_adj -10 ;
-: y_v_label_adj -3 ;
-\ Fixed height for waterfall display
-: wf_height 75 ;
-
-\ ========================================
-\ db scale to scale the Y axis of the panadapter display
-: low_db -140 ;
-: high_db -20 ;
-: span_db low_db n:abs high_db n:+ ;
-: step_db span_db divs  n:/ ;
-: inter_db 	\ idx
-	divs n:- n:abs step_db n:* low_db n:+ >s ;
+\ Panadapter and waterfall calculations
 
 \ dBm per pixel in the y plane
 : dBm_pp	\ disp_id -- dBm-pp 

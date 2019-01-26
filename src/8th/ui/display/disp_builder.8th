@@ -31,6 +31,10 @@ ns: sdr
 	The instance data is locked for the duration as it is shared with the renderer.
 *)
 
+\ Get instance data
+: get_inst_data
+	"inst_data" t:@ ;
+	
 \ ===============================================================================
 \ Array builder words
 
@@ -40,7 +44,7 @@ ns: sdr
 	a:push													\ y_start ["idx"]
 	5 a:push												\ y_start ["idx",x]
 	1 pick y_v_label_adj n:+ a:push	\ y_start ["idx",x,y]
-	get_disp_id v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
+	get_inst_data v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
 	drop														\ y_start 
 ;
 
@@ -61,11 +65,11 @@ ns: sdr
 
 \ Add one horizontal label
 : add_h_label											\ high x_start idx -- high x_start
-	get_disp_id freq_str a:new swap \ high x_start [] "idx"
+	get_inst_data freq_str a:new swap \ high x_start [] "idx"
 	a:push													\ high x_start ["idx"]
 	1 pick x_h_label_adj n:+ a:push	\ high x_start ["idx",x]
 	2 pick y_h_label_adj n:+ a:push	\ high x_start ["idx",x,y]
-	get_disp_id h_label_data_ref swap a:push  	\ high x_start h_label_data
+	get_inst_data h_label_data_ref swap a:push  	\ high x_start h_label_data
 	drop														\ high x_start
 ;
 
@@ -91,7 +95,7 @@ ns: sdr
 	swap n:-								\ height rel-dBm
 	swap b_margin n:- swap	\ height-margin rel-dBm
 	\ y-coord = height - (rel-dBm * dBm_pp)
-	get_disp_id dBm_pp n:* n:- n:int		\ y-coord
+	get_inst_data dBm_pp n:* n:- n:int		\ y-coord
 ;
 
 \ Color check words
@@ -174,7 +178,7 @@ ns: sdr
 	rot													\ disp-data height width  y-coord [] x-coord  
 	a:push											\ disp-data height width  y-coord [x-coord]
 	swap a:push									\ disp-data height width  [x-coord, y-coord]
-	get_disp_id pan_data_ref 		\ disp-data height width  [x-coord, y-coord] pan-data
+	get_inst_data pan_data_ref 		\ disp-data height width  [x-coord, y-coord] pan-data
 	swap 												\ disp-data height width  spec-data [x-coord, y-coord]
 	a:push drop  								\ disp-data height width
 ;
@@ -192,7 +196,7 @@ ns: sdr
 	rot													\ disp-data height width  colour [] x-coord  
 	a:push											\ disp-data height width  colour [x-coord]
 	swap a:push									\ disp-data height width  [x-coord, colour]
-	get_disp_id wf_data_ref			\ disp-data height width  [x-coord, colour] wf-data
+	get_inst_data wf_data_ref			\ disp-data height width  [x-coord, colour] wf-data
 	swap 												\ disp-data height width  spec-data [x-coord, colour]
 	a:push drop  								\ disp-data height width
 ;
@@ -201,11 +205,11 @@ ns: sdr
 \ Build grid array
 : make_grid_array	\ --
 	\ Get current widow size
-	get_disp_id get_disp_win_metrics a:open
+	get_inst_data get_disp_win_metrics a:open
 	\ Make grid and label arrays
-	get_disp_id v_label_data_ref a:clear drop
-	get_disp_id h_label_data_ref a:clear drop
-	get_disp_id fixed_data_ref a:clear
+	get_inst_data v_label_data_ref a:clear drop
+	get_inst_data h_label_data_ref a:clear drop
+	get_inst_data fixed_data_ref a:clear
 	' add_h_line 0 divs loop
 	' add_v_line 0 divs loop
 	3drop
@@ -225,9 +229,9 @@ ns: sdr
 \ Build pan array
 : make_pan_array															\ --
 	\ Get current widow size
-	get_disp_id get_disp_win_metrics a:open			\ width height
+	get_inst_data get_disp_win_metrics a:open			\ width height
 	\ Clear the data array
-	get_disp_id pan_data_ref a:clear drop				\ width height
+	get_inst_data pan_data_ref a:clear drop				\ width height
 	\ Get display data for the instance
 	"inst_data" t:@	get_raw_data 	\ width height disp-data(float array)														
 	\ ... or calibrate
@@ -252,9 +256,9 @@ ns: sdr
 \ Build wf array
 : make_wf_array	\ --
 \ Get current widow size
-	get_disp_id get_disp_win_metrics a:open					\ width height
+	get_inst_data get_disp_win_metrics a:open					\ width height
 	\ Clear the data array
-	get_disp_id wf_data_ref a:clear drop						\ width height
+	get_inst_data wf_data_ref a:clear drop						\ width height
 	\ Get display data for the instance
 	"inst_data" t:@ get_raw_data	 	\ width height disp-data(float array)
 	\ ... or calibrate
