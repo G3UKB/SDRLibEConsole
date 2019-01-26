@@ -479,7 +479,7 @@ disp_inst_data_test @ #if
 	;
 
 	: usage_test	\ --
-		' run_task 1 1 loop
+		' run_task 1 10 loop
 		0.1 sleep
 	;
 

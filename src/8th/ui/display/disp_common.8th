@@ -1,7 +1,7 @@
 (*
 	disp_common.8th
  
-  Common definitions and calculations for the SDRLibEConsole displays
+  Calculations for the SDRLibEConsole displays
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -27,37 +27,55 @@
 \ Set namespace
 ns: sdr
 
-\ ===============================================================================
+\ ========================================
 \ Panadapter and waterfall calculations
 
+\ ----------------------------------
+\ Total absolute span 
+: span_db low_db n:abs high_db n:+ ;
+\ db increment per division in grid
+
+\ ----------------------------------
+: step_db span_db divs  n:/ ;
+
+\ ----------------------------------
+\ Given the grid number (e.g. 1-6) return the db
+\ Return a string label at the given grid point
+: inter_db	SED: n -- s
+	\ in: 	0: n - grid number where 0 is topmost grid line
+	\ out:	0: s - signed db as a string
+	divs n:- n:abs step_db n:* low_db n:+ >s ;
+
+\ ----------------------------------	
 \ dBm per pixel in the y plane
 : dBm_pp	\ disp_id -- dBm-pp 
 	get_disp_win_metrics 1 a:@ nip span_db n:/ ;
 
 \ ========================================
 \ Frequency calculations
-\ FIXME - get from model
-: span_freq 48000 ;
 
+\ ----------------------------------	
 \ Start freq for display
 : start_freq	\ disp_id --
-	get_disp_mid_freq span_freq 2 n:/ n:- 1000000 n:/ n:float
-;
+	get_disp_mid_freq span_freq 2 n:/ n:- 1000000 n:/ n:float ;
 
+\ ----------------------------------	
 \ Step freq per div
 : step_freq
-	span_freq divs n:/ 1000000 n:/ n:float
-;
+	span_freq divs n:/ 1000000 n:/ n:float ;
 
+\ ----------------------------------	
 \ Return one string freq value
 : freq_str \ idx disp_id -- freq_str
 	start_freq swap step_freq n:* n:+
 	"%.3f" s:strfmt ;
 
+\ ----------------------------------	
 \ Freq per pixel in the x plane
 : freq_pp	\ disp_id -- freq-pp 
 	span_freq swap get_disp_disp_metrics 0 a:@ nip n:/ ;
 
+\ ----------------------------------	
 \ Given an x offset into the display area return the frequency at x
 : x_to_freq								\ x disp_id -- freq
 	dup 										\ x disp_id spec-id 
