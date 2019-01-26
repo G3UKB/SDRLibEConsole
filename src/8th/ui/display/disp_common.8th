@@ -1,9 +1,9 @@
 (*
 	disp_common.8th
  
-  Instance data and access words for the displays
+  Common definitions and calculations for the SDRLibEConsole displays
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -27,333 +27,40 @@
 \ Set namespace
 ns: sdr
 
-\ Display instance data for the 3 radios
-\ These are separate structures so we don't need locks
-{
-		\ ========================================
-		\ Instance id of this radio
-		"instance" : 0,
-		\ ========================================
-		\ GUI instance
-		"gui" : null ,
-		\ ========================================
-		\ Window metrics
-		"win-metrics" : [0,0],	\ Current panel size
-		"disp-metrics" : [0,0],	\ Current working area
-		"mouse-pos" : [0,0],		\ Current mouse position rel to display area
-		"mouse-valid" : false,	\ True if mouse within the display area
-		\ ========================================
-		\ Display data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
-		\ ========================================
-		\ Buffers
-		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
-		\ ========================================
-		\ Images
-		"wf-img" : ` 100 100 img:new ` ,
-		\ ========================================
-		\ Mutual exclusion semaphores
-		\ Access to build and rendering functions
-		"disp-render-s4" : ` "r1-disp-render-s4" 1 G:sem ` ,
-		\ ========================================
-		\ Radio state
-		"mid-freq" : 0,
-		"mode" : 0,
-		"filter" : 0
-} var, disp_instance_data_1
-
-{
-		\ ========================================
-		\ Instance id of this radio
-		"instance" : 1,
-		\ ========================================
-		\ GUI instance
-		"gui" : null ,
-		\ ========================================
-		\ Window metrics
-		"win-metrics" : [0,0],	\ Current panel size
-		"disp-metrics" : [0,0],	\ Current working area
-		"mouse-pos" : [0,0],		\ Current mouse position
-		\ ========================================
-		\ Display data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
-		\ ========================================
-		\ Buffers
-		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
-		\ ========================================
-		\ Images
-		"wf-img" : ` 100 100 img:new ` ,
-		\ ========================================
-		\ Mutual exclusion semaphores
-		\ Access to build and rendering functions
-		"disp-render-s4" : ` "r2-disp-render-s4" 1 G:sem ` ,
-		\ ========================================
-		\ Radio state
-		"mid-freq" : 0,
-		"mode" : 0,
-		"filter" : 0
-} var, disp_instance_data_2
-
-{
-		\ ========================================
-		\ Instance id of this radio
-		"instance" : 2,
-		\ ========================================
-		\ GUI instance
-		"gui" : null ,
-		\ ========================================
-		\ Window metrics
-		"win-metrics" : [0,0],	\ Current panel size
-		"disp-metrics" : [0,0],	\ Current working area
-		"mouse-pos" : [0,0],		\ Current mouse position
-		\ ========================================
-		\ Display data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
-		\ ========================================
-		\ Buffers
-		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
-		\ ========================================
-		\ Images
-		"wf-img" : ` 100 100 img:new ` ,
-		\ ========================================
-		\ Mutual exclusion semaphores
-		\ Access to build and rendering functions
-		"disp-render-s4" : ` "r3-disp-render-s4" 1 G:sem ` ,
-		\ ========================================
-		\ Radio state
-		"mid-freq" : 0,
-		"mode" : 0,
-		"filter" : 0
-} var, disp_instance_data_3
+\ ===============================================================================
+\ Definitions
 
 \ ===============================================================================
-\ Helper words
-\ ========================================
+\ Panadapter and waterfall definitions
+
+\ ----------------------------------
 \ Divisions and margins
+\ Paradapter grid divs
 : divs 6 ;
+\ Left, right, top, bottom margins (limits of grid and display)
 : l_margin 35 ;
 : r_margin 15 ;
 : t_margin 10 ;
 : b_margin 100 ;
+\ Adjustments for label data to correctly align
 : x_h_label_adj -20 ;
 : y_h_label_adj -10 ;
 : y_v_label_adj -3 ;
+\ Fixed height for waterfall display
 : wf_height 75 ;
 
-\ Return disp_id corresponding the spec instance
-: disp_id_to_inst	\ id -- inst
-	{ "DISP-R1": 0, "DISP-R2": 1, "DISP-R3": 2 } 
-	swap caseof
-;
-
-: meter_id_to_inst	\ id -- inst
-	{ "METER-R1": 0, "METER-R2": 1, "METER-R3": 2 } 
-	swap caseof
-;
-
-\ Return disp instance corresponding the disp_id
-: disp_inst_to_id	\ inst -- id
-	[ "DISP-R1", "DISP-R2", "DISP-R3" ] 
-	swap caseof
-;
-
-\ Deref radio section
-: radio_ref	\ disp-id -- radio-ref
-	{ "DISP-R1": ` disp_instance_data_1 @ ` , "DISP-R2": ` disp_instance_data_2 @ ` , "DISP-R3": ` disp_instance_data_3 @ ` }
-	swap caseof
-;
-
-\ ===============================================================================
-\ Get/set words
-\ GUI instance
-\ Set gui instance for this display
-: set_gui_disp_instance	\  gui disp-id --
-	radio_ref "gui" rot m:! drop
-;
-
-\ Get gui instance for this disp
-: get_gui_disp_instance	\  disp-id -- gui 
-	radio_ref "gui" m:@	nip
-;
-
 \ ========================================
-\ Display area metrics
-\ Set win-metrics
-: set_disp_win_metrics	\  width height disp-id -- 
-	radio_ref "win-metrics" m:@ nip
-	1 rot a:!
-	0 rot a:!
-	drop
-;
-
-\ Publish disp width
-: sys_r1_disp_updt SYS_R1_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-: sys_r2_disp_updt SYS_R2_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-: sys_r3_disp_updt SYS_R3_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-: pub_disp_width	\ width height disp-id -- width height disp-id
-	{ "DISP-R1": ' sys_r1_disp_updt , "DISP-R2": ' sys_r2_disp_updt , "DISP-R3": ' sys_r3_disp_updt }
-	1 pick caseof
-;
-
-\ Set disp-metrics
-: set_disp_disp_metrics			\  width height disp-id -- 
-	\ Publish the dislay width
-	pub_disp_width
-	radio_ref "disp-metrics" m:@ nip
-	1 rot a:!
-	0 rot a:!
-	drop
-	\ Create and store the new image at the current width
-	1 pick wf_height img:new 	\ disp-id w h img 
-	3 pick radio_ref "wf-img" rot m:! drop
-;
-
-\ Get win-metrics
-: get_disp_win_metrics	\  disp-id -- win-metrics
-	radio_ref "win-metrics" m:@ nip
-;
-
-\ Get disp-metrics
-: get_disp_disp_metrics	\  disp-id -- disp-metrics
-	radio_ref "disp-metrics" m:@ nip
-;
-
-\ Get mouse position
-: get_mouse_pos	\  disp-id -- [x,y]
-	\ If the mouse is within the panel
-	\ then if its within the display area return x,y relative to the display area
-	\ else return null
-	dup radio_ref "mouse-valid" m:@ nip if 	\ disp-id
-		radio_ref "mouse-pos" m:@ nip 				\ mouse-pos
-		dup a:open drop 											\ mouse-pos x
-		l_margin n:> not if
-			null
-		then		
-	else
-		null
-	then
-;
-
-\ Set mouse position
-: set_mouse_pos	\  x y disp-id -- 
-	radio_ref "mouse-pos" m:@ nip
-		1 rot a:!
-		0 rot a:!
-	drop
-;
-
-: mouse_valid \ f disp_id --
-	radio_ref "mouse-valid" rot m:!
-;
-
-\ ========================================
-\ Images
-: set_wf_img	\ img disp_id
-	radio_ref "wf-img" rot m:! drop
-;
-
-: get_wf_img	\ disp-id -- img
-	radio_ref "wf-img" m:@ nip
-;
-	
-\ ========================================
-\ Radio params
-
-: set_disp_mid_freq	\ mid-freq disp_id --
-	radio_ref "mid-freq" rot m:! drop
-;
-
-: get_disp_mid_freq	\ disp_id -- mid-freq
-	radio_ref "mid-freq" m:@ nip
-;
-
-: set_disp_mode	\ mid-freq disp_id --
-	radio_ref "mode" rot m:! drop
-;
-
-: get_disp_mode	\ disp_id -- mid-freq
-	radio_ref "mode" m:@ nip
-;
-
-: set_disp_filt	\ mid-freq disp_id --
-	radio_ref "filter" rot m:! drop
-;
-
-: get_disp_filt	\ disp_id -- mid-freq
-	radio_ref "filter" m:@ nip
-;
-
-\ ===============================================================================
-\ Deref arrays
-\ Deref fixed-data
-: fixed_data_ref	\  disp_id -- a
-	radio_ref "fixed-data" m:@ nip
-;
-
-\ Deref v-label-data
-: v_label_data_ref	\  disp_id -- a
-	radio_ref "v-label-data" m:@ nip
-;
-
-\ Deref h-label-data
-: h_label_data_ref	\  disp_id -- a
-	radio_ref "h-label-data" m:@ nip
-;
-
-\ Deref pan-data
-: pan_data_ref	\  disp_id -- a
-	radio_ref "pan-data" m:@ nip
-;
-
-\ Deref wf-data
-: wf_data_ref	\  disp_id -- a
-	radio_ref "wf-data" m:@ nip
-;
-
-\ ===============================================================================
-\ Deref buffers
-\ Deref data buffer
-: disp_buf_ref	\  disp_id -- a
-	radio_ref "data-buffer" m:@ nip
-;
-
-\ ===============================================================================
-\ Semaphore management
-: wait_disp_s4	\  disp_id --
-	radio_ref "disp-render-s4" m:@ sem-wait drop
-;
-
-: rel_disp_s4		\  disp_id --
-	radio_ref "disp-render-s4" m:@ sem-post drop
-;
-
-\ ===============================================================================
-\ Params and calculators
-\ ========================================
-\ db scale
+\ db scale to scale the Y axis of the panadapter display
 : low_db -140 ;
 : high_db -20 ;
 : span_db low_db n:abs high_db n:+ ;
 : step_db span_db divs  n:/ ;
 : inter_db 	\ idx
-	divs n:- n:abs step_db n:* low_db n:+ >s
-;
+	divs n:- n:abs step_db n:* low_db n:+ >s ;
+
 \ dBm per pixel in the y plane
 : dBm_pp	\ disp_id -- dBm-pp 
-	get_disp_win_metrics 1 a:@ nip span_db n:/
-;
+	get_disp_win_metrics 1 a:@ nip span_db n:/ ;
 
 \ ========================================
 \ Frequency calculations
@@ -370,22 +77,14 @@ ns: sdr
 	span_freq divs n:/ 1000000 n:/ n:float
 ;
 
-\ Temp until 18.02
-"fsem" 1 sem var, fsem
-
 \ Return one string freq value
 : freq_str \ idx disp_id -- freq_str
 	start_freq swap step_freq n:* n:+
-	\ FIXME - remove when happy problem is fixed
-	\ fsem @ sem-wait
-	"%.3f" s:strfmt
-	\ fsem @ sem-post
-;
+	"%.3f" s:strfmt ;
 
 \ Freq per pixel in the x plane
 : freq_pp	\ disp_id -- freq-pp 
-	span_freq swap get_disp_disp_metrics 0 a:@ nip n:/
-;
+	span_freq swap get_disp_disp_metrics 0 a:@ nip n:/ ;
 
 \ Given an x offset into the display area return the frequency at x
 : x_to_freq								\ x disp_id -- freq
@@ -398,5 +97,6 @@ ns: sdr
 	n:+ 1000000 n:/ 				\ x freq-at-x
 ;
 
+\ ========================================
 \ Restore namespace	
 ns: user

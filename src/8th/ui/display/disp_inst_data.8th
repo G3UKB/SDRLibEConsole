@@ -1,0 +1,395 @@
+(*
+	disp_inst_data.8th
+ 
+  Instance data and access words for the SRLibEConsole displays
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ============================================================================
+
+\ Set namespace
+ns: sdr
+
+\ Display instance data for the 3 radios
+\ These are separate structures so we don't need locks
+{
+		\ ========================================
+		\ Instance id of this radio
+		"instance" : 0,
+		\ ========================================
+		\ GUI instance
+		"gui" : null ,
+		\ ========================================
+		\ Window metrics
+		"win-metrics" : [0,0],	\ Current panel size
+		"disp-metrics" : [0,0],	\ Current working area
+		"mouse-pos" : [0,0],		\ Current mouse position rel to display area
+		"mouse-valid" : false,	\ True if mouse within the display area
+		\ ========================================
+		\ Display data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+		\ ========================================
+		\ Buffers
+		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
+		\ ========================================
+		\ Images
+		"wf-img" : ` 100 100 img:new ` ,
+		\ ========================================
+		\ Radio state
+		"mid-freq" : 0,
+		"mode" : 0,
+		"filter" : 0
+} var, disp_instance_data_1
+
+{
+		\ ========================================
+		\ Instance id of this radio
+		"instance" : 1,
+		\ ========================================
+		\ GUI instance
+		"gui" : null ,
+		\ ========================================
+		\ Window metrics
+		"win-metrics" : [0,0],	\ Current panel size
+		"disp-metrics" : [0,0],	\ Current working area
+		"mouse-pos" : [0,0],		\ Current mouse position
+		\ ========================================
+		\ Display data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+		\ ========================================
+		\ Buffers
+		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
+		\ ========================================
+		\ Images
+		"wf-img" : ` 100 100 img:new ` ,
+		\ ========================================
+		\ Radio state
+		"mid-freq" : 0,
+		"mode" : 0,
+		"filter" : 0
+} var, disp_instance_data_2
+
+{
+		\ ========================================
+		\ Instance id of this radio
+		"instance" : 2,
+		\ ========================================
+		\ GUI instance
+		"gui" : null ,
+		\ ========================================
+		\ Window metrics
+		"win-metrics" : [0,0],	\ Current panel size
+		"disp-metrics" : [0,0],	\ Current working area
+		"mouse-pos" : [0,0],		\ Current mouse position
+		\ ========================================
+		\ Display data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+		\ ========================================
+		\ Buffers
+		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
+		\ ========================================
+		\ Images
+		"wf-img" : ` 100 100 img:new ` ,
+		\ ========================================
+		\ Radio state
+		"mid-freq" : 0,
+		"mode" : 0,
+		"filter" : 0
+} var, disp_instance_data_3
+
+\ ===============================================================================
+\ Accessors for instance data
+
+\ ----------------------------------
+\ Deref and lock display instance data
+: radio_ref	SED: s -- m
+	\ in: 	0: s - display name
+	\ out:	0: m - locked radio instance data
+	{ "DISP-R1": ` disp_instance_data_1 lock @ ` , "DISP-R2": ` disp_instance_data_2 lock @ ` , "DISP-R3": ` disp_instance_data_3 lock @ ` }
+	swap caseof ;
+
+\ ----------------------------------
+\ Unlock display instance data
+: radio_ref_unlock	SED: s --
+	\ in: 	0: s - display name
+	\ out:	none
+	{ "DISP-R1": ` disp_instance_data_1 unlock drop ` , "DISP-R2": ` disp_instance_data_2 unlock drop ` , "DISP-R3": ` disp_instance_data_3 unlock drop ` }
+	swap caseof ;	
+
+\ ----------------------------------
+\ Deref fixed-data
+: fixed_data_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - fixed data array
+	"fixed-data" m:@ nip ;
+
+\ ----------------------------------
+\ Deref v-label-data
+: v_label_data_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - v-label array
+	"v-label-data" m:@ nip ;
+
+\ ----------------------------------
+\ Deref h-label-data
+: h_label_data_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - h-label array
+	"h-label-data" m:@ nip ;
+
+\ ----------------------------------
+\ Deref pan-data
+: pan_data_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - pan data
+	"pan-data" m:@ nip ;
+
+\ ----------------------------------
+\ Deref wf-data
+: wf_data_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - waterfall data
+	"wf-data" m:@ nip ;
+
+\ ----------------------------------
+\ Deref data buffer
+: disp_buf_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: a - data buffer
+	radio_ref "data-buffer" m:@ nip
+;
+
+\ ===============================================================================
+\ Getters and setters
+
+\ ========================================
+\ GUI instance
+
+\ ----------------------------------
+\ Get gui instance for this disp
+: get_gui_disp_instance	SED: m -- g
+	\ in: 	0: m - display instance data			
+	\ out:	1: g - gui instance
+	"gui" m:@	nip ;
+	
+\ ----------------------------------
+\ Set gui instance for this display
+: set_gui_disp_instance	SED: g m --
+	\ in: 	0: m - display instance data
+	\				1: g - gui instance
+	\ out:	none
+	"gui" rot m:! drop ;
+
+\ ========================================
+\ Display area metrics
+
+\ ----------------------------------
+\ Get win-metrics
+: get_disp_win_metrics	SED: m -- a
+	\ in: 	0: m - display instance data
+	\ out:	0: a - [W,H]
+	"win-metrics" m:@ nip ;
+
+\ ----------------------------------
+\ Get disp-metrics
+: get_disp_disp_metrics	SED: m -- a
+	\ in: 	0: m - display instance data
+	\ out:	0: a - [W,H]
+	"disp-metrics" m:@ nip ;
+
+\ ----------------------------------
+\ Set win-metrics
+: set_disp_win_metrics	SED: n n m --
+	\ in: 	0: m - display instance data
+	\				1: n - height
+	\				2: n - width
+	\ out:	none
+	"win-metrics" m:@ nip
+	1 rot a:!
+	0 rot a:!
+	drop ;
+
+\ ----------------------------------
+\ Publish disp width
+\ With a change in the display width we need to inform the system
+: sys_r1_disp_updt SYS_R1_DISP_UPDT 3 pick fr:pubsub_publish drop ;
+: sys_r2_disp_updt SYS_R2_DISP_UPDT 3 pick fr:pubsub_publish drop ;
+: sys_r3_disp_updt SYS_R3_DISP_UPDT 3 pick fr:pubsub_publish drop ;
+
+: pub_disp_width	SED: n n s --
+	\ in: 	0: s - display name
+	\				1: n - height
+	\				2: n - width
+	\ out:	none
+	{ "DISP-R1": ' sys_r1_disp_updt , "DISP-R2": ' sys_r2_disp_updt , "DISP-R3": ' sys_r3_disp_updt }
+	1 pick caseof ;
+
+\ ----------------------------------
+\ Set disp-metrics
+: set_disp_disp_metrics	SED: n n m -- 
+	\ in: 	0: m - display instance data
+	\				1: n - height
+	\				2: n - width
+	\ out:	none
+	"disp-metrics" m:@ nip
+	1 rot a:!
+	0 rot a:!
+	drop
+	\ Create and store the new image at the current width
+	1 pick wf_height img:new 	\ disp-id w h img 
+	3 pick "wf-img" rot m:! drop ;
+
+\ ========================================
+\ Mouse
+\ Track mouse so that position information can be written
+
+\ ----------------------------------
+\ Get mouse position
+: get_mouse_pos	SED: m -- a
+	\ in: 	0: m - display instance data
+	\	out:	0: n - [X,Y]
+	\ 			or null
+	\ If the mouse is within the panel -
+	\ then if its within the display area return 
+	\		x,y relative to the display area
+	\ else 
+	\		return null
+	dup "mouse-valid" m:@ nip if 	\ disp-id
+		"mouse-pos" m:@ nip 				\ mouse-pos
+		dup a:open drop 						\ mouse-pos x
+		l_margin n:> not if
+			null
+		then		
+	else
+		null
+	then ;
+
+\ ----------------------------------
+\ Set mouse position
+: set_mouse_pos	\  x y disp-id -- 
+	\ in: 	0: m - display instance data
+	\				1: n - Y coord
+	\				2: n - X coord
+	\	out:	none
+	"mouse-pos" m:@ nip
+		1 rot a:!
+		0 rot a:!
+	drop ;
+
+\ ----------------------------------
+\ True if mouse within display area else false
+: mouse_valid	SED: T m --
+	\ in: 	0: m - display instance data
+	\				1: T - true|false
+	\	out:	none
+	"mouse-valid" rot m:!
+;
+
+\ ========================================
+\ Image
+\ The waterfall is drawn on an image
+
+\ ----------------------------------
+\ Set the waterfall image
+: set_wf_img	SED: img m --
+	\ in: 	0: m - display instance data
+	\				1: img - new image to draw waterfall on
+	\	out:	none
+	"wf-img" rot m:! drop ;
+
+\ ----------------------------------
+\ Get the waterfall image
+: get_wf_img	\ disp-id -- img
+	\ in: 	0: m - display instance data
+	\	out:	0: img - image
+	"wf-img" m:@ nip
+;
+	
+\ ========================================
+\ Radio params
+\ Radio parameters are tracked so that the frequency legends can be written
+\ correctly and the vertical bar and filter area can be overlaid.
+
+\ ----------------------------------
+\ Get mid frequency of display area
+: get_disp_mid_freq	SED: m -- n
+	\ in: 	0: m - display instance data				
+	\	out:	0: n - mid frequency in Hz
+	"mid-freq" m:@ nip
+;
+
+\ ----------------------------------
+\ Set mid frequency of display area
+: set_disp_mid_freq	SED: n m --
+	\ in: 	0: m - display instance data
+	\				1: n - mid frequency in Hz
+	\	out:	none
+	"mid-freq" rot m:! drop
+;
+
+\ ----------------------------------
+\ Get radio mode
+: get_disp_mode	SED: m -- n
+	\ in: 	0: m - display instance data				
+	\	out:	0: n - radio mode
+	"mode" m:@ nip
+;
+
+\ ----------------------------------
+\ Set radio mode
+: set_disp_mode	SED: n m --
+	\ in: 	0: m - display instance data
+	\				1: n - radio mode
+	\	out:	none
+	"mode" rot m:! drop
+;
+
+\ ----------------------------------
+\ Get radio filter
+: get_disp_filt	SED: m -- n
+	\ in: 	0: m - display instance data				
+	\	out:	0: n - radio filter
+	"filter" m:@ nip
+;
+
+\ ----------------------------------
+\ Set radio filter
+: set_disp_filt	SED: n m --
+	\ in: 	0: m - display instance data
+	\				1: n - radio filter
+	\	out:	none
+	"filter" rot m:! drop
+;
+
+\ ========================================
+\ Restore namespace	
+ns: user

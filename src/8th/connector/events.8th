@@ -131,6 +131,8 @@ ns: sdr
 				"reader_skt" t:@ true 500 net:wait if
 					\ "reader_inst" t:@ "-read data?" s:+ log
 					\ Socket says yes
+					\ Lock the instance data and copy the ref to a task variable
+					"reader_inst" t:@ radio_ref "inst_data" t:!
 					"reader_inst" t:@ disp_buf_ref 0 net:recvfrom null? not if
 						\ Read something
 						"reader_inst" t:@ "-read data" s:+ log
@@ -138,6 +140,8 @@ ns: sdr
 						\ Call display builder to process the data
 						disp_builder 
 					then
+					\ Unlock the instance data
+					"reader_inst" t:@ radio_ref_unlock
 				then
 			then
 			drop

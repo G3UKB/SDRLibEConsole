@@ -40,6 +40,16 @@ ns: sdr
 } var, rx_meter_panel
 
 \ ===============================================================================
+\ Metering definitions
+
+: meter_id_to_inst	\ id -- inst
+	\ in: 	o: s - display name
+	\ out:	none
+	{ "METER-R1": 0, "METER-R2": 1, "METER-R3": 2 } 
+	swap caseof
+;
+
+\ ===============================================================================
 \ GUI event handlers
 \ Draw one scale tick and label
 : draw_scale										\ gui ix item -- gui

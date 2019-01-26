@@ -1,9 +1,9 @@
 (*
 	disp_builder.8th
  
-  Display array builder for the DynamicSDR application
+  Display array builder for the SDRLibEConsole application
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -24,6 +24,12 @@
 
 \ Use SDR namespace
 ns: sdr
+
+(*
+	The display builder is called by event.8th when display data is available. Each display
+	is called on a separate thread and builds arrays such that the renderer has minimal work.
+	The instance data is locked for the duration as it is shared with the renderer.
+*)
 
 \ ===============================================================================
 \ Array builder words
@@ -223,7 +229,7 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id pan_data_ref a:clear drop				\ width height
 	\ Get display data for the instance
-	"reader_inst" t:@ disp_id_to_inst					\ width height disp-id
+	"inst_data" t:@															\ width height disp-id
 	get_disp_id data_buffer_ref	"1024f" unpack drop													\ width height disp-data(float array)
 	\ ... or calibrate
 	\ make_float_array
@@ -251,7 +257,7 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id wf_data_ref a:clear drop						\ width height
 	\ Get display data for the instance
-	"reader_inst" t:@ disp_id_to_inst data_buffer_ref	"1024f" unpack drop	 	\ width height disp-data(float array)
+	"inst_data" t:@ data_buffer_ref	"1024f" unpack drop	 	\ width height disp-data(float array)
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -269,44 +275,16 @@ ns: sdr
 		3drop
 	then
 ;
-(*
-\ Make and render the display on a separate thread
-\ Runs every 100ms
-: disp_task			\ disp-id --
-	\ This task is an instance of the display
-	\ Name this thread
-	dup t:name!
-	t:curtask . cr
-	\ Store the disp-id in a task var
-	"this-disp-id" t:!
-	\ Do until terminated
-	repeat
-		\ Check for terminate
-		\ Note - do not use break as this terminates on the next iteration
-		\ which allows the lock to be taken and possibly not released.
-		disp_term @ if ;; then
-		"this-disp-id" t:@ wait_disp_s4
-		make_grid_array
-		make_pan_array
-		make_wf_array
-		"this-disp-id" t:@ rel_disp_s4
-		0.1 sleep
-	again
-	"Display task exiting..." log
-;
-*)
-\ Make and render the display on a separate thread
-\ Runs every 100ms
-: disp_builder	SED: s --
+
+\ ===============================================================================
+\ Build the display structures
+: disp_builder	SED:  --
 	
-	\ Store the disp-id in a task var
-	"reader_inst" t:!
-	"reader_inst" t:@ wait_disp_s4
 	make_grid_array
 	make_pan_array
 	make_wf_array
-	"reader_inst" t:@ rel_disp_s4
 ;
 
+\ ========================================
 \ Restore namespace	
 ns: user	
