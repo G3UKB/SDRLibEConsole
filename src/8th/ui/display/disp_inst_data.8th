@@ -22,11 +22,30 @@
      bob@bobcowdery.plus.com
 *)
 
+
+
 \ ============================================================================
+
+\ ========================================
+\ Testing only
+false var, disp_inst_data_test
+
+disp_inst_data_test @ #if
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+\ ========================================
 
 \ Set namespace
 ns: sdr
 
+(*
+	the displays are driven by a set a instance data for each radio. This is all
+	values required for the rendered to render the displays. This data is built
+	by the builder in response to the display data events.
+*)
+
+\ ===============================================================================
 \ Display instance data for the 3 radios
 \ These are separate structures so we don't need locks
 {
@@ -44,6 +63,7 @@ ns: sdr
 		"mouse-valid" : false,	\ True if mouse within the display area
 		\ ========================================
 		\ Display data
+		"raw-data" : [],				\ raw float array formatted from data buffer
 		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
 		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
@@ -76,6 +96,7 @@ ns: sdr
 		"mouse-pos" : [0,0],		\ Current mouse position
 		\ ========================================
 		\ Display data
+		"raw-data" : [],				\ raw float array formatted from data buffer
 		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
 		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
@@ -108,6 +129,7 @@ ns: sdr
 		"mouse-pos" : [0,0],		\ Current mouse position
 		\ ========================================
 		\ Display data
+		"raw-data" : [],				\ raw float array formatted from data buffer
 		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
 		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
@@ -191,6 +213,24 @@ ns: sdr
 \ ===============================================================================
 \ Getters and setters
 
+\ ========================================
+\ Raw data
+
+\ ----------------------------------
+\ Convert and save raw data
+: copy_to_raw	SED: m --
+	\ in: 	0: m - display instance data			
+	\ out:	none
+	"data-buffer" m:@ 
+	"1024f" unpack drop swap
+	"raw-data" a:! ;
+
+\ ----------------------------------
+: get_raw_data	SED: m -- a
+	\ in: 	0: m - display instance data			
+	\ out:	0: a - raw data array
+	"raw-data" m:@ nip ;
+	
 \ ========================================
 \ GUI instance
 
@@ -393,3 +433,12 @@ ns: sdr
 \ ========================================
 \ Restore namespace	
 ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+disp_inst_data_test @ #if
+
+
+#then

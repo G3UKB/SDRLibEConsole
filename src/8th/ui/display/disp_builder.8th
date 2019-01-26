@@ -229,8 +229,7 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id pan_data_ref a:clear drop				\ width height
 	\ Get display data for the instance
-	"inst_data" t:@															\ width height disp-id
-	get_disp_id data_buffer_ref	"1024f" unpack drop													\ width height disp-data(float array)
+	"inst_data" t:@	get_raw_data 	\ width height disp-data(float array)														
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -257,7 +256,7 @@ ns: sdr
 	\ Clear the data array
 	get_disp_id wf_data_ref a:clear drop						\ width height
 	\ Get display data for the instance
-	"inst_data" t:@ data_buffer_ref	"1024f" unpack drop	 	\ width height disp-data(float array)
+	"inst_data" t:@ get_raw_data	 	\ width height disp-data(float array)
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
