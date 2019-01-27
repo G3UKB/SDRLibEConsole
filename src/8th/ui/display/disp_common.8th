@@ -24,23 +24,41 @@
 
 \ ============================================================================
 
+\ ========================================
+\ Testing only
+true var, disp_common_test
+
+disp_common_test @ #if
+	"disp_defs.8th" f:include
+	"disp_inst_data.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+\ ========================================
+
 \ Set namespace
 ns: sdr
 
 \ ========================================
-\ Panadapter and waterfall calculations
+\ dBm Calculations
 
 \ ----------------------------------
-\ Total absolute span 
-: span_db low_db n:abs high_db n:+ ;
-\ db increment per division in grid
+\ Total absolute dBm span 
+: span_db	SED: -- n
+	\ in: 	none	
+	\ out:	0: n - absolute dBm span
+	low_db n:abs high_db n:+ ;
 
 \ ----------------------------------
-: step_db span_db divs  n:/ ;
+\ dBm increment per division in grid
+: step_db	SED: -- n 
+	\ in: 	none	
+	\ out:	0: n - dBm per grid division
+	span_db divs  n:/ ;
 
 \ ----------------------------------
-\ Given the grid number (e.g. 1-6) return the db
-\ Return a string label at the given grid point
+\ Given the grid number (e.g. 1-6) return
+\ return a string dBm label at the given grid point
 : inter_db	SED: n -- s
 	\ in: 	0: n - grid number where 0 is topmost grid line
 	\ out:	0: s - signed db as a string
@@ -48,39 +66,54 @@ ns: sdr
 
 \ ----------------------------------	
 \ dBm per pixel in the y plane
-: dBm_pp	\ disp_id -- dBm-pp 
+: dBm_pp	SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - dBm per pixel
 	get_disp_win_metrics 1 a:@ nip span_db n:/ ;
 
 \ ========================================
-\ Frequency calculations
+\ Frequency Calculations
 
 \ ----------------------------------	
 \ Start freq for display
-: start_freq	\ disp_id --
+: start_freq	SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - start frequency as MHz float
 	get_disp_mid_freq span_freq 2 n:/ n:- 1000000 n:/ n:float ;
 
 \ ----------------------------------	
 \ Step freq per div
-: step_freq
+: step_freq	SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - frequency increment per grid division as MHz float
 	span_freq divs n:/ 1000000 n:/ n:float ;
 
 \ ----------------------------------	
-\ Return one string freq value
-: freq_str \ idx disp_id -- freq_str
+\ Return a string freq value for the grid division
+: freq_str	SED: n m -- s
+	\ in: 	0: m - display instance data	
+	\				1: n - grid number (e.g. 1-6)
+	\ out:	0: s - frequency string in MHz (3 sig digits) for the grid number
 	start_freq swap step_freq n:* n:+
 	"%.3f" s:strfmt ;
 
 \ ----------------------------------	
 \ Freq per pixel in the x plane
-: freq_pp	\ disp_id -- freq-pp 
+: freq_pp	SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - frequency per pixel in Hz
 	span_freq swap get_disp_disp_metrics 0 a:@ nip n:/ ;
 
 \ ----------------------------------	
 \ Given an x offset into the display area return the frequency at x
+\ This provides a tracking frequency for the mouse pointer
 : x_to_freq								\ x disp_id -- freq
+	\ in: 	0: m - display instance data	
+	\				1: n - x coordinate
+	\ out:	0: s - frequency at x in MHz as float
 	dup 										\ x disp_id spec-id 
 	start_freq 1000000 n:* 	\ x disp_id start-freq 
-	swap 										\ x start-freq disp_id
+	swap 										\ x start-freq disp_inst
 	freq_pp 								\ x start-freq freq-pp
 	rot 
 	n:* 
@@ -90,3 +123,50 @@ ns: sdr
 \ ========================================
 \ Restore namespace	
 ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+disp_common_test @ #if
+
+	: push_data
+		"DISP-R1" sdr:radio_ref >r
+		"A GUI" r@ sdr:set_gui_disp_instance
+		400 200 r@ sdr:set_disp_win_metrics
+		300 180 r@ sdr:set_disp_disp_metrics
+		150 180 r@ sdr:set_mouse_pos
+		true r@ sdr:mouse_valid
+		"An image" r@ sdr:set_wf_img
+		14000000 r@ sdr:set_disp_mid_freq
+		5 r@ sdr:set_disp_mode
+		6 r@ sdr:set_disp_filt
+		"DISP-R1" sdr:radio_ref_unlock
+	;
+	
+	: usage
+		param_st_alloc
+		push_data
+		sdr:span_db "span_db" . . cr
+		sdr:step_db "step_db" . . cr
+		1 sdr:inter_db "inter_db" . . cr
+		6 sdr:inter_db "inter_db" . . cr
+		r@ sdr:dBm_pp "dBm_pp" . . cr
+		r@ sdr:start_freq "start_freq" . . cr
+		r@ sdr:step_freq "step_freq" . . cr
+		1 r@ sdr:freq_str "freq_str" . .cr
+		3 r@ sdr:freq_str "freq_str" . .cr
+		6 r@ sdr:freq_str "freq_str" . .cr
+		r@ sdr:freq_pp "freq_pp" . .cr
+		0 r@ sdr:x_to_freq "x_to_freq" . .cr
+		100 r@ sdr:x_to_freq "x_to_freq" . .cr
+		200 r@ sdr:x_to_freq "x_to_freq" . .cr
+	;
+	
+	cr cr "Running usage test..." . cr cr
+	usage_test
+	1 sleep
+	"Done usage test" . cr
+	
+	bye
+#then
