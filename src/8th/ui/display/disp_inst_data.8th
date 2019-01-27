@@ -154,6 +154,13 @@ ns: sdr
 \ ===============================================================================
 \ Accessors for instance data
 
+\ Get instance data
+\ The locked instance data reference is saved to task var by event.8th
+: get_inst_data	SED: -- m
+	\ in: 	none
+	\ out:	0: m - locked radio instance data ref
+	"inst_data" t:@ ;
+	
 \ ----------------------------------
 \ Deref and lock display instance data
 : radio_ref	SED: s -- m

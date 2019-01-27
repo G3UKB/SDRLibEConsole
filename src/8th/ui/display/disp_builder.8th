@@ -1,7 +1,7 @@
 (*
 	disp_builder.8th
  
-  Display array builder for the SDRLibEConsole application
+  Display builder for the SDRLibEConsole application
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -30,14 +30,11 @@ ns: sdr
 	is called on a separate thread and builds arrays such that the renderer has minimal work.
 	The instance data is locked for the duration as it is shared with the renderer.
 *)
-
-\ Get instance data
-: get_inst_data
-	"inst_data" t:@ ;
 	
 \ ===============================================================================
-\ Array builder words
+\ Add labels, lines and points
 
+\ ----------------------------------
 \ Add one vertical label
 : add_v_label											\ y_start idx -- y_start 
 	inter_db a:new swap 						\ y_start [] "idx"
@@ -48,6 +45,7 @@ ns: sdr
 	drop														\ y_start 
 ;
 
+\ ----------------------------------
 \ Add one horizontal line
 : add_h_line		  					\ wide high fixed_data idx -- wide high fixed_data 
 	swap >r	>r r@							\ wide high idx r:fixed_data idx
@@ -63,6 +61,7 @@ ns: sdr
 	r> swap a:push 						\ wide high fixed_data
 ;
 
+\ ----------------------------------
 \ Add one horizontal label
 : add_h_label											\ high x_start idx -- high x_start
 	get_inst_data freq_str a:new swap \ high x_start [] "idx"
@@ -73,6 +72,7 @@ ns: sdr
 	drop														\ high x_start
 ;
 
+\ ----------------------------------
 \ Add one vertical line
 : add_v_line								\ wide high fixed_data idx -- wide high fixed_data
 	swap >r	>r r@							\ wide high idx r:fixed_data idx
@@ -87,83 +87,7 @@ ns: sdr
 	r> swap a:push nip 				\ wide high fixed_data
 ;
 
-\ Convert a dBm value to a y-coord
-: db_to_y									\ dBm height -- y-coord
-	\ rel-dBm = abs(low-dBm) - abs(dBm)
-	swap n:int n:abs 				\ height abs(dBm)
-	low_db n:int n:abs 			\ height abs(dBm) abs(low-dBm)
-	swap n:-								\ height rel-dBm
-	swap b_margin n:- swap	\ height-margin rel-dBm
-	\ y-coord = height - (rel-dBm * dBm_pp)
-	get_inst_data dBm_pp n:* n:- n:int		\ y-coord
-;
-
-\ Color check words
-: M160-M135  \ dbM	-- dbM f
-	dup -160 -135 n:between
-;
-
-: M135-M130  \ dbM	-- dbM f
-	dup -135 -130  n:between
-;
-
-: M130-M125  \ dbM	-- dbM f
-	dup -130 -125  n:between
-;
-
-: M125-M120  \ dbM	-- dbM f
-	dup -125 -120  n:between
-;
-
-: M120-M115  \ dbM	-- dbM f
-	dup -120 -115  n:between
-;
-
-: M115-M110  \ dbM	-- dbM f
-	dup -115 -110  n:between
-;
-
-: M110-M100  \ dbM	-- dbM f
-	dup -110 -100  n:between
-;
-
-: M100+  \ dbM	-- dbM f
-	dup -100 0  n:between
-;
-
-: M200-M+40  \ dbM	-- dbM f
-	dup -200 40  n:between
-;
-
-: color-1 [ 0.0,0.0,0.2,1.0 ] ;
-: color-2 [ 0.1,0.0,0.3,1.0 ] ;
-: color-3 [ 0.2,0.0,0.4,1.0 ] ;
-: color-4 [ 0.3,0.0,0.5,1.0 ] ;
-: color-5 [ 0.5,0.0,0.4,1.0 ] ;
-: color-6 [ 0.7,0.0,0.2,1.0 ] ;
-: color-7 [ 0.9,0.0,0.1,1.0 ] ;
-: color-8 [ 1.0,0.0,0.0,1.0 ] ;
-
-[
-	' M160-M135 , ' color-1 ,
-	' M135-M130 , ' color-2 , 
-	' M130-M125 , ' color-3 ,
-	' M125-M120 , ' color-4 ,
-	' M120-M115 , ' color-5 , 
-	' M115-M110 , ' color-6 ,
-	' M110-M100 , ' color-7 ,
-	' M100+ 		, ' color-8 ,
-	' M200-M+40 , ' color-1 ,
-	' color-1
-] var, clookup
-
-: db_to_colour						\ dBm -- colour
-	\ Must lock read-only structures!
-	clookup lock @
-	a:when
-	clookup unlock drop	
-;
-
+\ ----------------------------------
 \ Add one pan point
 \ Note that the data array is ordered high freq to low freq so indexing is reversed
 : add_pan_point								\ disp-data height width x-coord -- disp-data height width 
@@ -183,6 +107,7 @@ ns: sdr
 	a:push drop  								\ disp-data height width
 ;
 
+\ ----------------------------------
 \ Add one waterfall point
 \ Note that the data array is ordered high freq to low freq so indexing is reversed
 : add_wf_point								\ disp-data height width x-coord -- disp-data height width
@@ -201,7 +126,10 @@ ns: sdr
 	a:push drop  								\ disp-data height width
 ;
 
-\ ========================================
+\ ===============================================================================
+\ Build arrays
+
+\ ----------------------------------
 \ Build grid array
 : make_grid_array	\ --
 	\ Get current widow size
@@ -215,7 +143,7 @@ ns: sdr
 	3drop
 ;
 
-\ ========================================
+\ ----------------------------------
 \ Use to calibrate the display db range
 : add_float
 	[-119.0, -109.0, -131.0, -50.0, -101.0, -141.0, -135.0, -111.0] a:shuffle
@@ -225,7 +153,7 @@ ns: sdr
 	a:new ' add_float 1024 times
 ;
 
-\ ========================================
+\ ----------------------------------
 \ Build pan array
 : make_pan_array															\ --
 	\ Get current widow size
@@ -252,7 +180,7 @@ ns: sdr
 	then
 ;
 
-\ ========================================
+\ ----------------------------------
 \ Build wf array
 : make_wf_array	\ --
 \ Get current widow size
@@ -280,9 +208,8 @@ ns: sdr
 ;
 
 \ ===============================================================================
-\ Build the display structures
+\ Build the display arrays
 : disp_builder	SED:  --
-	
 	make_grid_array
 	make_pan_array
 	make_wf_array

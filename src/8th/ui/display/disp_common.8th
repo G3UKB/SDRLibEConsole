@@ -26,9 +26,13 @@
 
 \ ========================================
 \ Testing only
-true var, disp_common_test
+false var, disp_common_test
 
 disp_common_test @ #if
+	"../../common/events.8th"  f:include
+	"../../framework/param_st.8th"  f:include
+	"../../framework/gen_server.8th"  f:include
+	"../../framework/pub_sub.8th"  f:include
 	"disp_defs.8th" f:include
 	"disp_inst_data.8th" f:include
 	\ needs debug/sed
@@ -38,6 +42,10 @@ disp_common_test @ #if
 
 \ Set namespace
 ns: sdr
+
+(*  
+	General helper calcultions for the panadapter and waterfall displays.
+*)
 
 \ ========================================
 \ dBm Calculations
@@ -70,6 +78,21 @@ ns: sdr
 	\ in: 	0: m - display instance data	
 	\ out:	0: n - dBm per pixel
 	get_disp_win_metrics 1 a:@ nip span_db n:/ ;
+
+\ ----------------------------------	
+\ Convert a dBm value to a y-coord
+: db_to_y	SED: n n -- n
+	\ in: 	0: n - display height
+	\				1: n - dBm value
+	\ out:	0: n - corresponding y coordinate
+	\ rel-dBm = abs(low-dBm) - abs(dBm)
+	swap n:int n:abs 				\ height abs(dBm)
+	low_db n:int n:abs 			\ height abs(dBm) abs(low-dBm)
+	swap n:-								\ height rel-dBm
+	swap b_margin n:- swap	\ height-margin rel-dBm
+	\ y-coord = height - (rel-dBm * dBm_pp)
+	get_inst_data dBm_pp n:* n:- n:int		\ y-coord
+;
 
 \ ========================================
 \ Frequency Calculations
@@ -121,6 +144,62 @@ ns: sdr
 ;
 
 \ ========================================
+\ Waterfall colour calculation
+
+\ ----------------------------------
+: M160-M135	SED: n -- n T
+	\ in: 	0: n - dBm value
+	\ out:	0: n - dBm value
+	\				1: T - true if dBm fell between limits
+	dup -160 -135 n:between
+;
+: M135-M130 dup -135 -130  n:between ;
+: M130-M125 dup -130 -125  n:between ;
+: M125-M120 dup -125 -120  n:between ;
+: M120-M115 dup -120 -115  n:between ;
+: M115-M110 dup -115 -110  n:between ;
+: M110-M100 dup -110 -100  n:between ;
+: M100+ dup -100 0  n:between ;
+: M200-M+40 dup -200 40  n:between ;
+
+\ ----------------------------------
+\ RGBA colour values representing the colour spread
+: color-1 [ 0.0,0.0,0.2,1.0 ] ;
+: color-2 [ 0.1,0.0,0.3,1.0 ] ;
+: color-3 [ 0.2,0.0,0.4,1.0 ] ;
+: color-4 [ 0.3,0.0,0.5,1.0 ] ;
+: color-5 [ 0.5,0.0,0.4,1.0 ] ;
+: color-6 [ 0.7,0.0,0.2,1.0 ] ;
+: color-7 [ 0.9,0.0,0.1,1.0 ] ;
+: color-8 [ 1.0,0.0,0.0,1.0 ] ;
+
+\ ----------------------------------
+\ Lookup table [w, colour]
+\ If w returns true the corresponding colour is selected
+[
+	' M160-M135 , ' color-1 ,
+	' M135-M130 , ' color-2 , 
+	' M130-M125 , ' color-3 ,
+	' M125-M120 , ' color-4 ,
+	' M120-M115 , ' color-5 , 
+	' M115-M110 , ' color-6 ,
+	' M110-M100 , ' color-7 ,
+	' M100+ 		, ' color-8 ,
+	' M200-M+40 , ' color-1 ,
+	' color-1
+] var, clookup
+
+\ ----------------------------------
+\ Translate a dBm value to a colour
+: db_to_colour						\ dBm -- colour
+	\ in: 	0: n - dBm value
+	\ out:	0: n - RGBA colour
+	\ Must lock read-only structures!
+	clookup lock @
+	a:when
+	clookup unlock drop	;
+
+\ ========================================
 \ Restore namespace	
 ns: user
 
@@ -144,23 +223,23 @@ disp_common_test @ #if
 		"DISP-R1" sdr:radio_ref_unlock
 	;
 	
-	: usage
+	: usage_test
 		param_st_alloc
 		push_data
-		sdr:span_db "span_db" . . cr
-		sdr:step_db "step_db" . . cr
-		1 sdr:inter_db "inter_db" . . cr
-		6 sdr:inter_db "inter_db" . . cr
-		r@ sdr:dBm_pp "dBm_pp" . . cr
-		r@ sdr:start_freq "start_freq" . . cr
-		r@ sdr:step_freq "step_freq" . . cr
-		1 r@ sdr:freq_str "freq_str" . .cr
-		3 r@ sdr:freq_str "freq_str" . .cr
-		6 r@ sdr:freq_str "freq_str" . .cr
-		r@ sdr:freq_pp "freq_pp" . .cr
-		0 r@ sdr:x_to_freq "x_to_freq" . .cr
-		100 r@ sdr:x_to_freq "x_to_freq" . .cr
-		200 r@ sdr:x_to_freq "x_to_freq" . .cr
+		sdr:span_db "span_db: " . . cr
+		sdr:step_db "step_db: " . . cr
+		0 sdr:inter_db "inter_db: " . . cr
+		6 sdr:inter_db "inter_db: " . . cr
+		r@ sdr:dBm_pp "dBm_pp: " . . cr
+		r@ sdr:start_freq "start_freq: " . . cr
+		r@ sdr:step_freq "step_freq: " . . cr
+		1 r@ sdr:freq_str "freq_str: " . . cr
+		3 r@ sdr:freq_str "freq_str: " . . cr
+		6 r@ sdr:freq_str "freq_str: " . . cr
+		r@ sdr:freq_pp "freq_pp: " . . cr
+		0 r@ sdr:x_to_freq "x_to_freq: " . . cr
+		100 r@ sdr:x_to_freq "x_to_freq: " . . cr
+		200 r@ sdr:x_to_freq "x_to_freq: " . . cr
 	;
 	
 	cr cr "Running usage test..." . cr cr
