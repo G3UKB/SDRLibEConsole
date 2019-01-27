@@ -26,7 +26,7 @@
 
 \ ========================================
 \ Testing only
-false var, disp_common_test
+true var, disp_common_test
 
 disp_common_test @ #if
 	"../../common/events.8th"  f:include
@@ -81,17 +81,17 @@ ns: sdr
 
 \ ----------------------------------	
 \ Convert a dBm value to a y-coord
-: db_to_y	SED: n n -- n
+: db_to_y	SED: n n m -- n
 	\ in: 	0: n - display height
 	\				1: n - dBm value
 	\ out:	0: n - corresponding y coordinate
 	\ rel-dBm = abs(low-dBm) - abs(dBm)
-	swap n:int n:abs 				\ height abs(dBm)
-	low_db n:int n:abs 			\ height abs(dBm) abs(low-dBm)
+	>p swap n:int n:abs 				\ height abs(dBm)
+	low_db n:int n:abs 		\ height abs(dBm) abs(low-dBm)
 	swap n:-								\ height rel-dBm
 	swap b_margin n:- swap	\ height-margin rel-dBm
 	\ y-coord = height - (rel-dBm * dBm_pp)
-	get_inst_data dBm_pp n:* n:- n:int		\ y-coord
+	p> dBm_pp n:* n:- n:int		\ y-coord
 ;
 
 \ ========================================
@@ -191,9 +191,9 @@ ns: sdr
 
 \ ----------------------------------
 \ Translate a dBm value to a colour
-: db_to_colour						\ dBm -- colour
+: db_to_colour	SED: n -- a
 	\ in: 	0: n - dBm value
-	\ out:	0: n - RGBA colour
+	\ out:	0: a - RGBA colour array
 	\ Must lock read-only structures!
 	clookup lock @
 	a:when
@@ -231,6 +231,9 @@ disp_common_test @ #if
 		0 sdr:inter_db "inter_db: " . . cr
 		6 sdr:inter_db "inter_db: " . . cr
 		r@ sdr:dBm_pp "dBm_pp: " . . cr
+		-140 200 r@ sdr:db_to_y "db_to_y: " . . cr
+		-140 sdr:db_to_colour "db_to_colour: " . . cr
+		
 		r@ sdr:start_freq "start_freq: " . . cr
 		r@ sdr:step_freq "step_freq: " . . cr
 		1 r@ sdr:freq_str "freq_str: " . . cr
