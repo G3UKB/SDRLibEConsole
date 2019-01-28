@@ -26,7 +26,7 @@
 
 \ ========================================
 \ Testing only
-true var, disp_common_test
+false var, disp_common_test
 
 disp_common_test @ #if
 	"../../common/events.8th"  f:include
@@ -82,16 +82,18 @@ ns: sdr
 \ ----------------------------------	
 \ Convert a dBm value to a y-coord
 : db_to_y	SED: n n m -- n
-	\ in: 	0: n - display height
-	\				1: n - dBm value
+	\ in: 	0: n - display instance data	
+	\				1: n - display height
+	\				2: n - dBm value
 	\ out:	0: n - corresponding y coordinate
 	\ rel-dBm = abs(low-dBm) - abs(dBm)
-	>p swap n:int n:abs 				\ height abs(dBm)
-	low_db n:int n:abs 		\ height abs(dBm) abs(low-dBm)
-	swap n:-								\ height rel-dBm
-	swap b_margin n:- swap	\ height-margin rel-dBm
+	>p 													\ dBm height
+	swap n:int n:abs 						\ height abs(dBm)
+	low_db n:int n:abs 					\ height abs(dBm) abs(low-dBm)
+	swap n:-										\ height abs(rel-dBm)
+	swap b_margin n:- swap			\ height-margin abs(rel-dBm)
 	\ y-coord = height - (rel-dBm * dBm_pp)
-	p> dBm_pp n:* n:- n:int		\ y-coord
+	p> dBm_pp n:* n:- n:int			\ y-coord
 ;
 
 \ ========================================
@@ -106,18 +108,18 @@ ns: sdr
 
 \ ----------------------------------	
 \ Step freq per div
-: step_freq	SED: m -- n
+: step_freq	 SED: m -- n
 	\ in: 	0: m - display instance data	
 	\ out:	0: n - frequency increment per grid division as MHz float
-	span_freq divs n:/ 1000000 n:/ n:float ;
+	span_freq divs n:/ 1000000 n:/ n:float nip ;
 
 \ ----------------------------------	
 \ Return a string freq value for the grid division
-: freq_str	SED: n m -- s
+: freq_str SED: n m -- s
 	\ in: 	0: m - display instance data	
 	\				1: n - grid number (e.g. 1-6)
 	\ out:	0: s - frequency string in MHz (3 sig digits) for the grid number
-	start_freq swap step_freq n:* n:+
+	dup >p start_freq swap p> step_freq n:* n:+
 	"%.3f" s:strfmt ;
 
 \ ----------------------------------	
@@ -196,8 +198,8 @@ ns: sdr
 	\ out:	0: a - RGBA colour array
 	\ Must lock read-only structures!
 	clookup lock @
-	a:when
-	clookup unlock drop	;
+	a:when nip
+	clookup unlock drop ;
 
 \ ========================================
 \ Restore namespace	
@@ -231,10 +233,28 @@ disp_common_test @ #if
 		0 sdr:inter_db "inter_db: " . . cr
 		6 sdr:inter_db "inter_db: " . . cr
 		r@ sdr:dBm_pp "dBm_pp: " . . cr
-		-140 200 r@ sdr:db_to_y "db_to_y: " . . cr
-		-140 sdr:db_to_colour "db_to_colour: " . . cr
 		
-		r@ sdr:start_freq "start_freq: " . . cr
+		-20 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-40 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-60 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-80 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-100 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-110 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-120 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-130 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		-140 400 r@ sdr:db_to_y "db_to_y: " . . cr
+		
+		-20 sdr:db_to_colour "db_to_colour: " . . cr
+		-40 sdr:db_to_colour "db_to_colour: " . . cr
+		-100 sdr:db_to_colour "db_to_colour: " . . cr
+		-110 sdr:db_to_colour "db_to_colour: " . . cr
+		-115 sdr:db_to_colour "db_to_colour: " . . cr
+		-120 sdr:db_to_colour "db_to_colour: " . . cr
+		-125 sdr:db_to_colour "db_to_colour: " . . cr
+		-130 sdr:db_to_colour "db_to_colour: " . . cr
+		-135 sdr:db_to_colour "db_to_colour: " . . cr
+		
+		r@ sdr:start_freq "start_freq: " . . cr		
 		r@ sdr:step_freq "step_freq: " . . cr
 		1 r@ sdr:freq_str "freq_str: " . . cr
 		3 r@ sdr:freq_str "freq_str: " . . cr

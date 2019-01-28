@@ -98,6 +98,8 @@ ns: sdr
 	"reader_skt" t:!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
+	\ Init param stack
+	param_st_alloc
 	
 	\ ----------------------------------
 	\ Wait for work
@@ -133,9 +135,9 @@ ns: sdr
 					\ Socket says yes
 					\ Lock the instance data and copy the ref to a task variable
 					"reader_inst" t:@ radio_ref "inst_data" t:!
-					"reader_inst" t:@ disp_buf_ref 0 net:recvfrom null? not if
+					"inst_data" t:@ disp_buf_ref 0 net:recvfrom null? not if
 						\ Read something
-						"reader_inst" t:@ "-read data" s:+ log
+						\ "reader_inst" t:@ "-read data" s:+ log
 						\ "Received:" swap s:+ log 4drop
 						\ Call display builder to process the data
 						disp_builder 
@@ -163,7 +165,7 @@ ns: sdr
 	\ Create sockets
 	__svr_evnt_create_d1_sock
 	__svr_evnt_create_d2_sock
-	\ __svr_evnt_create_d3_sock
+	__svr_evnt_create_d3_sock
 	\ Start tasks
 	__svr_evnt_d1_sock@ "DISP-R1" 2 ' __svr_evnt_reader t:task-n
 	__svr_evnt_d2_sock@ "DISP-R2" 2 ' __svr_evnt_reader t:task-n
@@ -190,9 +192,9 @@ ns: sdr
 	2 pick 2 pick 2 pick conn_set_disp_state
 	"resp" m:@ "ACK" s:= nip if 
 		\ Enable the corresponding reader tasks
-		if "R3" . cr "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
-		if "R2" . cr "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
-		if "R1" . cr "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
 		true 
 	else 
 		false 
@@ -201,9 +203,9 @@ ns: sdr
 \ ----------------------------------
 \ Terminate displays
 : svr_evnt_term	SED:  -- 
-	"DISP-R1-TASK" fr:__gs_reg@ dup "term" t:push t:q-notify
-	"DISP-R2-TASK" fr:__gs_reg@ dup "term" t:push t:q-notify
-	"DISP-R3-TASK" fr:__gs_reg@ dup "term" t:push t:q-notify ;
+	"DISP-R1-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then
+	"DISP-R2-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then
+	"DISP-R3-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then ;
 
 \ ========================================
 \ Reset namespace

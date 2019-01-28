@@ -97,7 +97,7 @@ ns: sdr
 	3 pick swap n:- n:1-				\ disp-data height width  x-coord disp-data width-x-coord-l_margin
 	a:@ nip											\ disp-data height width  x-coord dBm 
 	3 pick											\ disp-data height width  x-coord dBm height
-	db_to_y											\ disp-data height width  x-coord y-coord
+	get_inst_data db_to_y				\ disp-data height width  x-coord y-coord
 	a:new 											\ disp-data height width  x-coord y-coord [] 
 	rot													\ disp-data height width  y-coord [] x-coord  
 	a:push											\ disp-data height width  y-coord [x-coord]
@@ -131,7 +131,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Build grid array
-: make_grid_array	\ --
+: build_grid_array	\ --
 	\ Get current widow size
 	get_inst_data get_disp_win_metrics a:open
 	\ Make grid and label arrays
@@ -155,7 +155,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Build pan array
-: make_pan_array															\ --
+: build_pan_array															\ --
 	\ Get current widow size
 	get_inst_data get_disp_win_metrics a:open			\ width height
 	\ Clear the data array
@@ -182,7 +182,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Build wf array
-: make_wf_array	\ --
+: build_wf_array	\ --
 \ Get current widow size
 	get_inst_data get_disp_win_metrics a:open					\ width height
 	\ Clear the data array
@@ -209,10 +209,11 @@ ns: sdr
 
 \ ===============================================================================
 \ Build the display arrays
+\ called periodically from event.8th
 : disp_builder	SED:  --
-	make_grid_array
-	make_pan_array
-	make_wf_array
+	build_grid_array
+	build_pan_array
+	build_wf_array
 ;
 
 \ ========================================

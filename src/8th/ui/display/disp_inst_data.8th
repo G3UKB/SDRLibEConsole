@@ -163,7 +163,7 @@ ns: sdr
 	
 \ ----------------------------------
 \ Deref and lock display instance data
-: radio_ref	SED: s -- m
+: radio_ref	\ SED: s -- m
 	\ in: 	0: s - display name
 	\ out:	0: m - locked radio instance data
 	{ "DISP-R1": ( disp_instance_data_1 lock @ ) , "DISP-R2": ( disp_instance_data_2 lock @ ) , "DISP-R3": ( disp_instance_data_3 lock @ ) }
@@ -171,7 +171,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Unlock display instance data
-: radio_ref_unlock	SED: s --
+: radio_ref_unlock	\ SED: s --
 	\ in: 	0: s - display name
 	\ out:	none
 	{ "DISP-R1": ( disp_instance_data_1 unlock drop ) , "DISP-R2": ( disp_instance_data_2 unlock drop ) , "DISP-R3": ( disp_instance_data_3 unlock drop ) }
@@ -217,7 +217,7 @@ ns: sdr
 : disp_buf_ref	SED: m -- a
 	\ in: 	0: m - display instance data	
 	\ out:	0: a - data buffer
-	radio_ref "data-buffer" m:@ nip
+	"data-buffer" m:@ nip
 ;
 
 \ ===============================================================================
@@ -246,14 +246,14 @@ ns: sdr
 
 \ ----------------------------------
 \ Get gui instance for this disp
-: get_gui_disp_instance	SED: m -- g
+: get_gui_disp_instance	\ SED: m -- g
 	\ in: 	0: m - display instance data			
 	\ out:	1: g - gui instance
 	"gui" m:@	nip ;
 	
 \ ----------------------------------
 \ Set gui instance for this display
-: set_gui_disp_instance	SED: g m --
+: set_gui_disp_instance	\ SED: g m --
 	\ in: 	0: m - display instance data
 	\				1: g - gui instance
 	\ out:	none
@@ -372,7 +372,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Set the waterfall image
-: set_wf_img	SED: img m --
+: set_wf_img	\ SED: img m --
 	\ in: 	0: m - display instance data
 	\				1: img - new image to draw waterfall on
 	\	out:	none
@@ -380,7 +380,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Get the waterfall image
-: get_wf_img	SED: m -- img
+: get_wf_img	\ SED: m -- img
 	\ in: 	0: m - display instance data
 	\	out:	0: img - image
 	"wf-img" m:@ nip ;
@@ -486,7 +486,8 @@ disp_inst_data_test @ #if
 	;
 
 	: usage_test	\ --
-		' run_task 1 10 loop
+		\ ' run_task 1 1 loop
+		tn
 		0.1 sleep
 	;
 

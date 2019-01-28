@@ -49,8 +49,9 @@
 \ ========================================
 \ UI displays data
 "../ui/display/disp_defs.8th"  f:include
-"../ui/display/disp_common.8th"  f:include
 "../ui/display/disp_inst_data.8th"  f:include
+"../ui/display/disp_common.8th"  f:include
+"../ui/display/disp_builder.8th"  f:include
 
 \ ========================================
 \ Connector
@@ -90,8 +91,6 @@
 \ UI displays
 \ "../ui/display/disp.8th"  f:include
 \ "../ui/display/disp_render.8th"  f:include
-"../ui/display/disp_builder.8th"  f:include
-
 
 \ ========================================
 \ UI
