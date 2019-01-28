@@ -26,7 +26,7 @@
 
 \ ========================================
 \ Testing only
-false var, disp_inst_data_test
+true var, disp_inst_data_test
 
 disp_inst_data_test @ #if
 	"../../common/events.8th"  f:include
@@ -34,8 +34,8 @@ disp_inst_data_test @ #if
 	"../../framework/gen_server.8th"  f:include
 	"../../framework/pub_sub.8th"  f:include
 	"disp_defs.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
+	needs debug/sed
+	true SED-CHECK
 #then
 \ ========================================
 
@@ -43,9 +43,11 @@ disp_inst_data_test @ #if
 ns: sdr
 
 (*
-	the displays are driven by a set a instance data for each radio. This is all
-	values required for the rendered to render the displays. This data is built
+	The displays are driven by a set of instance data for each radio. This is all
+	values required for the renderer to render the displays. This data is built
 	by the builder in response to the display data events.
+	NOTE: Where the word takes a display instance data it MUST be a locked instance
+	obtained using radio_ref and released using radio_ref_unlock.
 *)
 
 \ ===============================================================================
@@ -314,13 +316,33 @@ ns: sdr
 	dup >p 2 pick >p
 	\ set the new disp metrics
 	"disp-metrics" m:@ nip
-	1 rot a:!
 	0 rot a:!
+	1 rot a:!
 	drop
 	\ Create and store the new image at the current width and height
 	p> wf_height img:new 			\ w h img 
 	p> "wf-img" rot m:! drop ;
 
+\ ----------------------------------
+\ Set all metrics
+\ Set all metrics from the width/height of a display panel
+\ Called from a resize event
+: set_all_metrics	SED: n n m --	
+	\ in: 	0: m - display instance data
+	\				1: n - height
+	\				2: n - width
+	\ out:	none
+	>r																\ width height
+	2dup															\ width height width height
+	\ Minus top and bottom margins for display height
+	t_margin n:- b_margin n:- 				\ width height width disp-height
+	\ Minus left and right margins for display width
+	swap l_margin n:- r_margin n:- 		\ width height disp-height disp-width
+	\ Set the pan area metrics
+	r@ set_disp_disp_metrics					\ width height
+	\ Set the display panel metrics
+	r> set_disp_win_metrics	;
+		
 \ ========================================
 \ Mouse
 \ Track mouse so that position information can be written
@@ -460,22 +482,34 @@ disp_inst_data_test @ #if
 	;
 	
 	: pull_data
-			"DISP-R1" sdr:radio_ref >r
-			r@ sdr:get_gui_disp_instance log
-			r@ sdr:get_disp_win_metrics >s log
-			r@ sdr:get_disp_disp_metrics >s log
-			r@ sdr:get_mouse_pos >s log
-			r@ sdr:get_wf_img log
-			r@ sdr:get_disp_mid_freq >s log
-			r@ sdr:get_disp_mode >s log
-			r@ sdr:get_disp_filt >s log
-			"DISP-R1" sdr:radio_ref_unlock
+		"DISP-R1" sdr:radio_ref >r
+		r@ sdr:get_gui_disp_instance >s log
+		r@ sdr:get_disp_win_metrics >s log
+		r@ sdr:get_disp_disp_metrics >s log
+		r@ sdr:get_mouse_pos >s log
+		r@ sdr:get_wf_img >s log
+		r@ sdr:get_disp_mid_freq >s log
+		r@ sdr:get_disp_mode >s log
+		r@ sdr:get_disp_filt >s log
+		"DISP-R1" sdr:radio_ref_unlock
+	;
+	
+	: display_area
+		"DISP-R1" sdr:radio_ref >r
+		400 200 r@ sdr:set_all_metrics
+		r@ sdr:get_disp_win_metrics >s log
+		r@ sdr:get_disp_disp_metrics >s log
+		600 250 r@ sdr:set_all_metrics
+		r@ sdr:get_disp_win_metrics >s log
+		r@ sdr:get_disp_disp_metrics >s log
+		"DISP-R1" sdr:radio_ref_unlock
 	;
 
 	: tn
 		param_st_alloc
 		push_data
 		pull_data
+		display_area
 		param_st_free
 	;
 	

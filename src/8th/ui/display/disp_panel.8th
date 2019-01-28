@@ -25,9 +25,19 @@
 \ Use SDR namespace
 ns: sdr
 
+(*
+	There is one display panel for each radio. This module drives the displays
+	by invalidating the panel on each timer event. The disp_render.8th module
+	is then enetered at the paint event to render the display.
+*)
+
+\ ===============================================================================
+\ Display panel per radio fits inside its parent.
+\ The panadapter is the top variable size display with a fixed hight waterfall below.
 {
 	"kind" : "box",
-	"name" : "display",
+	"name" : "display-name",
+	"id" : "display-id",
 	"bounds" : "0,0,parent.width, parent.height",
 	"bg" : "gray10",
 	"draw" : "sdr:disp_draw",
@@ -38,39 +48,48 @@ ns: sdr
 	"mouse-exit" : "sdr:mouse_exit",
 	"timer-period" : 200,
 	"timer" : "sdr:disp-timer"
-	
 } var, disp_panel
 
 \ ===============================================================================
 \ GUI event handlers
 
+\ ========================================
+\ Size event
 \ On resize save the new panel width and height and display width and height
-: disp_size													\ gui width height --
-	rot "id" g:m@ nip -rot						\ disp-id width height
-	2dup															\ disp-id width height width height
-	t_margin n:- b_margin n:- 				\ disp-id width height width disp-height
-	swap l_margin n:- r_margin n:- 		\ disp-id width height disp-height disp-width
-	4 pick dup >r wait_disp_s4
-	swap 4 pick set_disp_disp_metrics	\ disp-id width height
-	rot set_disp_win_metrics					\ --
-	r> rel_disp_s4
-;
+: disp_size	SED: g n n --	
+	\ in: 	0: n - height
+	\				1: n - width
+	\				2: g - gui
+	\ out:	none
+	rot "id" g:m@ nip -rot 
+	2 pick radio_ref
+	set_all_metrics
+	radio_ref_unlock ;
 
-\ Drawing
+\ ========================================
+\ Drawing event
 : disp_draw	\ gui --
 	draw_all
-	drop
-;
+	drop ;
 
-\ Mouse management
+\ ========================================
+\ Mouse events
+
+\ ----------------------------------
+\ Mouse entered the display panel
 : mouse_enter	\ gui --
 	true swap "id" g:m@ nip mouse_valid
 ;
 
+\ ----------------------------------
+\ Mouse exited the display panel
 : mouse_exit	\ gui --
 	false swap "id" g:m@ nip mouse_valid
 ;
 
+\ ----------------------------------
+\ Mouse moved
+\ Inside or outside the dislay area
 : mouse_move	\ gui x y --
 	2 pick "id" g:m@ nip
 	dup wait_disp_s4
@@ -78,6 +97,11 @@ ns: sdr
 	"id" g:m@ rel_disp_s4
 ;
 
+\ ========================================
+\ Click frequency management
+
+\ ----------------------------------
+\ Determine which radio panel we are within
 : click_freq_r1 \ spec-id -- 
 	dup "DISP-R1" s:= if drop true true else false then
 ;
@@ -90,6 +114,10 @@ ns: sdr
 	dup "DISP-R3" s:= if drop true true else false then 
 ;
 
+\ ----------------------------------
+\ Mouse button down
+\ Directly set the radio frequency 
+\ ToDo - what if we are outside the panel?
 : mouse_down									\ gui x y --
 	drop over 									\ x gui
 	"id" g:m@ nip  							\ x id
@@ -101,12 +129,17 @@ ns: sdr
 	drop
 ;
 
-\ Render
+\ ========================================
+\ GUI Timer
+\ Render on the timer frequency by invalidating the display
 : disp-timer	\ g --
 	g:invalidate
 ;
 
-\ ============================================================================
+\ ===============================================================================
+\ Create and initialise a display panel
+
+\ ----------------------------------
 \ Create a display panel
 : disp_panel_new						\ id bounds -- new-disp-gui
 	disp_panel @ G:clone nip	\ id bounds disp-clone
@@ -118,6 +151,7 @@ ns: sdr
 	rot set_gui_disp_instance	\ new-disp-gui
 ;
 
+\ ----------------------------------
 \ Initialise a display panel instance
 : disp_panel_init								\ disp_id -- 
 	\ Start a task for this instance
@@ -129,11 +163,11 @@ ns: sdr
 	m:! drop
 ;
 
-\ ============================================================================
+\ ===============================================================================
 \ Subscriber Events
-\ Obey the SED and consume the data
-\ Potentially a freq update
 
+\ ----------------------------------
+\ Freq update
 : disp_evt_r1_vfo						\ a --
 	"DISP-R1" swap						\ DISP-ID a
 	"freq" m:@								\ DISP-ID a f
@@ -143,6 +177,7 @@ ns: sdr
 	drop											\ a
 ;
 
+\ ----------------------------------
 : disp_evt_r2_vfo						\ a --
 	"DISP-R2" swap						\ DISP-ID a
 	"freq" m:@								\ DISP-ID a f
@@ -152,6 +187,7 @@ ns: sdr
 	drop		
 ;
 
+\ ----------------------------------
 : disp_evt_r3_vfo						\ a --
 	"DISP-R3" swap						\ DISP-ID a
 	"freq" m:@								\ DISP-ID a f
@@ -161,6 +197,8 @@ ns: sdr
 	drop
 ;
 
+\ ----------------------------------
+\ Mode update
 : disp_evt_r1_mode	\ a --
 	"mode" m:@
 	"DISP-R1" set_disp_mode
@@ -179,6 +217,8 @@ ns: sdr
 	drop
 ;
 
+\ ----------------------------------
+\ Filter update
 : disp_evt_r1_filt	\ a --
 	"filter" m:@
 	"DISP-R1" set_disp_filt
@@ -197,66 +237,41 @@ ns: sdr
 	drop
 ;
 
+\ ========================================
 \ Subscribe to available radios
 : disp_subscribe_radios_1
 	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
-	
 	UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
-	
-	SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
-	
-	SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
-;
+	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe ;
 
 : disp_subscribe_radios_2
-	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
 	UI_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
-	
-	UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
 	UI_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
-	UI_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
-	
-	SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
-	SYS_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
-	
-	SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
-	SYS_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
-	SYS_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
-;
+	UI_R2_FILT ' disp_evt_r2_filt pubsub_subscribe ;
 
 : disp_subscribe_radios_3
-	UI_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
-	UI_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
   UI_R3_FREQ ' disp_evt_r3_vfo pubsub_subscribe
-  
-  UI_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	UI_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
-	UI_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
-	UI_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
 	UI_R3_MODE ' disp_evt_r3_mode pubsub_subscribe 
-	UI_R3_FILT ' disp_evt_r3_filt pubsub_subscribe
-	
-  SYS_R1_FREQ ' disp_evt_r1_vfo pubsub_subscribe
-  SYS_R2_FREQ ' disp_evt_r2_vfo pubsub_subscribe
-  SYS_R3_FREQ ' disp_evt_r3_vfo pubsub_subscribe
-  
-  SYS_R1_MODE ' disp_evt_r1_mode pubsub_subscribe 
-	SYS_R1_FILT ' disp_evt_r1_filt pubsub_subscribe
-	SYS_R2_MODE ' disp_evt_r2_mode pubsub_subscribe 
-	SYS_R2_FILT ' disp_evt_r2_filt pubsub_subscribe
-	SYS_R3_MODE ' disp_evt_r3_mode pubsub_subscribe 
-	SYS_R3_FILT ' disp_evt_r3_filt pubsub_subscribe
-;
+	UI_R3_FILT ' disp_evt_r3_filt pubsub_subscribe ;
 
+: disp_do_r1_sub
+	disp_subscribe_radios_1 ;
+	
+: disp_do_r2_sub
+	disp_subscribe_radios_1 
+	disp_subscribe_radios_2 ;
+	
+: disp_do_r3_sub
+	disp_subscribe_radios_1
+	disp_subscribe_radios_2 
+	disp_subscribe_radios_3 ;
+	
 : disp_subscribe	\  --
   \ Subscribe to events
-	[ ' disp_subscribe_radios_1 , ' disp_subscribe_radios_2 , ' disp_subscribe_radios_3 ]
+	[ ' disp_do_r1_sub , ' disp_do_r2_sub , ' disp_do_r3_sub ]
 	swap caseof
 ;
 
+\ ========================================
 \ Restore namespace	
 ns: user	
