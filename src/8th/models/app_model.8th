@@ -694,8 +694,8 @@ ns: sdr
 \ ========================================
 \ Frequency
 : app_model_r1_set_freq	SED: n T --
-	\ in: 	0: n - new R1 frequency in Hz
-	\				1: T - true if to be propogated to UI as well as SYS
+	\ in: 	0: T - true if to be propogated to UI as well as SYS
+	\				1: n - new R1 frequency in Hz
 	\ out: 	none
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_r1_set_freq rot fr:msg! ;

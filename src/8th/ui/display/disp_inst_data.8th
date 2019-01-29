@@ -26,7 +26,7 @@
 
 \ ========================================
 \ Testing only
-true var, disp_inst_data_test
+false var, disp_inst_data_test
 
 disp_inst_data_test @ #if
 	"../../common/events.8th"  f:include

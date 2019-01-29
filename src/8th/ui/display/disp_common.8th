@@ -132,10 +132,10 @@ ns: sdr
 \ ----------------------------------	
 \ Given an x offset into the display area return the frequency at x
 \ This provides a tracking frequency for the mouse pointer
-: x_to_freq								\ x disp_id -- freq
+: x_to_freq	SED: n m -- n
 	\ in: 	0: m - display instance data	
 	\				1: n - x coordinate
-	\ out:	0: s - frequency at x in MHz as float
+	\ out:	0: n - frequency at x in MHz as float
 	dup 										\ x disp_id spec-id 
 	start_freq 1000000 n:* 	\ x disp_id start-freq 
 	swap 										\ x start-freq disp_inst

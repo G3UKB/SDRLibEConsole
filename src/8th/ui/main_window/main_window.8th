@@ -1056,17 +1056,16 @@ ns: sdr
 	g:+child								\ meter_id radio-gui
 	2drop										\ --
 ;
-
+*)
 \ Add child display panel
-: add_child_disp_panel		\ gui radio_id disp_id bounds --
-	add_child_common
+: add_child_disp_panel		\ radio_id disp_id bounds --
+	add_child_common				\ disp_id radio-gui disp_id bounds
 	disp_panel_new 					\ spec_id radio-gui spec-obj
-	rot 										\ radio-gui spec-obj spec_id
-	disp_panel_init					\ radio-gui spec-obj
+	rot drop								\ radio-gui spec-obj
 	g:+child								\ radio-gui
 	drop										\ --
 ;
-*)
+
 \ ========================================
 \ Create num-radios widgets
 \ VFO panels
@@ -1180,7 +1179,7 @@ ns: sdr
 	"radio-2" "METER-R2" "parent.width-165,0,parent.width-15,50" add_child_meter_panel
 	"radio-3" "METER-R3" "parent.width-165,0,parent.width-15,50" add_child_meter_panel
 ;
-
+*)
 \ Display panels
 : disp_radios_1	\ --
 	"radio-1" "DISP-R1" "50,50,parent.width,parent.height" add_child_disp_panel
@@ -1196,7 +1195,7 @@ ns: sdr
 	"radio-2" "DISP-R2" "50,50,parent.width,parent.height" add_child_disp_panel
 	"radio-3" "DISP-R3" "50,50,parent.width,parent.height" add_child_disp_panel
 ;
-*)
+
 \ ========================================
 \ Called when run mode is entered
 : evt_main_window	\ a -- 
@@ -1235,8 +1234,8 @@ ns: sdr
 	r@ caseof
 	\ [ ' meter_radios_1 , ' meter_radios_2 , ' meter_radios_3 ]
 	\ r@ caseof 
-	\ [ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
-	\ r@ caseof 
+	[ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
+	r@ caseof
 	[ ' mode_radios_1 , ' mode_radios_2 , ' mode_radios_3 ]
 	r@ caseof
 	[ ' filter_radios_1 , ' filter_radios_2 , ' filter_radios_3 ]
@@ -1269,6 +1268,7 @@ ns: sdr
 	\ Store main window GUI
 	main_window ! ;
 
+\ ----------------------------------
 : main_window_subscribe	\  --
 	\ Subscribe to events
 	st_rad_num_rx@ n:1- >r
@@ -1281,7 +1281,7 @@ ns: sdr
 	r@ agc_subscribe
 	r@ afgain_subscribe
 	\ r@ rx_meter_subscribe
-  \ r@ disp_subscribe
+  r@ disp_subscribe
   rdrop
 ;
 
