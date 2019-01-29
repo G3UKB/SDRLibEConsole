@@ -72,7 +72,7 @@ ns: sdr
 	\ in: 	0: g - gui
 	\ out:	none
 	\ Call the renderer
-	\ draw_all
+	draw_all
 	drop ;
 
 \ ========================================
@@ -184,7 +184,7 @@ ns: sdr
 \ ===============================================================================
 \ Subscriber Events
 
-: disp_evt_vfo	SEED: s a --
+: disp_evt_vfo	SED: s a --
 	\ in: 	0: a - event array
 	\				1: s - display name
 	\ out:	none

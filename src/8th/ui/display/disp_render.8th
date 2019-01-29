@@ -1,9 +1,9 @@
 (*
 	disp_render.8th
  
-  Display renderer for the DynamicSDR application
+  Display renderer for the SDRLibEConsole application
  
- Copyright C 2017 by G3UKB Bob Cowdery
+ Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -35,12 +35,12 @@ var current_spec_id
 \ Helpers
 \ Get width of display panel
 : w_width		\ -- width
-	current_spec_id @ get_disp_win_metrics 0 a:@ nip	\	width
+	"inst_data" t:@ get_disp_win_metrics 0 a:@ nip	\	width
 ;
 
 \ Get height of display panel
 : w_height	\ -- height
-	current_spec_id @ get_disp_win_metrics 1 a:@ nip	\	height
+	"inst_data" t:@ get_disp_win_metrics 1 a:@ nip	\	height
 ;
 
 \ Get mid-point of the grid in x plane
@@ -71,12 +71,12 @@ var current_spec_id
 
 \ Get the x offset of the low freq side of the filter
 : low_x_offset					\ low_filt -- low-x-offset
-	current_spec_id @ freq_pp n:/ n:int
+	"inst_data" t:@ freq_pp n:/ n:int
 ;
 
 \ Get the x offset of the high freq side of the filter
 : high_x_offset					\ high_filt -- high-x-offset
-	current_spec_id @ freq_pp n:/ n:int
+	"inst_data" t:@ freq_pp n:/ n:int
 ;
 
 \ Get the low/high bounds of the filter
@@ -176,7 +176,7 @@ enum;
 
 \ Make the grid path
 : make_grid_path	\ gui --
-	"id" g:m@ fixed_data_ref ' doline a:each 
+	"inst_data" t:@ fixed_data_ref ' doline a:each 
 ;
 
 \ ========================================
@@ -194,13 +194,13 @@ enum;
 \ Close the pan path so it can be filled
 : complete_pan_path																\ gui pan-data -- 
 	\ Line from the current end point to the bottom right
-	swap "id" g:m@ get_disp_win_metrics 2dup a:open		\ pan-data gui [width,height] gui width height
+	swap "inst_data" t:@ get_disp_win_metrics 2dup a:open		\ pan-data gui [width,height] gui width height
 	b_margin n:- swap r_margin n:- swap g:lineto			\ pan-data gui [width,height] gui
 	\ Line from bottom right to bottom left
 	drop 2dup a:open 1 0 poke													\ pan-data gui [width,height] gui 0 height
 	b_margin n:- swap l_margin n:+ swap g:lineto			\ pan-data gui [width,height] gui
 	\ Line to the first point
-	"id" g:m@ pan_data_ref														\ pan-data gui [width,height] gui pan-data
+	"inst_data" t:@ pan_data_ref														\ pan-data gui [width,height] gui pan-data
 	0 a:@ nip 0 a:@ swap 1 a:@ nip										\ pan-data gui [width,height] gui x y
 	g:lineto																					\ pan-data gui [width,height] gui
 	4drop																							\ --
@@ -208,7 +208,7 @@ enum;
 
 \ Make the pan path
 : make_pan_path	\ gui --
-	"id" g:m@ pan_data_ref ' do_node a:each
+	"inst_data" t:@ pan_data_ref ' do_node a:each
 	a:len 0 n:> if
 		2dup complete_pan_path
 	then
@@ -232,7 +232,7 @@ enum;
 
 \ Write waterfall line
 : wf_update	\ g --
-	"id" g:m@ dup wf_data_ref \ g disp-id wf-data-ref
+	"inst_data" t:@ dup wf_data_ref \ g disp-id wf-data-ref
 	swap get_wf_img						\ g wf-data-ref img
 	swap											\ g img wf-data-ref
 	' dopix										\ g img wf-data-ref 'dopix
@@ -245,19 +245,18 @@ enum;
 \ Draw grid, labels, pan, waterfall
 \ Return freq at the current mouse pointer
 : get_freq_text	\ gui x y -- gui x y freq
-	1 pick l_margin n:- 3 pick "id" g:m@ nip x_to_freq >s
+	1 pick l_margin n:- 3 pick "inst_data" t:@ nip x_to_freq >s
 ;
 
 : draw_all	\ g -- g
 	\ Stash the id for this display
-	"id" g:m@ current_spec_id !
+	"id" g:m@ dup "disp_name" t:!
+	\ and the locked instance data
+	radio_ref "inst_data" t:!
 	
 	\ Common settings
 	"gray11" g:fillall
 	1 g:line-width
-	
-	\ Take lock
-	"id" g:m@ wait_disp_s4
 	
 	\ Grid lines
 	"gray17" g:scolor
@@ -268,8 +267,8 @@ enum;
 	
 	\ Labels
 	"yellow:50" g:scolor
-	"id" g:m@ h_label_data_ref ' draw_label a:each drop
-	"id" g:m@ v_label_data_ref ' draw_label a:each
+	"inst_data" t:@ h_label_data_ref ' draw_label a:each drop
+	"inst_data" t:@ v_label_data_ref ' draw_label a:each
 	drop
 	
 	\ Panadapter
@@ -281,9 +280,9 @@ enum;
 	g:/path g:stroke-fill
 	
 	\ Waterfall
-	state_model locked@ "metis" m:@ nip "running" m:@ nip if
+	st_rad_running@ if
 		wf_update
-		current_spec_id @	dup get_disp_win_metrics a:open nip 	\ g disp-id height
+		"inst_data" t:@	dup get_disp_win_metrics a:open nip 	\ g disp-id height
 		b_margin n:-																						\ g disp-id start-y
 		swap get_wf_img 																				\ g start-y img 
 		swap l_margin swap g:image-at
@@ -304,13 +303,13 @@ enum;
 	"green:15" g:fcolor
 	g:path
 	\ Get the bounding rectangle
-	"id" g:m@ dup get_disp_filt swap get_disp_mode filter_bounding_rect
+	"inst_data" t:@ dup get_disp_filt swap get_disp_mode filter_bounding_rect
 	a:open g:rect
 	g:/path g:stroke-fill
 	
 	\ Draw mouse position text
 	"orange" g:scolor
-	"id" g:m@ get_mouse_pos null? not if 
+	"inst_data" t:@ get_mouse_pos null? not if 
 		a:open get_freq_text rot 10 n:+ -rot
 		g:draw-text-at 
 	else
@@ -318,7 +317,7 @@ enum;
 	then
 	
 	\ Release lock
-	 "id" g:m@ rel_disp_s4
+	 "disp_name" t:@ radio_ref_unlock
 ;
 
 \ Restore namespace	

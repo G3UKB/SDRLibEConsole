@@ -211,6 +211,7 @@ ns: sdr
 \ Build the display arrays
 \ called periodically from event.8th
 : disp_builder	SED:  --
+	
 	build_grid_array
 	build_pan_array
 	build_wf_array

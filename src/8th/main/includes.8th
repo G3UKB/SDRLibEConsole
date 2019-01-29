@@ -89,8 +89,8 @@
 
 \ ========================================
 \ UI displays
+"../ui/display/disp_render.8th"  f:include
 "../ui/display/disp_panel.8th"  f:include
-\ "../ui/display/disp_render.8th"  f:include
 
 \ ========================================
 \ UI
