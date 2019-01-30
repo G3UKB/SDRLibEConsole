@@ -211,10 +211,14 @@ ns: sdr
 \ Build the display arrays
 \ called periodically from event.8th
 : disp_builder	SED:  --
-	
+	\ "inst_data" t:@ disp_buf_ref . cr
+	\ "inst_data" t:@ get_raw_data . cr
 	build_grid_array
-	build_pan_array
-	build_wf_array
+	\ "inst_data" t:@ fixed_data_ref . cr
+	build_pan_array 
+	"inst_data" t:@ pan_data_ref . cr
+	build_wf_array 
+	\ "inst_data" t:@ wf_data_ref . cr
 ;
 
 \ ========================================

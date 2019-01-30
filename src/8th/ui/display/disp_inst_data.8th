@@ -234,8 +234,8 @@ ns: sdr
 	\ in: 	0: m - display instance data			
 	\ out:	none
 	"data-buffer" m:@ 
-	"1024f" unpack drop swap
-	"raw-data" a:! ;
+	"1024f" unpack drop
+	"raw-data" swap m:! ;
 
 \ ----------------------------------
 : get_raw_data	SED: m -- a

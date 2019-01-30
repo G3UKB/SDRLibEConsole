@@ -1234,8 +1234,8 @@ ns: sdr
 	r@ caseof
 	\ [ ' meter_radios_1 , ' meter_radios_2 , ' meter_radios_3 ]
 	\ r@ caseof 
-	[ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
-	r@ caseof
+	\ [ ' disp_radios_1 , ' disp_radios_2 , ' disp_radios_3 ]
+	\ r@ caseof
 	[ ' mode_radios_1 , ' mode_radios_2 , ' mode_radios_3 ]
 	r@ caseof
 	[ ' filter_radios_1 , ' filter_radios_2 , ' filter_radios_3 ]
@@ -1281,7 +1281,7 @@ ns: sdr
 	r@ agc_subscribe
 	r@ afgain_subscribe
 	\ r@ rx_meter_subscribe
-  r@ disp_subscribe
+  \ r@ disp_subscribe
   rdrop
 ;
 

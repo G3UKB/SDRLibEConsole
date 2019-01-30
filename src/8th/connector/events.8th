@@ -141,7 +141,7 @@ ns: sdr
 						\ "Received:" swap s:+ log 4drop
 						\ Call display builder to process the data
 						"inst_data" t:@ copy_to_raw
-						disp_builder 
+						disp_builder
 					then
 					\ Unlock the instance data
 					"reader_inst" t:@ radio_ref_unlock
