@@ -36,7 +36,10 @@ ns: sdr
 
 \ ----------------------------------
 \ Add one vertical label
-: add_v_label											\ y_start idx -- y_start 
+: add_v_label	SED: n n -- n
+	\ in: 	0: n - idx
+	\				1: n - y_start
+	\ out: 	0: n - y_start
 	inter_db a:new swap 						\ y_start [] "idx"
 	a:push													\ y_start ["idx"]
 	5 a:push												\ y_start ["idx",x]
@@ -47,7 +50,14 @@ ns: sdr
 
 \ ----------------------------------
 \ Add one horizontal line
-: add_h_line		  					\ wide high fixed_data idx -- wide high fixed_data 
+: add_h_line	SED: n n a n -- n n a
+	\ in: 	0: n - idx
+	\				1: a - fixed_data
+	\				2: n - height
+	\				3: n - width
+	\ out: 	0: a - fixed_data
+	\				1: n - height
+	\				1: n - width
 	swap >r	>r r@							\ wide high idx r:fixed_data idx
 	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
 	a:new l_margin a:push			\ wide high wide high idx [x_start]
@@ -63,7 +73,12 @@ ns: sdr
 
 \ ----------------------------------
 \ Add one horizontal label
-: add_h_label											\ high x_start idx -- high x_start
+: add_h_label	SED: n n n -- n n
+	\ in: 	0: n - idx
+	\				1: n - x_start
+	\				2: n - height
+	\ out: 	0: n - x_start
+	\				1: n - height
 	get_inst_data freq_str a:new swap \ high x_start [] "idx"
 	a:push													\ high x_start ["idx"]
 	1 pick x_h_label_adj n:+ a:push	\ high x_start ["idx",x]
@@ -74,7 +89,14 @@ ns: sdr
 
 \ ----------------------------------
 \ Add one vertical line
-: add_v_line								\ wide high fixed_data idx -- wide high fixed_data
+: add_v_line	SED: n n a n -- n n a
+	\ in: 	0: n - idx
+	\				1: a - fixed_data
+	\				2: n - height
+	\				3: n - width
+	\ out: 	0: a - fixed_data
+	\				1: n - height
+	\				2: n - width
 	swap >r	>r r@							\ wide high idx r:fixed_data idx
 	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
 	\ (((wide - 2*margin)/divs)*idx) + margin
@@ -90,7 +112,14 @@ ns: sdr
 \ ----------------------------------
 \ Add one pan point
 \ Note that the data array is ordered high freq to low freq so indexing is reversed
-: add_pan_point								\ disp-data height width x-coord -- disp-data height width 
+: add_pan_point	SED: a n n n -- a n n
+	\ in: 	0: n - x-coord
+	\				1: n - width
+	\				2: n - height
+	\				3: a - disp-data
+	\ out: 	0: n - width
+	\				1: n - height
+	\				2: a - disp-data
 	\ We want the corresponding dBm value for the x offset
 	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
 	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
@@ -110,7 +139,14 @@ ns: sdr
 \ ----------------------------------
 \ Add one waterfall point
 \ Note that the data array is ordered high freq to low freq so indexing is reversed
-: add_wf_point								\ disp-data height width x-coord -- disp-data height width
+: add_wf_point	SED: a n n n -- a n n
+	\ in: 	0: n - x-coord
+	\				1: n - width
+	\				2: n - height
+	\				3: a - disp-data
+	\ out: 	0: n - width
+	\				1: n - height
+	\				2: a - disp-data
 	\ We want the corresponding dBm value for the x offset
 	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
 	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
@@ -121,7 +157,7 @@ ns: sdr
 	2 pick 											\ disp-data height width  colour [] x-coord  							
 	a:push											\ disp-data height width  colour [x-coord]
 	swap a:push									\ disp-data height width  [x-coord, colour]
-	get_inst_data wf_data_ref			\ disp-data height width  [x-coord, colour] wf-data
+	get_inst_data wf_data_ref		\ disp-data height width  [x-coord, colour] wf-data
 	swap 												\ disp-data height width  spec-data [x-coord, colour]
 	a:push drop 								\ disp-data height width
 ;
@@ -131,7 +167,9 @@ ns: sdr
 
 \ ----------------------------------
 \ Build grid array
-: build_grid_array	\ --
+: build_grid_array	SED:  --
+	\ in: none
+	\ out: none
 	\ Get current widow size
 	get_inst_data get_disp_win_metrics a:open
 	\ Make grid and label arrays
@@ -144,7 +182,7 @@ ns: sdr
 ;
 
 \ ----------------------------------
-\ Use to calibrate the display db range
+\ Use to calibrate the display db range see build_pan_array
 : add_float
 	[-119.0, -109.0, -131.0, -50.0, -101.0, -141.0, -135.0, -111.0] a:shuffle
 	0 a:@ nip a:push
@@ -155,7 +193,9 @@ ns: sdr
 
 \ ----------------------------------
 \ Build pan array
-: build_pan_array															\ --
+: build_pan_array	SED:  --
+	\ in: none
+	\ out: none
 	\ Get current widow size
 	get_inst_data get_disp_win_metrics a:open			\ width height
 	\ Clear the data array
@@ -182,8 +222,10 @@ ns: sdr
 
 \ ----------------------------------
 \ Build wf array
-: build_wf_array	\ --
-\ Get current widow size
+: build_wf_array	SED:  --
+	\ in: none
+	\ out: none
+	\ Get current widow size
 	get_inst_data get_disp_win_metrics a:open					\ width height
 	\ Clear the data array
 	get_inst_data wf_data_ref a:clear drop						\ width height
@@ -209,8 +251,10 @@ ns: sdr
 
 \ ===============================================================================
 \ Build the display arrays
-\ called periodically from event.8th
+\ Called periodically from event.8th
 : disp_builder	SED:  --
+	\ in: none
+	\ out: none
 	build_grid_array
 	build_pan_array 
 	build_wf_array ;
