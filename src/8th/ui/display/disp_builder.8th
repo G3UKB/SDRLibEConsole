@@ -118,12 +118,12 @@ ns: sdr
 	a:@ nip											\ disp-data height width  x-coord dBm 
 	db_to_colour nip						\ disp-data height width  x-coord colour
 	a:new 											\ disp-data height width  x-coord colour [] 
-	rot													\ disp-data height width  colour [] x-coord  
+	2 pick 											\ disp-data height width  colour [] x-coord  							
 	a:push											\ disp-data height width  colour [x-coord]
 	swap a:push									\ disp-data height width  [x-coord, colour]
 	get_inst_data wf_data_ref			\ disp-data height width  [x-coord, colour] wf-data
 	swap 												\ disp-data height width  spec-data [x-coord, colour]
-	a:push drop  								\ disp-data height width
+	a:push drop 								\ disp-data height width
 ;
 
 \ ===============================================================================
@@ -211,15 +211,9 @@ ns: sdr
 \ Build the display arrays
 \ called periodically from event.8th
 : disp_builder	SED:  --
-	\ "inst_data" t:@ disp_buf_ref . cr
-	\ "inst_data" t:@ get_raw_data . cr
 	build_grid_array
-	\ "inst_data" t:@ fixed_data_ref . cr
 	build_pan_array 
-	"inst_data" t:@ pan_data_ref . cr
-	build_wf_array 
-	\ "inst_data" t:@ wf_data_ref . cr
-;
+	build_wf_array ;
 
 \ ========================================
 \ Restore namespace	

@@ -264,13 +264,11 @@ enum;
 	g:path
 	make_grid_path drop
 	g:/path g:stroke
-	
 	\ Labels
 	"yellow:50" g:scolor
 	"inst_data" t:@ h_label_data_ref ' draw_label a:each drop
 	"inst_data" t:@ v_label_data_ref ' draw_label a:each
 	drop
-	
 	\ Panadapter
 	g:clearpath
 	"green:50" g:scolor
@@ -278,7 +276,6 @@ enum;
 	g:path
 	make_pan_path
 	g:/path g:stroke-fill
-	
 	\ Waterfall
 	st_rad_running@ if
 		wf_update
@@ -287,7 +284,6 @@ enum;
 		swap get_wf_img 																				\ g start-y img 
 		swap l_margin swap g:image-at
 	then
-	
 	\ Draw centre freq line
 	g:clearpath
 	1 g:line-width
@@ -295,7 +291,6 @@ enum;
 	mid_top g:moveto
 	mid_bottom g:lineto
 	g:/path g:stroke
-	
 	\ Draw filter overlay
 	\ Need to get the mid-freq, mode and filter to work out where to put rectangle 
 	g:clearpath
@@ -306,7 +301,6 @@ enum;
 	"inst_data" t:@ dup get_disp_filt swap get_disp_mode filter_bounding_rect
 	a:open g:rect
 	g:/path g:stroke-fill
-	
 	\ Draw mouse position text
 	"orange" g:scolor
 	"inst_data" t:@ get_mouse_pos null? not if 
@@ -315,7 +309,6 @@ enum;
 	else
 		2drop
 	then
-	
 	\ Release lock
 	 "disp_name" t:@ radio_ref_unlock
 ;
