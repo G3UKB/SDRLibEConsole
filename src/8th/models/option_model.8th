@@ -141,10 +141,11 @@ ns: sdr
 \ ----------------------------------
 \ Default app model structure
 \ Model data which is used as default when there is no saved model.
-: __option_model_default	\	-- default-structure
+: __option_model_default	SED: -- m
+	\ in: 	none
+	\ out:	0: m - default structure
 	
-	\ ToDo: Are the src and SOD flags necessary??	
-	
+	\ ToDo: Are the src and SOD flags necessary??		
 	{
 		"general" : {
 		\	key								src			index/val 	SoD			option list			

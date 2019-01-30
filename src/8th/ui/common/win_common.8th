@@ -1,5 +1,5 @@
 (*
-	widget_common.8th
+	win_common.8th
  
   References and helper words that must be included first in the UI area
  
