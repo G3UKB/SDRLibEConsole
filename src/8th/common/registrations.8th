@@ -125,9 +125,7 @@ ns: sdr
 	false SYS_TX_FILT r@ w:exec
 
 	\ Window system events 
-	false SYS_R1_DISP_UPDT r@ w:exec
-	false SYS_R2_DISP_UPDT r@ w:exec
-	false SYS_R3_DISP_UPDT r@ w:exec
+	false SYS_DISP_WIDTH r@ w:exec
 
 	\ End of init
 	true SYS_RUN_STATE r> w:exec

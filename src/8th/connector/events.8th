@@ -147,7 +147,8 @@ ns: sdr
 					"reader_inst" t:@ radio_ref_unlock
 				then
 			then
-			drop
+			\ depth . cr drop
+			reset
 		again
 	then
 	t:name@ " exiting..." s:+ log

@@ -98,6 +98,7 @@ ns: sdr
 	
 	\ Done SOD
 	false st_app_sod!
+	true st_app_run!
 	
 	"STARTUP_TASK exiting" log ;
 

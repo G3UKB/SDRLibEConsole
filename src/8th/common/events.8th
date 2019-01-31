@@ -119,9 +119,7 @@ ns: sdr
 : SYS_TX_FILT "SysTXFilt" ;
 
 \ Window system events
-: SYS_R1_DISP_UPDT "SysR1DispUpdt" ;
-: SYS_R2_DISP_UPDT "SysR2DispUpdt" ;
-: SYS_R3_DISP_UPDT "SysR3DispUpdt" ;
+: SYS_DISP_WIDTH "SysDispWidth" ;
 
 \ End of init
 : SYS_RUN_STATE "SysRunState" ;

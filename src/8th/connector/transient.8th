@@ -136,6 +136,26 @@ ns: sdr
 	then
 	"TRY_RADIO_TASK exiting" log ;
 
+\ ----------------------------------
+\ ToDo: make permanent task
+\ This must br run as a task and not called directly
+\ call a miscellaneous command
+: conn_misc	SED: * w --
+	\ in: 	0: w - word to call
+	\				1: * - opaque data
+	\ out:	none
+	
+	"MISC_RADIO_TASK" t:name!
+	t:curtask "MISC_RADIO_TASK" fr:gs_reg!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	
+	w:exec "resp" m:@ nip "NAK" s:= if
+		"Command failed!" log
+	then
+	\ "MISC_RADIO_TASK exiting" log 
+;
+	
 \ ========================================
 \ Reset namespace
 ns: user

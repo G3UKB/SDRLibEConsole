@@ -235,7 +235,8 @@ ns: sdr
 	\ out:	none
 	"data-buffer" m:@ 
 	"1024f" unpack drop
-	"raw-data" swap m:! ;
+	"raw-data" swap m:! 
+	;
 
 \ ----------------------------------
 : get_raw_data	SED: m -- a
@@ -291,21 +292,6 @@ ns: sdr
 	drop ;
 
 \ ----------------------------------
-\ Publish disp width
-\ With a change in the display width we need to inform the system
-: sys_r1_disp_updt SYS_R1_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-: sys_r2_disp_updt SYS_R2_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-: sys_r3_disp_updt SYS_R3_DISP_UPDT 3 pick fr:pubsub_publish drop ;
-
-: pub_disp_width	SED: n n s --
-	\ in: 	0: s - display name
-	\				1: n - height
-	\				2: n - width
-	\ out:	none
-	{ "DISP-R1": ' sys_r1_disp_updt , "DISP-R2": ' sys_r2_disp_updt , "DISP-R3": ' sys_r3_disp_updt }
-	1 pick caseof ;
-
-\ ----------------------------------
 \ Set disp-metrics
 : set_disp_disp_metrics	SED: n n m -- 
 	\ in: 	0: m - display instance data
@@ -316,6 +302,7 @@ ns: sdr
 	dup >p 2 pick >p
 	\ set the new disp metrics
 	"disp-metrics" m:@ nip
+	\ Store in instance data
 	0 rot a:!
 	1 rot a:!
 	drop

@@ -166,6 +166,7 @@ ns: sdr
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
 : __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
 
 \ Complex messages
@@ -347,7 +348,7 @@ ns: sdr
 	\ in: 	0: m - message to send	
 	\				1: T - if true then throw on error
 	\ out: 	none
-	__conn_send_cmd_msg  __con_do_response ;
+	__conn_send_cmd_msg __con_do_response ;
 
 \ ========================================
 \ Poll - is there anybody there
@@ -417,6 +418,10 @@ ns: sdr
 
 \ ========================================
 \ Receiver functions
+
+\ ========================================
+\ FREQUENCY
+
 \ Set R1 frequency
 : do_conn_r1_freq	SED: a --
 	a:open
@@ -452,6 +457,9 @@ ns: sdr
 	\ out: 	q: * - "Timeout" or response data
 	swap __conn_tx_freq_msg false swap __con_do_exchange ;
 
+\ ========================================
+\ MODES
+
 \ ----------------------------------
 \ Set R1 mode
 : do_conn_r1_mode	SED: a --
@@ -479,13 +487,15 @@ ns: sdr
 	\ out: 	q: * - "Timeout" or response data
 	swap __conn_r3_mode_msg false swap __con_do_exchange ;
 
-\ ----------------------------------
+\ ========================================
+\ FILTERS
+
 \ Set R1 filter
 : do_conn_r1_filter	SED: a --
 	a:open
-	\ in: 	0: n - sender (task name)
-	\				1: s - R1 filter high
-	\				2: s - R1 filter low
+	\ in: 	0: s - sender (task name)
+	\				1: n - R1 filter high
+	\				2: n - R1 filter low
 	\ out: 	q: * - "Timeout" or response data
 	rot rot __conn_r1_filt_msg false swap __con_do_exchange ;
 	
@@ -497,7 +507,7 @@ ns: sdr
 	\				1: s - R2 filter high
 	\				2: s - R2 filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot  __conn_r2_filt_msg false swap __con_do_exchange ;
+	rot rot __conn_r2_filt_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set R3 filter
@@ -507,7 +517,7 @@ ns: sdr
 	\				1: s - R3 filter high
 	\				2: s - R3 filter low
 	\ out: 	q: * - "Timeout" or response data
-	rot rot  __conn_r3_filt_msg false swap __con_do_exchange ;
+	rot rot __conn_r3_filt_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------
 \ Set TX filter
@@ -522,6 +532,15 @@ ns: sdr
 \ ========================================
 \ Display functions
 
+\ ----------------------------------
+\ Set display width
+: do_conn_disp_width
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - width in pixels
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_disp_width_msg false swap __con_do_exchange ;
+	
 \ ----------------------------------
 \ Set display period
 : do_conn_disp_period
@@ -691,6 +710,14 @@ ns: sdr
 \ ----------------------------------
 \ Displays
 
+\ Set the display width
+: conn_set_disp_width	SED: n -- *
+	\ in: 	0: n - width in pixels
+	\ out:	0: * - response
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_disp_width rot fr:msg! 
+	fr:response@ ;
+	
 \ Set the display update period
 : conn_set_disp_period	SED: n -- *
 	\ in: 	0: n - update period in ms
@@ -774,7 +801,12 @@ ns: sdr
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r3_filter "r3 filter" __conn_evnt_resp ;
-	
+
+\ ----------------------------------
+\ Display update
+: __conn_evnt_disp_width	SED: w --
+	conn_set_disp_width "disp_width" __conn_evnt_resp ;
+
 \ ===============================================================================
 \ INITIALISATION and TERMINATION
 
@@ -805,9 +837,7 @@ ns: sdr
 	\ SYS_TX_FREQ ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_TX_MODE ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_TX_FILT ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R1_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R2_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R3_DISP_UPDT ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_DISP_WIDTH ' __conn_evnt_disp_width fr:pubsub_subscribe
 	\ SYS_RUN_STATE ' __conn_not_implemented fr:pubsub_subscribe 
 ;
 	
