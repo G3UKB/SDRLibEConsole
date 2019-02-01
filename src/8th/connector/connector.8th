@@ -284,7 +284,7 @@ ns: sdr
 	>r __conn_net_wait_recv_cmd if
 		__conn_recv_from
 	else
-		"Timeout waiting for response from device!" r> if throw else log {"resp":"NAK"} then
+		"Timeout waiting for response from device!" r> if throw else log drop {"resp":"NAK"} then
 	then ;
 	
 \ ===============================================================================
@@ -340,7 +340,7 @@ ns: sdr
 \ ========================================
 \ Do response
 : __con_do_response	SED: -- 
-	__conn_wait_resp_with_timeout
+	__conn_wait_resp_with_timeout 
 	fr:response! ;
 
 \ Do exchange
@@ -567,6 +567,13 @@ ns: sdr
 \ ===============================================================================
 
 \ ----------------------------------
+\ Are we ok to roll
+: conn_ready_1?	SED: n
+	st_rad_running@ not if drop {"resp" : "NAK"} ;;; then ;
+: conn_ready_2?	SED: n
+	st_rad_running@ not if 2drop {"resp" : "NAK"} ;;; then ;
+
+\ ----------------------------------
 \ Execute poll
 : conn_poll	SED:  -- *
 	\ in: 	none
@@ -625,6 +632,7 @@ ns: sdr
 : conn_r1_freq	SED: n -- *
 	\ in: 	0: n - freq in Hz
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_freq rot fr:msg! 
 	fr:response@ ;
@@ -632,6 +640,7 @@ ns: sdr
 : conn_r2_freq	SED: n -- *
 	\ in: 	0: n - freq in Hz
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push  fr:+sender
 	"Connector_TASK" ' do_conn_r2_freq rot fr:msg! 
 	fr:response@ ;
@@ -639,6 +648,7 @@ ns: sdr
 : conn_r3_freq	SED: n -- *
 	\ in: 	0: n - freq in Hz
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push  fr:+sender
 	"Connector_TASK" ' do_conn_r3_freq rot fr:msg! 
 	fr:response@ ;
@@ -648,6 +658,7 @@ ns: sdr
 : conn_r1_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_mode rot fr:msg!
 	fr:response@ ;
@@ -655,6 +666,7 @@ ns: sdr
 : conn_r2_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r2_mode rot fr:msg! 
 	fr:response@ ;
@@ -662,6 +674,7 @@ ns: sdr
 : conn_r3_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r3_mode rot fr:msg! 
 	fr:response@ ;
@@ -669,6 +682,7 @@ ns: sdr
 : conn_tx_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_tx_mode rot fr:msg! 
 	fr:response@ ;
@@ -679,6 +693,7 @@ ns: sdr
 	\ in: 	0: n - filter high
 	\				1: n - filter low
 	\ out:	0: * - response
+	st_rad_running@ not if 2drop {"resp" : "NAK"} ;; then
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_filter rot fr:msg! 
 	fr:response@ ;
@@ -687,6 +702,7 @@ ns: sdr
 	\ in: 	0: n - filter high
 	\				1: n - filter low
 	\ out:	0: * - response
+	st_rad_running@ not if 2drop {"resp" : "NAK"} ;; then
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r2_filter rot fr:msg! 
 	fr:response@ ;
@@ -695,6 +711,7 @@ ns: sdr
 	\ in: 	0: n - filter high
 	\				1: n - filter low
 	\ out:	0: * - response
+	st_rad_running@ not if 2drop {"resp" : "NAK"} ;; then
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r3_filter rot fr:msg! 
 	fr:response@ ;
@@ -703,6 +720,7 @@ ns: sdr
 	\ in: 	0: n - filter high
 	\				1: n - filter low
 	\ out:	0: * - response
+	st_rad_running@ not if 2drop {"resp" : "NAK"} ;; then
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
 	fr:response@ ;
@@ -714,6 +732,7 @@ ns: sdr
 : conn_set_disp_width	SED: n -- *
 	\ in: 	0: n - width in pixels
 	\ out:	0: * - response
+	st_rad_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_disp_width rot fr:msg! 
 	fr:response@ ;
