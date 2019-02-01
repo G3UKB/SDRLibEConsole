@@ -1,5 +1,5 @@
 (* 
-	events.8th
+	con_events.8th
  
   SDRLibEConnector server display event handler
  

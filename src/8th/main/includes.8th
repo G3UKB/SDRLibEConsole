@@ -29,7 +29,7 @@
 "../common/persist.8th" f:include
 "../common/radio_defs.8th" f:include
 "../common/state.8th" f:include
-"../common/events.8th" f:include
+"../common/ps_events.8th" f:include
 "../common/registrations.8th" f:include
 
 \ ========================================
@@ -56,7 +56,7 @@
 \ ========================================
 \ Connector
 "../connector/connector.8th" f:include
-"../connector/events.8th" f:include
+"../connector/con_events.8th" f:include
 "../connector/transient.8th" f:include
 
 \ ========================================

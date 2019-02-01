@@ -1,5 +1,5 @@
 (*
-	events.8th
+	ps_events.8th
  
   Event names for the publish/subscribe service
  
