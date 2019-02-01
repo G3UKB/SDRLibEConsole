@@ -113,9 +113,7 @@ ns: sdr
 	SYS_TX_FREQ ' test_callback fr:pubsub_subscribe
 	SYS_TX_MODE ' test_callback fr:pubsub_subscribe
 	SYS_TX_FILT ' test_callback fr:pubsub_subscribe
-	SYS_R1_DISP_UPDT ' test_callback fr:pubsub_subscribe
-	SYS_R2_DISP_UPDT ' test_callback fr:pubsub_subscribe
-	SYS_R3_DISP_UPDT ' test_callback fr:pubsub_subscribe
+	SYS_DISP_WIDTH ' test_callback fr:pubsub_subscribe
 	SYS_RUN_STATE ' test_callback fr:pubsub_subscribe
 ;
 

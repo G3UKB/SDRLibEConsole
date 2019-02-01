@@ -139,7 +139,7 @@ ns: sdr
 *)
 
 \ ----------------------------------
-\ Default app model structure
+\ Default option model structure
 \ Model data which is used as default when there is no saved model.
 : __option_model_default	SED: -- m
 	\ in: 	none

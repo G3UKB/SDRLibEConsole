@@ -69,6 +69,12 @@ ns: sdr
 \ Model data which is used as default when there is no saved model.
 : __app_model_default
 	{
+		"window-metrics" : {
+			"x" : 100,
+			"y" : 100,
+			"width" : 800,
+			"height" : 400
+		},
 		\ HPSDR Protocol-1 only supports 3 radios
 		\ More can be added into the array as required
 		"radio-state" : [
@@ -286,6 +292,41 @@ ns: sdr
 	drop __app_model_save
 ;
 
+\ ===============================================================================
+\ WINDOW
+
+\ ----------------------------------
+\ Set window position and size
+: do_app_set_win_metrics	SED: a --
+	\ in: 	0: n - y pos
+	\				1: n - x pos
+	\				2: n - height
+	\				3: n - width
+	\ out:	none
+	a:open
+	__app_model@ "window-metrics" m:@ nip
+	"height" rot m:!
+	"width" rot m:!
+	"y" rot m:!
+	"x" rot m:! drop ;
+
+\ ----------------------------------
+\ Get window position and size
+: do_app_get_win_metrics	SED: a --
+	\ in: 	sender (task name)
+	\ out:	q: a - [x,y,w,h]
+	a:open
+	__app_model@ "window-metrics" m:@ nip
+	"height" m:@ >r  
+	"width" m:@ >r 
+	"y" m:@ >r 
+	"x" m:@ >r
+	a:new 0 r> a:! 1 r> a:! 2 r> a:! 3 r> a:!	
+	nip fr:response! ;
+	
+\ ===============================================================================
+\ RADIOS
+
 \ ========================================
 \ Getters and Setters
 
@@ -318,7 +359,7 @@ ns: sdr
 	SYS_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	if
 		UI_R2_FREQ __app_model@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	then  2drop
+	then drop
 ;
 
 \ ----------------------------------
@@ -331,7 +372,7 @@ ns: sdr
 	SYS_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	if
 		UI_R3_FREQ __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	then  2drop
+	then  drop
 ;
 
 \ ----------------------------------
@@ -687,7 +728,28 @@ ns: sdr
 	\ Ask the model to exit
 	"AppModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
+\ ========================================
+\ Window functions
 
+\ ----------------------------------
+: app_model_set_win_metrics
+	\ in: 	0: n - height
+	\				1: n - width
+	\				2: n - y pos
+	\				3: n - x pos
+	\ out:	none
+	>r >r >r >r
+	a:new r> a:push r> a:push r> a:push r> a:push
+	"AppModel_TASK" ' do_app_set_win_metrics rot fr:msg! ;
+
+\ ----------------------------------
+: app_model_get_win_metrics
+	\ in: 	none
+	\ out:	[x,y,w,h]
+	a:new fr:+sender
+	"AppModel_TASK" ' do_app_get_win_metrics rot fr:msg!
+	fr:response@ ;
+	
 \ ========================================
 \ Radio functions
 
@@ -702,24 +764,24 @@ ns: sdr
 
 \ ----------------------------------
 : app_model_r2_set_freq	SED: n T --
-	\ in: 	0: n - new R2 frequency in Hz
-	\				1: T - true if to be propogated to UI as well as SYS
+	\ in: 	0: T - true if to be propogated to UI as well as SYS
+	\				1: n - new R2 frequency in Hz
 	\ out: 	none
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_r2_set_freq rot fr:msg! ;
 
 \ ----------------------------------	
 : app_model_r3_set_freq	SED: n T --
-	\ in: 	0: n - new R3 frequency in Hz
-	\				1: T - true if to be propogated to UI as well as SYS
+	\ in: 	0: T - true if to be propogated to UI as well as SYS
+	\				1: n - new R3 frequency in Hz
 	\ out: 	none
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_r3_set_freq rot fr:msg! ;
 
 \ ----------------------------------	
 : app_model_tx_set_freq	SED: n T --
-	\ in: 	0: n - new TX frequency in Hz
-	\				1: T - true if to be propogated to UI as well as SYS
+	\ in: 	0: T - true if to be propogated to UI as well as SYS
+	\				1: n - new TX frequency in Hz
 	\ out: 	none
 	a:new rot a:push swap a:push
 	"AppModel_TASK" ' do_app_tx_set_freq rot fr:msg! ;
@@ -931,6 +993,9 @@ app_model_test @ #if
 	\ Run the procedural tests
 	: run_proc
 		\ Procedural interface tests
+		sdr:app_model_get_win_metrics "Metrics: " swap >s s:+ log
+		150 250 750 360 sdr:app_model_set_win_metrics
+		sdr:app_model_get_win_metrics "Metrics: " swap >s s:+ log
 		7100000 false sdr:app_model_r1_set_freq
 		7100000 false sdr:app_model_r2_set_freq
 		7100000 false sdr:app_model_r3_set_freq
@@ -972,6 +1037,7 @@ app_model_test @ #if
 		sdr:app_model_sys_evnts
 		"Done initialise" log
 		\ Run proc tests
+		1 sleep
 		"Running proc tests" log
 		run_proc
 		"Done proc tests" log
