@@ -126,6 +126,7 @@ ns: sdr
 
 	\ Window system events 
 	false SYS_DISP_WIDTH r@ w:exec
+	true MAIN_WINDOW_METRICS r@ w:exec
 
 	\ End of init
 	true SYS_RUN_STATE r> w:exec

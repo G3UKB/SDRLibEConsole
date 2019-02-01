@@ -80,7 +80,7 @@ ns: sdr
 	\ Main UI subscribes to SYS_RUN_STATE
 	\ Subscribe propogates down to all widgets which do own subscriptions
 	main_window_subscribe 
-	0.2 sleep
+	0.5 sleep
 	\ Publish SYS_RUN_STATE, gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
 	2 sleep
@@ -100,7 +100,7 @@ ns: sdr
 	false st_app_sod!
 	true st_app_run!
 	
-	"STARTUP_TASK exiting" log ;
+	"STARTUP_TASK - exiting..." log ;
 
 \ ----------------------------------
 \ We cleanup all gen-server tasks
@@ -119,12 +119,14 @@ ns: sdr
 	\ Close connector
 	svr_evnt_term
 	conn_term
+	
 	\ Close models
 	option_model_term
 	app_model_term
+	
 	\ Close pub/sub
 	fr:pubsub_term
-	"Cleanup task exiting" log ;
+	"Cleanup task - exiting..." log ;
 	
 \ ----------------------------------
 \ Called on application exit

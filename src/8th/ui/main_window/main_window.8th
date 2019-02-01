@@ -25,6 +25,7 @@
 \ ============================================================================
 
 needs gui/msgdlg
+needs stack/3drop
 
 \ Define our SDR namespace
 ns: sdr
@@ -734,6 +735,10 @@ ns: sdr
 		\ Disable start
 		"radio-state" g:child false g:enable drop
 	then
+	
+	\ Save window metrics
+	sdr:main_window @ g:xy? rot g:size? rot drop
+	app_model_set_win_metrics
 ;
 
 \ ----------------------------------
@@ -1206,17 +1211,13 @@ ns: sdr
 	st_rad_num_rx@ n:1- >r
 	
 	\ Set the main window size and position
-	\ main_window @ model_win_get_size dup 0 n:> if
-	\ 	\ Probably ok to use from model
-	\ 	g:size
-	\ 	model_win_get_pos g:xy
-	\ else 
-	\ 	\ Set the window size and position to default values
-	\ 	main_window @ [ ( 610 350 g:size ) , ( 610 600 g:size ) , ( 610 900 g:size ) ] 
-	\ 	r@ caseof 
-	\ 	200 20 g:xy
-	\ 	drop
-	\ then
+	\ app_model_get_win_metrics  \ [x,y,w,h]
+	[200,200,700,400]
+	a:open \ x y w h
+	main_window @
+	2 pick 2 pick g:size
+	4 pick 4 pick g:xy
+	3drop 2drop
 	
 	\ Add the concertina panels
 	main_window @	

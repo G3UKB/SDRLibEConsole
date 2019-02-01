@@ -120,6 +120,7 @@ ns: sdr
 
 \ Window system events
 : SYS_DISP_WIDTH "SysDispWidth" ;
+: MAIN_WINDOW_METRICS "MainWindowMetrics" ;
 
 \ End of init
 : SYS_RUN_STATE "SysRunState" ;
