@@ -483,6 +483,10 @@ ns: sdr
 	"ontop" : false,
 	"bg" : "gray10",
 	"resize-corner" : 20,
+	"wide" : 400,
+	"high" : 200,
+	"top" : 100,
+	"left" : 100,
 	"close" : "sdr:w_close",
 	"font" : "Arial 10",
 	"timer-period" : 200,
@@ -695,14 +699,12 @@ ns: sdr
 
 \ Quit button pressed so just exit
 : w_quit	SED: g --
-	g:quit
-;
+	g:quit ;
 
 \ ----------------------------------
 \ Ask first
 : main_quit?	SED: n --
-	0 n:= if g:quit then 
-;
+	0 n:= if g:quit then ;
 
 \ ----------------------------------
 \ Window closed, ask just in case		
@@ -717,8 +719,7 @@ ns: sdr
 		"high" : 100,
 		"bg" : "gray",
 		"resize-border" : 0
-	} g:msgdlg 
-;
+	} g:msgdlg ;
 
 \ ===============================================================================
 \ GUI idle timer
@@ -734,18 +735,18 @@ ns: sdr
 		main_window @ "button-box" g:child dup "discover" g:child true g:enable drop
 		\ Disable start
 		"radio-state" g:child false g:enable drop
-	then
-	
-	\ Save window metrics
-	sdr:main_window @ g:xy? rot g:size? rot drop
-	app_model_set_win_metrics
-;
+	then ;
 
 \ ----------------------------------
 \ The timer is used to maintain the GUI state
 : w_timer	SED: g --
 	\ Radio on-line status
-	st_rad_online@ __set_run_state ;
+	st_rad_online@ __set_run_state
+	\ Save window metrics
+	st_app_run@ if
+		g:xy? rot g:size? rot drop
+		app_model_set_win_metrics 
+	then ;
 
 \ ===============================================================================
 \ Menu management
@@ -1210,15 +1211,6 @@ ns: sdr
 	\ Get the number of radios 
 	st_rad_num_rx@ n:1- >r
 	
-	\ Set the main window size and position
-	\ app_model_get_win_metrics  \ [x,y,w,h]
-	[200,200,700,400]
-	a:open \ x y w h
-	main_window @
-	2 pick 2 pick g:size
-	4 pick 4 pick g:xy
-	3drop 2drop
-	
 	\ Add the concertina panels
 	main_window @	
 	[ ` concertina_panel_radios_1 @ ` , ` concertina_panel_radios_2 @ ` , ` concertina_panel_radios_3 @ ` ] 
@@ -1260,10 +1252,20 @@ ns: sdr
 	\ then
 ;
 
+\ ----------------------------------
+\ Restore window to last metrics
+: evt_metrics	SED: m --
+	\ {"x":200,"height":400,"width":700,"y":200}
+	>r
+	main_window @ 
+	r@ "width" m:@ swap "height" m:@ nip g:size
+	r> "x" m:@ swap "y" m:@ nip g:xy 
+	g:show ;
+
 \ ============================================================================
 \ Window subscribe
 : main_window_init	\ --
-	main_window_obj @ g:new g:show
+	main_window_obj @ g:new g:hide
 	\ This must be set after new and before showing
 	"Arial 14" g:set-popup-font
 	\ Store main window GUI
@@ -1273,7 +1275,8 @@ ns: sdr
 : main_window_subscribe	\  --
 	\ Subscribe to events
 	st_rad_num_rx@ n:1- >r
-	SYS_RUN_STATE ' evt_main_window fr:pubsub_subscribe 
+	SYS_RUN_STATE ' evt_main_window fr:pubsub_subscribe
+	MAIN_WINDOW_METRICS ' evt_metrics fr:pubsub_subscribe
 	\ Do dependent subscribes
 	r@ vfo_subscribe
 	r@ mode_subscribe

@@ -197,6 +197,7 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	__app_model@ >r
+	MAIN_WINDOW_METRICS r@ ["window-metrics"] val@ fr:pubsub_publish 
 	UI_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
 	UI_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
 	UI_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
