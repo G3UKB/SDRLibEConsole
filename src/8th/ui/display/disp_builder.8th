@@ -131,7 +131,7 @@ ns: sdr
 	rot													\ disp-data height width  y-coord [] x-coord  
 	a:push											\ disp-data height width  y-coord [x-coord]
 	swap a:push									\ disp-data height width  [x-coord, y-coord]
-	get_inst_data pan_data_ref 		\ disp-data height width  [x-coord, y-coord] pan-data
+	get_inst_data pan_data_ref 	\ disp-data height width  [x-coord, y-coord] pan-data
 	swap 												\ disp-data height width  spec-data [x-coord, y-coord]
 	a:push drop  								\ disp-data height width
 ;

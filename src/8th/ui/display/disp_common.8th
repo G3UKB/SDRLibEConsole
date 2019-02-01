@@ -82,7 +82,7 @@ ns: sdr
 \ ----------------------------------	
 \ Convert a dBm value to a y-coord
 : db_to_y	SED: n n m -- n
-	\ in: 	0: n - display instance data	
+	\ in: 	0: m - display instance data	
 	\				1: n - display height
 	\				2: n - dBm value
 	\ out:	0: n - corresponding y coordinate

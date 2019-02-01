@@ -303,8 +303,8 @@ ns: sdr
 	\ set the new disp metrics
 	"disp-metrics" m:@ nip
 	\ Store in instance data
-	0 rot a:!
 	1 rot a:!
+	0 rot a:!
 	drop
 	\ Create and store the new image at the current width and height
 	p> wf_height img:new 			\ w h img 
@@ -326,7 +326,7 @@ ns: sdr
 	\ Minus left and right margins for display width
 	swap l_margin n:- r_margin n:- 		\ width height disp-height disp-width
 	\ Set the pan area metrics
-	r@ set_disp_disp_metrics					\ width height
+	swap r@ set_disp_disp_metrics					\ width height
 	\ Set the display panel metrics
 	r> set_disp_win_metrics	;
 		

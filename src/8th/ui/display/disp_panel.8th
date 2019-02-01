@@ -46,7 +46,7 @@ ns: sdr
 	"mouse-down" : "sdr:mouse_down",
 	"mouse-enter" : "sdr:mouse_enter",
 	"mouse-exit" : "sdr:mouse_exit",
-	"timer-period" : 200,
+	"timer-period" : 100,
 	"timer" : "sdr:disp-timer"
 } var, disp_panel
 

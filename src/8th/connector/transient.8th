@@ -70,7 +70,7 @@ ns: sdr
 				\ Start the event services
 				svr_evnt_init 
 				\ 200ms period
-				200 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
+				100 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
 				\ Just start radio 1 displays for now
 				true false false svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
