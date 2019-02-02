@@ -265,19 +265,19 @@ ns: sdr
 \ ========================================
 \ Subscribe to available radios
 : disp_subscribe_radios_1
-	UI_R1_FREQ ' disp_evt_r1_vfo fr:pubsub_subscribe
-	UI_R1_MODE ' disp_evt_r1_mode fr:pubsub_subscribe 
-	UI_R1_FILT ' disp_evt_r1_filt fr:pubsub_subscribe ;
+	DISP_R1_FREQ ' disp_evt_r1_vfo fr:pubsub_subscribe
+	DISP_R1_MODE ' disp_evt_r1_mode fr:pubsub_subscribe 
+	DISP_R1_FILT ' disp_evt_r1_filt fr:pubsub_subscribe ;
 
 : disp_subscribe_radios_2
-	UI_R2_FREQ ' disp_evt_r2_vfo fr:pubsub_subscribe
-	UI_R2_MODE ' disp_evt_r2_mode fr:pubsub_subscribe 
-	UI_R2_FILT ' disp_evt_r2_filt fr:pubsub_subscribe ;
+	DISP_R2_FREQ ' disp_evt_r2_vfo fr:pubsub_subscribe
+	DISP_R2_MODE ' disp_evt_r2_mode fr:pubsub_subscribe 
+	DISP_R2_FILT ' disp_evt_r2_filt fr:pubsub_subscribe ;
 
 : disp_subscribe_radios_3
-  UI_R3_FREQ ' disp_evt_r3_vfo fr:pubsub_subscribe
-	UI_R3_MODE ' disp_evt_r3_mode fr:pubsub_subscribe 
-	UI_R3_FILT ' disp_evt_r3_filt fr:pubsub_subscribe ;
+  DISP_R3_FREQ ' disp_evt_r3_vfo fr:pubsub_subscribe
+	DISP_R3_MODE ' disp_evt_r3_mode fr:pubsub_subscribe 
+	DISP_R3_FILT ' disp_evt_r3_filt fr:pubsub_subscribe ;
 
 : disp_do_r1_sub
 	disp_subscribe_radios_1 ;

@@ -126,6 +126,16 @@ ns: sdr
 
 	\ Window system events 
 	false SYS_DISP_WIDTH r@ w:exec
+	true DISP_R1_FREQ r@ w:exec
+	true DISP_R2_FREQ r@ w:exec
+	true DISP_R3_FREQ r@ w:exec
+	true DISP_R1_MODE r@ w:exec
+	true DISP_R2_MODE r@ w:exec
+	true DISP_R3_MODE r@ w:exec
+	true DISP_R1_FILT r@ w:exec
+	true DISP_R2_FILT r@ w:exec
+	true DISP_R3_FILT r@ w:exec
+	
 	true MAIN_WINDOW_METRICS r@ w:exec
 
 	\ End of init

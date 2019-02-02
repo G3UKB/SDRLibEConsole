@@ -1216,8 +1216,6 @@ ns: sdr
 	[ ` concertina_panel_radios_1 @ ` , ` concertina_panel_radios_2 @ ` , ` concertina_panel_radios_3 @ ` ] 
 	r@ caseof g:new g:+child
 	
-	\ Now good to show
-	g:show
 	\ Clean up
 	2drop drop
 	
@@ -1260,6 +1258,7 @@ ns: sdr
 	main_window @ 
 	r@ "width" m:@ swap "height" m:@ nip g:size
 	r> "x" m:@ swap "y" m:@ nip g:xy 
+	\ Now good to show
 	g:show ;
 
 \ ============================================================================

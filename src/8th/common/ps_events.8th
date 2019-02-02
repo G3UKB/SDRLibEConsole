@@ -120,6 +120,15 @@ ns: sdr
 
 \ Window system events
 : SYS_DISP_WIDTH "SysDispWidth" ;
+: DISP_R1_FREQ "DispR1Freq" ;
+:	DISP_R2_FREQ "DispR2Freq" ;
+:	DISP_R3_FREQ "DispR3Freq" ;
+:	DISP_R1_MODE "DispR1Mode" ;
+:	DISP_R2_MODE "DispR2Mode" ;
+:	DISP_R3_MODE "DispR3Mode" ;
+:	DISP_R1_FILT "DispR1Filt" ;
+:	DISP_R2_FILT "DispR2Filt" ;
+:	DISP_R3_FILT "DispR3Filt" ;
 : MAIN_WINDOW_METRICS "MainWindowMetrics" ;
 
 \ End of init
