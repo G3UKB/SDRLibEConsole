@@ -118,7 +118,6 @@ ns: sdr
 	\ ----------------------------------
 	\ Have we been told to run?
 	"run" s:= if
-		\ "reader_inst" t:@ "-running" s:+ log
 		\ Yes, so enter the read loop
 		repeat
 			\ Check for termination at top of loop
@@ -129,27 +128,27 @@ ns: sdr
 			else
 				 \ drop
 				\ See if we have data
-				\ "reader_inst" t:@ "-waiting data" s:+ log
 				"reader_skt" t:@ true 500 net:wait if
-					\ "reader_inst" t:@ "-read data?" s:+ log
 					\ Socket says yes
 					\ Lock the instance data and copy the ref to a task variable
 					"reader_inst" t:@ radio_ref "inst_data" t:!
 					"inst_data" t:@ disp_buf_ref 0 net:recvfrom null? not if
+						\ Not interested in anything back from the receive
+						\ The data is stored in the instance data - data-buffer
+						3drop 2drop
 						\ Read something
-						\ "reader_inst" t:@ "-read data" s:+ log
-						\ "Received:" swap s:+ log 4drop
 						\ Call display builder to process the data
 						"inst_data" t:@ copy_to_raw
 						disp_builder
 					then
 					\ Unlock the instance data
-					"reader_inst" t:@ radio_ref_unlock
+					\ Remember null is not removed so drop it
+					drop "reader_inst" t:@ radio_ref_unlock
+				else
+					\ drop socket
+					drop
 				then
 			then
-			\ ToDo: clean stack properly
-			\ depth . cr drop
-			reset
 		again
 	then
 	t:name@ " exiting..." s:+ log

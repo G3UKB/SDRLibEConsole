@@ -204,7 +204,7 @@ ns: fr
 		t:name@ "_run" s:+ t:@
 		\ Check for stack problem, only the T value should be on stack at this point.
 		depth 1 n:> if
-			"Task " t:name@ s:+ " warning - stack growing [" s:+ depth >s s:+ "]!" s:+ log
+			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth >s s:+ "]!" s:+ log
 		then
 	while!
 	t:name@ " - exiting..." s:+ log ;

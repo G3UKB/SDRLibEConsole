@@ -115,7 +115,10 @@ param_st_test @ #if
 	\ out:	none
 	__pss@ null? if
 		"param_st_check attempt before the parameter stack has been initialised for task [" t:name@ s:+ "]!" s:+ nip throw
-	then drop ;
+	then 
+	st:len nip 10 n:> if
+		"Task " t:name@ s:+ " warning - param stack growing [" s:+ __pss@ st:len nip >s s:+ "]!" s:+ log
+	then ;
 
 \ ===============================================================================
 \ PUBLIC	
@@ -230,9 +233,17 @@ param_st_test @ #if
 		' run_task 1 500 loop
 		0.1 sleep
 	;
+	
+	: add_item
+		>p ;
+		
+	: overflow_test	\ --
+		param_st_alloc
+		' add_item 1 101 loop ;
 
 	cr cr "Running usage test..." . cr cr
 	usage_test
+	\ overflow_test
 	1 sleep
 	"Done usage test" . cr
 	bye

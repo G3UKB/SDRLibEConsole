@@ -235,8 +235,7 @@ ns: sdr
 	\ out:	none
 	"data-buffer" m:@ 
 	"1024f" unpack drop
-	"raw-data" swap m:! 
-	;
+	"raw-data" swap m:! drop ;
 
 \ ----------------------------------
 : get_raw_data	SED: m -- a
