@@ -743,11 +743,13 @@ ns: sdr
 	\ Radio on-line status
 	st_rad_online@ __set_run_state
 	\ Save window metrics
-	st_app_run@ if
-		g:xy? rot g:size? rot drop
-		app_model_set_win_metrics 
-	then ;
-
+	\ ToDo: only is changed
+	\ st_app_run@ if
+	\ 	g:xy? rot g:size? rot drop
+	\ 	app_model_set_win_metrics 
+	\ then ;
+	;
+	
 \ ===============================================================================
 \ Menu management
 
@@ -833,7 +835,8 @@ ns: sdr
 		\ Set button label to "Start"
 		"Start" g:text
 		\ Stop the radio
-		false 1 ' conn_try_radio t:task-n t:wait
+		\ false 1 ' conn_try_radio t:task-n t:wait
+		"RADIO_TASK" ' conn_try_radio false fr:msg! 
 		\ ToDo: WBS stuff
 		\ Stop WBS if its running
 		\ true inhibit_wbs !
@@ -842,7 +845,8 @@ ns: sdr
 		\ Stopped so start radio
 		\ Set button label to "Stop"
 		"Stop" g:text
-		true 1 ' conn_try_radio t:task-n t:wait
+		\ true 1 ' conn_try_radio t:task-n t:wait
+		"RADIO_TASK" ' conn_try_radio true fr:msg!
 	then ;
 
 \ ToDo: Sort other windows

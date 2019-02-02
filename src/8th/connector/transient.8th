@@ -105,12 +105,13 @@ ns: sdr
 	\ in: 	0: T - if true then start radio else stop radio
 	\ out:	none
 	\ state updated
-	>r
-	"TRY_RADIO_TASK" t:name!
-	t:curtask "TRY_RADIO_TASK" fr:gs_reg!
+	\ >r
+	\ "TRY_RADIO_TASK" t:name!
+	\ t:curtask "TRY_RADIO_TASK" fr:gs_reg!
 	\ Make sure the q does not throw
-	t:getq false q:throwing drop
-	r> if
+	\ t:getq false q:throwing drop
+	\ r> 
+	if
 		\ Try to start the radio
 		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
 			\ Set radio running flag
@@ -133,8 +134,16 @@ ns: sdr
 			"****" log
 		then
 	then
-	"TRY_RADIO_TASK exiting" log ;
+	"conn_try_radio done" log ;
 
+: con_init_try_radio
+	"RADIO_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
+;
+
+: conn_try_term	SED: --
+	\ Ask the connector to exit
+	"RADIO_TASK" ' fr:gs_do_term a:new fr:msg! ;
+	
 \ ----------------------------------
 \ ToDo: make permanent task
 \ This must br run as a task and not called directly
@@ -156,7 +165,8 @@ ns: sdr
 	\ Frequent flyer so no message
 	\ "MISC_RADIO_TASK exiting" log 
 ;
-	
+
+
 \ ========================================
 \ Reset namespace
 ns: user

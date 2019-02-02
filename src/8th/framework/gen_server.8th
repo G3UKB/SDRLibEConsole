@@ -235,18 +235,13 @@ ns: fr
 	\ Clone the whole message structure and push to the task q
 	clone nip
 	\ Get task for name and lock task-dict
-	swap __gs_lock@  
-	\ cr "2:" t:name@ s:+ . cr
+	swap __gs_lock@ 
 	swap m:@ nip
 	\ Push message to task q
 	dup rot t:push 
-	\ cr "3:" t:name@ s:+  . cr
 	t:notify 
-	\ cr "4:" t:name@ s:+ . cr
 	\ Release lock
 	__gs_unlock
-	\ cr "5:" t:name@ s:+ . cr
-	\ 0.01 sleep 
 ;
 
 \ ----------------------------------

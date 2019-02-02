@@ -340,7 +340,7 @@ ns: sdr
 \ ========================================
 \ Do response
 : __con_do_response	SED: -- 
-	__conn_wait_resp_with_timeout 
+	__conn_wait_resp_with_timeout
 	fr:response! ;
 
 \ Do exchange

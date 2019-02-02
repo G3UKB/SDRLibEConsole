@@ -98,6 +98,8 @@ var t_startup
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
 	\ Start the display tasks
 	svr_evnt_init
+	\ Try as permanent task
+	con_init_try_radio
 	
 	\ ----------------------------------
 	\ Done SOD
@@ -130,6 +132,7 @@ var t_startup
 	\ Close connector
 	svr_evnt_term
 	conn_term
+	conn_try_term
 	
 	\ Close models
 	option_model_term
