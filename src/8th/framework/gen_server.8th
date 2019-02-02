@@ -207,7 +207,13 @@ ns: fr
 			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth >s s:+ "]!" s:+ log
 		then
 	while!
-	t:name@ " - exiting..." s:+ log ;
+	\ Free parameter stack
+	param_st_free
+	\ Exit message
+	\ ToDo: Something odd with connector start/stop/exit as stack underflow
+	\ Also Start?stop/Start/Stop crashes but not same problem.
+	1 \ put this on stack here to avoid problem 1
+	t:name@ " - exiting... [" s:+ depth >s s:+ "]" s:+ log ;
 
 \ ===============================================================================
 \ Message management

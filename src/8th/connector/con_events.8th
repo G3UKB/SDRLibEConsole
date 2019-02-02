@@ -142,8 +142,7 @@ ns: sdr
 						disp_builder
 					then
 					\ Unlock the instance data
-					\ Remember null is not removed so drop it
-					drop "reader_inst" t:@ radio_ref_unlock
+					"reader_inst" t:@ radio_ref_unlock
 				else
 					\ drop socket
 					drop
@@ -151,7 +150,7 @@ ns: sdr
 			then
 		again
 	then
-	t:name@ " exiting..." s:+ log
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
 ;
 
 \ ===============================================================================

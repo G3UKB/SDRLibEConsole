@@ -821,9 +821,7 @@ ns: sdr
 \ Discovery will be run again which will set the state variables
 \ The button is state adjusted in the idle timer event
 : w_discover	\ gui --
-	true 1 ' conn_try_connect t:task-n t:wait
-	\ 0.1 sleep
-;
+	true 1 ' conn_try_connect t:task-n t:wait ;
 
 \ ----------------------------------
 \ Start/stop radio depending on current state
@@ -845,9 +843,7 @@ ns: sdr
 		\ Set button label to "Stop"
 		"Stop" g:text
 		true 1 ' conn_try_radio t:task-n t:wait
-	then
-	\ 0.1 sleep
-;
+	then ;
 
 \ ToDo: Sort other windows
 (*

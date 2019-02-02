@@ -626,7 +626,10 @@ ns: sdr
 	a:new fr:+sender 
 	"Connector_TASK" ' do_conn_stop_radio rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ========================================
+\ Frequency
+
 \ ----------------------------------
 \ Freq change
 : conn_r1_freq	SED: n -- *
@@ -636,7 +639,8 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_freq rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_r2_freq	SED: n -- *
 	\ in: 	0: n - freq in Hz
 	\ out:	0: * - response
@@ -644,7 +648,8 @@ ns: sdr
 	a:new swap a:push  fr:+sender
 	"Connector_TASK" ' do_conn_r2_freq rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_r3_freq	SED: n -- *
 	\ in: 	0: n - freq in Hz
 	\ out:	0: * - response
@@ -652,6 +657,9 @@ ns: sdr
 	a:new swap a:push  fr:+sender
 	"Connector_TASK" ' do_conn_r3_freq rot fr:msg! 
 	fr:response@ ;
+
+\ ========================================
+\ Mode
 
 \ ----------------------------------
 \ Mode change
@@ -662,7 +670,8 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_mode rot fr:msg!
 	fr:response@ ;
-
+	
+\ ----------------------------------
 : conn_r2_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
@@ -670,7 +679,8 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r2_mode rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_r3_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
@@ -679,6 +689,7 @@ ns: sdr
 	"Connector_TASK" ' do_conn_r3_mode rot fr:msg! 
 	fr:response@ ;
 
+\ ----------------------------------
 : conn_tx_mode	SED: n -- *
 	\ in: 	0: n - mode id
 	\ out:	0: * - response
@@ -686,6 +697,9 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_tx_mode rot fr:msg! 
 	fr:response@ ;
+
+\ ========================================
+\ Filter
 
 \ ----------------------------------
 \ Filter change
@@ -697,7 +711,8 @@ ns: sdr
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r1_filter rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_r2_filter	SED: n n -- *
 	\ in: 	0: n - filter high
 	\				1: n - filter low
@@ -706,7 +721,8 @@ ns: sdr
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r2_filter rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_r3_filter	SED: n n -- *
 	\ in: 	0: n - filter high
 	\				1: n - filter low
@@ -715,7 +731,8 @@ ns: sdr
 	a:new swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_r3_filter rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------	
 : conn_tx_filter	SED: n n -- *
 	\ in: 	0: n - filter high
 	\				1: n - filter low
@@ -725,9 +742,10 @@ ns: sdr
 	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
 	fr:response@ ;
 
-\ ----------------------------------
+\ ========================================
 \ Displays
 
+\ ----------------------------------	
 \ Set the display width
 : conn_set_disp_width	SED: n -- *
 	\ in: 	0: n - width in pixels
@@ -736,7 +754,8 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_disp_width rot fr:msg! 
 	fr:response@ ;
-	
+
+\ ----------------------------------		
 \ Set the display update period
 : conn_set_disp_period	SED: n -- *
 	\ in: 	0: n - update period in ms
@@ -746,6 +765,7 @@ ns: sdr
 	"Connector_TASK" ' do_conn_disp_period rot fr:msg! 
 	fr:response@ ;
 
+\ ----------------------------------	
 \ Set the display state
 : conn_set_disp_state	SED: T T T -- *
 	\ in: 	0: T - true if enable R1 display
@@ -890,7 +910,6 @@ ns: sdr
 \ ========================================
 \ Reset namespace
 ns: user
-
 
 \ ===============================================================================
 \ ===============================================================================

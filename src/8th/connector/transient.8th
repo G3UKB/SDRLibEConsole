@@ -68,7 +68,7 @@ ns: sdr
 				app_model_sys_evnts
 				\ Connector events
 				\ Start the event services
-				svr_evnt_init 
+				\ svr_evnt_init 
 				\ 200ms period
 				100 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
 				\ Just start radio 1 displays for now
@@ -93,6 +93,7 @@ ns: sdr
 		"****" log
 		rdrop  false
 	then 
+	\ Free parameter stack, else they will accumulate
 	param_st_free
 	
 	"TRY_CONNECT_TASK exiting" log ;
@@ -109,8 +110,6 @@ ns: sdr
 	t:curtask "TRY_RADIO_TASK" fr:gs_reg!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
-	\ Allocate param stack for this thread
-	\ param_st_alloc
 	r> if
 		\ Try to start the radio
 		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
@@ -153,6 +152,8 @@ ns: sdr
 	w:exec "resp" m:@ nip "NAK" s:= if
 		"Command failed!" log
 	then
+	
+	\ Frequent flyer so no message
 	\ "MISC_RADIO_TASK exiting" log 
 ;
 	

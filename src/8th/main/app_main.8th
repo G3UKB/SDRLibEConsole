@@ -44,6 +44,7 @@ ns: sdr
 	
 \ ----------------------------------
 \ We start all gen-server tasks from the startup task
+var t_startup
 : startup_task	SED: --
 	\ in: 	none
 	\ out:	none
@@ -95,11 +96,21 @@ ns: sdr
 	conn_init
 	\ Attempt connection but do not start anything
 	false 1 ' conn_try_connect t:task-n \ 2 sleep
+	\ Start the display tasks
+	svr_evnt_init
 	
+	\ ----------------------------------
 	\ Done SOD
 	false st_app_sod!
 	true st_app_run!
 	
+	\ We have started multiple tasks from the startup task
+	\ We keep a reference to it and close it at the end of
+	\ the shutdown before waiting for all tasks.
+	-1 sleep
+	\ Free the parameter stack
+	param_st_free
+	\ Exit message
 	"STARTUP_TASK - exiting..." log ;
 
 \ ----------------------------------
@@ -135,7 +146,8 @@ ns: sdr
 	\ out:	none
 	\ Otherwise messages are lost in closedown
 	false log-async
-	' cleanup_task t:task 
+	\ Run the cleanup task and wait for it to complete
+	' cleanup_task t:task t:wait
 	\ We have to wait a good time here because
 	\ 1. The cleanup task kicks off multiple other tasks to terminat...
 	\ 2. The cleanup task exits long before those tasks actually complete.
@@ -143,12 +155,14 @@ ns: sdr
 	\ 4. Waiting too early means the wait can take the lock on the task array and then
 	\ 	deadlocks the tasks that are trying to close. We should be able to find out
 	\		when it is safe but havn't figured that yet.
-	7.0 sleep
+	1.0 sleep
+	\ Finally close the Startup task
+	t_startup @ t:notify
 	\ Wait for all tasks to terminate
 	fr:gs_wait_all
 	"Shutdown complete" log
 	\ Wait for messages to flush
-	1.0 sleep ;
+	0.2 sleep ;
 
 \ ===============================================================================
 \ Application entry point  
@@ -174,7 +188,7 @@ ns: sdr
 	
 	\ ----------------------------------
 	\ Start the gen_server tasks
-	' startup_task t:task
+	' startup_task t:task dup t_startup !
 	
 	\ ----------------------------------
   \ Set our cleanup word
