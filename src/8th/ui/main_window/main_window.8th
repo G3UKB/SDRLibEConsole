@@ -743,12 +743,11 @@ ns: sdr
 	\ Radio on-line status
 	st_rad_online@ __set_run_state
 	\ Save window metrics
-	\ ToDo: only is changed
-	\ st_app_run@ if
-	\ 	g:xy? rot g:size? rot drop
-	\ 	app_model_set_win_metrics 
-	\ then ;
-	;
+	\ ToDo: only if changed
+	st_app_run@ if
+		g:xy? rot g:size? rot drop
+		app_model_set_win_metrics 
+	then ;
 	
 \ ===============================================================================
 \ Menu management

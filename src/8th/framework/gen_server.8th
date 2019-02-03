@@ -212,7 +212,7 @@ ns: fr
 	\ Exit message
 	\ ToDo: Something odd with connector start/stop/exit as stack underflow
 	\ Also Start?stop/Start/Stop crashes but not same problem.
-	1 \ put this on stack here to avoid problem 1
+	1 \ put this on stack here to avoid underflow on connector task!
 	t:name@ " - exiting... [" s:+ depth >s s:+ "]" s:+ log ;
 
 \ ===============================================================================
