@@ -26,27 +26,27 @@
 ns: sdr
 
 (*
-	Transient tasks are tasks started to complete a relatively short operation. They run to 
-	completion and exit. These are usually called from GUI event procs to get processing off
-	the GUI thread.
+	Transient tasks are tasks started that are normal permanent gen-server tasks but spend
+	most time sitting on the gen-server q. They are messaged usually from GUI event procs to
+	perform functions that may have a response. Responses cannot be sent to the main thread
+	for some reason that crashes. If the response is required by the main thread then it is
+	send asychronously by a g:do which is the only way to communicate from a task back to
+	the main thread.
 *)
 
+\ ===============================================================================
+\ Transient task execution words
+
 \ ----------------------------------
-\ This must br run as a task and not called directly
-\ Try to connect and start the radio hardware
-: conn_try_connect	SED: T -- T
-	\ in: 	0: T - if true then run radio if possible else just give a status
-	\ out:	0: T - if true the radio was successfully run up
-	>r
-	"TRY_CONNECT_TASK" t:name!
-	t:curtask "TRY_CONNECT_TASK" fr:gs_reg!
-	\ Make sure the q does not throw
-	t:getq false q:throwing drop
-	\ Allocate param stack for this thread
-	param_st_alloc
+\ Try to connect and start the server
+: conn_try_connect	SED: T -- 
+	\ in: 		0: T - if true then run radio if possible else just give a status
+	\ out:		none
+	\ state: 	updated for GUI to interrogate
+	
 	conn_poll if
 		"SDRLibE server is on-line..." log
-		r> if
+		if
 			\ Set server running
 			true st_svr_running!
 			\ Try discover to see if we have radio hardware
@@ -56,25 +56,20 @@ ns: sdr
 				"Radio hardware found!" log
 				\ Set state to on-line
 				true st_rad_online!
-				\ ***
 				\ ToDo - response processing and multi-radio
 				\ Set the default route
 				\ ToDo: This is temporary until we fix the audio routing.
-				conn_set_default_route "Route: " . . cr
+				conn_set_default_route "Route: " swap s:+ log
 				\ Start the server processes (this starts the DSP etc)
-				conn_start_server "Server start: " . . cr
-				\ Now update the server with the current values
+				conn_start_server "Server start: " swap s:+ log
+				\ Now update the server with the current model state
 				option_model_sys_evnts
 				app_model_sys_evnts
-				\ Connector events
-				\ Start the event services
-				\ svr_evnt_init 
-				\ 200ms period
+				\ Set disply frequency to 100ms period
 				100 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
 				\ Just start radio 1 displays for now
 				true false false svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
-				\ ***
 				true
 			else
 				drop
@@ -92,25 +87,14 @@ ns: sdr
 		"To try again use the 'Discover' button." log
 		"****" log
 		rdrop  false
-	then 
-	\ Free parameter stack, else they will accumulate
-	param_st_free
-	
-	"TRY_CONNECT_TASK exiting" log ;
+	then ;
 
 \ ----------------------------------
-\ This must br run as a task and not called directly
 \ Try to start/stop the radio hardware
 : conn_try_radio	SED: T --
-	\ in: 	0: T - if true then start radio else stop radio
-	\ out:	none
-	\ state updated
-	\ >r
-	\ "TRY_RADIO_TASK" t:name!
-	\ t:curtask "TRY_RADIO_TASK" fr:gs_reg!
-	\ Make sure the q does not throw
-	\ t:getq false q:throwing drop
-	\ r> 
+	\ in: 		0: T - if true then start radio else stop radio
+	\ out:		none
+	\ state: 	updated for GUI to interrogate
 	if
 		\ Try to start the radio
 		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
@@ -133,40 +117,39 @@ ns: sdr
 			"To try again use the 'Stop' button." log
 			"****" log
 		then
-	then
-	"conn_try_radio done" log ;
+	then ;
 
-: con_init_try_radio
-	"RADIO_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
-;
-
-: conn_try_term	SED: --
-	\ Ask the connector to exit
-	"RADIO_TASK" ' fr:gs_do_term a:new fr:msg! ;
-	
 \ ----------------------------------
-\ ToDo: make permanent task
-\ This must br run as a task and not called directly
-\ call a miscellaneous command
-: conn_misc	SED: * w --
-	\ in: 	0: w - word to call
-	\				1: * - opaque data
+\ Call a miscellaneous word and check the response
+: conn_call	SED: a --
+	\ in: 	0: T - true if oneway (i.e. no response)
+	\				1: w - word to call
+	\				2: * - opaque data
 	\ out:	none
-	
-	"MISC_RADIO_TASK" t:name!
-	t:curtask "MISC_RADIO_TASK" fr:gs_reg!
-	\ Make sure the q does not throw
-	t:getq false q:throwing drop
-	
-	w:exec "resp" m:@ nip "NAK" s:= if
-		"Command failed!" log
-	then
-	
-	\ Frequent flyer so no message
-	\ "MISC_RADIO_TASK exiting" log 
+	a:open
+	if
+		w:exec "resp" m:@ nip "NAK" s:= if
+			"Word invoked by conn_call returned NAK!" log
+		then
+	else
+		w:exec
+	then ;
+
+\ ===============================================================================
+\ Initialisation and destruction
+
+\ ----------------------------------
+\ Start transient task
+: con_transient_init SED: --
+	"TRANSIENT_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 ;
 
-
+\ ----------------------------------
+\ Terminate transient task
+: conn_transient_term	SED: --
+	\ Ask the task to exit
+	"TRANSIENT_TASK" ' fr:gs_do_term a:new fr:msg! ;
+	
 \ ========================================
 \ Reset namespace
 ns: user

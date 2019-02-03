@@ -94,12 +94,13 @@ var t_startup
 	\ Connector
 	\ Initialise
 	conn_init
-	\ Attempt connection but do not start anything
-	false 1 ' conn_try_connect t:task-n \ 2 sleep
 	\ Start the display tasks
 	svr_evnt_init
-	\ Try as permanent task
-	con_init_try_radio
+	\ Start the transient task
+	con_transient_init
+	0.1 sleep
+	\ See if we can discover hardware
+	"TRANSIENT_TASK" ' conn_try_connect true fr:msg!
 	
 	\ ----------------------------------
 	\ Done SOD
@@ -110,8 +111,10 @@ var t_startup
 	\ We keep a reference to it and close it at the end of
 	\ the shutdown before waiting for all tasks.
 	-1 sleep
+	
 	\ Free the parameter stack
 	param_st_free
+	
 	\ Exit message
 	"STARTUP_TASK - exiting..." log ;
 
@@ -129,10 +132,10 @@ var t_startup
 	param_st_alloc
 	
 	"Shutdown in progress" log
-	\ Close connector
+	\ Close connector and associated tasks
 	svr_evnt_term
 	conn_term
-	conn_try_term
+	conn_transient_term
 	
 	\ Close models
 	option_model_term
@@ -190,7 +193,9 @@ var t_startup
 	main_window_init
 	
 	\ ----------------------------------
-	\ Start the gen_server tasks
+	\ Start the startup task which starts all gen_server tasks
+	\ This cannot itself be a gen-server task as the framework
+	\ is not instantiated yet.
 	' startup_task t:task dup t_startup !
 	
 	\ ----------------------------------

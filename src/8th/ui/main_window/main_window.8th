@@ -822,8 +822,8 @@ ns: sdr
 \ This button is enabled when discovery failed at startup
 \ Discovery will be run again which will set the state variables
 \ The button is state adjusted in the idle timer event
-: w_discover	\ gui --
-	true 1 ' conn_try_connect t:task-n t:wait ;
+: w_discover	\ gui -- 
+	"TRANSIENT_TASK" ' conn_try_connect true fr:msg! ;
 
 \ ----------------------------------
 \ Start/stop radio depending on current state
@@ -836,7 +836,7 @@ ns: sdr
 		"Start" g:text
 		\ Stop the radio
 		\ false 1 ' conn_try_radio t:task-n t:wait
-		"RADIO_TASK" ' conn_try_radio false fr:msg! 
+		"TRANSIENT_TASK" ' conn_try_radio false fr:msg! 
 		\ ToDo: WBS stuff
 		\ Stop WBS if its running
 		\ true inhibit_wbs !
@@ -846,7 +846,7 @@ ns: sdr
 		\ Set button label to "Stop"
 		"Stop" g:text
 		\ true 1 ' conn_try_radio t:task-n t:wait
-		"RADIO_TASK" ' conn_try_radio true fr:msg!
+		"TRANSIENT_TASK" ' conn_try_radio true fr:msg!
 	then ;
 
 \ ToDo: Sort other windows
