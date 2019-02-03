@@ -487,6 +487,8 @@ ns: sdr
 	"high" : 200,
 	"top" : 100,
 	"left" : 100,
+	"size" : "sdr:w_size",
+	"moved" : "sdr:w_moved",
 	"close" : "sdr:w_close",
 	"font" : "Arial 10",
 	"timer-period" : 200,
@@ -721,6 +723,34 @@ ns: sdr
 		"resize-border" : 0
 	} g:msgdlg ;
 
+\ ========================================
+\ Metrics changed
+: __w_metrics_changed	SED: g --
+	st_app_run@ if
+		g:xy? rot g:size? rot drop
+		app_model_set_win_metrics 
+	then ;
+	
+\ ========================================
+\ Size event
+\ On resize save the new window width and height
+: w_size	SED: g n n --	
+	\ in: 	0: n - height
+	\				1: n - width
+	\				2: g - gui
+	\ out:	none
+	2drop __w_metrics_changed ;
+
+\ ========================================
+\ Moved event
+\ On move save the new window x and y
+: w_moved	SED: g n n --	
+	\ in: 	0: n - y
+	\				1: n - x
+	\				2: g - gui
+	\ out:	none
+	2drop __w_metrics_changed ;
+	
 \ ===============================================================================
 \ GUI idle timer
 
@@ -741,13 +771,7 @@ ns: sdr
 \ The timer is used to maintain the GUI state
 : w_timer	SED: g --
 	\ Radio on-line status
-	st_rad_online@ __set_run_state
-	\ Save window metrics
-	\ ToDo: only if changed
-	st_app_run@ if
-		g:xy? rot g:size? rot drop
-		app_model_set_win_metrics 
-	then ;
+	st_rad_online@ __set_run_state ;
 	
 \ ===============================================================================
 \ Menu management
@@ -834,7 +858,6 @@ ns: sdr
 		\ Set button label to "Start"
 		"Start" g:text
 		\ Stop the radio
-		\ false 1 ' conn_try_radio t:task-n t:wait
 		"TRANSIENT_TASK" ' conn_try_radio false fr:msg! 
 		\ ToDo: WBS stuff
 		\ Stop WBS if its running
@@ -844,7 +867,6 @@ ns: sdr
 		\ Stopped so start radio
 		\ Set button label to "Stop"
 		"Stop" g:text
-		\ true 1 ' conn_try_radio t:task-n t:wait
 		"TRANSIENT_TASK" ' conn_try_radio true fr:msg!
 	then ;
 

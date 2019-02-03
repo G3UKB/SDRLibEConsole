@@ -196,7 +196,7 @@ ns: fr
 	repeat
 		\ Wait for a wake up notify
 		-1 sleep
-		' __gs_proc_q t:qlen 
+		' __gs_proc_q t:qlen
 		\ Check q length
 		\ dup 1 n:> if "Q: " . t:qlen . cr cr then 
 		times
@@ -206,13 +206,14 @@ ns: fr
 		depth 1 n:> if
 			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth >s s:+ "]!" s:+ log
 		then
+		\ t:name@ ":" s:+ depth >s s:+ log 
 	while!
 	\ Free parameter stack
 	param_st_free
 	\ Exit message
 	\ ToDo: Something odd with connector start/stop/exit as stack underflow
 	\ Also Start?stop/Start/Stop crashes but not same problem.
-	1 \ put this on stack here to avoid underflow on connector task!
+	\ 1 \ put this on stack here to avoid underflow on connector task!
 	t:name@ " - exiting... [" s:+ depth >s s:+ "]" s:+ log ;
 
 \ ===============================================================================

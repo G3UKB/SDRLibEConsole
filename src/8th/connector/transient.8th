@@ -100,6 +100,7 @@ ns: sdr
 		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
 			\ Set radio running flag
 			true st_rad_running!
+			"ACK from start radio" log
 		else
 			"****" log
 			"Radio did not start!" log
@@ -110,6 +111,7 @@ ns: sdr
 		\ Try to stop the radio
 		conn_stop_radio "resp" m:@ "ACK" s:= if
 			\ Set radio running flag
+			"ACK from stop radio" log
 			false st_rad_running!
 		else
 			"****" log
@@ -120,7 +122,10 @@ ns: sdr
 	then ;
 
 \ ----------------------------------
-\ Call a miscellaneous word and check the response
+\ Call a miscellaneous word and optionally check the response
+\ Normally a message from a GUI event proc. The called word can
+\ do g:do to send an async response to the main thread.
+\ The called word can be a procedural interface to another gen-server task.
 : conn_call	SED: a --
 	\ in: 	0: T - true if twoway (i.e. response)
 	\				1: w - word to call
