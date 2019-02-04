@@ -249,10 +249,7 @@ ns: fr
 		\ Problem
 		"No registration " r> __ps_evnt_name@ s:+ " to publish to" s:+ throw 
 	then 
-	2 pndrop 
-	\ Some recipients may never create maps and arrays and therefore the structures
-	\ we pass along here may accumulate on the free pool and consume memory. 
-	ns:m pool-clear ns:a pool-clear ;
+	2 pndrop ;
 
 \ ===============================================================================
 \ PUBLIC

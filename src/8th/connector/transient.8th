@@ -84,7 +84,7 @@ ns: sdr
 		"The SDRLibE Server is not running!" log 
 		"To try again use the 'Discover' button." log
 		"****" log
-		rdrop  false
+		false
 	then ;
 
 \ ----------------------------------

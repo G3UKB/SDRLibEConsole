@@ -272,7 +272,7 @@ ns: sdr
 	__conn_resp_buf@ 0 net:recvfrom null? if 
 		2drop "Error in read from device!" r@ if throw else log {"resp":"NAK"} then
 	else
-		rdrop drop nip nip nip json>
+		drop nip nip nip json>
 	then ;
 
 \ ----------------------------------			
@@ -284,8 +284,8 @@ ns: sdr
 	>r __conn_net_wait_recv_cmd if
 		__conn_recv_from
 	else
-		"Timeout waiting for response from device!" r> if throw else log drop {"resp":"NAK"} then
-	then ;
+		"Timeout waiting for response from device!" r@ if throw else log drop {"resp":"NAK"} then
+	then rdrop ;
 	
 \ ===============================================================================
 \ Protocol words

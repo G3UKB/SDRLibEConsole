@@ -69,12 +69,15 @@ ns: sdr
 \ Model data which is used as default when there is no saved model.
 : __app_model_default
 	{
+		\ Metrics
 		"window-metrics" : {
 			"x" : 100,
 			"y" : 100,
 			"width" : 800,
 			"height" : 400
 		},
+		"display_width" : 500,
+		
 		\ HPSDR Protocol-1 only supports 3 radios
 		\ More can be added into the array as required
 		"radio-state" : [
@@ -82,8 +85,6 @@ ns: sdr
 				\ src						SoD
 				false, [null, false, 
 				{
-					"display-width": 0,
-					"display-height": 0,
 					"freq": 7100000,
 					"mode": ` CH_LSB ` ,
 					"filter": ` CH_2K4 ` ,
@@ -98,8 +99,6 @@ ns: sdr
 				\ src						SoD
 				false, [null, false, 
 				{
-					"display-width": 0,
-					"display-height": 0,
 					"freq": 7100000,
 					"mode": ` CH_LSB ` ,
 					"filter": ` CH_2K4 ` ,
@@ -114,8 +113,6 @@ ns: sdr
 				\ src						SoD
 				false, [null, false, 
 				{
-					"display-width": 0,
-					"display-height": 0,
 					"freq": 7100000,
 					"mode": ` CH_LSB ` ,
 					"filter": ` CH_2K4 ` ,
@@ -264,7 +261,8 @@ ns: sdr
 	SYS_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_R3_AFGAIN r> ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	SYS_R3_AFGAIN r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	SYS_DISP_WIDTH r> "disp-metrics" m:@ nip fr:pubsub_publish
 
 	"App sent SYS events " log
 ;
@@ -303,7 +301,7 @@ ns: sdr
 ;
 
 \ ===============================================================================
-\ WINDOW
+\ METRICS
 
 \ ----------------------------------
 \ Set window position and size
@@ -333,6 +331,15 @@ ns: sdr
 	"x" m:@ >r
 	a:new 0 r> a:! 1 r> a:! 2 r> a:! 3 r> a:!	
 	nip fr:response! ;
+
+\ ----------------------------------
+\ Set display width
+: do_app_set_disp_metrics	SED: a --
+	\ in: 	0: n - width
+	\ out:	none
+	a:open
+	__app_model@ "disp-metrics" rot m:! drop 
+	SYS_DISP_WIDTH __app_model@ "disp-metrics" m:@ nip fr:pubsub_publish ;
 	
 \ ===============================================================================
 \ RADIOS
@@ -748,7 +755,7 @@ ns: sdr
 	"AppModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
 \ ========================================
-\ Window functions
+\ Metric functions
 
 \ ----------------------------------
 : app_model_set_win_metrics
@@ -768,6 +775,13 @@ ns: sdr
 	a:new fr:+sender
 	"AppModel_TASK" ' do_app_get_win_metrics rot fr:msg!
 	fr:response@ ;
+
+\ ----------------------------------
+: app_model_set_disp_metrics
+	\ in: 	0: n - width
+	\ out:	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_set_disp_metrics rot fr:msg! ;
 	
 \ ========================================
 \ Radio functions

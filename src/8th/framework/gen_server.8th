@@ -207,6 +207,10 @@ ns: fr
 			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth >s s:+ "]!" s:+ log
 		then
 		\ t:name@ ":" s:+ depth >s s:+ log 
+		\ Some tasks may never create maps and arrays and therefore the structures
+		\ we pass along here may accumulate on the free pool and consume memory.
+		\ Clear maps and arrays on each iteration.
+		ns:m pool-clear ns:a pool-clear
 	while!
 	\ Free parameter stack
 	param_st_free
