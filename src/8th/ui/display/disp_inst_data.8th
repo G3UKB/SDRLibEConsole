@@ -74,6 +74,7 @@ ns: sdr
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"rx-meter" : 0.0,				\ meter data
 		\ ========================================
 		\ Buffers
 		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
@@ -107,6 +108,7 @@ ns: sdr
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"rx-meter" : 0.0,				\ meter data
 		\ ========================================
 		\ Buffers
 		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
@@ -140,6 +142,7 @@ ns: sdr
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"rx-meter" : 0.0,				\ meter data
 		\ ========================================
 		\ Buffers
 		"data-buffer" : ` 4096 b:new 0x0 b:fill ` ,
@@ -222,26 +225,16 @@ ns: sdr
 	"data-buffer" m:@ nip
 ;
 
+\ ----------------------------------
+\ Deref meter data
+: rx_meter_ref	SED: m -- a
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - rx meter dBm
+	"rx-meter" m:@ nip
+;
+
 \ ===============================================================================
 \ Getters and setters
-
-\ ========================================
-\ Raw data
-
-\ ----------------------------------
-\ Convert and save raw data
-: copy_to_raw	SED: m --
-	\ in: 	0: m - display instance data			
-	\ out:	none
-	"data-buffer" m:@ 
-	"1024f" unpack drop
-	"raw-data" swap m:! drop ;
-
-\ ----------------------------------
-: get_raw_data	SED: m -- a
-	\ in: 	0: m - display instance data			
-	\ out:	0: a - raw data array
-	"raw-data" m:@ nip ;
 	
 \ ========================================
 \ GUI instance
@@ -443,6 +436,32 @@ ns: sdr
 	\	out:	none
 	"filter" rot m:! drop ;
 
+\ ========================================
+\ Raw data
+
+\ ----------------------------------
+\ Convert and save raw data
+: copy_to_raw	SED: m --
+	\ in: 	0: m - display instance data			
+	\ out:	none
+	\ Get display width
+	dup get_disp_disp_metrics 0 a:@ nip	\ m w
+	swap "data-buffer" m:@ 							\ w m a
+	\ The buffer is display width +1 for the meter data
+	rot n:1+ >s "f" s:+ unpack drop			\ m a 
+	\ Get the meter data which is 0th element of the array
+	a:shift 2 pick											\ m a meter-val m 
+	\ Store meter value in the instance data
+	"meter-data" rot m:! drop						\ m a
+	\ Store display array in the instance data
+	"raw-data" swap m:! drop ;					\ m "raw-data" a
+
+\ ----------------------------------
+: get_raw_data	SED: m -- a
+	\ in: 	0: m - display instance data			
+	\ out:	0: a - raw data array
+	"raw-data" m:@ nip ;
+	
 \ ========================================
 \ Restore namespace	
 ns: user

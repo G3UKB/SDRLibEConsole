@@ -83,8 +83,8 @@
 "../ui/components/af_gain.8th"  f:include
 \ "../ui/components/rf_gain.8th"  f:include
 \ "../ui/components/mic_gain.8th"  f:include
-\ "../ui/components/meter_defs.8th"  f:include
-\ "../ui/components/rx_meter.8th"  f:include
+"../ui/components/meter_defs.8th"  f:include
+"../ui/components/rx_meter.8th"  f:include
 \ "../ui/components/tx_meter.8th"  f:include
 
 \ ========================================

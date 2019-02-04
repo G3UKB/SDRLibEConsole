@@ -52,6 +52,18 @@ ns: sdr
 \ ===============================================================================
 \ ===============================================================================
 \ RX specific constants and calculations
+
+\ RX meter types
+0 enum:
+	M_RX_S_PEAK
+	M_RX_S_AV
+	M_RX_IN_PEAK
+	M_RX_IN_AV
+	M_RX_AGC_GAIN
+	M_RX_AGC_PEAK
+	M_RX_AGC_AV
+enum;
+
 \ Calculations for next tick x-coord
 \ For DIV-1
 : M_DIV1_NEXT \ n --
@@ -95,6 +107,25 @@ ns: sdr
 \ ===============================================================================
 \ ===============================================================================
 \ TX specific constants and calculations
+
+\ TX meter types
+0 enum:
+	M_TX_MIC_PK
+	M_TX_MIC_AV
+	M_TX_EQ_PK
+	M_TX_EQ_AV
+	M_TX_LEV_PK
+	M_TX_LEV_AV
+	M_TX_LEV_GAIN
+	M_TX_COMP_PK
+	M_TX_COMP_AV
+	M_TX_ALC_PK
+	M_TX_ALC_AV
+	M_TX_ALC_GAIN
+	M_TX_OUT_PK
+	M_TX_OUT_AV
+enum;
+
 \ Calculations for next tick x-coord
 \ For DIV-1
 : M_DIV3_NEXT \ n --

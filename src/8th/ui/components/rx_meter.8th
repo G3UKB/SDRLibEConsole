@@ -49,6 +49,13 @@ ns: sdr
 	swap caseof
 ;
 
+: meter_id_to_disp	\ id -- inst
+	\ in: 	o: s - display name
+	\ out:	none
+	{ "METER-R1": "DISP-R1", "METER-R2": "DISP-R2", "METER-R3": "DISP-R3" } 
+	swap caseof
+;
+
 \ ===============================================================================
 \ GUI event handlers
 \ Draw one scale tick and label
@@ -102,12 +109,13 @@ ns: sdr
 	g:c-text
 	meter_sig_scale ' draw_scale a:each drop
 	\ Draw dynamic data
-	state_model locked@ "metis" m:@ nip "running" m:@ nip if
+	st_rad_online@ if
 		"red" g:scolor
 		4 g:line-width
 		g:path
 		M_INSET M_DYN_BASE g:moveto
-		"id" g:m@ meter_id_to_inst M_RX_S_AV c_i_get_rx_meter_data
+		"id" g:m@ meter_id_to_disp dup
+		radio_ref rx_meter_ref swap radio_ref_unlock
 		meter_dbm_to_x dup M_INSET n:< if drop M_INSET then
 		dup M_END n:> if drop M_INSET then
 		M_DYN_BASE g:lineto
