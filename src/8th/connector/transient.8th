@@ -70,14 +70,12 @@ ns: sdr
 				\ Just start radio 1 displays for now
 				true false false svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
-				true
 			else
 				drop
 				"****" log
 				"No radio hardware found!" log
 				"To try again use the 'Discover' button." log
 				"****" log
-				false
 			then
 		then
 	else
@@ -97,7 +95,7 @@ ns: sdr
 	\ state: 	updated for GUI to interrogate
 	if
 		\ Try to start the radio
-		NO_WBS conn_start_radio "resp" m:@ "ACK" s:= if
+		NO_WBS conn_start_radio "resp" m:@ nip "ACK" s:= if
 			\ Set radio running flag
 			true st_rad_running!
 			"ACK from start radio" log
@@ -109,7 +107,7 @@ ns: sdr
 		then
 	else
 		\ Try to stop the radio
-		conn_stop_radio "resp" m:@ "ACK" s:= if
+		conn_stop_radio "resp" m:@ nip "ACK" s:= if
 			\ Set radio running flag
 			"ACK from stop radio" log
 			false st_rad_running!

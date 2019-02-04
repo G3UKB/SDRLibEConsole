@@ -193,9 +193,9 @@ ns: sdr
 	2 pick 2 pick 2 pick conn_set_disp_state
 	"resp" m:@ "ACK" s:= nip if 
 		\ Enable the corresponding reader tasks
-		if "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
-		if "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
-		if "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify then
+		if "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
 		true 
 	else 
 		false 
@@ -204,9 +204,9 @@ ns: sdr
 \ ----------------------------------
 \ Terminate displays
 : svr_evnt_term	SED:  -- 
-	"DISP-R1-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then
-	"DISP-R2-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then
-	"DISP-R3-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify then ;
+	"DISP-R1-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R2-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R3-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then ;
 
 \ ========================================
 \ Reset namespace
