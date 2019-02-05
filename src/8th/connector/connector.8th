@@ -822,7 +822,7 @@ ns: sdr
 
 \ ----------------------------------
 \ Initial settings
-__conn_evnt_set_num_rx SED: n --
+: __conn_evnt_set_num_rx SED: n --
 	conn_set_num_rx "num rx" __conn_evnt_resp ;
 
 \ ----------------------------------
@@ -833,9 +833,11 @@ __conn_evnt_set_num_rx SED: n --
 	"freq" m:@ nip conn_r1_freq "r1 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_freq SED: m --
+	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"freq" m:@ nip conn_r2_freq "r2 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_freq SED: m --
+	st_rad_num_rx@ 3 n:< if drop ;; then 
 	"freq" m:@ nip conn_r3_freq "r3 frequency" __conn_evnt_resp ;
 
 \ ----------------------------------
@@ -846,9 +848,11 @@ __conn_evnt_set_num_rx SED: n --
 	"mode" m:@ nip conn_r1_mode "r1 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_mode SED: m --
+	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"mode" m:@ nip conn_r2_mode "r2 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_mode SED: m --
+	st_rad_num_rx@ 3 n:< if drop ;; then
 	"mode" m:@ nip conn_r3_mode "r3 mode" __conn_evnt_resp ;
 
 \ ----------------------------------
@@ -861,11 +865,13 @@ __conn_evnt_set_num_rx SED: n --
 	conn_r1_filter "r1 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_filter SED: m --
+	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r2_filter "r2 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_filter SED: m --
+	st_rad_num_rx@ 3 n:< if drop ;; then
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r3_filter "r3 filter" __conn_evnt_resp ;
@@ -882,23 +888,23 @@ __conn_evnt_set_num_rx SED: n --
 : __conn_subscribe	SED: --
 	SYS_NUM_RX ' __conn_evnt_set_num_rx fr:pubsub_subscribe
 	SYS_R1_FREQ ' __conn_evnt_r1_freq fr:pubsub_subscribe
-	\ SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
-	\ SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe
+	SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
+	SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe
 	SYS_R1_MODE ' __conn_evnt_r1_mode fr:pubsub_subscribe
-	\ SYS_R2_MODE ' __conn_evnt_r2_mode fr:pubsub_subscribe
-	\ SYS_R3_MODE ' __conn_evnt_r3_mode fr:pubsub_subscribe
+	SYS_R2_MODE ' __conn_evnt_r2_mode fr:pubsub_subscribe
+	SYS_R3_MODE ' __conn_evnt_r3_mode fr:pubsub_subscribe
 	SYS_R1_FILT ' __conn_evnt_r1_filter fr:pubsub_subscribe
-	\ SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
-	\ SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
+	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
+	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
 	SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
 	SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe

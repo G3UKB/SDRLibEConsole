@@ -82,7 +82,6 @@ ns: sdr
 : UI_R2_AFGAIN "UiR2AfGain" ;
 : UI_R3_AFGAIN "UiR3AfGain" ;
 \ System subscribers
-: SYS_NUM_RX "SysNumRx" ;
 : SYS_R1_FREQ "SysR1Freq" ;
 : SYS_R2_FREQ "SysR2Freq" ;
 : SYS_R3_FREQ "SysR3Freq" ;

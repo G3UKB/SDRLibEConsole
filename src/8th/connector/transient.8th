@@ -67,6 +67,8 @@ ns: sdr
 				\ Set state to on-line
 				true st_rad_online!
 				\ ToDo - response processing and multi-radio
+				\ Must set num rx before server start
+				st_rad_num_rx@ conn_set_num_rx "NumRX: " swap s:+ log
 				\ Set the default route
 				\ ToDo: This is temporary until we fix the audio routing.
 				conn_set_default_route "Route: " swap s:+ log
