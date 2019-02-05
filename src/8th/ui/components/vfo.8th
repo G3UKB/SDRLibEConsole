@@ -786,16 +786,16 @@ vfo_separator @ g:+kind
 : vfo_subscribe_radios_2
 	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
 	UI_R2_FREQ ' vfo_evt_r2_vfo fr:pubsub_subscribe
-	UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
-	SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	\ UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+	\ SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe_radios_3
 	UI_R1_FREQ ' vfo_evt_r1_vfo fr:pubsub_subscribe
 	UI_R2_FREQ ' vfo_evt_r2_vfo fr:pubsub_subscribe
   UI_R3_FREQ ' vfo_evt_r3_vfo fr:pubsub_subscribe
-  UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
-  SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+  \ UI_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
+  \ SYS_TX_FREQ ' vfo_evt_tx_vfo fr:pubsub_subscribe
 ;
 
 : vfo_subscribe	\  --

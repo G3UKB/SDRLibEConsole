@@ -37,6 +37,16 @@ ns: sdr
 \ ===============================================================================
 \ Transient task execution words
 
+\ Return start pattern for displays
+: conn_pat_rx1	SED: --
+	true false false ;
+	
+: conn_pat_rx2	SED: --
+	true true false ;
+	
+: conn_pat_rx3	SED: --
+	true true true ;
+	
 \ ----------------------------------
 \ Try to connect and start the server
 : conn_try_connect	SED: T -- 
@@ -67,8 +77,9 @@ ns: sdr
 				app_model_sys_evnts
 				\ Set disply frequency to 100ms period
 				100 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
-				\ Just start radio 1 displays for now
-				true false false svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
+				\ Get the start pattern for the number of radios
+				[ ' conn_pat_rx1 , ' conn_pat_rx2 , ' conn_pat_rx3 ] st_rad_num_rx@ n:1- caseof
+				svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
 			else
 				drop

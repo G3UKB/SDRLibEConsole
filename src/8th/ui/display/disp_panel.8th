@@ -68,8 +68,6 @@ ns: sdr
 	radio_ref_unlock
 	st_svr_running@ if
 		p> app_model_set_disp_metrics
-		\ a:new p> a:push ' conn_set_disp_width a:push true a:push
-		\ "TRANSIENT_TASK" ' conn_call rot fr:msg!
 	else
 		1 pndrop
 	then ;

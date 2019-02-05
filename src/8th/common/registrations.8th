@@ -88,6 +88,7 @@ ns: sdr
 	true UI_R2_AFGAIN r@ w:exec
 	true UI_R3_AFGAIN r@ w:exec
 	\ System subscribers
+	false SYS_NUM_RX r@ w:exec
 	false SYS_R1_FREQ r@ w:exec
 	false SYS_R2_FREQ r@ w:exec
 	false SYS_R3_FREQ r@ w:exec

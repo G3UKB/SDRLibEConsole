@@ -207,16 +207,16 @@ ns: sdr
 : filter_subscribe_radios_2
 	UI_R1_FILT ' filt_evt_r1_filt fr:pubsub_subscribe
 	UI_R2_FILT ' filt_evt_r2_filt fr:pubsub_subscribe
-	UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
-	SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	\ UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	\ SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
 ;
 
 : filter_subscribe_radios_3
 	UI_R1_FILT ' filt_evt_r1_filt fr:pubsub_subscribe
 	UI_R2_FILT ' filt_evt_r2_filt fr:pubsub_subscribe
   UI_R3_FILT ' filt_evt_r3_filt fr:pubsub_subscribe
-  UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
-	SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+  \ UI_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
+	\ SYS_TX_FILT ' filt_evt_tx_filt fr:pubsub_subscribe
 ;
 
 : filter_subscribe	\  --

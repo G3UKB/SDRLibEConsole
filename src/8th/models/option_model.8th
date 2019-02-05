@@ -312,6 +312,7 @@ ns: sdr
 	\ out:	none
 	__option_model@ >r
 	
+	SYS_NUM_RX st_rad_num_rx@ fr:pubsub_publish
 	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish

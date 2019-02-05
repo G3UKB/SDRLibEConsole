@@ -126,7 +126,6 @@ ns: sdr
 					"term" s:= if break then
 				then
 			else
-				 \ drop
 				\ See if we have data
 				"reader_skt" t:@ true 500 net:wait if
 					\ Socket says yes
@@ -137,10 +136,13 @@ ns: sdr
 						\ The data is stored in the instance data - data-buffer
 						3drop 2drop
 						\ Read something
-						\ Call display builder to process the data
+						\ Save the locked reference for the builder to use
 						"inst_data" t:@ copy_to_raw
+						\ Call display builder to build the arrays
 						disp_builder
 					then
+					\ Release temporary reference
+					null "inst_data" t:!
 					\ Unlock the instance data
 					"reader_inst" t:@ radio_ref_unlock
 				else
@@ -170,9 +172,7 @@ ns: sdr
 	\ Start tasks
 	__svr_evnt_d1_sock@ "DISP-R1" 2 ' __svr_evnt_reader t:task-n
 	__svr_evnt_d2_sock@ "DISP-R2" 2 ' __svr_evnt_reader t:task-n
-	__svr_evnt_d3_sock@ "DISP-R3" 2 ' __svr_evnt_reader t:task-n 
-	\ These are started by a transient task and must remain on-stack
-	\ for now else they will be collected. 
+	__svr_evnt_d3_sock@ "DISP-R3" 2 ' __svr_evnt_reader t:task-n  
 ;
 
 \ ----------------------------------	

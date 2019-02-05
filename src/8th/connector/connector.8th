@@ -154,6 +154,7 @@ ns: sdr
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
 : __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
 : __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+: __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
@@ -374,6 +375,16 @@ ns: sdr
 		then
 	then
 	fr:response! ;
+
+\ ========================================
+\ Initial setup functions
+\ Set number of receivers
+: do_conn_set_num_rx	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\				1: n - num rx
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_set_num_rx_msg false swap __con_do_exchange ;
 	
 \ ========================================
 \ Basic radio functions
@@ -629,6 +640,16 @@ ns: sdr
 	fr:response@ ;
 
 \ ========================================
+\ Initial setup
+: conn_set_num_rx	SED: n -- *
+	\ in: 	0: n - num rx
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_set_num_rx rot fr:msg! 
+	fr:response@ ;
+	
+\ ========================================
 \ Frequency
 
 \ ----------------------------------
@@ -800,6 +821,11 @@ ns: sdr
 	then ;
 
 \ ----------------------------------
+\ Initial settings
+__conn_evnt_set_num_rx SED: n --
+	conn_set_num_rx "num rx" __conn_evnt_resp ;
+
+\ ----------------------------------
 \ Frequency update
 \ in:		0: m - map of radio state
 \ out: 	none
@@ -854,6 +880,7 @@ ns: sdr
 
 \ Subscribe to system events that need to be forwarded to the server
 : __conn_subscribe	SED: --
+	SYS_NUM_RX ' __conn_evnt_set_num_rx fr:pubsub_subscribe
 	SYS_R1_FREQ ' __conn_evnt_r1_freq fr:pubsub_subscribe
 	\ SYS_R2_FREQ ' __conn_evnt_r2_freq fr:pubsub_subscribe
 	\ SYS_R3_FREQ ' __conn_evnt_r3_freq fr:pubsub_subscribe

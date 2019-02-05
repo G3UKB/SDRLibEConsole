@@ -443,7 +443,7 @@ enum;
 	\ Save the display name for this instance
 	"id" g:m@ dup "disp_name" t:!
 	
-	\ Lock and save the instance data
+	\ Lock and save the instance data for the drawing code
 	radio_ref "inst_data" t:!
 	
 	\ Common settings
@@ -458,8 +458,10 @@ enum;
 	draw_filter_overlay
 	draw_mouse_pos
 	
+	\ Drop temporary reference
+	null "inst_data" t:!
 	\ Release lock
-	 "disp_name" t:@ radio_ref_unlock ;
+	"disp_name" t:@ radio_ref_unlock ;
 
 \ ========================================
 \ Restore namespace	
