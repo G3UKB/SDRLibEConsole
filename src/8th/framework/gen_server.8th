@@ -166,7 +166,7 @@ ns: fr
 \ Process 1 item from task Q	
 : __gs_proc_q	SED: --
 	t:pop null? if
-		"Error gen-server queue returned null!" throw
+		"Error gen-server queue returned null [" t:name@ s:+ "]!" s:+ throw
 	else
 		\ Message to process, just send data part
 		"data" m:@ swap "cb" m:@ nip w:exec
