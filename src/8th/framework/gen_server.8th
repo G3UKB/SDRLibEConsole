@@ -207,8 +207,8 @@ ns: fr
 		\ Check for exit
 		t:name@ "_run" s:+ t:@
 		\ Check for stack problem, only the T value should be on stack at this point.
-		depth 1 n:> if
-			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth >s s:+ "]!" s:+ log
+		depth 2 n:> if
+			"Task " t:name@ s:+ " warning - data stack growing [" s:+ depth 2 n:- >s s:+ "]!" s:+ log
 		then
 		\ t:name@ ":" s:+ depth >s s:+ log 
 		\ Some tasks may never create maps and arrays and therefore the structures
@@ -273,15 +273,16 @@ ns: fr
 			drop "Timeout waiting for task response!" log 
 			\ This can only be from a remote call so return false
 			false
-		then
-		\ We have a response at this point
-		\ Remote calls will return {"resp", "ACK|NAK"}
-		dup >kind ns:m n:= if
-			"resp" m:exists? if
-				"resp" m:@ nip "ACK" s:= if
-					true
-				else
-					false
+		else
+			\ We have a response at this point
+			\ Remote calls will return {"resp", "ACK|NAK"}
+			dup >kind ns:m n:= if
+				"resp" m:exists? if
+					"resp" m:@ nip "ACK" s:= if
+						true
+					else
+						false
+					then
 				then
 			then
 		then

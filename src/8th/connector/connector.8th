@@ -809,10 +809,12 @@ ns: sdr
 	\ out: 	none
 	\ Throws exception on error
 	swap null? if
-		drop "Warning - bad response from connector call!" log
+		2drop "Warning - bad response from connector call!" log
 	else
 		not if
 			"Server error from [" swap >s s:+ "]" s:+ log
+		else
+			drop
 		then
 	then ;
 
@@ -903,15 +905,15 @@ ns: sdr
 	SYS_R1_FILT ' __conn_evnt_r1_filter fr:pubsub_subscribe
 	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
 	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
-	SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	\ SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe
