@@ -229,7 +229,9 @@ ns: fr
 		g:do
 	else
 		\ Dispatch on the dispatcher thread
-		p@ r> __ps_disp_thd_dispatch
+		\ p@ r> __ps_disp_thd_dispatch
+		\ Just dispatch for now on P/S thread
+		p@ r> w:exec
 	then ;
 
 \ ----------------------------------

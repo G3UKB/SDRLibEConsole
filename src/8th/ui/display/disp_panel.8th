@@ -62,12 +62,17 @@ ns: sdr
 	\				2: g - gui
 	\ out:	none
 	1 pick r_margin n:- l_margin n:- >p
-	rot "id" g:m@ nip -rot 
+	rot "id" g:m@ nip -rot
 	2 pick radio_ref
 	set_all_metrics
-	radio_ref_unlock
+	dup radio_ref_unlock
 	st_svr_running@ if
-		p> app_model_set_disp_metrics
+		\ All widths are the same so only event for radio 1
+		"DISP-R1" s:= if
+			p> app_model_set_disp_metrics
+		else
+			1 pndrop
+		then
 	else
 		1 pndrop
 	then ;

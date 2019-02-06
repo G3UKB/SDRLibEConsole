@@ -165,11 +165,15 @@ ns: fr
 \ ----------------------------------
 \ Process 1 item from task Q	
 : __gs_proc_q	SED: --
-	t:pop null? if
-		"Error gen-server queue returned null [" t:name@ s:+ "]!" s:+ throw
-	else
-		\ Message to process, just send data part
-		"data" m:@ swap "cb" m:@ nip w:exec
+	t:qlen 0 n:= if
+		"Warning gen-server queue was empty when processing [" t:name@ s:+ "]!" s:+ log 
+	else 
+		t:pop null? if
+			drop "Warning gen-server queue returned null [" t:name@ s:+ "]!" s:+ log
+		else
+			\ Message to process, just send data part
+			"data" m:@ swap "cb" m:@ nip w:exec
+		then
 	then ;
 	
 \ ----------------------------------
@@ -267,7 +271,7 @@ ns: fr
 		\ Nothing yet, so wait a while
 		drop -1 sleep t:pop null? if 
 			drop "Timeout waiting for task response!" log 
-			"???"
+			{"resp" : "NAK"}
 		then
 	then ;
 

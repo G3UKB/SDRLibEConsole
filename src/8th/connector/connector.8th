@@ -774,7 +774,7 @@ ns: sdr
 	\ out:	0: * - response
 	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
 	a:new swap a:push fr:+sender
-	"Connector_TASK" ' do_conn_disp_width rot fr:msg! 
+	"Connector_TASK" ' do_conn_disp_width rot fr:msg!
 	fr:response@ ;
 
 \ ----------------------------------		
