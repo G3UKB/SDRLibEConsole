@@ -821,7 +821,7 @@ ns: sdr
 \ ----------------------------------
 \ Initial settings
 : __conn_evnt_set_num_rx SED: n --
-"__conn_evnt_set_num_rx" log
+\ "__conn_evnt_set_num_rx" log
 	conn_set_num_rx "num rx" __conn_evnt_resp ;
 
 \ ----------------------------------

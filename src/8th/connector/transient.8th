@@ -83,7 +83,6 @@ ns: sdr
 				svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
 				\ End ToDo
 			else
-				drop
 				"****" log
 				"No radio hardware found!" log
 				"To try again use the 'Discover' button." log
