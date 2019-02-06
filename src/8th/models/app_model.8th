@@ -238,27 +238,27 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	__app_model@ >r	
-	SYS_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
-	SYS_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
-	SYS_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
+	\ SYS_DUPLEX r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
+	\ SYS_RFGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
+	\ SYS_MICGAIN r@ ["tx-state", ` dyn_idx ` , ` data_idx ` ] val@ fr:pubsub_publish
 	SYS_R1_FREQ r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_FREQ r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_FREQ r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_TX_FREQ r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_TX_FREQ r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_MODE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_MODE r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_MODE r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish	
-	SYS_TX_MODE r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_TX_MODE r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_FILT r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_FILT r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish  
 	SYS_R3_FILT r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_TX_FILT r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_TX_FILT r@ ["tx-state", ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_AGC r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_AGC r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_AGC r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	SYS_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	\ SYS_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_AFGAIN r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish

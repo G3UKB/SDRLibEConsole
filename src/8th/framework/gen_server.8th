@@ -271,8 +271,21 @@ ns: fr
 		\ Nothing yet, so wait a while
 		drop -1 sleep t:pop null? if 
 			drop "Timeout waiting for task response!" log 
-			{"resp" : "NAK"}
+			\ This can only be from a remote call so return false
+			false
 		then
+		\ We have a response at this point
+		\ Remote calls will return {"resp", "ACK|NAK"}
+		dup >kind ns:m n:= if
+			"resp" m:exists? if
+				"resp" m:@ nip "ACK" s:= if
+					true
+				else
+					false
+				then
+			then
+		then
+		\ Opaque type so just return what we received
 	then ;
 
 \ ----------------------------------

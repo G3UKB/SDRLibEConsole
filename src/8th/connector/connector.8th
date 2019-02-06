@@ -363,16 +363,10 @@ ns: sdr
 	__conn_cmd_sock@ __conn_resp_buf@ 0 net:recvfrom null? if
 		\ No server running or communications problem
 		"SDRLibE server is not running or cannot be contacted!" log
-		3drop false
+		3drop {"resp" : "NAK"}
 	else
-		\ Got a response, should only be an ACK
-		drop json> "resp" m:@ "ACK" s:= if
-			"SDRLibE server is running..." log
-			3drop 2drop true
-		else
-			"SDRLibE server gave a bad poll response!" log
-			3drop false
-		then
+		\ Got a response
+		drop json> >r 2drop 2drop r>
 	then
 	fr:response! ;
 
@@ -805,24 +799,27 @@ ns: sdr
 
 \ Not implemented subscribe
 : __conn_not_implemented	SED: * --
-	drop "Not implemented!" log ;
+	drop {"resp" : "NAK"} ;
 
 \ ----------------------------------
 \ Decode response
-: __conn_evnt_resp SED: m s --
+: __conn_evnt_resp SED: T s --
 	\ in:		0: s - failure message
-	\				1: m - respone {"resp" : value }
+	\				1: T - false if failure
 	\ out: 	none
 	\ Throws exception on error
-	swap "resp" m:@ nip "NAK" s:= if
-		"Server 'NAK' from [" swap s:+ "]" s:+ . cr \  log
+	swap null? if
+		drop "Warning - bad response from connector call!" log
 	else
-		drop
+		not if
+			"Server error from [" swap >s s:+ "]" s:+ log
+		then
 	then ;
 
 \ ----------------------------------
 \ Initial settings
 : __conn_evnt_set_num_rx SED: n --
+"__conn_evnt_set_num_rx" log
 	conn_set_num_rx "num rx" __conn_evnt_resp ;
 
 \ ----------------------------------
@@ -830,13 +827,16 @@ ns: sdr
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_freq SED: m --
+	\ "__conn_evnt_r1_freq" log
 	"freq" m:@ nip conn_r1_freq "r1 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_freq SED: m --
+	\ "__conn_evnt_r2_freq" log
 	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"freq" m:@ nip conn_r2_freq "r2 frequency" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_freq SED: m --
+	\ "__conn_evnt_r3_freq" log
 	st_rad_num_rx@ 3 n:< if drop ;; then 
 	"freq" m:@ nip conn_r3_freq "r3 frequency" __conn_evnt_resp ;
 
@@ -845,13 +845,16 @@ ns: sdr
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_mode SED: m --
+	\ "__conn_evnt_r1_mode" log
 	"mode" m:@ nip conn_r1_mode "r1 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_mode SED: m --
+	\ "__conn_evnt_r2_mode" log
 	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"mode" m:@ nip conn_r2_mode "r2 mode" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_mode SED: m --
+	\ "__conn_evnt_r3_mode" log
 	st_rad_num_rx@ 3 n:< if drop ;; then
 	"mode" m:@ nip conn_r3_mode "r3 mode" __conn_evnt_resp ;
 
@@ -860,17 +863,20 @@ ns: sdr
 \ in:		0: m - map of radio state
 \ out: 	none
 : __conn_evnt_r1_filter SED: m --
+	\ "__conn_evnt_r1_filter" log
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r1_filter "r1 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r2_filter SED: m --
+	\ "__conn_evnt_r2_filter" log
 	st_rad_num_rx@ 2 n:< if drop ;; then 
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
 	conn_r2_filter "r2 filter" __conn_evnt_resp ;
 	
 : __conn_evnt_r3_filter SED: m --
+	\ "__conn_evnt_r3_filter" log
 	st_rad_num_rx@ 3 n:< if drop ;; then
 	"filter" m:@ nip
 	sdr:filter_lookup 0 a:@ swap 1 a:@ nip 
@@ -879,6 +885,7 @@ ns: sdr
 \ ----------------------------------
 \ Display update
 : __conn_evnt_disp_width	SED: w --
+	\ "__conn_evnt_disp_width" log
 	conn_set_disp_width "disp_width" __conn_evnt_resp ;
 
 \ ===============================================================================
