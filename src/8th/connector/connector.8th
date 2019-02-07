@@ -573,13 +573,6 @@ ns: sdr
 \ ===============================================================================
 
 \ ----------------------------------
-\ Are we ok to roll
-: conn_ready_1?	SED: n
-	st_rad_running@ not if drop {"resp" : "NAK"} ;;; then ;
-: conn_ready_2?	SED: n
-	st_rad_running@ not if 2drop {"resp" : "NAK"} ;;; then ;
-
-\ ----------------------------------
 \ Execute poll
 : conn_poll	SED:  -- *
 	\ in: 	none
