@@ -1,0 +1,62 @@
+(* 
+	sim.8th
+ 
+ A simulating server which looks like SDRLibEConnector
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ Dispatcher table
+{
+	"poll" : ' conn_poll,
+	"set_rx1_freq" : ' conn_cc_out_set_rx_1_freq,
+	"set_rx2_freq" : ' conn_cc_out_set_rx_2_freq,
+	"set_rx3_freq" : ' conn_cc_out_set_rx_3_freq,
+	"set_tx_freq" : ' conn_cc_out_set_tx_freq,
+	"set_rx1_mode" : ' conn_set_rx_1_mode,
+	"set_rx2_mode" : ' conn_set_rx_2_mode,
+	"set_rx3_mode" : ' conn_set_rx_3_mode,
+	"set_tx_mode" : ' conn_set_tx_mode,
+	"set_rx1_filter" : ' conn_set_rx_1_filter,
+	"set_rx2_filter" : ' conn_set_rx_2_filter,
+	"set_rx3_filter" : ' conn_set_rx_3_filter,
+	"set_tx_filter" : ' conn_set_tx_filter,
+	"set_in_rate" : ' conn_set_in_rate,
+	"set_out_rate" ' conn_set_out_rate,
+	"set_iq_blk_sz" : ' conn_set_iq_blk_sz,
+	"set_mic_blk_sz" : ' conn_set_mic_blk_sz,
+	"set_duplex" : ' conn_set_duplex,
+	"set_fft_size" : ' conn_set_fft_size,
+	"set_window_type" : ' conn_set_window_type,
+	"set_av_mode" : ' conn_set_av_mode,
+	"set_display_width" : ' conn_set_display_width,
+	"set_audio_route" : '	conn_set_audio_route,
+	"server_start" : ' conn_server_start,
+	"terminate" : ' conn_server_terminate,
+	"radio_discover" : ' conn_radio_discover,
+	"radio_start" : ' conn_radio_start,
+	"radio_stop" : ' conn_radio_stop,
+	"wisdom" : ' conn_make_wisdom,
+	"enum_inputs" : ' conn_enum_audio_inputs,
+	"enum_outputs" : ' conn_enum_audio_outputs,
+	"set_disp_period" : ' conn_set_disp_period,
+	"set_disp_state" : ' conn_set_disp_state,
+	"set_num_rx" : ' conn_set_num_rx,
+} var, disp_table
+	
