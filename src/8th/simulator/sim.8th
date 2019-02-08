@@ -49,16 +49,24 @@ cmd_addr cmd_socket @ net:bind
 
 \ Buffers
 128 b:new 0x0 b:fill var, cmd_buffer
-[] var, disp_buffer
+[] var, disp_buffer_1
+[] var, disp_buffer_2
+[] var, disp_buffer_3
 
-: put_float	\ buf ix --
-	-120.0  a:! ;	
+: put_float	\ buf ix  --
+	r@ a:! ;	
 
-: fill_disp_buffer
-	disp_buffer @ ' put_float 0 1919 loop ;
+: fill_disp_buffers
+	disp_buffer_1 @ -73.0 >r ' put_float 0 1919 loop
+	disp_buffer_2 @ -110.0 >r ' put_float 0 1919 loop
+	disp_buffer_3 @ -130.0 >r ' put_float 0 1919 loop ;
 
-: get_buffer
-	disp_buffer @ disp_width @ n:1+ >s "f" s:+ pack ;
+: get_buffer_1
+	disp_buffer_1 @ disp_width @ n:1+ >s "f" s:+ pack ;
+: get_buffer_2
+	disp_buffer_2 @ disp_width @ n:1+ >s "f" s:+ pack ;
+: get_buffer_3
+	disp_buffer_3 @ disp_width @ n:1+ >s "f" s:+ pack ;
 	
 \ Client address
 var client_addr 
@@ -203,15 +211,15 @@ var client_port
 				disp_state @ a:rev a:open >r >r >r
 				r> if
 					\ Display 1
-					cmd_socket @ d1_addr get_buffer 0 net:sendto 2drop
+					cmd_socket @ d1_addr get_buffer_1 0 net:sendto 2drop
 				then
 				r> if
 					\ Display 2
-					cmd_socket @ d2_addr get_buffer 0 net:sendto 2drop
+					cmd_socket @ d2_addr get_buffer_2 0 net:sendto 2drop
 				then
 				r> if
 					\ Display 3
-					cmd_socket @ d3_addr get_buffer 0 net:sendto 2drop
+					cmd_socket @ d3_addr get_buffer_3 0 net:sendto 2drop
 				then
 				disp_period @ 1000 n:/ sleep
 			then
@@ -229,7 +237,7 @@ var display_events_task
 : app:main
 
 	\ Create display buffer
-	fill_disp_buffer
+	fill_disp_buffers
 	
 	\ Start cmd reader task
 	' cmd_reader t:task cmd_task !

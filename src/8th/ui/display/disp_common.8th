@@ -77,7 +77,7 @@ ns: sdr
 : dBm_pp	SED: m -- n
 	\ in: 	0: m - display instance data	
 	\ out:	0: n - dBm per pixel
-	get_disp_win_metrics 1 a:@ nip span_db n:/ ;
+	get_disp_disp_metrics 1 a:@ nip span_db n:/ ;
 
 \ ----------------------------------	
 \ Convert a dBm value to a y-coord
@@ -87,9 +87,9 @@ ns: sdr
 	\				2: n - dBm value
 	\ out:	0: n - corresponding y coordinate
 	\ rel-dBm = abs(low-dBm) - abs(dBm)
-	>p 													\ dBm height
-	swap n:int n:abs 						\ height abs(dBm)
-	low_db n:int n:abs 					\ height abs(dBm) abs(low-dBm)
+	>p													\ dBm height
+	swap n:int n:abs						\ height abs(dBm)
+	low_db n:int n:abs					\ height abs(dBm) abs(low-dBm)
 	swap n:-										\ height abs(rel-dBm)
 	swap b_margin n:- swap			\ height-margin abs(rel-dBm)
 	\ y-coord = height - (rel-dBm * dBm_pp)
