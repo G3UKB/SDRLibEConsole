@@ -22,41 +22,158 @@
      bob@bobcowdery.plus.com
 *)
 
+
+{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, cmd_socket
+{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, d1_socket
+{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, d2_socket
+{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, d3_socket
+
+: cmd_port 10010 ;
+: d1_port 10011 ;
+: d2_port 10012 ;
+: d3_port 10013 ;
+
+: cmd_addr "127.0.0.1" cmd_port net:getaddrinfo ;
+: d1_addr "127.0.0.1" d1_port net:getaddrinfo ;	
+: d2_addr "127.0.0.1" d2_port net:getaddrinfo ;	
+: d3_addr "127.0.0.1" d3_port net:getaddrinfo ;	
+
+128 b:new 0x0 b:fill var, cmd_buffer
+
+\ ========================================
+\ Execution words
+\ ========================================
+600 var, disp_width
+100 var, disp_period
+[true,false,false] var, disp_state
+1 var, num_rx
+
+: send_resp
+	{"resp" : "ACK"} >json cmd_socket @ cmd_addr rot 0 net:sendto 2drop ;
+	
+: do_audio_outputs
+	{ "outputs" : [{}, { "name" : "a device" , "api" : "an api" , "index" : 0 , "direction" : 0 , "channels" : 2 }]}
+	>json cmd_socket @ cmd_addr rot 0 net:sendto 2drop ;
+
+
+: conn_poll drop "poll" log send_resp ;
+: conn_cc_out_set_rx_1_freq drop "r1 freq" log send_resp ;
+: conn_cc_out_set_rx_2_freq drop "r2 freq" log send_resp ;
+: conn_cc_out_set_rx_3_freq drop "r3 freq" log send_resp ;
+: conn_cc_out_set_tx_freq drop "tx freq" log send_resp ;
+: conn_set_rx_1_mode drop "r1 mode" log send_resp ;
+: conn_set_rx_2_mode drop "r2 mode" log send_resp ;
+: conn_set_rx_3_mode drop "r3 mode" log send_resp ;
+: conn_set_tx_mode drop "tx mode" log send_resp ;
+: conn_set_rx_1_filter drop "r1 filter" log send_resp ;
+: conn_set_rx_2_filter drop "r2 filter" log send_resp ;
+: conn_set_rx_3_filter drop "r3 filter" log send_resp ;
+: conn_set_tx_filter drop "tx filter" log send_resp ;
+: conn_set_in_rate drop "in rate" log send_resp ;
+: conn_set_out_rate drop "out_rate" log send_resp ;
+: conn_set_iq_blk_sz drop "iq blk sz" log send_resp ;
+: conn_set_mic_blk_sz drop "mic blk sz" log send_resp ;
+: conn_set_duplex drop "set duplex" log send_resp ;
+: conn_set_fft_size drop "set fft sz" log send_resp ;
+: conn_set_window_type drop "set window type" log send_resp ;
+: conn_set_av_mode "set av mode" log send_resp ;
+: conn_set_display_width json> "params" m:@ >n disp_width lock @ ! disp_width unlock drop "set disp width" log send_resp ;
+: conn_set_audio_route "audio route" log send_resp ;
+: conn_server_start "server start" log send_resp ;
+: conn_server_terminate "server term" log send_resp ;
+: conn_radio_discover "discover" log send_resp ;
+: conn_radio_start "radio start" log send_resp ;
+: conn_radio_stop "radio stop" log send_resp ;
+: conn_make_wisdom "wisdom" log send_resp ;
+: conn_enum_audio_inputs "audio inputs" log send_resp ;
+: conn_enum_audio_outputs do_audio_outputs "audio outputs" log ;
+: conn_set_disp_period json> "params" m:@ >n disp_period lock @ ! disp_period unlock drop "set disp period" log send_resp ;
+: conn_set_disp_state json> "params" m:@ >n disp_state lock @ ! disp_state unlock drop "set disp state" log send_resp ;
+: conn_set_num_rx json> "params" m:@ >n num_rx lock @ ! num_rx unlock drop "set num rx" log send_resp ;
+
 \ Dispatcher table
 {
-	"poll" : ' conn_poll,
-	"set_rx1_freq" : ' conn_cc_out_set_rx_1_freq,
-	"set_rx2_freq" : ' conn_cc_out_set_rx_2_freq,
-	"set_rx3_freq" : ' conn_cc_out_set_rx_3_freq,
-	"set_tx_freq" : ' conn_cc_out_set_tx_freq,
-	"set_rx1_mode" : ' conn_set_rx_1_mode,
-	"set_rx2_mode" : ' conn_set_rx_2_mode,
-	"set_rx3_mode" : ' conn_set_rx_3_mode,
-	"set_tx_mode" : ' conn_set_tx_mode,
-	"set_rx1_filter" : ' conn_set_rx_1_filter,
-	"set_rx2_filter" : ' conn_set_rx_2_filter,
-	"set_rx3_filter" : ' conn_set_rx_3_filter,
-	"set_tx_filter" : ' conn_set_tx_filter,
-	"set_in_rate" : ' conn_set_in_rate,
-	"set_out_rate" ' conn_set_out_rate,
-	"set_iq_blk_sz" : ' conn_set_iq_blk_sz,
-	"set_mic_blk_sz" : ' conn_set_mic_blk_sz,
-	"set_duplex" : ' conn_set_duplex,
-	"set_fft_size" : ' conn_set_fft_size,
-	"set_window_type" : ' conn_set_window_type,
-	"set_av_mode" : ' conn_set_av_mode,
-	"set_display_width" : ' conn_set_display_width,
-	"set_audio_route" : '	conn_set_audio_route,
-	"server_start" : ' conn_server_start,
-	"terminate" : ' conn_server_terminate,
-	"radio_discover" : ' conn_radio_discover,
-	"radio_start" : ' conn_radio_start,
-	"radio_stop" : ' conn_radio_stop,
-	"wisdom" : ' conn_make_wisdom,
-	"enum_inputs" : ' conn_enum_audio_inputs,
-	"enum_outputs" : ' conn_enum_audio_outputs,
-	"set_disp_period" : ' conn_set_disp_period,
-	"set_disp_state" : ' conn_set_disp_state,
-	"set_num_rx" : ' conn_set_num_rx,
+	"poll" : ' conn_poll ,
+	"set_rx1_freq" : ' conn_cc_out_set_rx_1_freq ,
+	"set_rx2_freq" : ' conn_cc_out_set_rx_2_freq ,
+	"set_rx3_freq" : ' conn_cc_out_set_rx_3_freq ,
+	"set_tx_freq" : ' conn_cc_out_set_tx_freq ,
+	"set_rx1_mode" : ' conn_set_rx_1_mode ,
+	"set_rx2_mode" : ' conn_set_rx_2_mode ,
+	"set_rx3_mode" : ' conn_set_rx_3_mode ,
+	"set_tx_mode" : ' conn_set_tx_mode ,
+	"set_rx1_filter" : ' conn_set_rx_1_filter ,
+	"set_rx2_filter" : ' conn_set_rx_2_filter ,
+	"set_rx3_filter" : ' conn_set_rx_3_filter ,
+	"set_tx_filter" : ' conn_set_tx_filter ,
+	"set_in_rate" : ' conn_set_in_rate ,
+	"set_out_rate" : ' conn_set_out_rate ,
+	"set_iq_blk_sz" : ' conn_set_iq_blk_sz ,
+	"set_mic_blk_sz" : ' conn_set_mic_blk_sz ,
+	"set_duplex" : ' conn_set_duplex ,
+	"set_fft_size" : ' conn_set_fft_size ,
+	"set_window_type" : ' conn_set_window_type ,
+	"set_av_mode" : ' conn_set_av_mode ,
+	"set_display_width" : ' conn_set_display_width ,
+	"set_audio_route" : '	conn_set_audio_route ,
+	"server_start" : ' conn_server_start ,
+	"terminate" : ' conn_server_terminate ,
+	"radio_discover" : ' conn_radio_discover ,
+	"radio_start" : ' conn_radio_start ,
+	"radio_stop" : ' conn_radio_stop ,
+	"wisdom" : ' conn_make_wisdom ,
+	"enum_inputs" : ' conn_enum_audio_inputs ,
+	"enum_outputs" : ' conn_enum_audio_outputs ,
+	"set_disp_period" : ' conn_set_disp_period ,
+	"set_disp_state" : ' conn_set_disp_state ,
+	"set_num_rx" : ' conn_set_num_rx 
 } var, disp_table
 	
+\ ========================================
+\ Reader Task
+\ ========================================
+
+\ Read cmd data while not terminated
+: cmd_reader
+	
+		"Waiting for commands..." log
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break then
+				then
+			else
+				\ See if we have data
+				cmd_socket @ true 500 net:wait if
+				\ Read and dispatch
+					cmd_buffer @ 0 net:recvfrom null? not if
+						drop nip nip nip
+						json>
+						"cmd" m:@ disp_table @ m:@ w:exec
+					then
+				else
+					drop
+				then
+			then
+		again
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
+\ ========================================
+\ Reader Task
+\ ========================================
+
+var cmd_task
+: app:main
+	\ Start cmd reader task
+	' cmd_reader t:task cmd_task !
+	
+	\ Wait for something
+	con:key
+	
+	\ Terminate
+	cmd_task @ "term" t:push
+	1 sleep
+	bye
+;
