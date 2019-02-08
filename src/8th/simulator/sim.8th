@@ -22,7 +22,7 @@
      bob@bobcowdery.plus.com
 *)
 
-
+\ Sockets and addresses
 { "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, cmd_socket
 { "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, d1_socket
 { "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, d2_socket
@@ -38,10 +38,29 @@
 : d2_addr "127.0.0.1" d2_port net:getaddrinfo ;	
 : d3_addr "127.0.0.1" d3_port net:getaddrinfo ;	
 
+\ Bind the command port
 cmd_addr cmd_socket @ net:bind
 
-128 b:new 0x0 b:fill var, cmd_buffer
+\ State
+600 var, disp_width
+100 var, disp_period
+[false,false,false] var, disp_state
+1 var, num_rx
 
+\ Buffers
+128 b:new 0x0 b:fill var, cmd_buffer
+[] var, disp_buffer
+
+: put_float	\ buf ix --
+	-120.0  a:! ;	
+
+: fill_disp_buffer
+	disp_buffer @ ' put_float 0 1919 loop ;
+
+: get_buffer
+	disp_buffer @ disp_width @ n:1+ >s "f" s:+ pack ;
+	
+\ Client address
 var client_addr 
 var client_port
 
@@ -51,10 +70,6 @@ var client_port
 \ ========================================
 \ Execution words
 \ ========================================
-600 var, disp_width
-100 var, disp_period
-[true,false,false] var, disp_state
-1 var, num_rx
 
 : send_resp
 	{"resp" : "ACK"} >json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
@@ -84,7 +99,7 @@ var client_port
 : conn_set_fft_size drop "set fft sz" log send_resp ;
 : conn_set_window_type drop "set window type" log send_resp ;
 : conn_set_av_mode "set av mode" log send_resp ;
-: conn_set_display_width >n disp_width lock ! disp_width unlock drop "set disp width" log send_resp ;
+: conn_set_display_width 0 a:@ nip >n disp_width lock ! disp_width unlock drop "set disp width" log send_resp ;
 : conn_set_audio_route "audio route" log send_resp ;
 : conn_server_start "server start" log send_resp ;
 : conn_server_terminate "server term" log send_resp ;
@@ -94,9 +109,9 @@ var client_port
 : conn_make_wisdom "wisdom" log send_resp ;
 : conn_enum_audio_inputs "audio inputs" log send_resp ;
 : conn_enum_audio_outputs do_audio_outputs "audio outputs" log ;
-: conn_set_disp_period >n disp_period lock ! disp_period unlock drop "set disp period" log send_resp ;
-: conn_set_disp_state >n disp_state lock ! disp_state unlock drop "set disp state" log send_resp ;
-: conn_set_num_rx >n num_rx lock ! num_rx unlock drop "set num rx" log send_resp ;
+: conn_set_disp_period 0 a:@ nip >n disp_period lock ! disp_period unlock drop "set disp period" log send_resp drop ;
+: conn_set_disp_state disp_state lock ! disp_state unlock drop "set disp state" log send_resp drop ;
+: conn_set_num_rx 0 a:@ nip >n num_rx lock ! num_rx unlock drop "set num rx" log send_resp drop ;
 
 \ Dispatcher table
 {
@@ -158,6 +173,8 @@ var client_port
 						drop swap client_port ! swap client_addr ! nip
 						json>
 						"cmd" m:@ swap "params" m:@ >r drop disp_table @ swap m:@ nip r> swap w:exec
+					else
+						drop
 					then
 				else
 					drop
@@ -168,19 +185,65 @@ var client_port
 ;
 
 \ ========================================
+\ Display Task
+\ ========================================
+
+\ Send display data while not terminated
+: display_events
+	
+		"Starting event data.." log
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break then
+				then
+			else
+				\ Send data as required
+				disp_state @ a:rev a:open >r >r >r
+				r> if
+					\ Display 1
+					cmd_socket @ d1_addr get_buffer 0 net:sendto 2drop
+				then
+				r> if
+					\ Display 2
+					cmd_socket @ d2_addr get_buffer 0 net:sendto 2drop
+				then
+				r> if
+					\ Display 3
+					cmd_socket @ d3_addr get_buffer 0 net:sendto 2drop
+				then
+				disp_period @ 1000 n:/ sleep
+			then
+		again
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
+\ ========================================
 \ Main code
 \ ========================================
 
 var cmd_task
+var display_events_task
+
 : app:main
+
+	\ Create display buffer
+	fill_disp_buffer
+	
 	\ Start cmd reader task
 	' cmd_reader t:task cmd_task !
 	
-	\ Wait for something
+	\ Start display event task
+	' display_events t:task display_events_task !
+	
+	\ Wait for a ley
 	con:key
 	
 	\ Terminate
 	cmd_task @ "term" t:push
+	display_events_task @ "term" t:push
+	
 	1 sleep
 	bye
 ;
