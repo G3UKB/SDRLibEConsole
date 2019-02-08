@@ -38,8 +38,16 @@
 : d2_addr "127.0.0.1" d2_port net:getaddrinfo ;	
 : d3_addr "127.0.0.1" d3_port net:getaddrinfo ;	
 
+cmd_addr cmd_socket @ net:bind
+
 128 b:new 0x0 b:fill var, cmd_buffer
 
+var client_addr 
+var client_port
+
+: client_addr_info
+	client_addr @ client_port @ net:getaddrinfo ;
+	
 \ ========================================
 \ Execution words
 \ ========================================
@@ -49,12 +57,11 @@
 1 var, num_rx
 
 : send_resp
-	{"resp" : "ACK"} >json cmd_socket @ cmd_addr rot 0 net:sendto 2drop ;
+	{"resp" : "ACK"} >json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
 	
 : do_audio_outputs
 	{ "outputs" : [{}, { "name" : "a device" , "api" : "an api" , "index" : 0 , "direction" : 0 , "channels" : 2 }]}
-	>json cmd_socket @ cmd_addr rot 0 net:sendto 2drop ;
-
+	>json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
 
 : conn_poll drop "poll" log send_resp ;
 : conn_cc_out_set_rx_1_freq drop "r1 freq" log send_resp ;
@@ -77,7 +84,7 @@
 : conn_set_fft_size drop "set fft sz" log send_resp ;
 : conn_set_window_type drop "set window type" log send_resp ;
 : conn_set_av_mode "set av mode" log send_resp ;
-: conn_set_display_width json> "params" m:@ >n disp_width lock @ ! disp_width unlock drop "set disp width" log send_resp ;
+: conn_set_display_width >n disp_width lock ! disp_width unlock drop "set disp width" log send_resp ;
 : conn_set_audio_route "audio route" log send_resp ;
 : conn_server_start "server start" log send_resp ;
 : conn_server_terminate "server term" log send_resp ;
@@ -87,9 +94,9 @@
 : conn_make_wisdom "wisdom" log send_resp ;
 : conn_enum_audio_inputs "audio inputs" log send_resp ;
 : conn_enum_audio_outputs do_audio_outputs "audio outputs" log ;
-: conn_set_disp_period json> "params" m:@ >n disp_period lock @ ! disp_period unlock drop "set disp period" log send_resp ;
-: conn_set_disp_state json> "params" m:@ >n disp_state lock @ ! disp_state unlock drop "set disp state" log send_resp ;
-: conn_set_num_rx json> "params" m:@ >n num_rx lock @ ! num_rx unlock drop "set num rx" log send_resp ;
+: conn_set_disp_period >n disp_period lock ! disp_period unlock drop "set disp period" log send_resp ;
+: conn_set_disp_state >n disp_state lock ! disp_state unlock drop "set disp state" log send_resp ;
+: conn_set_num_rx >n num_rx lock ! num_rx unlock drop "set num rx" log send_resp ;
 
 \ Dispatcher table
 {
@@ -148,9 +155,9 @@
 				cmd_socket @ true 500 net:wait if
 				\ Read and dispatch
 					cmd_buffer @ 0 net:recvfrom null? not if
-						drop nip nip nip
+						drop swap client_port ! swap client_addr ! nip
 						json>
-						"cmd" m:@ disp_table @ m:@ w:exec
+						"cmd" m:@ swap "params" m:@ >r drop disp_table @ swap m:@ nip r> swap w:exec
 					then
 				else
 					drop
@@ -161,7 +168,7 @@
 ;
 
 \ ========================================
-\ Reader Task
+\ Main code
 \ ========================================
 
 var cmd_task
