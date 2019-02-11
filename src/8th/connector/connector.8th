@@ -307,8 +307,7 @@ ns: sdr
 	\ Return api and dev for the default device
 	\ Note, we should select for this aka gui interface
 	"outputs" m:@ nip 1 a:@ nip
-	"api" m:@ swap "name" m:@ nip ; 
-	
+	"api" m:@ swap "name" m:@ nip ;
 
 \ ========================================
 \ Message handlers
