@@ -180,6 +180,7 @@ var client_port
 					cmd_buffer @ 0 net:recvfrom null? not if
 						drop swap client_port ! swap client_addr ! nip
 						json>
+						dup >kind ns:m n:= not if .s cr "Bad request!" throw then
 						"cmd" m:@ swap "params" m:@ >r drop disp_table @ swap m:@ nip r> swap w:exec
 					else
 						drop
