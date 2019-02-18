@@ -65,7 +65,7 @@ ns: sdr
 	span_db divs  n:/ ;
 
 \ ----------------------------------
-\ Given the grid number (e.g. 1-6) return
+\ Given the grid number (e.g. 1-6)
 \ return a string dBm label at the given grid point
 : inter_db	SED: n -- s
 	\ in: 	0: n - grid number where 0 is topmost grid line
