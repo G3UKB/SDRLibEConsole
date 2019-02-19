@@ -131,10 +131,14 @@ ns: sdr
 					\ Socket says yes
 					\ Lock the instance data and copy the ref to a task variable
 					"reader_inst" t:@ radio_ref "inst_data" t:!
+					\ SED in >= 19.02:  \ net buf flags -- net X buf #recv | net null
 					"inst_data" t:@ disp_buf_ref 0 net:recvfrom null? not if
 						\ Not interested in anything back from the receive
 						\ The data is stored in the instance data - data-buffer
-						3drop 2drop
+						\ 19.01
+						\ 3drop 2drop
+						\ 19.02
+						3drop drop
 						\ Read something
 						\ Save the locked reference for the builder to use
 						"inst_data" t:@ copy_to_raw

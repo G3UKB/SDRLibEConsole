@@ -69,11 +69,17 @@ cmd_addr cmd_socket @ net:bind
 	disp_buffer_3 @ disp_width @ n:1+ >s "f" s:+ pack ;
 	
 \ Client address
-var client_addr 
-var client_port
+\ 19.01
+\ var client_addr 
+\ var client_port
+\ 19.02
+var client_x
 
 : client_addr_info
-	client_addr @ client_port @ net:getaddrinfo ;
+	\ 19.01
+	\ client_addr @ client_port @ net:getaddrinfo ;
+	\ 19.02
+	client_x @ ;
 	
 \ ========================================
 \ Execution words
@@ -177,8 +183,12 @@ var client_port
 				\ See if we have data
 				cmd_socket @ true 500 net:wait if
 				\ Read and dispatch
+					\ SED in >= 19.02:  \ net buf flags -- net X buf #recv | net null
 					cmd_buffer @ 0 net:recvfrom null? not if
-						drop swap client_port ! swap client_addr ! nip
+						\ 19.01
+						\ drop swap client_port ! swap client_addr ! nip
+						\ 19.02
+						drop swap client_x ! nip
 						json>
 						dup >kind ns:m n:= not if .s cr "Bad request!" throw then
 						"cmd" m:@ swap "params" m:@ >r drop disp_table @ swap m:@ nip r> swap w:exec
