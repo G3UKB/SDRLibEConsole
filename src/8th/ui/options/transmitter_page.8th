@@ -85,7 +85,7 @@ ns: sdr
 		\ Allow the event
 		nip									\ slider value -- value
 		\ Update the model
-		set_tune_level			\ value -- 
+		option_model_set_tune_level			\ value -- 
 	else 
 		2drop								\ slider value --
 	then
@@ -104,7 +104,7 @@ ns: sdr
 
 : opt_tx_subscribe	\ --
   \ Subscribe to events
-  UI_TUNE_LEVEL ' tx_evt_tune_level pubsub_subscribe 
+  UI_TUNE_LEVEL ' tx_evt_tune_level fr:pubsub_subscribe 
 ;
 
 \ Restore namespace	

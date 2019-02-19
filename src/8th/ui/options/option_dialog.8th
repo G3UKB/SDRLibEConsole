@@ -113,20 +113,6 @@ ns: sdr
 
 : o_restart	\ g --
 	"Restart in progress" log
-	\ Close models
-	app_model_close
-	option_model_close
-	
-	\ Terminate permanent tasks
-	task_dict @ "metis-task" m:@ dup "terminate" t:push t:notify
-	true disp_term !
-	true wbs_term !
-	  
-	\ Wait for all tasks to exit
-	task_dict @ ' task_waiting m:each
-	1 sleep
-	"DynamicSDR restarting" log
-	1 sleep
 	app:restart
 ;
 

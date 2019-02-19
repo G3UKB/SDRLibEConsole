@@ -132,7 +132,7 @@ ns: sdr
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
 		\ Update the model
-		set_average_mode		\ index -- 
+		option_model_set_average_mode		\ index -- 
 	else 
 		2drop drop					\ combo index rate --
 	then
@@ -140,19 +140,19 @@ ns: sdr
 
 : r_over	\ combo index num-rx --
 	st_app_run@ if
-		drop swap drop set_over
+		drop swap drop option_model_set_over
 	else 2drop drop then
 ;
 
 : r_window_type	\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_window_type
+		drop swap drop option_model_set_window_type
 	else 2drop drop then
 ;
 
 : r_fft_size	\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_fft_size
+		drop swap drop option_model_set_fft_size
 	else 2drop drop then
 ;
 
@@ -184,10 +184,10 @@ ns: sdr
 
 : opt_rx_subscribe	\ --
   \ Subscribe to events
-  UI_AVMODE ' rx_evt_average_mode pubsub_subscribe
-  UI_AVOVER ' rx_evt_over pubsub_subscribe
-  UI_WINTYPE ' rx_evt_window_type pubsub_subscribe
-  UI_FFT_SIZE ' rx_evt_fft_sz pubsub_subscribe
+  UI_AVMODE ' rx_evt_average_mode fr:pubsub_subscribe
+  UI_AVOVER ' rx_evt_over fr:pubsub_subscribe
+  UI_WINTYPE ' rx_evt_window_type fr:pubsub_subscribe
+  UI_FFT_SIZE ' rx_evt_fft_sz fr:pubsub_subscribe
 ;
 
 \ Restore namespace	

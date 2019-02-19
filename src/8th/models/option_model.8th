@@ -731,6 +731,44 @@ ns: sdr
 	a:new fr:+sender
 	"OptionModel_TASK" ' do_option_get_route_count rot fr:msg! 
 	fr:response@ ;
+
+\ ========================================
+\ Receiver tab
+: option_model_set_average_mode	SED: s --
+	\ in: 	0: s - av mode
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_average_mode rot fr:msg! ;	
+
+\ ----------------------------------
+: option_model_set_over	SED: n --
+	\ in: 	0: n - av mode over what period
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_over rot fr:msg! ;	
+
+\ ----------------------------------
+: option_model_set_window_type	SED: s --
+	\ in: 	0: s - window type
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_window_type rot fr:msg! ;		
+
+\ ----------------------------------
+: option_model_set_fft_size	SED: s --
+	\ in: 	0: s - window type
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_fft_size rot fr:msg! ;	
+
+\ ========================================
+\ Transmitter tab
+: option_model_set_tune_level	SED: n --
+	\ in: 	0: n - tune level
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_tune_level rot fr:msg! ;	
+	
 	
 \ ========================================
 \ Restore namespace	
