@@ -599,6 +599,140 @@ ns: sdr
 	"OptionsModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
 \ ========================================
+\ General tab
+: option_model_set_sample_rate	SED: n --
+	\ in: 	0: n - new sample rate
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_sample_rate rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_set_num_rx	SED: n --
+	\ in: 	0: n - num rx
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_num_rx rot fr:msg! ;
+	
+\ ----------------------------------
+: option_model_set_blk_sz	SED: n --
+	\ in: 	0: n - new blk sz
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_blk_sz rot fr:msg! ;
+
+\ ========================================
+\ Audio tab
+: option_model_set_input_source	SED: s --
+	\ in: 	0: s - input source
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_input_source rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_set_input_device	SED: s --
+	\ in: 	0: s - input_device
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_input_device rot fr:msg! ;
+	
+\ ----------------------------------
+: option_model_set_output_sink	SED: s --
+	\ in: 	0: s - output_sink
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_output_sink rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_set_receiver	SED: n --
+	\ in: 	0: n - receiver
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_receiver rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_set_output_device	SED: s --
+	\ in: 	0: s - output_device
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_output_device rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_set_ch	SED: s --
+	\ in: 	0: s - ch
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_set_ch rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_push_route SED: a --
+	\ in: 	0: a - new route
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_push_route rot fr:msg! ;
+
+\ ----------------------------------
+: option_model_remove_route SED: a --
+	\ in: 	0: a - new route
+	\ out: 	none
+	a:new swap a:push
+	"OptionModel_TASK" ' do_option_remove_route rot fr:msg! ;
+	
+\ ----------------------------------		
+\ Following are request/response words
+: option_model_get_output_sink SED:  -- s
+	\ in: 	none
+	\ out: 	0: s - output sink
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_output_sink rot fr:msg! 
+	fr:response@ ;
+
+\ ----------------------------------
+: option_model_get_receiver SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - receiver
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_receiver rot fr:msg! 
+	fr:response@ ;
+
+\ ----------------------------------
+: option_model_get_output_device SED:  -- s
+	\ in: 	none
+	\ out: 	0: s - output device
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_output_device rot fr:msg! 
+	fr:response@ ;	
+
+\ ----------------------------------
+: option_model_get_ch SED:  -- s
+	\ in: 	none
+	\ out: 	0: s - ch
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_ch rot fr:msg! 
+	fr:response@ ;	
+
+\ ----------------------------------
+: option_model_get_routes SED:  -- a
+	\ in: 	none
+	\ out: 	0: a - route array
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_routes rot fr:msg! 
+	fr:response@ ;	
+
+\ ----------------------------------
+: option_model_get_route_count SED:  -- n
+	\ in: 	none
+	\ out: 	0: n - route count
+	\ Send the parameters plus a sender
+	a:new fr:+sender
+	"OptionModel_TASK" ' do_option_get_route_count rot fr:msg! 
+	fr:response@ ;
+	
+\ ========================================
 \ Restore namespace	
 ns: user	
 

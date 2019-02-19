@@ -65,13 +65,13 @@
 
 \ ========================================
 \ Options
-\ "../ui/options/option_common.8th"  f:include
-\ "../ui/options/general_page.8th"  f:include
-\ "../ui/options/audio_page.8th"  f:include
-\ "../ui/options/antenna_page.8th"  f:include
-\ "../ui/options/receiver_page.8th"  f:include
-\ "../ui/options/transmitter_page.8th"  f:include
-\ "../ui/options/option_dialog.8th"  f:include
+"../ui/options/option_common.8th"  f:include
+"../ui/options/general_page.8th"  f:include
+"../ui/options/audio_page.8th"  f:include
+"../ui/options/antenna_page.8th"  f:include
+"../ui/options/receiver_page.8th"  f:include
+"../ui/options/transmitter_page.8th"  f:include
+"../ui/options/option_dialog.8th"  f:include
 
 \ ========================================
 \ UI components

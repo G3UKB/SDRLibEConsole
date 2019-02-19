@@ -212,7 +212,7 @@ needs gui/msgdlg
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
 		\ Update the model
-		set_input_source		\ index -- 
+		option_model_set_input_source		\ index -- 
 	else 
 		2drop drop					\ combo index rate --
 	then
@@ -220,31 +220,31 @@ needs gui/msgdlg
 
 : a_input_device				\ combo index num-rx --
 	st_app_run@ if
-		drop swap drop set_input_device
+		drop swap drop option_model_set_input_device
 	else 2drop drop then
 ;
 
 : a_output_sink					\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_output_sink
+		drop swap drop option_model_set_output_sink
 	else 2drop drop then
 ;
 
 : a_receiver						\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_receiver
+		drop swap drop option_model_set_receiver
 	else 2drop drop then
 ;
 
 : a_output_device				\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_output_device
+		drop swap drop option_model_set_output_device
 	else 2drop drop then
 ;
 
 : a_channel							\ combo index blk-sz --
 	st_app_run@ if
-		drop swap drop set_channel
+		drop swap drop option_model_set_ch
 	else 2drop drop then
 ;
 
@@ -258,12 +258,12 @@ null var, selected_item
 	\ Add an output sink route
 	\ Collect data for the route
 	a:new
-	get_output_sink a:push
-	get_receiver a:push
-	get_output_device a:push
-	get_channel a:push
+	option_model_get_output_sink a:push
+	option_model_get_receiver a:push
+	option_model_get_output_device a:push
+	option_model_get_ch a:push
 	\ Update the model
-	nip push_route if
+	nip option_model_push_route if
 		\ Update the table
 		\ Get a reference to the table
 		audio_tab "a-route-table" get_tab_target
@@ -284,7 +284,7 @@ null var, selected_item
 	\ Remove the last row clicked
 	selected_item @
 	null? not if
-		remove_route
+		option_model_remove_route
 	then
 	\ Update the table
 	\ Get a reference to the table
@@ -298,7 +298,7 @@ null var, selected_item
 \ The exect number of rows must be set here or an exception will be thrown.
 : a_get_item \ gui col row -- 
 	\ Return the item in the col/row requested
-	get_routes swap 
+	option_model_get_routes swap 
 	a:@ nip
 	swap a:@
 ;
@@ -306,7 +306,7 @@ null var, selected_item
 \ This fires after the g:update call
 \ It must return the new number of rows for the table
 : a_get_row_count	\	gui --
-	get_route_count
+	option_model_get_route_count
 ;
 
 \ Not right but a demo
@@ -353,12 +353,12 @@ null var, selected_item
 
 : opt_audio_subscribe	\ --
   \ Subscribe to events
-  UI_INPUT_SRC ' audio_evt_input_source pubsub_subscribe
-  UI_INPUT_DEV ' audio_evt_input_device pubsub_subscribe
-  UI_OUTPUT_SINK ' audio_evt_output_sink pubsub_subscribe
-  UI_RECEIVER ' audio_evt_receiver pubsub_subscribe
-  UI_OUTPUT_DEV ' audio_evt_output_device pubsub_subscribe
-  UI_CHANNEL ' audio_evt_channel pubsub_subscribe
+  UI_INPUT_SRC ' audio_evt_input_source fr:pubsub_subscribe
+  UI_INPUT_DEV ' audio_evt_input_device fr:pubsub_subscribe
+  UI_OUTPUT_SINK ' audio_evt_output_sink fr:pubsub_subscribe
+  UI_RECEIVER ' audio_evt_receiver fr:pubsub_subscribe
+  UI_OUTPUT_DEV ' audio_evt_output_device fr:pubsub_subscribe
+  UI_CHANNEL ' audio_evt_channel fr:pubsub_subscribe
 ;
 
 \ Restore namespace	
