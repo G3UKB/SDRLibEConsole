@@ -69,6 +69,7 @@ var t_startup
 	\ Publish/Subscribe
 	\ Initialise
 	' do_registrations fr:pubsub_init
+	repeat st_app_run_state@ STATE_2 n:= if break else 0.05 sleep then again
 	\ Testing only
 	\ test_registrations
 	

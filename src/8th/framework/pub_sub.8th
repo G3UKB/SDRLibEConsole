@@ -158,7 +158,8 @@ ns: fr
 	\ Create the dictionary in a task var
 	\ Form is as follows
 	\ {"name": [f,[w1,w2,w3...]], "name1": [f,[w4,w5,w6...]], ...}
-	drop {} "ps_s" t:! ;
+	drop {} "ps_s" t:! 
+	sdr:STATE_2 st_app_run_state! ;
 
 \ ----------------------------------
 \ Register a new event

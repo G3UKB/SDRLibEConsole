@@ -42,6 +42,17 @@ ns: sdr
 *)
 
 \ ========================================
+\ Startup states
+0 enum:
+	STATE_1
+	STATE_2
+	STATE_3
+	STATE_4
+	STATE_5
+enum;
+
+
+\ ========================================
 \ radio types currently supported
 0 enum:
 	TYPE_HPSDR
@@ -51,6 +62,7 @@ enum;
 \ ========================================
 {
 	"app" : {
+		"run-state" : ` STATE_1 `,
 		\ Free running mode, may be disabled at certain times
 		"run" : false,
 		\ Start of day flag
@@ -99,6 +111,12 @@ enum;
 	
 \ ----------------------------------	
 \ Application
+: st_app_run_state@	SED: -- n
+	st_lock@ st_app@ "run-state" m:@ nip nip st_unlock ; 
+	
+: st_app_run_state!	SED: n  --
+	st_lock@ st_app@ nip "run-state" rot m:! drop st_unlock ; 
+	
 : st_app_run@	SED: -- T
 	st_lock@ st_app@ "run" m:@ nip nip st_unlock ; 
 	

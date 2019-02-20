@@ -177,7 +177,9 @@ var client_x
 			\ Check for termination at top of loop
 			t:qlen 0 n:> if 
 				t:pop null? not if
-					"term" s:= if break then
+					"term" s:= if break else "Bad command!" throw then
+				else
+					"Got q but then null!" throw
 				then
 			else
 				\ See if we have data
@@ -193,6 +195,7 @@ var client_x
 						dup >kind ns:m n:= not if .s cr "Bad request!" throw then
 						"cmd" m:@ swap "params" m:@ >r drop disp_table @ swap m:@ nip r> swap w:exec
 					else
+						"net:recvfrom returned null!" throw
 						drop
 					then
 				else
@@ -215,7 +218,9 @@ var client_x
 			\ Check for termination at top of loop
 			t:qlen 0 n:> if 
 				t:pop null? not if
-					"term" s:= if break then
+					"term" s:= if break else "Bad command!" throw then
+				else
+					"Got q but then null" throw
 				then
 			else
 				\ Send data as required
