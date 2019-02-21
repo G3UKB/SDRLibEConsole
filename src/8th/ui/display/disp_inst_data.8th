@@ -452,7 +452,7 @@ ns: sdr
 	\ Get the meter data which is 0th element of the array
 	a:shift 2 pick											\ m a meter-val m 
 	\ Store meter value in the instance data
-	"rx-meter" rot m:! drop						\ m a
+	"rx-meter" rot m:! drop							\ m a
 	\ Store display array in the instance data
 	"raw-data" swap m:! drop ;					\ m "raw-data" a
 
