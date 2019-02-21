@@ -448,7 +448,7 @@ ns: sdr
 	dup get_disp_disp_metrics 0 a:@ nip	\ m w
 	swap "data-buffer" m:@ 							\ w m a
 	\ The buffer is display width +1 for the meter data
-	rot n:1+ >s "f" s:+ dup . cr unpack drop			\ m a 
+	rot n:1+ >s "f" s:+ unpack drop			\ m a 
 	\ Get the meter data which is 0th element of the array
 	a:shift 2 pick											\ m a meter-val m 
 	\ Store meter value in the instance data
