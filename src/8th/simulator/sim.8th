@@ -57,9 +57,9 @@ cmd_addr cmd_socket @ net:bind
 	r@ a:! ;	
 
 : fill_disp_buffers
-	disp_buffer_1 @ -73.0 >r ' put_float 0 1919 loop
-	disp_buffer_2 @ -110.0 >r ' put_float 0 1919 loop
-	disp_buffer_3 @ -130.0 >r ' put_float 0 1919 loop ;
+	disp_buffer_1 @ -73.0 >r ' put_float 0 3840 loop
+	disp_buffer_2 @ -110.0 >r ' put_float 0 3840 loop
+	disp_buffer_3 @ -130.0 >r ' put_float 0 3840 loop ;
 
 : get_buffer_1
 	disp_buffer_1 @ disp_width @ n:1+ >s "f" s:+ pack ;
@@ -113,7 +113,7 @@ var client_x
 : conn_set_fft_size drop "set fft sz" log send_resp ;
 : conn_set_window_type drop "set window type" log send_resp ;
 : conn_set_av_mode "set av mode" log send_resp ;
-: conn_set_display_width 0 a:@ nip >n disp_width lock ! disp_width unlock drop "set disp width" log send_resp ;
+: conn_set_display_width 0 a:@ nip >n disp_width lock ! disp_width unlock drop "set disp width:" disp_width @ >s s:+ log send_resp ;
 : conn_set_audio_route "audio route" log send_resp ;
 : conn_server_start "server start" log send_resp ;
 : conn_server_terminate "server term" log send_resp ;
