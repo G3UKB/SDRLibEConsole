@@ -69,14 +69,15 @@ var t_startup
 	\ Publish/Subscribe
 	\ Initialise
 	' do_registrations fr:pubsub_init
-	repeat st_app_run_state@ STATE_2 n:= if break else 0.05 sleep then again
 	\ Testing only
 	\ test_registrations
 	
 	\ ----------------------------------
 	\ Models
 	option_model_init
+	STATE_2 wait_run_state
 	app_model_init
+	STATE_3 wait_run_state
 	
 	\ ----------------------------------
 	\ Main UI subscribes to SYS_RUN_STATE
@@ -85,11 +86,13 @@ var t_startup
 	0.5 sleep
 	\ Publish SYS_RUN_STATE, gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
-	2 sleep
+	STATE_4 wait_run_state
 	
 	\ Once UI is stable we can populate it with the UI event data
 	option_model_ui_evnts
+	STATE_5 wait_run_state
 	app_model_ui_evnts
+	STATE_6 wait_run_state
 	
 	\ ----------------------------------
 	\ Connector

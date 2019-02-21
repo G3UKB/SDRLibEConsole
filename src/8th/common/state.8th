@@ -33,6 +33,7 @@ state_test @ #if
 	\ true SED-CHECK
 #then
 
+\ ========================================
 \ Set namespace
 ns: sdr
 
@@ -49,8 +50,8 @@ ns: sdr
 	STATE_3
 	STATE_4
 	STATE_5
+	STATE_6
 enum;
-
 
 \ ========================================
 \ radio types currently supported
@@ -174,7 +175,18 @@ enum;
 	
 : st_rad_num_rx!	SED: n --
 	st_lock@ st_radio@ nip "num-rx" rot m:! drop st_unlock ;
-	
+
+\ ----------------------------------	
+\ Helpers
+\ Wait for a run_state to be triggered
+: wait_run_state SED: n --
+	>r
+	repeat 
+		st_app_run_state@ r@ n:= if break else 0.05 sleep then 
+	again 
+	rdrop ;
+
+\ ========================================	
 \ Restore namespace	
 ns: user 
 

@@ -276,7 +276,8 @@ ns: sdr
 	\ in: 	message
 	\ out:	none
 	drop __app_model_restore
-;
+	\ Set run-state STATE_3
+	STATE_3 st_app_run_state! ;
 
 \ ----------------------------------
 \ Send events
@@ -284,6 +285,8 @@ ns: sdr
 	\ in: 	message
 	\ out:	none
 	drop __app_ui_evnts
+	\ Set run-state STATE_6
+	STATE_6 st_app_run_state!
 ;
 
 : do_app_sys_evnts	SED: m --

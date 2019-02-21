@@ -1269,6 +1269,8 @@ ns: sdr
 	\ 	main_window @ "common-box" g:child dup "m-6M-PRE" g:child false g:enable drop
 	\ 	main_window @ "common-box" g:child dup "m-attn" g:child false g:enable drop
 	\ then
+	\ Set run-state STATE_4
+	STATE_4 st_app_run_state!
 ;
 
 \ ----------------------------------
