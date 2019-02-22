@@ -77,7 +77,7 @@ ns: sdr
 				option_model_sys_evnts
 				app_model_sys_evnts
 				\ Set disply frequency to 100ms period
-				100 svr_evnt_set_disp_period not if "Failed to sst display period!" throw then
+				100 svr_evnt_set_disp_period not if "Failed to set display period!" throw then
 				\ Get the start pattern for the number of radios
 				[ ' conn_pat_rx1 , ' conn_pat_rx2 , ' conn_pat_rx3 ] st_rad_num_rx@ n:1- caseof
 				svr_evnt_set_disp_state not if "Failed to enable displays!" throw then			
