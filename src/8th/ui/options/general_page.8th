@@ -136,28 +136,27 @@ ns: sdr
 
 \ ================================================================================	
 \ UI Widget Update
-\ These are called from the model listeners via deferred words
-\ Helper words in options_common.8th
+\ Helper words in win_common.8th
 
 \ Update words
 : gen_evt_sample_rate															\	array-obj-ref value -- array-obj-ref
-	0 a:@ gen_tab "g-sample-rate" update_combo drop	\ array_obj_ref value tab "g-sample-rate" -- array-obj-ref
-	\ "gen_evt_sample_rate" log
+	"gen_evt_sample_rate" log
+	0 a:@ gen_tab "g-sample-rate" update_combo drop \ array_obj_ref value tab "g-sample-rate" -- array-obj-ref
 ;
 
 : gen_evt_num_rx															\	array-obj-ref value -- array-obj-ref
+	"gen_evt_num_rx" log
 	0 a:@ gen_tab "g-num-rx" update_combo drop	\ array_obj_ref value tab "g-num-rx" -- array-obj-ref
-	\ "gen_evt_num_rx" log
 ;
 
 : gen_evt_blk_sz															\	array-obj-ref value -- array-obj-ref
+	"gen_evt_blk_sz" log
 	0 a:@ gen_tab "g-blk-sz" update_combo drop	\ array_obj_ref value tab "g-blk-sz" -- array-obj-ref
-	\ "gen_evt_blk_sz" log
 ;
 
 : gen_evt_enabletx															\	array-obj-ref value -- array-obj-ref
+	"gen_evt_enabletx" log
 	0 a:@ gen_tab "g-enabletx" update_toggle drop	\ array_obj_ref value tab "g-enabletx" -- array-obj-ref
-	\ "gen_evt_enabletx" log
 ;
 
 : opt_gen_subscribe	\ --

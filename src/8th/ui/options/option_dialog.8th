@@ -89,11 +89,14 @@ ns: sdr
 \ ============================================================================
 \ Options init
 : options_init	\ --
+	options_tab_obj @ g:new options ! ;
+
+\ Option subscribe to events	
+: options_subscribe	\ --
 	opt_gen_subscribe
 	opt_audio_subscribe
 	opt_rx_subscribe
-	opt_tx_subscribe
-;
+	opt_tx_subscribe ;
 
 \ ============================================================================
 \ Window management

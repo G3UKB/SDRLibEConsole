@@ -80,14 +80,17 @@ var t_startup
 	STATE_3 wait_run_state
 	
 	\ ----------------------------------
-	\ Main UI subscribes to SYS_RUN_STATE
 	\ Subscribe propogates down to all widgets which do own subscriptions
 	main_window_subscribe 
+	options_subscribe
 	0.5 sleep
+	
+	\ ----------------------------------
 	\ Publish SYS_RUN_STATE, gets pushed onto main thread for UI to build
 	SYS_RUN_STATE [] fr:pubsub_publish
 	STATE_4 wait_run_state
 	
+	\ ----------------------------------
 	\ Once UI is stable we can populate it with the UI event data
 	option_model_ui_evnts
 	STATE_5 wait_run_state
@@ -195,6 +198,10 @@ var t_startup
 	\ ----------------------------------
 	\ Initialise main window
 	main_window_init
+	
+	\ ----------------------------------
+	\ Init the dialog window
+	options_init
 	
 	\ ----------------------------------
 	\ Start the startup task which starts all gen_server tasks

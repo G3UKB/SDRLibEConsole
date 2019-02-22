@@ -287,20 +287,20 @@ ns: sdr
 	\ __option_set_input_device_list
 	\ __option_set_output_device_list
 	
-	\ UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_RECEIVER r@ ["audio", "receiver", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_OUTPUT_DEV r@ ["audio", "outputdev", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
-	\ UI_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_RECEIVER r@ ["audio", "receiver", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_OUTPUT_DEV r@ ["audio", "outputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
+	UI_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 	
 	"Options sent UI events " log 
 ;
@@ -313,18 +313,18 @@ ns: sdr
 	__option_model@ >r
 	
 	SYS_NUM_RX st_rad_num_rx@ fr:pubsub_publish
-	\ SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_AUDIO_ROUTE r@ ["audio", "routes"] val@ fr:pubsub_publish
-	\ SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
-	\ SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_INPUT_SRC r@ ["audio", "inputsrc", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_AUDIO_ROUTE r@ ["audio", "routes"] val@ fr:pubsub_publish
+	SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_FFT_SIZE r@ ["receiver", "fftsize", ` dyn_idx `] val@ fr:pubsub_publish
+	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
 	"Options sent SYS events" log 
 ;
