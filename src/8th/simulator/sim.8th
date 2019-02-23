@@ -87,9 +87,15 @@ var client_x
 
 : send_resp
 	{"resp" : "ACK"} >json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
+
+: do_audio_inputs
+	{ "inputs" : [{"name" : "device-1" , "api" : "an api" , "index" : 0 , "direction" : 1 , "channels" : 1}, 
+	{ "name" : "device-2" , "api" : "an api" , "index" : 0 , "direction" : 1 , "channels" : 1 }]}
+	>json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
 	
 : do_audio_outputs
-	{ "outputs" : [{}, { "name" : "a device" , "api" : "an api" , "index" : 0 , "direction" : 0 , "channels" : 2 }]}
+	{ "outputs" : [{ "name" : "device-1" , "api" : "an api" , "index" : 0 , "direction" : 0 , "channels" : 2 },
+	{ "name" : "device-2" , "api" : "an api" , "index" : 0 , "direction" : 0 , "channels" : 2 }]}
 	>json cmd_socket @ client_addr_info rot 0 net:sendto 2drop ;
 
 : conn_poll drop "poll" log send_resp ;
@@ -121,7 +127,7 @@ var client_x
 : conn_radio_start "radio start" log send_resp ;
 : conn_radio_stop "radio stop" log send_resp ;
 : conn_make_wisdom "wisdom" log send_resp ;
-: conn_enum_audio_inputs "audio inputs" log send_resp ;
+: conn_enum_audio_inputs do_audio_inputs "audio outputs" log ;
 : conn_enum_audio_outputs do_audio_outputs "audio outputs" log ;
 : conn_set_disp_period 0 a:@ nip >n disp_period lock ! disp_period unlock drop "set disp period" log send_resp drop ;
 : conn_set_disp_state disp_state lock ! disp_state unlock drop "set disp state" log send_resp drop ;

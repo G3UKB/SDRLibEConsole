@@ -41,6 +41,10 @@
 \ "../testing/test_sink.8th" f:include
 
 \ ========================================
+\ Connector
+"../connector/connector.8th" f:include
+
+\ ========================================
 \ Models
 "../models/model_common.8th" f:include
 "../models/app_model.8th" f:include
@@ -55,7 +59,6 @@
 
 \ ========================================
 \ Connector
-"../connector/connector.8th" f:include
 "../connector/con_events.8th" f:include
 "../connector/transient.8th" f:include
 

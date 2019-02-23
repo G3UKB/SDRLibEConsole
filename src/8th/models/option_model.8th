@@ -258,7 +258,7 @@ ns: sdr
 \ Populate input device list
 : __option_set_input_device_list	\	 --
 	\ Get device list from the C layer
-	c_i_server_enum_audio_inputs dup "audio_device_inputs" t:! "inputs" m:@ nip
+	conn_enum_audio_inputs dup "audio_device_inputs" t:! "inputs" m:@ nip
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
@@ -268,25 +268,20 @@ ns: sdr
 \ Populate output device list
 : __option_set_output_device_list	\	 --
 	\ Get device list from the C layer
-	c_i_server_enum_audio_outputs dup "audio_device_outputs" t:! "outputs" m:@ nip
+	conn_enum_audio_outputs dup "audio_device_outputs" t:! "outputs" m:@ nip
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
 	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
 *)
-
 \ ----------------------------------
 \ Send restored/default UI data to all subscribers
 : __option_ui_evnts	SED: --
 	\ in: 	none
 	\ out:	none
-	__option_model@ >r
 	\ The model has been restored from disc at this point
-	\ First get the current audio devices from the C layer
-	\ as these are dynamic so have to be refreshed.
-	\ __option_set_input_device_list
-	\ __option_set_output_device_list
 	
+	__option_model@ >r
 	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
 	UI_NUM_RX r@ ["general", "numrx", ` dyn_idx `] val@ fr:pubsub_publish
 	UI_BLK_SZ r@ ["general", "blksz", ` dyn_idx `] val@ fr:pubsub_publish
@@ -329,6 +324,17 @@ ns: sdr
 	"Options sent SYS events" log 
 ;
 
+\ ----------------------------------
+\ Populate audio
+: __option_audio_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+	\ __option_set_input_device_list
+	\ __option_set_output_device_list
+	conn_enum_audio_inputs . cr
+	conn_enum_audio_outputs . cr
+;
+	
 \ ========================================
 \ Message Handlers
 \ ========================================
