@@ -280,6 +280,10 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ The model has been restored from disc at this point
+	\ __option_set_input_device_list
+	\ __option_set_output_device_list
+	conn_enum_audio_inputs . cr
+	conn_enum_audio_outputs . cr
 	
 	__option_model@ >r
 	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
@@ -322,17 +326,6 @@ ns: sdr
 	SYS_TUNE_LEVEL r> ["transmitter", "tunelevel", ` dyn_idx `] val@ fr:pubsub_publish
 
 	"Options sent SYS events" log 
-;
-
-\ ----------------------------------
-\ Populate audio
-: __option_audio_evnts	SED: --
-	\ in: 	none
-	\ out:	none
-	\ __option_set_input_device_list
-	\ __option_set_output_device_list
-	conn_enum_audio_inputs . cr
-	conn_enum_audio_outputs . cr
 ;
 	
 \ ========================================

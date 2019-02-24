@@ -47,6 +47,10 @@ cmd_addr cmd_socket @ net:bind
 [false,false,false] var, disp_state
 1 var, num_rx
 
+[0.01,0.011,0.012,0.013,0.014,0.015,0.016,0.017,0.018,0.019,0.020] var, randint_1
+[0.01,0.011,0.012,0.013,0.014,0.015,0.016,0.017,0.018,0.019,0.020] var, randint_2
+[0.01,0.011,0.012,0.013,0.014,0.015,0.016,0.017,0.018,0.019,0.020] var, randint_3
+
 \ Buffers
 128 b:new 0x0 b:fill var, cmd_buffer
 [] var, disp_buffer_1
@@ -249,12 +253,88 @@ var client_x
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
 ;
 
+\ Send display data while not terminated with random delays
+: display_events_1
+	
+		"Starting event data.." log
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break else "Bad command!" throw then
+				else
+					"Got q but then null" throw
+				then
+			else
+				\ Send data as required
+				disp_state lock @ 0 a:@ disp_state unlock drop
+				if
+					\ Display 1
+					cmd_socket @ d1_addr get_buffer_1 0 net:sendto 2drop
+				then
+				randint_1 @ a:shuffle 0 a:@ sleep
+			then
+		again
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
+: display_events_2
+	
+		"Starting event data.." log
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break else "Bad command!" throw then
+				else
+					"Got q but then null" throw
+				then
+			else
+				\ Send data as required
+				disp_state lock @ 1 a:@ disp_state unlock drop
+				if
+					\ Display 2
+					cmd_socket @ d2_addr get_buffer_2 0 net:sendto 2drop
+				then
+				randint_2 @ a:shuffle 0 a:@ sleep
+			then
+		again
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
+: display_events_3
+	
+		"Starting event data.." log
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break else "Bad command!" throw then
+				else
+					"Got q but then null" throw
+				then
+			else
+				\ Send data as required
+				disp_state lock @ 2 a:@ disp_state unlock drop
+				if
+					\ Display 3
+					cmd_socket @ d3_addr get_buffer_3 0 net:sendto 2drop
+				then
+				randint_3 @ a:shuffle 0 a:@ sleep
+			then
+		again
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
 \ ========================================
 \ Main code
 \ ========================================
 
 var cmd_task
-var display_events_task
+\ var display_events_task
+var display_events_task_1
+var display_events_task_2
+var display_events_task_3
 
 : app:main
 
@@ -265,14 +345,20 @@ var display_events_task
 	' cmd_reader t:task cmd_task !
 	
 	\ Start display event task
-	' display_events t:task display_events_task !
+	\ ' display_events t:task display_events_task !
+	' display_events_1 t:task display_events_task_1 !
+	' display_events_2 t:task display_events_task_2 !
+	' display_events_3 t:task display_events_task_3 !
 	
 	\ Wait for a ley
 	con:key
 	
 	\ Terminate
 	cmd_task @ "term" t:push
-	display_events_task @ "term" t:push
+	\ display_events_task @ "term" t:push
+	display_events_task_1 @ "term" t:push
+	display_events_task_2 @ "term" t:push
+	display_events_task_3 @ "term" t:push
 	
 	1 sleep
 	bye

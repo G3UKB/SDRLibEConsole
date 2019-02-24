@@ -617,15 +617,6 @@ ns: sdr
 	fr:response@ ;
 
 \ ----------------------------------
-\ Set a default route for RX1 to Speaker output both channels
-: conn_set_default_route	SED:  -- *
-	\ in: 	none
-	\ out:	0: * - response
-	a:new fr:+sender
-	"Connector_TASK" ' do_conn_set_default_route rot fr:msg! 
-	fr:response@ ;
-
-\ ----------------------------------
 \ Start the server 
 : conn_start_server	SED:  -- *
 	\ in: 	none
