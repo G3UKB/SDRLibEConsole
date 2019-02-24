@@ -156,9 +156,10 @@ ns: sdr
 	else
 		\ We have data so read from file
 		rdrop
-		\ Use open/read as slurp leaves the file open with no way to close it.
-		nip f:open 
-		1000 b:new 1000 f:read drop swap f:close 
+		\ Use open/read pre 19.01 as slurp leaves the file open with no way to close it.
+		nip 
+		\ f:open 1000 b:new 1000 f:read drop swap f:close 
+		f:slurp
 		json>
 	then ;
 
