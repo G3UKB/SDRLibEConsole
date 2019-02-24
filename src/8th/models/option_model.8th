@@ -257,7 +257,7 @@ ns: sdr
 \ Populate input device list
 : __option_set_input_device_list	\	 --
 	\ Get device list from the C layer
-	conn_enum_audio_inputs .s dup "audio_device_inputs" t:! "inputs" m:@ nip
+	conn_enum_audio_inputs dup "audio_device_inputs" t:! "inputs" m:@ nip
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
