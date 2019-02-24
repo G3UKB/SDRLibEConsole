@@ -99,8 +99,6 @@ var t_startup
 	\ Start the transient task
 	con_transient_init
 	0.1 sleep
-	\ See if we can discover hardware
-	"TRANSIENT_TASK" ' conn_try_connect true fr:msg!
 	
 	\ ----------------------------------
 	\ Once UI is stable we can populate it with the UI event data
@@ -109,19 +107,8 @@ var t_startup
 	app_model_ui_evnts
 	STATE_6 wait_run_state
 	
-	(*
-	\ ----------------------------------
-	\ Connector
-	\ Initialise
-	conn_init
-	\ Start the display tasks
-	svr_evnt_init
-	\ Start the transient task
-	con_transient_init
-	0.1 sleep
 	\ See if we can discover hardware
 	"TRANSIENT_TASK" ' conn_try_connect true fr:msg!
-	*)
 	
 	\ ----------------------------------
 	\ Done SOD

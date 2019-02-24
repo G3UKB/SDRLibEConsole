@@ -253,7 +253,6 @@ ns: sdr
 	swap "api" m:@ nip
 	"%s:%d:%s" s:strfmt a:push ;
 
-(*
 \ ----------------------------------
 \ Populate input device list
 : __option_set_input_device_list	\	 --
@@ -262,7 +261,7 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] lst_idx r> val! ;
 
 \ ----------------------------------
 \ Populate output device list
@@ -272,18 +271,16 @@ ns: sdr
 	\ Get array of device names
 	a:new swap ' __option_build_device_name_array a:each drop
 	\ Populate model
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! drop ;
-*)
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] lst_idx r> val! ;
+
 \ ----------------------------------
 \ Send restored/default UI data to all subscribers
 : __option_ui_evnts	SED: --
 	\ in: 	none
 	\ out:	none
 	\ The model has been restored from disc at this point
-	\ __option_set_input_device_list
-	\ __option_set_output_device_list
-	conn_enum_audio_inputs . cr
-	conn_enum_audio_outputs . cr
+	__option_set_input_device_list
+	__option_set_output_device_list
 	
 	__option_model@ >r
 	UI_SMPL_RATE r@ ["general", "smplrate", ` dyn_idx `] val@ fr:pubsub_publish
