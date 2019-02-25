@@ -207,7 +207,6 @@ needs gui/msgdlg
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : a_input_source				\ combo index rate --
-"a_input_source" . cr
 	st_app_run@ if
 		\ Allow the event
 		drop 								\ combo index rate -- combo index
@@ -220,35 +219,30 @@ needs gui/msgdlg
 ;
 
 : a_input_device				\ combo index num-rx --
-"a_input_device" . cr
 	st_app_run@ if
 		drop swap drop option_model_set_input_device
 	else 2drop drop then
 ;
 
 : a_output_sink					\ combo index blk-sz --
-"a_output_sink" . cr
 	st_app_run@ if
 		drop swap drop option_model_set_output_sink
 	else 2drop drop then
 ;
 
 : a_receiver						\ combo index blk-sz --
-"a_receiver" . cr
 	st_app_run@ if
 		drop swap drop option_model_set_receiver
 	else 2drop drop then
 ;
 
 : a_output_device				\ combo index blk-sz --
-"a_output_device" . cr
 	st_app_run@ if
 		drop swap drop option_model_set_output_device
 	else 2drop drop then
 ;
 
 : a_channel							\ combo index blk-sz --
-"a_channel" . cr
 	st_app_run@ if
 		drop swap drop option_model_set_ch
 	else 2drop drop then
@@ -256,7 +250,6 @@ needs gui/msgdlg
 
 null var, selected_item
 : a_item_clicked	\ gui col row
-"a_item_clicked" . cr
 	selected_item !
 ;
 
@@ -264,7 +257,6 @@ null var, selected_item
 : a_add_route	\ gui --
 	\ Add an output sink route
 	\ Collect data for the route
-	"a_add_route" . cr
 	a:new
 	option_model_get_output_sink a:push
 	option_model_get_receiver a:push
@@ -290,7 +282,6 @@ null var, selected_item
 \ Remove route button click
 : a_remove_route	\ gui --
 	\ Remove the last row clicked
-	"a_remove_route" . cr
 	selected_item @
 	null? not if
 		option_model_remove_route
@@ -307,7 +298,6 @@ null var, selected_item
 \ The exect number of rows must be set here or an exception will be thrown.
 : a_get_item \ gui col row -- 
 	\ Return the item in the col/row requested
-	"a_get_item" . cr
 	option_model_get_routes swap 
 	a:@ nip
 	swap a:@
@@ -316,7 +306,6 @@ null var, selected_item
 \ This fires after the g:update call
 \ It must return the new number of rows for the table
 : a_get_row_count	\	gui --
-	"a_get_row_count" . cr
 	st_app_run@ if
 		option_model_get_route_count
 	then
@@ -324,7 +313,6 @@ null var, selected_item
 
 \ Not right but a demo
 : a_paint_list_item	\ gui col row wide high select? --
-"a_paint_list_item" . cr
 	if "red" 5 pick swap .s g:fillall drop
 	else "blue" 5 pick swap .s g:fillall drop then
 ;

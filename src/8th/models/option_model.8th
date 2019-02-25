@@ -369,7 +369,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - num rx
 	\ out: 	none
-	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["general","numrx", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Sample rate
@@ -377,7 +377,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - sample rate
 	\ out: 	none
-	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["general","smplrate", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Block size
@@ -385,7 +385,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - block size
 	\ out: 	none
-	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["general","blksz", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ============================================
 \ Get/Set audio section value holders
@@ -394,7 +394,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input source name
 	\ out: 	none
-	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","inputsrc", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Set audio input device if local
@@ -402,7 +402,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - input device name
 	\ out: 	none
-	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","inputdev", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Set output sink index
@@ -410,7 +410,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output sink name
 	\ out: 	none
-	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","outputsnk", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Get the output sink index
@@ -427,7 +427,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - receiver index number as s
 	\ out: 	none
-	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","receiver", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 : do_option_get_receiver	SED: a --
@@ -443,7 +443,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - output device name
 	\ out: 	none
-	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","outputdev", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Get output device name
@@ -460,7 +460,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - set channel L/R/Both
 	\ out: 	none
-	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["audio","channel", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Get channel name
