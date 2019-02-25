@@ -69,7 +69,7 @@ enum;
 		\ Start of day flag
 		"sod" : true,
 		\ Inhibit UI, don't process UI events as they may be 
-		\ internal calls which cause event loops.
+		\ internal calls which cause event loops or maybe too early in startup.
 		"inhibit" : false
 	},
 	"server" : {

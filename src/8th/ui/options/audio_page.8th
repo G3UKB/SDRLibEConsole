@@ -207,7 +207,8 @@ needs gui/msgdlg
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : a_input_source				\ combo index rate --
-	;; st_app_run@ if
+"a_input_source" . cr
+	st_app_run@ if
 		\ Allow the event
 		drop 								\ combo index rate -- combo index
 		nip									\ combo index -- index
@@ -219,45 +220,52 @@ needs gui/msgdlg
 ;
 
 : a_input_device				\ combo index num-rx --
-	;; st_app_run@ if
+"a_input_device" . cr
+	st_app_run@ if
 		drop swap drop option_model_set_input_device
 	else 2drop drop then
 ;
 
 : a_output_sink					\ combo index blk-sz --
-	;; st_app_run@ if
+"a_output_sink" . cr
+	st_app_run@ if
 		drop swap drop option_model_set_output_sink
 	else 2drop drop then
 ;
 
 : a_receiver						\ combo index blk-sz --
-	;; st_app_run@ if
+"a_receiver" . cr
+	st_app_run@ if
 		drop swap drop option_model_set_receiver
 	else 2drop drop then
 ;
 
 : a_output_device				\ combo index blk-sz --
-	;; st_app_run@ if
+"a_output_device" . cr
+	st_app_run@ if
 		drop swap drop option_model_set_output_device
 	else 2drop drop then
 ;
 
 : a_channel							\ combo index blk-sz --
-	;; st_app_run@ if
+"a_channel" . cr
+	st_app_run@ if
 		drop swap drop option_model_set_ch
 	else 2drop drop then
 ;
 
 null var, selected_item
 : a_item_clicked	\ gui col row
-	;; selected_item !
+"a_item_clicked" . cr
+	selected_item !
 ;
 
 \ Add route button click
 : a_add_route	\ gui --
 	\ Add an output sink route
 	\ Collect data for the route
-	;; a:new
+	"a_add_route" . cr
+	a:new
 	option_model_get_output_sink a:push
 	option_model_get_receiver a:push
 	option_model_get_output_device a:push
@@ -282,7 +290,8 @@ null var, selected_item
 \ Remove route button click
 : a_remove_route	\ gui --
 	\ Remove the last row clicked
-	;; selected_item @
+	"a_remove_route" . cr
+	selected_item @
 	null? not if
 		option_model_remove_route
 	then
@@ -298,7 +307,8 @@ null var, selected_item
 \ The exect number of rows must be set here or an exception will be thrown.
 : a_get_item \ gui col row -- 
 	\ Return the item in the col/row requested
-	;; option_model_get_routes swap 
+	"a_get_item" . cr
+	option_model_get_routes swap 
 	a:@ nip
 	swap a:@
 ;
@@ -306,12 +316,16 @@ null var, selected_item
 \ This fires after the g:update call
 \ It must return the new number of rows for the table
 : a_get_row_count	\	gui --
-	;; option_model_get_route_count
+	"a_get_row_count" . cr
+	st_app_run@ if
+		option_model_get_route_count
+	then
 ;
 
 \ Not right but a demo
 : a_paint_list_item	\ gui col row wide high select? --
-	;; if "red" 5 pick swap .s g:fillall drop
+"a_paint_list_item" . cr
+	if "red" 5 pick swap .s g:fillall drop
 	else "blue" 5 pick swap .s g:fillall drop then
 ;
 

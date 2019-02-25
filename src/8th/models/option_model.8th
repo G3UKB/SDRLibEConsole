@@ -572,20 +572,20 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Create the app model gen-server
-	"OptionsModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
+	"OptionModel_TASK" t:curtask 2 ' fr:gen_server t:task-n -1 sleep drop
 	\ Ask the model to initialise itself
-	"OptionsModel_TASK" ' do_option_init a:new fr:msg!
+	"OptionModel_TASK" ' do_option_init a:new fr:msg!
 	"Options model initialised sent" log ;
 
 \ ----------------------------------
 \ UI events
 : option_model_ui_evnts	SED: --
-	"OptionsModel_TASK" ' do_option_ui_evnts a:new fr:msg! ;
+	"OptionModel_TASK" ' do_option_ui_evnts a:new fr:msg! ;
 
 \ ----------------------------------
 \ SYS events
 : option_model_sys_evnts	SED: --
-	"OptionsModel_TASK" ' do_option_sys_evnts a:new fr:msg! ;
+	"OptionModel_TASK" ' do_option_sys_evnts a:new fr:msg! ;
 	
 \ ----------------------------------
 \ Module close
@@ -593,10 +593,10 @@ ns: sdr
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the model
-	"OptionsModel_TASK" ' do_option_close a:new fr:msg!
+	"OptionModel_TASK" ' do_option_close a:new fr:msg!
 	0.5 sleep
 	\ Ask the model to exit
-	"OptionsModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
+	"OptionModel_TASK" ' fr:gs_do_term a:new fr:msg! ;
 
 \ ========================================
 \ General tab
@@ -812,7 +812,7 @@ option_model_test @ #if
 		\ Close options model to clean up for next iteration
 		"Closing model" log
 		sdr:option_model_term 
-		"OptionsModel_TASK" fr:gs_wait_single_task 
+		"OptionModel_TASK" fr:gs_wait_single_task 
 		"Done closing model" log
 		2 sleep
 	;
@@ -829,7 +829,7 @@ option_model_test @ #if
 		cr "Closing test..." log
 		fr:pubsub_term		
 		\ Wait for P/S to terminate
-		\ OptionsModel_TASK already terminated
+		\ OptionModel_TASK already terminated
 		"P/S_TASK" fr:gs_wait_single_task 
 		"TEST_TASK exiting..." log
 	;
