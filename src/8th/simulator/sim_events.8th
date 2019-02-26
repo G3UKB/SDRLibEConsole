@@ -1,0 +1,118 @@
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__svr_evnt_
+\ ===============================================================================
+
+\ Initialisation
+: __svr_evnt_host	"localhost" ;
+: __svr_evnt_d1_port 10011 ;
+: __svr_evnt_d2_port 10012 ;
+: __svr_evnt_d3_port 10013 ;
+	
+\ Create UDP socket
+: __svr_evnt_create_d1_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d1_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d1_port net:getaddrinfo swap net:bind ;
+
+: __svr_evnt_create_d2_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d2_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d2_port net:getaddrinfo swap net:bind ;
+	
+: __svr_evnt_create_d3_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d3_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d3_port net:getaddrinfo swap net:bind ;
+	
+\ ----------------------------------	
+\ Get command socket
+: __svr_evnt_d1_sock@	"udp_d1_evnt_sock" t:@ ;
+: __svr_evnt_d2_sock@	"udp_d2_evnt_sock" t:@ ;
+: __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
+
+\ ----------------------------------	
+\ Buffers
+20000 b:new 0x0 b:fill var, buf1
+20000 b:new 0x0 b:fill var, buf2
+20000 b:new 0x0 b:fill var, buf3
+
+\ ========================================
+\ Reader Task
+\ ========================================
+
+\ Read event data while enabled and not terminated
+\ Write event data to the data-buffer in instance data
+: __svr_evnt_reader	SED: net b --
+	\ in: 	0: b - buffer
+	\				1: net - socket
+	\ out:	none
+	"Starting reader task..." log
+	\ ----------------------------------
+	\ Task initialisation
+	\ Save buffer
+	"buffer" t:!
+	\ Save socket
+	"reader_skt" t:!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	
+	repeat
+		\ Check for termination at top of loop
+		t:qlen 0 n:> if 
+			t:pop null? not if
+				"term" s:= if break then
+			then
+		else
+			\ See if we have data
+			"reader_skt" t:@ true 500 net:wait if
+				\ Socket says yes
+				\ SED in >= 19.02:  \ net buf flags -- net X buf #recv | net null
+				"buffer" t:@ 0 net:recvfrom null? not if
+					2drop 2drop
+					\ Read something
+					\ "data..." log
+				then
+			else
+				drop
+			then
+		then
+	again
+	"Terminating task [" depth >s s:+ "]" s:+ log
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+var t1
+var t2
+var t3
+
+\ ========================================
+\ General management
+\ Initialise the sockets
+: svr_evnt_init	SED:  --
+	\ in: 	none
+	\ out:	none
+	\ Create sockets
+	__svr_evnt_create_d1_sock
+	__svr_evnt_create_d2_sock
+	__svr_evnt_create_d3_sock
+	\ Start tasks
+	__svr_evnt_d1_sock@ buf1 @ 2 ' __svr_evnt_reader t:task-n t1 !
+	__svr_evnt_d2_sock@ buf2 @ 2 ' __svr_evnt_reader t:task-n t2 !
+	__svr_evnt_d3_sock@ buf3 @ 2 ' __svr_evnt_reader t:task-n t3 ! 
+;
+
+\ ----------------------------------
+\ Terminate displays
+: svr_evnt_term	SED:  -- 
+	t1 @ dup "term" t:push t:q-notify drop
+	t2 @ dup "term" t:push t:q-notify drop
+	t3 @ dup "term" t:push t:q-notify drop ;
+
+\ ----------------------------------
+\ Main
+: app:main
+	svr_evnt_init
+	con:key
+	svr_evnt_term ;
