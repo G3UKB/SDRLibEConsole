@@ -283,7 +283,7 @@ var client_x
 					cmd_socket @ d1_addr get_buffer_1 0 net:sendto null? if "Send error" log drop else 2drop then
 				then
 				\ randint_1 @ a:shuffle 0 a:@ nip sleep
-				0.0009 sleep
+				0.001 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
@@ -308,7 +308,7 @@ var client_x
 					cmd_socket @ d2_addr get_buffer_2 0 net:sendto null? if "Send error" log drop else 2drop then
 				then
 				\ randint_2 @ a:shuffle 0 a:@ nip sleep
-				0.0011 sleep
+				0.002 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
@@ -333,7 +333,7 @@ var client_x
 					cmd_socket @ d3_addr get_buffer_3 0 net:sendto null? if "Send error" log drop else 2drop then
 				then
 				\ randint_3 @ a:shuffle 0 a:@ nip sleep
-				0.0017 sleep
+				0.003 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
