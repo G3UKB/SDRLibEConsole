@@ -684,7 +684,7 @@ ns: sdr
 	\ out: 	0: s - output sink
 	\ Send the parameters plus a sender
 	a:new fr:+sender
-	"OptionModel_TASK" ' do_option_get_output_sink rot fr:msg! 
+	"OptionModel_TASK" ' do_option_get_output_sink rot fr:msg!
 	fr:response@ ;
 
 \ ----------------------------------

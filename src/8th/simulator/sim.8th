@@ -22,7 +22,7 @@
      bob@bobcowdery.plus.com
 *)
 
-true var, stress
+false var, stress
 
 \ Sockets and addresses
 { "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, cmd_socket

@@ -253,15 +253,18 @@ null var, selected_item
 	selected_item !
 ;
 
+: __a_get_widget_value	\ name
+	audio_tab swap get_tab_target g:text? nip ;
+
 \ Add route button click
 : a_add_route	\ gui --
 	\ Add an output sink route
 	\ Collect data for the route
-	a:new
-	option_model_get_output_sink a:push
-	option_model_get_receiver a:push
-	option_model_get_output_device a:push
-	option_model_get_ch a:push
+	a:new >r
+	"a-output-sink" __a_get_widget_value r@ swap a:push
+	"a-receiver" __a_get_widget_value r@ swap a:push
+	"a-output-device" __a_get_widget_value r@ swap a:push
+	"a-channel" __a_get_widget_value r> swap a:push
 	\ Update the model
 	nip option_model_push_route if
 		\ Update the table
@@ -295,8 +298,8 @@ null var, selected_item
 
 \ This fires when the new number of rows as returned in a_get_row_count
 \ is != to the current number of rows.
-\ The exect number of rows must be set here or an exception will be thrown.
-: a_get_item \ gui col row -- 
+\ The exact number of rows must be set here or an exception will be thrown.
+: a_get_item \ gui col row -- item
 	\ Return the item in the col/row requested
 	option_model_get_routes swap 
 	a:@ nip
