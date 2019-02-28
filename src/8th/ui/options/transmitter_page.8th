@@ -81,7 +81,7 @@ ns: sdr
 \ UI Event Handlers
 \ These simply update the model (options_model_controllr.8th) which takes any necessary action
 : ui_set_tune_level					\ slider value --
-	;; st_app_run@ if
+	st_app_run@ if
 		\ Allow the event
 		nip									\ slider value -- value
 		\ Update the model

@@ -516,11 +516,12 @@ ns: sdr
 	\ out: 	none
 	\ pre:	route must have been validated
 	__option_model@ ["audio","routes" ] val@ swap a:push drop 
-	\ Temp for testing
-	true fr:response!
 	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
-
+	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish
+	\ Temp for testing
+	\ We need to validate and then return true/false
+	true fr:response! ;
+	
 \ ============================================
 \ Get/Set receiver section value holders
 \ Set the average mode type
@@ -528,7 +529,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - av mode index
 	\ out: 	none
-	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["receiver","avmode", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Set the number of cycles to average over
@@ -536,7 +537,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - average over n cycles
 	\ out: 	none
-	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["receiver","avover", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Set the window type for averaging
@@ -544,7 +545,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - window type
 	\ out: 	none
-	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["receiver","wintype", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ----------------------------------
 \ Set display FFT size
@@ -552,7 +553,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - fft size
 	\ out: 	none
-	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["receiver","fftsize", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ============================================
 \ Get/Set transmitter section value holders
@@ -561,7 +562,7 @@ ns: sdr
 	a:open
 	\ in: 	0: n - tune level 0-100
 	\ out: 	none
-	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> val! drop ;
+	>r __option_model@ ["transmitter","tunelevel", ` dyn_idx ` ] val_or_idx r> val! ;
 
 \ ===============================================================================
 \ PUBLIC

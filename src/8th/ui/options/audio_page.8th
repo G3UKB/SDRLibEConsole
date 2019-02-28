@@ -264,7 +264,7 @@ null var, selected_item
 	option_model_get_output_sink a:push
 	option_model_get_receiver a:push
 	option_model_get_output_device a:push
-	option_model_get_ch a:push 
+	option_model_get_ch a:push
 	\ Update the model
 	nip option_model_push_route if
 		\ Update the table
