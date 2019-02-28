@@ -140,7 +140,7 @@ ns: sdr
 
 : r_over	\ combo index over-frames --
 	st_app_run@ if
-		nip nip option_model_set_over
+		drop nip option_model_set_over
 	else 
 		2drop drop 
 	then ;
