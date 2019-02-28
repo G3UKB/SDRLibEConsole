@@ -179,6 +179,15 @@ ns: sdr
 	>r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
 	"params" m:@ 3 r> a:! 4 r> a:! drop >json ;
 
+\ ----------------------------------	
+: __conn_audio_route_msg	SED: a -- s
+	\ in:		0: s - audio api i.e. "MME"
+	\				1: s - audio device name string
+	\ out:	0: s - json encoded default route message
+	\ >r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
+	\ "params" m:@ 3 r> a:! 4 r> a:! drop >json ;
+	;
+	
 \ ----------------------------------		
 : __conn_disp_state_msg SED: T T T -- s
 	{ "cmd" : "set_disp_state" , "params" : [] }
@@ -393,6 +402,14 @@ ns: sdr
 
 \ Set a default route for RX1 to Speaker output both channels
 : do_conn_set_default_route	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_get_default_route __conn_default_route_msg false swap __con_do_exchange ;
+
+\ ----------------------------------	
+\ Set a new route
+: do_conn_set_audio_route	SED: a --
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
@@ -665,6 +682,15 @@ ns: sdr
 	fr:response@ ;
 
 \ ----------------------------------
+\ Set a new audio route
+: conn_set_audio_route	SED:  a -- *
+	\ in: 	0: a - route descriptor
+	\ out:	0: * - response
+	a:new fr:+sender
+	"Connector_TASK" ' do_conn_set_audio_route rot fr:msg! 
+	fr:response@ ;
+	
+\ ----------------------------------
 \ Enum audio inputs
 : conn_enum_audio_inputs	SED:  -- *
 	\ in: 	none
@@ -929,6 +955,12 @@ ns: sdr
 	\ "__conn_evnt_disp_width" log
 	conn_set_disp_width "disp_width" __conn_evnt_resp ;
 
+\ ----------------------------------
+\ Audio route update
+: __conn_evnt_set_audio_route	SED: w --
+	\ "__conn_evnt_audio_route" log
+	conn_set_audio_route "audio_route" __conn_evnt_resp ;
+	
 \ ===============================================================================
 \ INITIALISATION and TERMINATION
 
@@ -961,6 +993,7 @@ ns: sdr
 	\ SYS_TX_MODE ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_TX_FILT ' __conn_not_implemented fr:pubsub_subscribe
 	SYS_DISP_WIDTH ' __conn_evnt_disp_width fr:pubsub_subscribe
+	SYS_AUDIO_ROUTE ' __conn_evnt_set_audio_route fr:pubsub_subscribe
 	\ SYS_RUN_STATE ' __conn_not_implemented fr:pubsub_subscribe 
 ;
 	
