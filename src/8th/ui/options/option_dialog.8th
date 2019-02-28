@@ -98,6 +98,10 @@ ns: sdr
 	opt_rx_subscribe
 	opt_tx_subscribe ;
 
+\ Option refresh	
+: options_refresh	\ --
+	opt_audio_refresh ;
+	
 \ ============================================================================
 \ Window management
 

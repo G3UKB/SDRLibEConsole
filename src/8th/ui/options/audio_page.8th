@@ -301,24 +301,18 @@ null var, selected_item
 \ The exact number of rows must be set here or an exception will be thrown.
 : a_get_item \ gui col row -- item
 	\ Return the item in the col/row requested
-	option_model_get_routes swap 
-	a:@ nip
-	swap a:@
-;
+	st_app_run@ if
+		option_model_get_routes swap 
+		a:@ nip
+		swap a:@
+	then ;
 
 \ This fires after the g:update call
 \ It must return the new number of rows for the table
 : a_get_row_count	\	gui --
 	st_app_run@ if
 		option_model_get_route_count
-	then
-;
-
-\ Not right but a demo
-: a_paint_list_item	\ gui col row wide high select? --
-	if "red" 5 pick swap .s g:fillall drop
-	else "blue" 5 pick swap .s g:fillall drop then
-;
+	then ;
 
 \ ================================================================================	
 \ UI Widget Update
@@ -363,8 +357,13 @@ null var, selected_item
   UI_OUTPUT_SINK ' audio_evt_output_sink fr:pubsub_subscribe
   UI_RECEIVER ' audio_evt_receiver fr:pubsub_subscribe
   UI_OUTPUT_DEV ' audio_evt_output_device fr:pubsub_subscribe
-  UI_CHANNEL ' audio_evt_channel fr:pubsub_subscribe
-;
+  UI_CHANNEL ' audio_evt_channel fr:pubsub_subscribe ;
+  
+: opt_audio_refresh 
+  \ g:update will force the audio list to populate itself
+  audio_tab "a-route-table" get_tab_target
+	\ Force update
+	g:update ;
 
 \ Restore namespace	
 ns: user

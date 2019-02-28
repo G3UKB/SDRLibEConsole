@@ -117,6 +117,12 @@ var t_startup
 	false st_app_sod!
 	true st_app_run!
 	
+	\ ----------------------------------
+	\ Some UI updates are turned off during SOD
+	\ Refresh propogates down the hierarchy
+	main_window_refresh
+	options_refresh
+	
 	\ We have started multiple tasks from the startup task
 	\ We keep a reference to it and close it at the end of
 	\ the shutdown before waiting for all tasks.

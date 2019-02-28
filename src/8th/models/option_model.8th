@@ -487,7 +487,7 @@ ns: sdr
 : __option_get_routes	SED:  -- a
 	\ in: 	none
 	\ out: 	0: a - route array
-	__option_model@ ["audio","routes" ] val@ ;
+	__option_model@ ["audio","routes"] val@ ;
 
 \ ----------------------------------
 \ Get all current routes
@@ -504,7 +504,7 @@ ns: sdr
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: a - route array
-	__option_get_routes a:len
+	__option_get_routes a:len nip
 	fr:response! ;
 
 \ ----------------------------------
@@ -517,9 +517,9 @@ ns: sdr
 	\ pre:	route must have been validated
 	__option_model@ ["audio","routes" ] val@ swap a:push drop 
 	\ Temp for testing
-	true fr:response! ;
+	true fr:response!
 	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	\ SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
+	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
 
 \ ============================================
 \ Get/Set receiver section value holders
@@ -665,7 +665,7 @@ ns: sdr
 	\ in: 	0: s - ch
 	\ out: 	none
 	a:new swap a:push
-	"OptionModel_TASK" ' do_option_set_ch rot fr:msg! ;
+	"OptionModel_TASK" ' do_option_set_channel rot fr:msg! ;
 
 \ ----------------------------------
 : option_model_push_route SED: a --
