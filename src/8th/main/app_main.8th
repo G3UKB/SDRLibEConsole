@@ -56,6 +56,8 @@ var t_startup
 	\ Set our task in the task registry
 	"STARTUP_TASK" t:name!
 	t:curtask "STARTUP_TASK" fr:gs_reg!
+	\ Register the GUI task so we can message it
+	t:guitask "MAIN_TASK" fr:gs_reg!
 	
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
@@ -185,7 +187,10 @@ var t_startup
 	\ out:	none
 	\ ----------------------------------
 	\ Set our task name
-	"MainThrd" t:name!
+	\ "Main_Thrd" t:name!
+	"MAIN_TASK" t:name!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
 	t:curtask . cr
 	
 	\ ----------------------------------

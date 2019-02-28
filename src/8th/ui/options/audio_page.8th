@@ -260,11 +260,11 @@ null var, selected_item
 : a_add_route	\ gui --
 	\ Add an output sink route
 	\ Collect data for the route
-	a:new >r
-	"a-output-sink" __a_get_widget_value r@ swap a:push
-	"a-receiver" __a_get_widget_value r@ swap a:push
-	"a-output-device" __a_get_widget_value r@ swap a:push
-	"a-channel" __a_get_widget_value r> swap a:push
+	a:new
+	option_model_get_output_sink a:push
+	option_model_get_receiver a:push
+	option_model_get_output_device a:push
+	option_model_get_ch a:push 
 	\ Update the model
 	nip option_model_push_route if
 		\ Update the table

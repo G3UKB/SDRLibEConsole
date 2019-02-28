@@ -468,7 +468,8 @@ ns: sdr
 	a:open
 	\ in: 	0: q - sender (task name)
 	\ out: 	q: s - channel name
-	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] idx_val@ ;
+	__option_model@ ["audio","channel", ` dyn_idx ` , ` lst_idx ` ] ["audio","channel", ` dyn_idx ` , ` val_or_idx ` ] idx_val@
+	fr:response! ;
 
 \ ========================================
 \ Audio Route Management
@@ -492,7 +493,7 @@ ns: sdr
 \ Get all current routes
 : do_option_get_routes	SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: a - route array
 	__option_get_routes
 	fr:response! ;
@@ -501,7 +502,7 @@ ns: sdr
 \ Get route count
 : do_option_get_route_count	SED: a --
 	a:open
-	\ in: 	0: q - sender (task name)
+	\ in: 	0: s - sender (task name)
 	\ out: 	q: a - route array
 	__option_get_routes a:len
 	fr:response! ;
@@ -509,13 +510,16 @@ ns: sdr
 \ ----------------------------------
 \ Push route to the model
 : do_option_push_route	SED: a --
-	a:open
-	\ in: 	0: a - new route
+	a:open swap
+	\ in: 	0: s - sender (task name)
+	\				1: a - new route
 	\ out: 	none
 	\ pre:	route must have been validated
-	__option_model@ ["audio","routes" ] val@ swap a:push
+	__option_model@ ["audio","routes" ] val@ swap a:push drop 
+	\ Temp for testing
+	true fr:response! ;
 	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
+	\ SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish ;
 
 \ ============================================
 \ Get/Set receiver section value holders
@@ -667,8 +671,9 @@ ns: sdr
 : option_model_push_route SED: a --
 	\ in: 	0: a - new route
 	\ out: 	none
-	a:new swap a:push
-	"OptionModel_TASK" ' do_option_push_route rot fr:msg! ;
+	a:new swap a:push fr:+sender
+	"OptionModel_TASK" ' do_option_push_route rot fr:msg! 
+	fr:response@ ;
 
 \ ----------------------------------
 : option_model_remove_route SED: a --
@@ -711,7 +716,7 @@ ns: sdr
 	\ out: 	0: s - ch
 	\ Send the parameters plus a sender
 	a:new fr:+sender
-	"OptionModel_TASK" ' do_option_get_ch rot fr:msg! 
+	"OptionModel_TASK" ' do_option_get_channel rot fr:msg! 
 	fr:response@ ;	
 
 \ ----------------------------------
