@@ -185,11 +185,11 @@ ns: sdr
 	\ out:	0: s - json encoded default route message
 	>r { "cmd" : "set_audio_route" , "params" : [1] }
 	"params" m:@ 
-	r@ 0 a:@ nip a:push
-	r@ 1 a:@ nip a:push
+	r@ 0 a:@ nip s:uc a:push
+	r@ 1 a:@ nip >n a:push
 	r@ 2 a:@ nip ":" s:/ 0 a:@ nip a:push
 	r@ 2 a:@ nip ":" s:/ 2 a:@ nip a:push
-	r> 3 a:@ nip a:push drop
+	r> 3 a:@ nip s:uc a:push drop
 	>json ;
 	
 \ ----------------------------------		
@@ -418,7 +418,9 @@ ns: sdr
 	\ in: 	0: s - sender (task name)
 	\				1: a - [source, rx, dev,ch] 
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_audio_route_msg false swap __con_do_exchange ;
+	
+	swap "Set audio route: " . dup . cr
+	__conn_audio_route_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------	
 : do_conn_enum_audio_inputs	SED: a --

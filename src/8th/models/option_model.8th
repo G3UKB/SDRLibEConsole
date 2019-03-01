@@ -303,6 +303,18 @@ ns: sdr
 
 \ ----------------------------------
 \ Send restored/default SYS data to all subscribers
+: __option_pre_sys_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+	__option_model@ >r
+	
+	SYS_AUDIO_ROUTE r> ["audio", "routes"] val@ fr:pubsub_publish
+
+	"Options sent Pre-SYS events" log 
+;
+
+\ ----------------------------------
+\ Send restored/default SYS data to all subscribers
 : __option_sys_evnts	SED: --
 	\ in: 	none
 	\ out:	none
@@ -315,7 +327,6 @@ ns: sdr
 	SYS_INPUT_DEV r@ ["audio", "inputdev", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_OUTPUT_SINK r@ ["audio", "outputsnk", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_CHANNEL r@ ["audio", "channel", ` dyn_idx `] val@ fr:pubsub_publish
-	SYS_AUDIO_ROUTE r@ ["audio", "routes"] val@ fr:pubsub_publish
 	SYS_AVMODE r@ ["receiver", "avmode", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_AVOVER r@ ["receiver", "avover", ` dyn_idx `] val@ fr:pubsub_publish
 	SYS_WINTYPE r@ ["receiver", "wintype", ` dyn_idx `] val@ fr:pubsub_publish
@@ -324,7 +335,7 @@ ns: sdr
 
 	"Options sent SYS events" log 
 ;
-	
+
 \ ========================================
 \ Message Handlers
 \ ========================================
@@ -345,6 +356,12 @@ ns: sdr
 	drop __option_ui_evnts
 	\ Set run-state STATE_5
 	STATE_5 st_app_run_state!
+;
+
+: do_option_pre_sys_evnts	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __option_pre_sys_evnts
 ;
 
 : do_option_sys_evnts	SED: m --
@@ -588,6 +605,9 @@ ns: sdr
 
 \ ----------------------------------
 \ SYS events
+: option_model_pre_sys_evnts	SED: --
+	"OptionModel_TASK" ' do_option_pre_sys_evnts a:new fr:msg! ;
+	
 : option_model_sys_evnts	SED: --
 	"OptionModel_TASK" ' do_option_sys_evnts a:new fr:msg! ;
 	
