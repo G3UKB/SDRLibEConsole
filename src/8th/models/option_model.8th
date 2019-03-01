@@ -516,8 +516,7 @@ ns: sdr
 	\ out: 	none
 	\ pre:	route must have been validated
 	__option_model@ ["audio","routes" ] val@ swap a:push drop 
-	\ Publish all routes as we don't know what changed, we may have deleted some etc
-	SYS_AUDIO_ROUTE __option_model@ ["audio","routes" ] val@ fr:pubsub_publish
+	\ We don't publish as routes must be configured at startup
 	\ Temp for testing
 	\ We need to validate and then return true/false
 	true fr:response! ;
