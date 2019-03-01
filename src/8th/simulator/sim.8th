@@ -23,6 +23,9 @@
 *)
 
 false var, stress
+\ needs debug/trace
+\ needs debug/trace-crash
+\ needs debug/nicer
 
 \ Sockets and addresses
 { "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket var, cmd_socket
@@ -308,7 +311,7 @@ var client_x
 					cmd_socket @ d2_addr get_buffer_2 0 net:sendto null? if "Send error" log drop else 2drop then
 				then
 				\ randint_2 @ a:shuffle 0 a:@ nip sleep
-				0.002 sleep
+				0.001 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
@@ -333,7 +336,7 @@ var client_x
 					cmd_socket @ d3_addr get_buffer_3 0 net:sendto null? if "Send error" log drop else 2drop then
 				then
 				\ randint_3 @ a:shuffle 0 a:@ nip sleep
-				0.003 sleep
+				0.001 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log

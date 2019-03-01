@@ -103,6 +103,17 @@ var t_startup
 	0.1 sleep
 	
 	\ ----------------------------------
+	\ See if we have a server or simulator running
+	conn_poll not if
+		"\n\n\***The console cannot run without SDRLibEConnector server or a simulator." log
+		"***Please start the server or simulator and then restart the console." log
+		"***Press any key to exit the application\n\n" log
+		"STARTUP_TASK" fr:gs_reg_rm
+		con:key
+		bye
+	then
+	
+	\ ----------------------------------
 	\ Once UI is stable we can populate it with the UI event data
 	option_model_ui_evnts
 	STATE_5 wait_run_state
@@ -191,6 +202,7 @@ var t_startup
 : app:main	SED: --
 	\ in: 	none
 	\ out:	none
+	
 	\ ----------------------------------
 	\ Set our task name
 	\ "Main_Thrd" t:name!
@@ -198,7 +210,7 @@ var t_startup
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
 	t:curtask . cr
-	
+		
 	\ ----------------------------------
 	\ Pretty print Json
 	\ Note: this messes up save/restore so use only for debug
