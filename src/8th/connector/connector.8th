@@ -147,13 +147,15 @@ ns: sdr
 	
 \ ========================================
 \ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
+\ No params
 : __conn_poll_msg { "cmd" : "poll" , "params" : [] } >json ;
 : __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
 : __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
-: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
 : __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+\ One param
+: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
 : __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
@@ -163,20 +165,22 @@ ns: sdr
 : __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
 : __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
 : __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_one_param >json ;
+: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_one_param >json ;
+: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
+: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
+\ Two params
 : __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_two_param >json ;
-: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_two_param >json ;
-: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_two_param >json ;
-: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
-: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
+
 
 \ Complex messages
 \ ----------------------------------	
@@ -602,7 +606,7 @@ ns: sdr
 	swap __conn_r1_agc_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
-: do_conn_r_agc	SED: a --
+: do_conn_r2_agc	SED: a --
 	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 AGC mode
@@ -628,7 +632,7 @@ ns: sdr
 	swap __conn_r1_gain_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
-: do_conn_r_gain	SED: a --
+: do_conn_r2_gain	SED: a --
 	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 AF gain
@@ -1143,8 +1147,19 @@ ns: sdr
 	
 : __conn_evnt_r3_gain SED: m --
 	\ "__conn_evnt_r3_gain" log
-		st_rad_num_rx@ 3 n:< if drop ;; then 
+	st_rad_num_rx@ 3 n:< if drop ;; then 
 	"audio-gain" m:@ nip conn_r3_gain "r3 gain" __conn_evnt_resp ;
+
+\ ----------------------------------
+\ Misc update
+: __conn_evnt_hf_pre SED: m --
+	\ "__conn_evnt_hf_pre" log 
+	"hf-pre" m:@ nip conn_hf_pre "hf pre" __conn_evnt_resp ;
+
+\ ----------------------------------
+: __conn_evnt_attn SED: m --
+	\ "__conn_evnt_attn" log 
+	"attn" m:@ nip conn_attn "attn" __conn_evnt_resp ;
 	
 \ ----------------------------------
 \ Display update

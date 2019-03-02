@@ -807,7 +807,7 @@ ns: sdr
 	else
 		PRE_OFF 
 	then
-	\ cco_preamp
+	app_model_set_hf_pre
 ;
 
 \ ----------------------------------
@@ -828,8 +828,10 @@ ns: sdr
 	\				1: g - gui
 	\				2: s - value
 	\ out:	none
-	drop 
-	\ cco_alex_attn
+	drop
+	st_app_run@ if
+		app_model_set_attn
+	then
 ;
 
 \ ----------------------------------

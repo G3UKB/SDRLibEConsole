@@ -618,6 +618,24 @@ ns: sdr
 	SYS_R3_AFGAIN __app_model@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish drop
 ;
 
+\ ========================================
+\ MISC
+: do_app_set_hf_pre SED: a --
+	a:open
+	\ in: 	0: T - HF re on/off
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "hf-preamp" 3 pick val!
+	SYS_R_HF_PRE __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish drop
+;
+
+: do_app_set_attn SED: a --
+	a:open
+	\ in: 	0: n - Attenuator in dBm
+	\ out: 	none
+	__app_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx ` ] "attn" 3 pick val!
+	SYS_R_ATTN __app_model@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish drop
+;
+
 \ ============================================
 \ Get/Set TX Attributes
 \ Duplex
@@ -924,6 +942,21 @@ ns: sdr
 	a:new swap a:push
 	"AppModel_TASK" ' do_app_r3_set_afgain rot fr:msg! ;
 
+\ ========================================
+\ MISC
+
+: app_model_set_hf_pre	SED: n --
+	\ in: 	0: F - HF Preamp on/off
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_set_hf_pre rot fr:msg! ;
+
+: app_model_set_attn	SED: n --
+	\ in: 	0: n - Attenuator in dBM
+	\ out: 	none
+	a:new swap a:push
+	"AppModel_TASK" ' do_app_set_attn rot fr:msg! ;
+	
 \ ========================================
 \ TX Attributes
 : app_model_tx_set_duplex SED: T --
