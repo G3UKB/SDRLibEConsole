@@ -599,7 +599,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 AGC mode
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_agc_msg false swap __con_do_exchange ;
+	swap __conn_r1_agc_msg false swap .s __con_do_exchange ;
 
 \ ----------------------------------
 : do_conn_r_agc	SED: a --

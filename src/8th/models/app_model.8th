@@ -256,8 +256,8 @@ ns: sdr
 	SYS_R1_AGC r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_AGC r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R3_AGC r@ ["radio-state", ` radio_3 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	\ SYS_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
-	\ SYS_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	SYS_R_ATTN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
+	SYS_R_HF_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	\ SYS_R_6M_PRE r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R1_AFGAIN r@ ["radio-state", ` radio_1 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
 	SYS_R2_AFGAIN r@ ["radio-state", ` radio_2 `, ` dyn_idx `, ` data_idx `] val@ fr:pubsub_publish
