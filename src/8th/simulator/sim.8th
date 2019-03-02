@@ -125,6 +125,14 @@ var client_x
 : conn_set_rx_2_filter drop "r2 filter" log send_resp ;
 : conn_set_rx_3_filter drop "r3 filter" log send_resp ;
 : conn_set_tx_filter drop "tx filter" log send_resp ;
+: conn_set_rx_1_agc drop "r1 agc" log send_resp ;
+: conn_set_rx_2_agc drop "r2 agc" log send_resp ;
+: conn_set_rx_3_agc drop "r3 agc" log send_resp ;
+: conn_set_rx_1_gain drop "r1 gain" log send_resp ;
+: conn_set_rx_2_gain drop "r2 gain" log send_resp ;
+: conn_set_rx_3_gain drop "r3 gain" log send_resp ;
+: conn_set_hf_pre drop "HF Pre" log send_resp ;
+: conn_set_attn drop "Attn" log send_resp ;
 : conn_set_in_rate drop "in rate" log send_resp ;
 : conn_set_out_rate drop "out_rate" log send_resp ;
 : conn_set_iq_blk_sz drop "iq blk sz" log send_resp ;
@@ -162,6 +170,14 @@ var client_x
 	"set_rx2_filter" : ' conn_set_rx_2_filter ,
 	"set_rx3_filter" : ' conn_set_rx_3_filter ,
 	"set_tx_filter" : ' conn_set_tx_filter ,
+	"set_rx1_agc" : ' conn_set_rx_1_agc ,
+	"set_rx2_agc" : ' conn_set_rx_2_agc ,
+	"set_rx3_agc" : ' conn_set_rx_3_agc ,
+	"set_rx1_gain" : ' conn_set_rx_1_gain ,
+	"set_rx2_gain" : ' conn_set_rx_2_gain ,
+	"set_rx3_gain" : ' conn_set_rx_3_gain ,
+	"set_hf_pre" : ' conn_set_hf_pre ,
+	"set_attn" : ' conn_set_attn ,
 	"set_in_rate" : ' conn_set_in_rate ,
 	"set_out_rate" : ' conn_set_out_rate ,
 	"set_iq_blk_sz" : ' conn_set_iq_blk_sz ,

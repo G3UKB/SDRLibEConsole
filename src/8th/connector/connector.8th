@@ -167,6 +167,14 @@ ns: sdr
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_two_param >json ;
+: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_two_param >json ;
+: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_two_param >json ;
 : __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
 : __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
 
@@ -584,6 +592,58 @@ ns: sdr
 	rot rot  __conn_tx_filt_msg false swap __con_do_exchange ;
 
 \ ========================================
+\ AGC
+\ Set R1 AGC mode
+: do_conn_r1_agc	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 AGC mode
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r1_agc_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+: do_conn_r_agc	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 AGC mode
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r2_agc_msg false swap __con_do_exchange ;
+	
+\ ----------------------------------
+: do_conn_r3_agc	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 AGC mode
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r3_agc_msg false swap __con_do_exchange ;	
+
+\ ========================================
+\ Audio Gain
+\ Set R1 AGC mode
+: do_conn_r1_gain	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 AF gain
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r1_gain_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+: do_conn_r_gain	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 AF gain
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r2_gain_msg false swap __con_do_exchange ;
+	
+\ ----------------------------------
+: do_conn_r3_gain	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 AF gain
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_r3_gain_msg false swap __con_do_exchange ;	
+	
+\ ========================================
 \ Display functions
 
 \ ----------------------------------
@@ -614,6 +674,25 @@ ns: sdr
 	\				3: T - true if enable R3 display
 	\ out: 	q: * - "Timeout" or response data
 	3 pick 3 pick 3 pick __conn_disp_state_msg false swap __con_do_exchange 3drop ;
+
+\ ========================================
+\ MISC
+\ Set HF Preamp
+: do_conn_hf_pre
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: T - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hf_pre_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set Attenuator
+: do_conn_attn
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - attenuator in dBM
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_attn_msg false swap __con_do_exchange ;
 	
 \ ===============================================================================
 \ PUBLIC
@@ -830,6 +909,62 @@ ns: sdr
 	"Connector_TASK" ' do_conn_tx_filter rot fr:msg! 
 	fr:response@ ;
 
+\ ----------------------------------
+\ AGC change
+: conn_r1_agc	SED: n -- *
+	\ in: 	0: n - agc id
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r1_agc rot fr:msg!
+	fr:response@ ;
+	
+\ ----------------------------------
+: conn_r2_agc	SED: n -- *
+	\ in: 	0: n - agc id
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r2_agc rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_r3_agc	SED: n -- *
+	\ in: 	0: n - agc id
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r3_agc rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+\ Audio gain change
+: conn_r1_gain	SED: n -- *
+	\ in: 	0: n - audio gain
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r1_gain rot fr:msg!
+	fr:response@ ;
+	
+\ ----------------------------------
+: conn_r2_gain	SED: n -- *
+	\ in: 	0: n - audio gain
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r2_gain rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_r3_gain	SED: n -- *
+	\ in: 	0: n - audio gain
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_r3_gain rot fr:msg!
+	fr:response@ ;
+
 \ ========================================
 \ Displays
 
@@ -864,6 +999,25 @@ ns: sdr
 	a:new swap a:push swap a:push swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_disp_state rot fr:msg! 
 	fr:response@ ;	
+
+\ ========================================
+\ Misc
+: conn_hf_pre	SED: n -- *
+	\ in: 	0: T - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hf_pre rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_attn	SED: n -- *
+	\ in: 	0: n - attenuator in dBM
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_attn rot fr:msg!
+	fr:response@ ;
 	
 \ ===============================================================================
 \ EVENT HANDLERS for Publish/Subscribe system
@@ -957,6 +1111,42 @@ ns: sdr
 	conn_r3_filter "r3 filter" __conn_evnt_resp ;
 
 \ ----------------------------------
+\ AGC update
+\ in:		0: m - map of radio state
+\ out: 	none
+: __conn_evnt_r1_agc SED: m --
+	\ "__conn_evnt_r1_agc" log
+	"agc" m:@ nip conn_r1_agc "r1 agc" __conn_evnt_resp ;
+	
+: __conn_evnt_r2_agc SED: m --
+	\ "__conn_evnt_r2_agc" log
+	st_rad_num_rx@ 2 n:< if drop ;; then 
+	"agc" m:@ nip conn_r2_agc "r2 agc" __conn_evnt_resp ;
+	
+: __conn_evnt_r3_agc SED: m --
+	\ "__conn_evnt_r3_agc" log
+		st_rad_num_rx@ 3 n:< if drop ;; then 
+	"agc" m:@ nip conn_r3_agc "r3 agc" __conn_evnt_resp ;
+
+\ ----------------------------------
+\ Audio gain update
+\ in:		0: m - map of radio state
+\ out: 	none
+: __conn_evnt_r1_gain SED: m --
+	\ "__conn_evnt_r1_gain" log
+	"audio-gain" m:@ nip conn_r1_gain "r1 gain" __conn_evnt_resp ;
+	
+: __conn_evnt_r2_gain SED: m --
+	\ "__conn_evnt_r2_gain" log
+	st_rad_num_rx@ 2 n:< if drop ;; then 
+	"audio-gain" m:@ nip conn_r2_gain "r2 gain" __conn_evnt_resp ;
+	
+: __conn_evnt_r3_gain SED: m --
+	\ "__conn_evnt_r3_gain" log
+		st_rad_num_rx@ 3 n:< if drop ;; then 
+	"audio-gain" m:@ nip conn_r3_gain "r3 gain" __conn_evnt_resp ;
+	
+\ ----------------------------------
 \ Display update
 : __conn_evnt_disp_width	SED: w --
 	\ "__conn_evnt_disp_width" log
@@ -986,15 +1176,15 @@ ns: sdr
 	SYS_R1_FILT ' __conn_evnt_r1_filter fr:pubsub_subscribe
 	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
 	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
-	\ SYS_R1_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R2_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R3_AGC ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R_ATTN ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R_HF_PRE ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
+	SYS_R2_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
+	SYS_R3_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
+	SYS_R_ATTN ' __conn_evnt_attn fr:pubsub_subscribe
+	SYS_R_HF_PRE ' __conn_evnt_hf_pre fr:pubsub_subscribe
 	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R1_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R2_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
-	\ SYS_R3_AFGAIN ' __conn_not_implemented fr:pubsub_subscribe
+	SYS_R1_AFGAIN ' __conn_evnt_r1_gain fr:pubsub_subscribe
+	SYS_R2_AFGAIN ' __conn_evnt_r2_gain fr:pubsub_subscribe
+	SYS_R3_AFGAIN ' __conn_evnt_r3_gain fr:pubsub_subscribe
 	\ SYS_MOX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_DUPLEX ' __conn_not_implemented fr:pubsub_subscribe
 	\ SYS_RFGAIN ' __conn_not_implemented fr:pubsub_subscribe
