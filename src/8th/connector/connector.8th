@@ -599,7 +599,7 @@ ns: sdr
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 AGC mode
 	\ out: 	q: * - "Timeout" or response data
-	swap __conn_r1_agc_msg false swap .s __con_do_exchange ;
+	swap __conn_r1_agc_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 : do_conn_r_agc	SED: a --
@@ -1177,8 +1177,8 @@ ns: sdr
 	SYS_R2_FILT ' __conn_evnt_r2_filter fr:pubsub_subscribe
 	SYS_R3_FILT ' __conn_evnt_r3_filter fr:pubsub_subscribe
 	SYS_R1_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
-	SYS_R2_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
-	SYS_R3_AGC ' __conn_evnt_r1_agc fr:pubsub_subscribe
+	SYS_R2_AGC ' __conn_evnt_r2_agc fr:pubsub_subscribe
+	SYS_R3_AGC ' __conn_evnt_r3_agc fr:pubsub_subscribe
 	SYS_R_ATTN ' __conn_evnt_attn fr:pubsub_subscribe
 	SYS_R_HF_PRE ' __conn_evnt_hf_pre fr:pubsub_subscribe
 	\ SYS_R_6M_PRE ' __conn_not_implemented fr:pubsub_subscribe
