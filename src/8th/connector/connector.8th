@@ -433,7 +433,7 @@ ns: sdr
 	\				1: a - [source, rx, dev,ch] 
 	\ out: 	q: * - "Timeout" or response data
 	
-	swap "Set audio route: " . dup log
+	swap
 	__conn_audio_route_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------	

@@ -22,7 +22,7 @@
      bob@bobcowdery.plus.com
 *)
 
-false var, stress
+true var, stress
 \ needs debug/trace
 \ needs debug/trace-crash
 \ needs debug/nicer
@@ -303,10 +303,10 @@ var client_x
 				disp_state lock @ 0 a:@ nip disp_state unlock drop
 				if
 					\ Display 1
-					cmd_socket @ d1_addr get_buffer_1 0 net:sendto null? if "Send error" log drop else 2drop then
+					cmd_socket @ d1_addr get_buffer_1 0 net:sendto null? if "Send error" log 2drop else 2drop then
 				then
 				\ randint_1 @ a:shuffle 0 a:@ nip sleep
-				0.001 sleep
+				0.03 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
@@ -328,10 +328,10 @@ var client_x
 				disp_state lock @ 1 a:@ nip disp_state unlock drop
 				if
 					\ Display 2
-					cmd_socket @ d2_addr get_buffer_2 0 net:sendto null? if "Send error" log drop else 2drop then
+					cmd_socket @ d2_addr get_buffer_2 0 net:sendto null? if "Send error" log 2drop else 2drop then
 				then
 				\ randint_2 @ a:shuffle 0 a:@ nip sleep
-				0.001 sleep
+				0.05 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
@@ -353,10 +353,10 @@ var client_x
 				disp_state lock @ 2 a:@ nip disp_state unlock drop
 				if
 					\ Display 3
-					cmd_socket @ d3_addr get_buffer_3 0 net:sendto null? if "Send error" log drop else 2drop then
+					cmd_socket @ d3_addr get_buffer_3 0 net:sendto null? if "Send error" log 2drop else 2drop then
 				then
 				\ randint_3 @ a:shuffle 0 a:@ nip sleep
-				0.001 sleep
+				0.1 sleep
 			then
 		again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
