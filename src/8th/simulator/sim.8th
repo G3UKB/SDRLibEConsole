@@ -151,6 +151,8 @@ var client_x
 : conn_make_wisdom "wisdom" log send_resp ;
 : conn_enum_audio_inputs do_audio_inputs "audio inputs" log ;
 : conn_enum_audio_outputs do_audio_outputs "audio outputs" log ;
+: conn_change_audio_outputs "change audio outputs" log send_resp drop ;
+: conn_revert_audio_outputs "revert audio outputs" log send_resp drop ;
 : conn_set_disp_period 0 a:@ nip >n disp_period lock ! disp_period unlock drop "set disp period" log send_resp drop ;
 : conn_set_disp_state disp_state lock ! disp_state unlock drop "set disp state" log send_resp drop ;
 : conn_set_num_rx 0 a:@ nip >n num_rx lock ! num_rx unlock drop "set num rx" log send_resp drop ;
@@ -196,6 +198,8 @@ var client_x
 	"wisdom" : ' conn_make_wisdom ,
 	"enum_inputs" : ' conn_enum_audio_inputs ,
 	"enum_outputs" : ' conn_enum_audio_outputs ,
+	"change_outputs" : ' conn_change_audio_outputs ,
+	"revert_outputs" : ' conn_revert_audio_outputs ,
 	"set_disp_period" : ' conn_set_disp_period ,
 	"set_disp_state" : ' conn_set_disp_state ,
 	"set_num_rx" : ' conn_set_num_rx 

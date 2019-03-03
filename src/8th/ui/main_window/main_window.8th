@@ -836,8 +836,8 @@ ns: sdr
 
 \ ----------------------------------
 \ Revert to the audio routes in the options
-: evt_default_audio	SED: g --
-	\ c_i_server_revert_audio_outputs
+: w_default_audio	SED: g --
+	conn_dir_revert_audio_outputs
 ;
 
 \ ========================================
@@ -1006,15 +1006,15 @@ ns: sdr
 \ ========================================
 \ Temporarily redirect audio outputs from a radio to both channels on first device
 : w_r1_audio_select
-	\ 0 "both" c_i_server_change_audio_outputs
+	0 "BOTH" conn_dir_change_audio_outputs
 ;
 
 : w_r2_audio_select
-	\ 1 "both" c_i_server_change_audio_outputs
+	1 "BOTH" conn_dir_change_audio_outputs
 ;
 
 : w_r3_audio_select
-	\ 2 "both" c_i_server_change_audio_outputs
+	2 "BOTH" conn_dir_change_audio_outputs
 ;
 
 \ ============================================================================

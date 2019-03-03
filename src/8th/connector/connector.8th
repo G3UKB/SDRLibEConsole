@@ -154,6 +154,7 @@ ns: sdr
 : __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
 : __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
 : __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+: __conn_revert_audio_outputs_msg { "cmd" : "revert_outputs" , "params" : [] } >json ;
 \ One param
 : __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
 : __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
@@ -180,6 +181,7 @@ ns: sdr
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_change_audio_outputs_msg { "cmd" : "change_outputs" , "params" : [] } __conn_push_two_param >json ;
 
 
 \ Complex messages
@@ -431,7 +433,7 @@ ns: sdr
 	\				1: a - [source, rx, dev,ch] 
 	\ out: 	q: * - "Timeout" or response data
 	
-	swap "Set audio route: " . dup . cr
+	swap "Set audio route: " . dup log
 	__conn_audio_route_msg false swap __con_do_exchange ;
 	
 \ ----------------------------------	
@@ -447,7 +449,24 @@ ns: sdr
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
 	__conn_enum_outputs_msg false swap __con_do_exchange ;
-	
+
+\ ----------------------------------	
+: do_conn_change_audio_outputs	SED: a --	
+	a:open
+	\ in: 	0: s - sender (task name)
+	\				1: n - rx id
+	\				2: s - audio ch
+	\ out: 	q: * - "Timeout" or response data
+	rot rot 
+	__conn_change_audio_outputs_msg false swap __con_do_exchange ;	
+
+\ ----------------------------------	
+: do_conn_revert_audio_outputs	SED: a --	
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_revert_audio_outputs_msg false swap __con_do_exchange ;	
+
 \ ========================================
 \ Basic radio functions
 \ Execute discover protocol
@@ -797,6 +816,27 @@ ns: sdr
 	a:new fr:+sender
 	"Connector_TASK" ' do_conn_enum_audio_outputs rot fr:msg! 
 	fr:response@ ;
+
+\ ----------------------------------
+\ Change audio outputs
+: conn_change_audio_outputs	SED:  s n -- *
+	\ in: 	0: n - rx id
+	\				1: s - audio ch
+	\ out:	0: * - response
+	st_svr_running@ not if 2drop {"resp" : "NAK"} ;; then
+	a:new swap a:push swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_change_audio_outputs rot fr:msg! 
+	fr:response@ ;
+
+\ ----------------------------------
+\ Revert audio outputs
+: conn_revert_audio_outputs	SED:  -- *
+	\ in: 	none
+	\ out:	0: * - response
+	st_svr_running@ not if 2drop {"resp" : "NAK"} ;; then
+	a:new fr:+sender
+	"Connector_TASK" ' do_conn_revert_audio_outputs rot fr:msg! 
+	fr:response@ ;
 	
 \ ========================================
 \ Frequency
@@ -1022,6 +1062,25 @@ ns: sdr
 	a:new swap a:push fr:+sender
 	"Connector_TASK" ' do_conn_attn rot fr:msg!
 	fr:response@ ;
+
+\ ===============================================================================
+\ HANDLERS for direct calls
+\ These allow the words to be called by the event handlers as well if required
+: conn_dir_change_audio_outputs	SED: n s --
+	\ in: 	0: s - audio ch
+	\				1: n - rx id
+	\ out:	none
+	conn_change_audio_outputs not if
+		"Error from change audio outputs!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_revert_audio_outputs	SED:  --
+	\ in: 	none
+	\ out:	none
+	conn_revert_audio_outputs not if
+		"Error from revert audio outputs!" log
+	then ;
 	
 \ ===============================================================================
 \ EVENT HANDLERS for Publish/Subscribe system
@@ -1029,7 +1088,7 @@ ns: sdr
 
 \ Not implemented subscribe
 : __conn_not_implemented	SED: * --
-	drop {"resp" : "NAK"} ;
+	drop "Not implemented" log false ;
 
 \ ----------------------------------
 \ Decode response
