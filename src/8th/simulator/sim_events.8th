@@ -70,6 +70,7 @@
 					2drop 2drop
 					\ Read something
 					\ "data..." log
+					\ "." .
 				then
 			else
 				drop
