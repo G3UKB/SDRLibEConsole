@@ -52,7 +52,8 @@ ns: sdr
 \ ===============================================================================
 
 \ Initialisation
-: __svr_evnt_host	"localhost" ;
+: __svr_evnt_host	"127.0.0.1" ;
+\ : __svr_evnt_host	"192.168.1.14 ;
 : __svr_evnt_d1_port 10011 ;
 : __svr_evnt_d2_port 10012 ;
 : __svr_evnt_d3_port 10013 ;

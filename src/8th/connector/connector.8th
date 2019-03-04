@@ -216,6 +216,12 @@ ns: sdr
 
 \ ========================================
 \ Address management
+: __conn_cmd_ip	SED: -- n
+	\ in: 	none
+	\ out:	s0 - cmd ip
+	"127.0.0.1" ;
+	\ "192.168.1.8" ;
+	
 \ Return the command port
 : __conn_cmd_port	SED: -- n
 	\ in: 	none
@@ -248,28 +254,28 @@ ns: sdr
 : __conn_cmd_addr		SED: -- X
 	\ in: 	none
 	\ out:	s0 - cmd address info
-	"127.0.0.1" __conn_cmd_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_cmd_port net:getaddrinfo ;
 	
 \ ----------------------------------	
 \ Return the display data receiver 1 address info	
 : __conn_data_1_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 1 address info
-	"127.0.0.1" __conn_data_1_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_1_port net:getaddrinfo ;
 
 \ ----------------------------------	
 \ Return the display data receiver 2 address info		
 : __conn_data_2_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 2 address info
-	"127.0.0.1" __conn_data_2_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_2_port net:getaddrinfo ;
 
 \ ----------------------------------	
 \ Return the display data receiver 3 address info	
 : __conn_data_3_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 3 address info
-	"127.0.0.1" __conn_data_3_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_3_port net:getaddrinfo ;
 
 \ ========================================
 \ Message send/receive
