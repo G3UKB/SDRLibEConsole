@@ -784,7 +784,7 @@ ns: sdr
 \ ----------------------------------
 \ Show Alex window
 : do_alex	SED: g --
-	\ alex_window @ g:show drop
+	alex_window @ g:show drop
 ;
 
 \ ----------------------------------

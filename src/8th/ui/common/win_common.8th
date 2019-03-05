@@ -41,7 +41,6 @@ var wbs_window
 \ The GUI Alex window variable
 var alex_window
 
-
 \ ===============================================================================
 \ The GUI options variable
 var options

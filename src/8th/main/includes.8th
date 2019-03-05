@@ -96,8 +96,8 @@
 "../ui/display/disp_panel.8th"  f:include
 
 \ ========================================
-\ UI
+\ UI windows
 \ "../ui/tx_window/tx_window.8th"  f:include
-\ "../ui/alex_window/alex_window.8th"  f:include
+"../ui/alex_window/alex_window.8th"  f:include
 \ "../ui/wbs_window/wbs_window.8th"  f:include
 "../ui/main_window/main_window.8th" f:include

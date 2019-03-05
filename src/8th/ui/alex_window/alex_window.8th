@@ -1,9 +1,9 @@
 (*
 	alex_window.8th
  
-  Alex filter selection for the DynamicSDR application
+  Alex filter selection for the SDRLibEConsole application
  
- Copyright C 2018 by G3UKB Bob Cowdery
+ Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -257,31 +257,31 @@ ns: sdr
 : alex_auto
 	g:on? if
 		"Manual" g:text
-		ALEX-MANUAL cco_alex_auto
+		ALEX-MANUAL \ cco_alex_auto
 		\ Enable all filter switches
-		alex_window @ "alex-filters" g:child 2dup 
-		"alex-lpf" g:child true g:enable drop
-		"alex-hpf" g:child true g:enable drop dup
-		"mode-group" g:child "alex-bypass" g:child true g:enable drop
+		alex_window @ "alex-filters" g:child >r
+		r@ "alex-lpf" g:child true g:enable
+		r@ "alex-hpf" g:child true g:enable
+		r> "mode-group" g:child "alex-bypass" g:child true g:enable drop
 	else
 		"Auto" g:text
-		ALEX-AUTO cco_alex_auto
+		ALEX-AUTO \ cco_alex_auto
 		\ Disable all filter switches
-		alex_window @ "alex-filters" g:child 2dup 
-		"alex-lpf" g:child false g:enable drop
-		"alex-hpf" g:child false g:enable drop dup
-		"mode-group" g:child "alex-bypass" g:child false g:enable drop
+		alex_window @ "alex-filters" g:child >r
+		r@ "alex-lpf" g:child false g:enable drop
+		r@ "alex-hpf" g:child false g:enable drop dup
+		r> "mode-group" g:child "alex-bypass" g:child false g:enable drop
 	then
 ;
 
 : alex_hpf_bypass
 	g:on? if
-		ALEX-HPF-ENABLE cco_alex_hpf_bypass
+		ALEX-HPF-ENABLE \ cco_alex_hpf_bypass
 		\ Disable hpf filter switches
 		alex_window @ "alex-filters" g:child dup 
 		"hpf-group" g:child false g:enable drop
 	else
-		ALEX-HPF-DISABLE cco_alex_hpf_bypass
+		ALEX-HPF-DISABLE \ cco_alex_hpf_bypass
 		\ Enable hpf filter switches
 		alex_window @ "alex-filters" g:child dup 
 		"hpf-group" g:child true g:enable drop
@@ -291,103 +291,104 @@ ns: sdr
 \ LPF filters
 : alex_lpf_160
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_160
+		ALEX-FILT-ENABLE \ cco_alex_lpf_160
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_160
+		ALEX-FILT-DISABLE \ cco_alex_lpf_160
 	then
 ;
 
 : alex_lpf_80
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_80
+		ALEX-FILT-ENABLE \ cco_alex_lpf_80
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_80
+		ALEX-FILT-DISABLE \ cco_alex_lpf_80
 	then
 ;
 
 : alex_lpf_60_40
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_60_40
+		ALEX-FILT-ENABLE \ cco_alex_lpf_60_40
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_60_40
+		ALEX-FILT-DISABLE \ cco_alex_lpf_60_40
 	then
 ;
 
 : alex_lpf_30_20
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_30_20
+		ALEX-FILT-ENABLE \ cco_alex_lpf_30_20
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_30_20
+		ALEX-FILT-DISABLE \ cco_alex_lpf_30_20
 	then
 ;
 
 : alex_lpf_17_15
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_17_15
+		ALEX-FILT-ENABLE \ cco_alex_lpf_17_15
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_17_15
+		ALEX-FILT-DISABLE \ cco_alex_lpf_17_15
 	then
 ;
 
 : alex_lpf_12_10
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_12_10
+		ALEX-FILT-ENABLE \ cco_alex_lpf_12_10
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_12_10
+		ALEX-FILT-DISABLE \ cco_alex_lpf_12_10
 	then
 ;
 
 : alex_lpf_6
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_lpf_6
+		ALEX-FILT-ENABLE \ cco_alex_lpf_6
 	else
-		ALEX-FILT-DISABLE cco_alex_lpf_6
+		ALEX-FILT-DISABLE \ cco_alex_lpf_6
 	then
 ;
 
 \ HPF filters
 : alex_hpf_1.5
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_hpf_1.5
+		ALEX-FILT-ENABLE \ cco_alex_hpf_1.5
 	else
-		ALEX-FILT-DISABLE cco_alex_hpf_1.5
+		ALEX-FILT-DISABLE \ cco_alex_hpf_1.5
 	then
 ;
 
 : alex_hpf_6.5
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_hpf_6.5
+		ALEX-FILT-ENABLE \ cco_alex_hpf_6.5
 	else
-		ALEX-FILT-DISABLE cco_alex_hpf_6.5
+		ALEX-FILT-DISABLE \ cco_alex_hpf_6.5
 	then
 ;
 
 : alex_hpf_9.5
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_hpf_9.5
+		ALEX-FILT-ENABLE \ cco_alex_hpf_9.5
 	else
-		ALEX-FILT-DISABLE cco_alex_hpf_9.5
+		ALEX-FILT-DISABLE \ cco_alex_hpf_9.5
 	then
 ;
 
 : alex_hpf_13
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_hpf_13
+		ALEX-FILT-ENABLE \ cco_alex_hpf_13
 	else
-		ALEX-FILT-DISABLE cco_alex_hpf_13
+		ALEX-FILT-DISABLE \ cco_alex_hpf_13
 	then
 ;
 
 : alex_hpf_20
 	g:on? if
-		ALEX-FILT-ENABLE cco_alex_hpf_20
+		ALEX-FILT-ENABLE \ cco_alex_hpf_20
 	else
-		ALEX-FILT-DISABLE cco_alex_hpf_20
+		ALEX-FILT-DISABLE \ cco_alex_hpf_20
 	then
 ;
 
 \ Initialisation
 : alex_window_init
+	alex_window_obj @ g:new alex_window !
 	alex_window @ "alex-filters" g:child dup
 	"alex-lpf" g:child false g:enable drop dup
 	"alex-hpf" g:child false g:enable drop

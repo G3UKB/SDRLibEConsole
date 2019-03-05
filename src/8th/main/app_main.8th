@@ -228,6 +228,10 @@ var t_startup
 	options_init
 	
 	\ ----------------------------------
+	\ Initialise the Alex window
+	alex_window_init
+	
+	\ ----------------------------------
 	\ Start the startup task which starts all gen_server tasks
 	\ This cannot itself be a gen-server task as the framework
 	\ is not instantiated yet.

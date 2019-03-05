@@ -200,6 +200,25 @@ enum;
 : PRE_ON 1 ;
 
 \ ========================================
+\ Alex auto
+0 enum:
+	ALEX-AUTO
+	ALEX-MANUAL
+enum;
+
+\ Alex HPF bypass
+0 enum:
+	ALEX-HPF-DISABLE
+	ALEX-HPF-ENABLE
+enum;
+
+\ Alex LPF/HPF select
+0 enum:
+	ALEX-FILT-DISABLE
+	ALEX-FILT-ENABLE
+enum;
+
+\ ========================================
 \ Restore namespace	
 ns: user	
 
