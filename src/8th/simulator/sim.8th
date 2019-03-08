@@ -133,6 +133,20 @@ var client_x
 : conn_set_rx_3_gain drop "r3 gain" log send_resp ;
 : conn_set_hf_pre drop "HF Pre" log send_resp ;
 : conn_set_attn drop "Attn" log send_resp ;
+: conn_alex_auto drop "Alex auto" log send_resp ;
+: conn_hf_bypass drop "Alex HF bypass" log send_resp ;
+: conn_lpf_30_20 drop "Alex LPF 30/20" log send_resp ;
+: conn_lpf_60_40 drop "Alex LPF 60/40" log send_resp ;
+: conn_lpf_80 drop "Alex LPF 80" log send_resp ;
+: conn_lpf_160 drop "Alex LPF 160" log send_resp ;
+: conn_lpf_6 drop "Alex LPF 6" log send_resp ;
+: conn_lpf_12_10 drop "Alex LPF 12/10" log send_resp ;
+: conn_lpf_17_15 drop "Alex LPF 17/15" log send_resp ;
+: conn_hpf_13 drop "Alex HPF 13" log send_resp ;
+: conn_hpf_20 drop "Alex HPF 20" log send_resp ;
+: conn_hpf_9_5 drop "Alex HPF 9/5" log send_resp ;
+: conn_hpf_6_5 drop "Alex HPF 6/5" log send_resp ;
+: conn_hpf_1_5 drop "Alex HPF 1/5" log send_resp ;
 : conn_set_in_rate drop "in rate" log send_resp ;
 : conn_set_out_rate drop "out_rate" log send_resp ;
 : conn_set_iq_blk_sz drop "iq blk sz" log send_resp ;
@@ -180,6 +194,20 @@ var client_x
 	"set_rx3_gain" : ' conn_set_rx_3_gain ,
 	"set_hf_pre" : ' conn_set_hf_pre ,
 	"set_attn" : ' conn_set_attn ,
+	"set_alex_auto" : ' conn_alex_auto ,
+	"set_hf_bypass" : ' conn_hf_bypass ,
+	"set_lpf_30_20" : ' conn_lpf_30_20 ,
+	"set_lpf_60_40" : ' conn_lpf_60_40 ,
+	"set_lpf_80" : ' conn_lpf_80 ,
+	"set_lpf_160" : ' conn_lpf_160 ,
+	"set_lpf_6" : ' conn_lpf_6 ,
+	"set_lpf_12_10" : ' conn_lpf_12_10 ,
+	"set_lpf_17_15" : ' conn_lpf_17_15 ,
+	"set_hpf_13" : ' conn_hpf_13 ,
+	"set_hpf_20" : ' conn_hpf_20 ,
+	"set_hpf_9_5" : ' conn_hpf_9_5 ,
+	"set_hpf_6_5" : ' conn_hpf_6_5 ,
+	"set_hpf_1_5" : ' conn_hpf_1_5 ,	
 	"set_in_rate" : ' conn_set_in_rate ,
 	"set_out_rate" : ' conn_set_out_rate ,
 	"set_iq_blk_sz" : ' conn_set_iq_blk_sz ,

@@ -821,6 +821,7 @@ ns: sdr
 \ ----------------------------------
 \ Set hpf 13
 : do_conn_hpf_13
+	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: n - on/off
 	\ out: 	q: * - "Timeout" or response data
@@ -829,6 +830,7 @@ ns: sdr
 \ ----------------------------------
 \ Set hpf 20
 : do_conn_hpf_20
+	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: n - on/off
 	\ out: 	q: * - "Timeout" or response data
@@ -836,7 +838,8 @@ ns: sdr
 
 \ ----------------------------------
 \ Set hpf 9/5
-: do_conn_hpf_9-5
+: do_conn_hpf_9_5
+	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: n - on/off
 	\ out: 	q: * - "Timeout" or response data
@@ -844,7 +847,8 @@ ns: sdr
 
 \ ----------------------------------
 \ Set hpf 6/5
-: do_conn_hpf_6-5
+: do_conn_hpf_6_5
+	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: n - on/off
 	\ out: 	q: * - "Timeout" or response data
@@ -852,7 +856,8 @@ ns: sdr
 
 \ ----------------------------------
 \ Set hpf 1/5
-: do_conn_hpf_1-5
+: do_conn_hpf_1_5
+	a:open
 	\ in: 	0: n - sender (task name)
 	\				1: n - on/off
 	\ out: 	q: * - "Timeout" or response data
