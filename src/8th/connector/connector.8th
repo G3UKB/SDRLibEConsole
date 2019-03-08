@@ -176,6 +176,20 @@ ns: sdr
 : __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_one_param >json ;
 : __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
 : __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
+: __conn_alex_auto_msg { "cmd" : "set_alex_auto" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hf_bypass_msg { "cmd" : "set_hf_bypass" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_30_20_msg { "cmd" : "set_lpf_30_20" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_60_40_msg { "cmd" : "set_lpf_60_40" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_80_msg { "cmd" : "set_lpf_80" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_160_msg { "cmd" : "set_lpf_160" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_6_msg { "cmd" : "set_lpf_6" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_12_10_msg { "cmd" : "set_lpf_12_10" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_17_15_msg { "cmd" : "set_lpf_17_15" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_13_msg { "cmd" : "set_hpf_13" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_20_msg { "cmd" : "set_hpf_20" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_9_5_msg { "cmd" : "set_hpf_9_5" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_6_5_msg { "cmd" : "set_hpf_6_5" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_1_5_msg { "cmd" : "set_hpf_1_5" , "params" : [] } __conn_push_one_param >json ;
 \ Two params
 : __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
 : __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
@@ -722,6 +736,127 @@ ns: sdr
 	\				1: n - attenuator in dBM
 	\ out: 	q: * - "Timeout" or response data
 	swap __conn_attn_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set alex auto
+: do_conn_alex_auto
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_alex_auto_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set hf bypass
+: do_conn_hf_bypass
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hf_bypass_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 30/20
+: do_conn_lpf_30_20
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_30_20_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 60/40
+: do_conn_lpf_60_40
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_60_40_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 80
+: do_conn_lpf_80
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_80_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 160
+: do_conn_lpf_160
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_160_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 6
+: do_conn_lpf_6
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_6_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set lpf 12/10
+: do_conn_lpf_12_10
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_12_10_msg false swap __con_do_exchange ;	
+
+\ ----------------------------------
+\ Set lpf 17/15
+: do_conn_lpf_17_15
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_lpf_17_15_msg false swap __con_do_exchange ;	
+
+\ ----------------------------------
+\ Set hpf 13
+: do_conn_hpf_13
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hpf_13_msg false swap __con_do_exchange ;	
+
+\ ----------------------------------
+\ Set hpf 20
+: do_conn_hpf_20
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hpf_20_msg false swap __con_do_exchange ;		
+
+\ ----------------------------------
+\ Set hpf 9/5
+: do_conn_hpf_9-5
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hpf_9_5_msg false swap __con_do_exchange ;	
+
+\ ----------------------------------
+\ Set hpf 6/5
+: do_conn_hpf_6-5
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hpf_6_5_msg false swap __con_do_exchange ;		
+
+\ ----------------------------------
+\ Set hpf 1/5
+: do_conn_hpf_1-5
+	\ in: 	0: n - sender (task name)
+	\				1: n - on/off
+	\ out: 	q: * - "Timeout" or response data
+	swap __conn_hpf_1_5_msg false swap __con_do_exchange ;
 	
 \ ===============================================================================
 \ PUBLIC
@@ -1069,6 +1204,134 @@ ns: sdr
 	"Connector_TASK" ' do_conn_attn rot fr:msg!
 	fr:response@ ;
 
+\ ========================================
+\ Alex filters
+
+: conn_alex_auto	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_alex_auto rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_hf_bypass	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hf_bypass rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_30_20	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_30_20 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_60_40	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_60_40 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_80	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_80 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_160	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_160 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_6	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_6 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_lpf_12_10	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_12_10 rot fr:msg!
+	fr:response@ ;	
+
+\ ----------------------------------
+: conn_lpf_17_15	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_lpf_17_15 rot fr:msg!
+	fr:response@ ;	
+
+\ ----------------------------------
+: conn_hpf_13	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hpf_13 rot fr:msg!
+	fr:response@ ;	
+
+\ ----------------------------------
+: conn_hpf_20	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hpf_20 rot fr:msg!
+	fr:response@ ;
+
+\ ----------------------------------
+: conn_hpf_9_5	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hpf_9_5 rot fr:msg!
+	fr:response@ ;	
+
+\ ----------------------------------
+: conn_hpf_6_5	SED: n -- *
+	\ in: 	0: n - on/off
+	\ out:	0: * - response
+	st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+	a:new swap a:push fr:+sender
+	"Connector_TASK" ' do_conn_hpf_6_5 rot fr:msg!
+	fr:response@ ;	
+	
+	\ ----------------------------------
+	: conn_hpf_1_5	SED: n -- *
+		\ in: 	0: n - on/off
+		\ out:	0: * - response
+		st_svr_running@ not if drop {"resp" : "NAK"} ;; then
+		a:new swap a:push fr:+sender
+		"Connector_TASK" ' do_conn_hpf_1_5 rot fr:msg!
+	fr:response@ ;	
+	
 \ ===============================================================================
 \ HANDLERS for direct calls
 \ These allow the words to be called by the event handlers as well if required
@@ -1086,6 +1349,118 @@ ns: sdr
 	\ out:	none
 	conn_revert_audio_outputs not if
 		"Error from revert audio outputs!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_alex_auto	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_alex_auto not if
+		"Error from alex-auto!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_hf_bypass	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hf_bypass not if
+		"Error from hf_bypass!" log
+	then ;
+	
+\ ----------------------------------
+: conn_dir_lpf_30_20	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_30_20 not if
+		"Error from lpf_30_20!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_lpf_60_40	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_60_40 not if
+		"Error from lpf_60_40!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_lpf_80	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_80 not if
+		"Error from lpf_80!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_lpf_160	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_160 not if
+		"Error from lpf_160!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_lpf_6	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_6 not if
+		"Error from lpf_6!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_lpf_12_10	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_12_10 not if
+		"Error from lpf_12_10!" log
+	then ;	
+
+\ ----------------------------------
+: conn_dir_lpf_17_15	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_lpf_17_15 not if
+		"Error from lpf_17_15!" log
+	then ;	
+
+\ ----------------------------------
+: conn_dir_hpf_13	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hpf_13 not if
+		"Error from hpf_13!" log
+	then ;	
+
+\ ----------------------------------
+: conn_dir_hpf_20	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hpf_20 not if
+		"Error from hpf_20!" log
+	then ;	
+
+\ ----------------------------------
+: conn_dir_hpf_9_5	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hpf_9_5 not if
+		"Error from hpf_9_5!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_hpf_6_5	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hpf_6_5 not if
+		"Error from hpf_6_5!" log
+	then ;
+
+\ ----------------------------------
+: conn_dir_hpf_1_5	SED:  --
+	\ in: 	T
+	\ out:	none
+	conn_hpf_1_5 not if
+		"Error from hpf_1_5!" log
 	then ;
 	
 \ ===============================================================================

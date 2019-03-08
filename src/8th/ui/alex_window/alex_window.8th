@@ -257,7 +257,7 @@ ns: sdr
 : alex_auto
 	g:on? if
 		"Manual" g:text
-		ALEX-MANUAL \ cco_alex_auto
+		ALEX-MANUAL conn_dir_alex_auto
 		\ Enable all filter switches
 		alex_window @ "alex-filters" g:child >r
 		r@ "alex-lpf" g:child true g:enable
@@ -265,7 +265,7 @@ ns: sdr
 		r> "mode-group" g:child "alex-bypass" g:child true g:enable drop
 	else
 		"Auto" g:text
-		ALEX-AUTO \ cco_alex_auto
+		ALEX-AUTO conn_dir_alex_auto
 		\ Disable all filter switches
 		alex_window @ "alex-filters" g:child >r
 		r@ "alex-lpf" g:child false g:enable drop
@@ -276,12 +276,12 @@ ns: sdr
 
 : alex_hpf_bypass
 	g:on? if
-		ALEX-HPF-ENABLE \ cco_alex_hpf_bypass
+		ALEX-HPF-ENABLE conn_dir_hf_bypass
 		\ Disable hpf filter switches
 		alex_window @ "alex-filters" g:child dup 
 		"hpf-group" g:child false g:enable drop
 	else
-		ALEX-HPF-DISABLE \ cco_alex_hpf_bypass
+		ALEX-HPF-DISABLE conn_dir_hf_bypass
 		\ Enable hpf filter switches
 		alex_window @ "alex-filters" g:child dup 
 		"hpf-group" g:child true g:enable drop
@@ -291,98 +291,98 @@ ns: sdr
 \ LPF filters
 : alex_lpf_160
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_160
+		ALEX-FILT-ENABLE conn_dir_lpf_160
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_160
+		ALEX-FILT-DISABLE conn_dir_lpf_160
 	then
 ;
 
 : alex_lpf_80
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_80
+		ALEX-FILT-ENABLE conn_dir_lpf_80
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_80
+		ALEX-FILT-DISABLE conn_dir_lpf_80
 	then
 ;
 
 : alex_lpf_60_40
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_60_40
+		ALEX-FILT-ENABLE conn_dir_lpf_60_40
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_60_40
+		ALEX-FILT-DISABLE conn_dir_lpf_60_40
 	then
 ;
 
 : alex_lpf_30_20
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_30_20
+		ALEX-FILT-ENABLE conn_dir_lpf_30_20
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_30_20
+		ALEX-FILT-DISABLE conn_dir_lpf_30_20
 	then
 ;
 
 : alex_lpf_17_15
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_17_15
+		ALEX-FILT-ENABLE conn_dir_lpf_17_15
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_17_15
+		ALEX-FILT-DISABLE conn_dir_lpf_17_15
 	then
 ;
 
 : alex_lpf_12_10
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_12_10
+		ALEX-FILT-ENABLE conn_dir_lpf_12_10
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_12_10
+		ALEX-FILT-DISABLE conn_dir_lpf_12_10
 	then
 ;
 
 : alex_lpf_6
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_lpf_6
+		ALEX-FILT-ENABLE conn_dir_lpf_6
 	else
-		ALEX-FILT-DISABLE \ cco_alex_lpf_6
+		ALEX-FILT-DISABLE conn_dir_lpf_6
 	then
 ;
 
 \ HPF filters
 : alex_hpf_1.5
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_hpf_1.5
+		ALEX-FILT-ENABLE conn_dir_hpf_1_5
 	else
-		ALEX-FILT-DISABLE \ cco_alex_hpf_1.5
+		ALEX-FILT-DISABLE conn_dir_hpf_1_5
 	then
 ;
 
 : alex_hpf_6.5
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_hpf_6.5
+		ALEX-FILT-ENABLE conn_dir_hpf_6_5
 	else
-		ALEX-FILT-DISABLE \ cco_alex_hpf_6.5
+		ALEX-FILT-DISABLE conn_dir_hpf_6_5
 	then
 ;
 
 : alex_hpf_9.5
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_hpf_9.5
+		ALEX-FILT-ENABLE conn_dir_hpf_9_5
 	else
-		ALEX-FILT-DISABLE \ cco_alex_hpf_9.5
+		ALEX-FILT-DISABLE conn_dir_hpf_9_5
 	then
 ;
 
 : alex_hpf_13
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_hpf_13
+		ALEX-FILT-ENABLE conn_dir_hpf_13
 	else
-		ALEX-FILT-DISABLE \ cco_alex_hpf_13
+		ALEX-FILT-DISABLE conn_dir_hpf_13
 	then
 ;
 
 : alex_hpf_20
 	g:on? if
-		ALEX-FILT-ENABLE \ cco_alex_hpf_20
+		ALEX-FILT-ENABLE conn_dir_hpf_20
 	else
-		ALEX-FILT-DISABLE \ cco_alex_hpf_20
+		ALEX-FILT-DISABLE conn_dir_hpf_20
 	then
 ;
 
