@@ -258,7 +258,7 @@ ns: sdr
 	build_grid_array
 	build_pan_array 
 	build_wf_array ;
-
+	
 \ ========================================
 \ Restore namespace	
 ns: user	

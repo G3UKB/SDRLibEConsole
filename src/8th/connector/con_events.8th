@@ -166,6 +166,7 @@ ns: sdr
 
 \ ========================================
 \ General management
+
 \ Initialise the sockets
 : svr_evnt_init	SED:  --
 	\ in: 	none
@@ -179,7 +180,7 @@ ns: sdr
 	__svr_evnt_d2_sock@ "DISP-R2" 2 ' __svr_evnt_reader t:task-n
 	__svr_evnt_d3_sock@ "DISP-R3" 2 ' __svr_evnt_reader t:task-n  
 ;
-
+	
 \ ----------------------------------	
 \ Set the display period in ms
 : svr_evnt_set_disp_period	SED: n -- T
