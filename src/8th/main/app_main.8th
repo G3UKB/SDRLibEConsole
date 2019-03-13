@@ -158,7 +158,7 @@ var t_startup
 	\ Allocate param stack for this thread
 	param_st_alloc
 	
-	"Shutdown in progress" log
+	"Shutdown in progress at: " d:new >s s:+ log
 	\ Close connector and associated tasks
 	svr_evnt_term
 	conn_term

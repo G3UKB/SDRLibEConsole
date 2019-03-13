@@ -148,7 +148,7 @@ var options
 {
 	"dir" : "",
 	"wrap" : "nowrap",
-	"align" : "start",
+	"aligncontent" : "start",
 	"alignitems" : "start",
 	"justify" : "start"
 } var, flex_page
