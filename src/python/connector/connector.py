@@ -180,8 +180,7 @@ class M_LU:
 # Interface class to SDRLibEConnector -> server -> HPSDR
 # Sends messages to SDRLibEConnector and receives responses
 #===================================================== 
-class Connector:
-    
+class Connector: 
     #-------------------------------------------------
     # Initialisation
     def __init__(self) :

@@ -48,6 +48,7 @@ from ui.main_window.main_window import *
 # Main application class
 #=====================================================
 class AppMain:
+    
     #-------------------------------------------------
     # Start processing and wait for user to exit the application
     def main(self):
@@ -82,6 +83,9 @@ class AppMain:
 #=====================================================
 # Entry point
 #=====================================================
+
+#-------------------------------------------------
+# Start processing and wait for user to exit the application
 def main():
     try:  
         app = AppMain()
@@ -90,6 +94,7 @@ def main():
     except Exception as e:
         print ('Exception from main code','Exception [%s][%s]' % (str(e), traceback.format_exc()))
 
+#-------------------------------------------------
 # Enter here when run as script        
 if __name__ == '__main__':
     main()

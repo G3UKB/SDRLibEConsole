@@ -2,9 +2,9 @@
 #
 # instance_cache.py
 #
-# Python instance cache for the SdrScript SDR application
+# Cache class instances to save passing these around
 # 
-# Copyright (C) 2014 by G3UKB Bob Cowdery
+# Copyright (C) 2019 by G3UKB Bob Cowdery
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -23,12 +23,11 @@
 #     bob@bobcowdery.plus.com
 #
 
-"""
-Singletons
-"""
-
+# Cache of {name : inst, name : inst}
 instCache = {}
 
+#-------------------------------------------------
+# Add an instance to the cache
 def addToCache(name, instance):
     """
     Add a class instance
@@ -39,7 +38,9 @@ def addToCache(name, instance):
     """
     
     instCache[name] = instance
-    
+
+#-------------------------------------------------
+# Get an instance from the cache    
 def getInstance(name):
     """
     Get the one and only class instance

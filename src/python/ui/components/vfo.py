@@ -49,6 +49,8 @@ HZ_COLOR = 'orange'
 #===================================================== 
 class Vfo:
     
+    #-------------------------------------------------
+    # Constructor
     def __init__(self, connector, direction, vfo_id):
         """
         Constructor
@@ -83,7 +85,8 @@ class Vfo:
             '1Hz': 0.000001,
         }
         
-    # Interactors --------------------------------------------------------------
+    #-------------------------------------------------
+    # Add a new VFO to the given grid
     def addVfo(self, parent, grid, current_freq):
         """
         Add a single VFO control
@@ -155,12 +158,18 @@ class Vfo:
         self.__adjust_vfo(current_freq)
         self.__current_freq = current_freq
     
+    #==============================================================================================
+    # PUBLIC
+    #==============================================================================================
+    
+    #-------------------------------------------------
+    # Called on mouse wheel from the parent
     def doWheelEvent(self, direction):
         """
         Mouse wheel event
         
         Arguments:
-            delta   --  change in position
+            direction   --  VFO_UP or VFO_DOWN
             
         """
         if self.__freq_inc != None:
@@ -174,21 +183,34 @@ class Vfo:
             self.set_freq(self.__current_freq)
         return self.__current_freq
     
+    #-------------------------------------------------
+    # Set current frequency and send to the connector
     def set_freq(self, freq):
         """
         Set freq
         
         Arguments:
-            freq    --  to this frequency
+            freq    --  to this frequency as MHz float
             
         """
         
         self.__adjust_vfo(freq)
         self.__current_freq = freq
         if self.__direction == CH_RX:
-            self.__con.cmd_exchange(M_ID.R1_FREQ, [int(self.__current_freq*1000000)])
+            if self.__vfo_id == 1:
+                r = M_ID.R1_FREQ
+            elif self.__vfo_id == 2:
+                r = M_ID.R2_FREQ
+            else:
+                r = M_ID.R3_FREQ
+            self.__con.cmd_exchange(r, [int(self.__current_freq*1000000)])
+    
+    #==============================================================================================
+    # PRIVATE
+    #==============================================================================================
         
-    # Helpers --------------------------------------------------------------
+    #-------------------------------------------------
+    # Callback from mouseover on digit
     def __mouse_over(self, digit):
         """
         Callback from the mouse over digit
@@ -203,6 +225,8 @@ class Vfo:
         else:
             self.__freq_inc = self.__freq_inc_lookup[digit]
     
+    #-------------------------------------------------
+    # Rewrite the VFO digits with current frequency
     def __adjust_vfo(self, freq):
         """
         Set the VFO to the given frequency
@@ -223,12 +247,15 @@ class Vfo:
         self.__d_1Hz.setText(freq_str[8])
         
         self.__last_freq = freq
-        
-"""
-Event Filter Class for mouse over
-"""
+
+#=====================================================
+# Event Filter Class for mouse over
+#=====================================================        
+
 class mouseoverEvent(QObject):
     
+    #-------------------------------------------------
+    # Constructor
     def __init__(self, parent, callback):
         """
         Constructor
@@ -241,7 +268,9 @@ class mouseoverEvent(QObject):
         
         super(mouseoverEvent, self).__init__(parent)
         self.__callback = callback
-        
+    
+    #-------------------------------------------------
+    # Installed filter    
     def eventFilter(self, object, event):
         name = object.accessibleName()
         if name.find('MHz') != -1:
@@ -262,11 +291,14 @@ class mouseoverEvent(QObject):
             return True
         return False
 
-"""
-GUI Classes
-"""
+#=====================================================
+# Digit and spaces classes
+#=====================================================        
+
 class VfoDigit(QLabel):
     
+    #-------------------------------------------------
+    # Constructor
     def __init__(self, text, colour, size):
         super(VfoDigit, self).__init__(text)
         
@@ -277,6 +309,8 @@ class VfoDigit(QLabel):
  
 class VfoSep(QLabel):
     
+    #-------------------------------------------------
+    # Constructor
     def __init__(self, text, colour, size):
         super(VfoSep, self).__init__(text)
         

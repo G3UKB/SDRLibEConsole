@@ -47,6 +47,8 @@ from common.defs import *
 #=====================================================
 class MainWindow(QMainWindow):
     
+    #-------------------------------------------------
+    # Constructor
     def __init__(self):
         super(MainWindow, self).__init__()
         self.__con = getInstance('conn_inst')
@@ -70,10 +72,13 @@ class MainWindow(QMainWindow):
         # Add VFO control
         vfo_grid = QGridLayout()
         main_grid.addLayout(vfo_grid, 1, 0)
-        self.__vfo = Vfo(self.__con, CH_RX, 0)
+        self.__vfo = Vfo(self.__con, CH_RX, 1)
         self.__vfo.addVfo(self, vfo_grid, 7.1)
-        
+    
+    #-------------------------------------------------
+    # Mouse wheel event for VFO    
     def wheelEvent(self, event):
+        # Forward event to VFO
         if event.angleDelta().y() >= 0:
             self.__vfo.doWheelEvent(VFO_UP)
         else:
