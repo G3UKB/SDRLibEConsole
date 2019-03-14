@@ -42,8 +42,12 @@ from enum import Enum, auto
 #==============================================================================================
 
 #=====================================================
-# Message name lookup
-#===================================================== 
+# Global message name management
+# i.e. use M_ID.POLL as a parameter to this module
+#=====================================================
+
+#-------------------------------------------------
+# Message name enumerations
 class M_ID(Enum):
     #---------------
     # Response types
@@ -105,70 +109,75 @@ class M_ID(Enum):
     DISP_WIDTH = auto(),
     DISP_PERIOD = auto(),
     DISP_STATE = auto(),
-    
-class M_LU:
+
+#-------------------------------------------------
+# Message name lookup    
+class M_LU:   
+    @staticmethod
     def lookup(msg_id):
         t = {
-        #---------------
-        # Control commands
-        M_ID.POLL : ("poll", M_ID.ACK_NAK),
-        M_ID.DISCOVER : ("radio_discover", M_ID.ACK_NAK),
-        M_ID.SVR_START : ("server_start", M_ID.ACK_NAK),
-        M_ID.RADIO_START : ("radio_start", M_ID.ACK_NAK),
-        M_ID.RADIO_STOP : ("radio_stop", M_ID.ACK_NAK),
-        M_ID.NUM_RX : ("set_num_rx", M_ID.ACK_NAK),
-        #---------------
-        # Radio commands
-        M_ID.HF_PRE : ("set_hf_pre", M_ID.ACK_NAK),
-        M_ID.ATTN : ("set_attn", M_ID.ACK_NAK),
-        M_ID.R1_FREQ : ("set_rx1_freq", M_ID.ACK_NAK),
-        M_ID.R2_FREQ : ("set_rx2_freq", M_ID.ACK_NAK),
-        M_ID.R3_FREQ : ("set_rx3_freq", M_ID.ACK_NAK),
-        M_ID.R1_MODE : ("set_rx1_mode", M_ID.ACK_NAK),
-        M_ID.R2_MODE : ("set_rx2_mode", M_ID.ACK_NAK),
-        M_ID.R3_MODE : ("set_rx3_mode", M_ID.ACK_NAK),
-        M_ID.R1_FILT : ("set_rx1_filter", M_ID.ACK_NAK),
-        M_ID.R2_FILT : ("set_rx2_filter", M_ID.ACK_NAK),
-        M_ID.R3_FILT  : ("set_rx3_filter", M_ID.ACK_NAK),
-        M_ID.TX_FILT : ("set_tx_filter", M_ID.ACK_NAK),
-        M_ID.R1_AGC : ("set_rx1_agc", M_ID.ACK_NAK),
-        M_ID.R2_AGC : ("set_rx2_agc", M_ID.ACK_NAK),
-        M_ID.R3_AGC : ("set_rx3_agc", M_ID.ACK_NAK),
-        M_ID.R1_GAIN : ("set_rx1_gain", M_ID.ACK_NAK),
-        M_ID.R2_GAIN : ("set_rx2_gain", M_ID.ACK_NAK),
-        M_ID.R3_GAIN  : ("set_rx3_gain", M_ID.ACK_NAK),
-        #---------------
-        # Alex filters
-        M_ID.ALEX_AUTO : ("set_alex_auto", M_ID.ACK_NAK),
-        M_ID.HF_BYPASS : ("set_hf_bypass", M_ID.ACK_NAK),
-        M_ID.LPF_160 : ("set_lpf_160", M_ID.ACK_NAK),
-        M_ID.LPF_80 : ("set_lpf_80", M_ID.ACK_NAK),
-        M_ID.LPF_60_40 : ("set_lpf_60_40", M_ID.ACK_NAK),
-        M_ID.LPF_30_20 : ("set_lpf_30_20", M_ID.ACK_NAK),
-        M_ID.LPF_17_15 : ("set_lpf_17_15", M_ID.ACK_NAK),
-        M_ID.LPF_12_10 : ("set_lpf_12_10", M_ID.ACK_NAK),
-        M_ID.LPF_6 : ("set_lpf_6", M_ID.ACK_NAK),
-        M_ID.HPF_1_5 : ("set_hpf_1_5", M_ID.ACK_NAK),
-        M_ID.HPF_6_5 : ("set_hpf_6_5", M_ID.ACK_NAK),
-        M_ID.HPF_9_5 : ("set_hpf_9_5", M_ID.ACK_NAK),
-        M_ID.HPF_13 : ("set_hpf_13", M_ID.ACK_NAK),
-        M_ID.HPF_20 : ("set_hpf_20", M_ID.ACK_NAK),
-        #---------------
-        # Audio
-        M_ID.ENUM_INPUTS : ("enum_inputs", M_ID.DATA),
-        M_ID.ENUM_OUTPUTS : ("enum_outputs", M_ID.DATA),
-        M_ID.REVERT_OUTPUTS : ("revert_outputs", M_ID.ACK_NAK),
-        M_ID.CHANGE_OUTPUTS : ("change_outputs", M_ID.ACK_NAK),
-        M_ID.AUDIO_ROUTE : ("set_audio_route", M_ID.ACK_NAK),
-        #---------------
-        # Display
-        M_ID.DISP_WIDTH : ("set_display_width", M_ID.ACK_NAK),
-        M_ID.DISP_PERIOD : ("set_disp_period", M_ID.ACK_NAK),
-        M_ID.DISP_STATE : ("set_disp_state", M_ID.ACK_NAK),
+            # ID : (name, response-type)
+            #---------------
+            # Control commands
+            M_ID.POLL : ("poll", M_ID.ACK_NAK),
+            M_ID.DISCOVER : ("radio_discover", M_ID.ACK_NAK),
+            M_ID.SVR_START : ("server_start", M_ID.ACK_NAK),
+            M_ID.RADIO_START : ("radio_start", M_ID.ACK_NAK),
+            M_ID.RADIO_STOP : ("radio_stop", M_ID.ACK_NAK),
+            M_ID.NUM_RX : ("set_num_rx", M_ID.ACK_NAK),
+            #---------------
+            # Radio commands
+            M_ID.HF_PRE : ("set_hf_pre", M_ID.ACK_NAK),
+            M_ID.ATTN : ("set_attn", M_ID.ACK_NAK),
+            M_ID.R1_FREQ : ("set_rx1_freq", M_ID.ACK_NAK),
+            M_ID.R2_FREQ : ("set_rx2_freq", M_ID.ACK_NAK),
+            M_ID.R3_FREQ : ("set_rx3_freq", M_ID.ACK_NAK),
+            M_ID.R1_MODE : ("set_rx1_mode", M_ID.ACK_NAK),
+            M_ID.R2_MODE : ("set_rx2_mode", M_ID.ACK_NAK),
+            M_ID.R3_MODE : ("set_rx3_mode", M_ID.ACK_NAK),
+            M_ID.R1_FILT : ("set_rx1_filter", M_ID.ACK_NAK),
+            M_ID.R2_FILT : ("set_rx2_filter", M_ID.ACK_NAK),
+            M_ID.R3_FILT  : ("set_rx3_filter", M_ID.ACK_NAK),
+            M_ID.TX_FILT : ("set_tx_filter", M_ID.ACK_NAK),
+            M_ID.R1_AGC : ("set_rx1_agc", M_ID.ACK_NAK),
+            M_ID.R2_AGC : ("set_rx2_agc", M_ID.ACK_NAK),
+            M_ID.R3_AGC : ("set_rx3_agc", M_ID.ACK_NAK),
+            M_ID.R1_GAIN : ("set_rx1_gain", M_ID.ACK_NAK),
+            M_ID.R2_GAIN : ("set_rx2_gain", M_ID.ACK_NAK),
+            M_ID.R3_GAIN  : ("set_rx3_gain", M_ID.ACK_NAK),
+            #---------------
+            # Alex filters
+            M_ID.ALEX_AUTO : ("set_alex_auto", M_ID.ACK_NAK),
+            M_ID.HF_BYPASS : ("set_hf_bypass", M_ID.ACK_NAK),
+            M_ID.LPF_160 : ("set_lpf_160", M_ID.ACK_NAK),
+            M_ID.LPF_80 : ("set_lpf_80", M_ID.ACK_NAK),
+            M_ID.LPF_60_40 : ("set_lpf_60_40", M_ID.ACK_NAK),
+            M_ID.LPF_30_20 : ("set_lpf_30_20", M_ID.ACK_NAK),
+            M_ID.LPF_17_15 : ("set_lpf_17_15", M_ID.ACK_NAK),
+            M_ID.LPF_12_10 : ("set_lpf_12_10", M_ID.ACK_NAK),
+            M_ID.LPF_6 : ("set_lpf_6", M_ID.ACK_NAK),
+            M_ID.HPF_1_5 : ("set_hpf_1_5", M_ID.ACK_NAK),
+            M_ID.HPF_6_5 : ("set_hpf_6_5", M_ID.ACK_NAK),
+            M_ID.HPF_9_5 : ("set_hpf_9_5", M_ID.ACK_NAK),
+            M_ID.HPF_13 : ("set_hpf_13", M_ID.ACK_NAK),
+            M_ID.HPF_20 : ("set_hpf_20", M_ID.ACK_NAK),
+            #---------------
+            # Audio
+            M_ID.ENUM_INPUTS : ("enum_inputs", M_ID.DATA),
+            M_ID.ENUM_OUTPUTS : ("enum_outputs", M_ID.DATA),
+            M_ID.REVERT_OUTPUTS : ("revert_outputs", M_ID.ACK_NAK),
+            M_ID.CHANGE_OUTPUTS : ("change_outputs", M_ID.ACK_NAK),
+            M_ID.AUDIO_ROUTE : ("set_audio_route", M_ID.ACK_NAK),
+            #---------------
+            # Display
+            M_ID.DISP_WIDTH : ("set_display_width", M_ID.ACK_NAK),
+            M_ID.DISP_PERIOD : ("set_disp_period", M_ID.ACK_NAK),
+            M_ID.DISP_STATE : ("set_disp_state", M_ID.ACK_NAK),
         }
         return t[msg_id]
     
 #=====================================================
+# Interface class to SDRLibEConnector -> server -> HPSDR
 # Sends messages to SDRLibEConnector and receives responses
 #===================================================== 
 class Connector:
@@ -181,6 +190,7 @@ class Connector:
         # Set a default timeout
         self.__cmd_sock.settimeout(5)
         # IP and Port of server
+        # Note, can be remote so needs to be configurable
         self.__IP = '127.0.0.1'
         self.__port = 10010
         # Buffers
@@ -189,7 +199,9 @@ class Connector:
     #==============================================================================================
     # PUBLIC
     #==============================================================================================
-    # Send command and get response
+    
+    #-------------------------------------------------
+    # Send command and get synchronous response
     def cmd_exchange(self, cmd_id, params):
         entry = M_LU.lookup(cmd_id)
         cmd_str = entry[0] 
@@ -201,6 +213,8 @@ class Connector:
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
+    
+    #-------------------------------------------------
     # Return the message structure for the given command
     def __get_message(self, cmd_str, params):
         msg = {"cmd" : cmd_str, "params" : params}

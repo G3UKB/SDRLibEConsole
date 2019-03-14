@@ -34,6 +34,7 @@ from PyQt5.QtWidgets import QWidget, QMainWindow, QGridLayout
 from PyQt5.QtGui import QPalette, QColor
 
 # Application imports
+from framework.instance_cache import *
 from ui.components.vfo import *
 from common.defs import *
 
@@ -46,9 +47,9 @@ from common.defs import *
 #=====================================================
 class MainWindow(QMainWindow):
     
-    def __init__(self, connector):
+    def __init__(self):
         super(MainWindow, self).__init__()
-        self.__con = connector
+        self.__con = getInstance('conn_inst')
         
         # Set the back colour
         palette = QPalette()
@@ -72,4 +73,9 @@ class MainWindow(QMainWindow):
         self.__vfo = Vfo(self.__con, CH_RX, 0)
         self.__vfo.addVfo(self, vfo_grid, 7.1)
         
+    def wheelEvent(self, event):
+        if event.angleDelta().y() >= 0:
+            self.__vfo.doWheelEvent(VFO_UP)
+        else:
+            self.__vfo.doWheelEvent(VFO_DOWN)
         

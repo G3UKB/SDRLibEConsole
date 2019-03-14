@@ -61,7 +61,7 @@ class Vfo:
         """
         
         self.__con = connector
-        self.__dir = direction
+        self.__direction = direction
         self.__vfo_id = vfo_id
         
         # Initialise variables
@@ -155,7 +155,7 @@ class Vfo:
         self.__adjust_vfo(current_freq)
         self.__current_freq = current_freq
     
-    def wheelEvent(self, delta):
+    def doWheelEvent(self, direction):
         """
         Mouse wheel event
         
@@ -163,9 +163,8 @@ class Vfo:
             delta   --  change in position
             
         """
-        
         if self.__freq_inc != None:
-            if delta > 0:
+            if direction == VFO_UP:
                 if (self.__current_freq + self.__freq_inc) < MAX_FREQ:
                     self.__current_freq = self.__current_freq + self.__freq_inc
             else:
@@ -187,7 +186,7 @@ class Vfo:
         self.__adjust_vfo(freq)
         self.__current_freq = freq
         if self.__direction == CH_RX:
-            self.__con.cmd_exchange(M_ID.R1_FREQ, [self.__current_freq])
+            self.__con.cmd_exchange(M_ID.R1_FREQ, [int(self.__current_freq*1000000)])
         
     # Helpers --------------------------------------------------------------
     def __mouse_over(self, digit):

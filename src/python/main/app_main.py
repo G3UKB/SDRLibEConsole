@@ -35,6 +35,8 @@ from PyQt5.QtWidgets import QApplication, QWidget
 # Application imports
 sys.path.append('..')
 from common.defs import *
+from model.model import *
+from framework.instance_cache import *
 from connector.connector import *
 from ui.main_window.main_window import *
 
@@ -49,26 +51,33 @@ class AppMain:
     #-------------------------------------------------
     # Start processing and wait for user to exit the application
     def main(self):
-        # The one and only application
+        # The one and only QT application
         self.__qtapp = QApplication([])
-        # Create a top level window
-        #self.__w = QWidget()
-        #self.__w.show()
+        
+        # Restore the model
+        self.__m = Model()
+        addToCache('model_inst', self.__m)
+        self.__m.restore_model()
         
         # Create a connector interface
         con = Connector()
+        addToCache('conn_inst', con)
         # and run a test script
         print ("DISCOVER", con.cmd_exchange(M_ID.DISCOVER, []))
         print("SET AUDIO", set_audio(con))
         print ("SRV_START", con.cmd_exchange(M_ID.SVR_START, []))
         print ("RADIO_START", con.cmd_exchange(M_ID.RADIO_START, [False]))
-        print ("R1_FREQ", con.cmd_exchange(M_ID.R1_FREQ, [7.15]))
         
-        self.__w = MainWindow(con)
+        # Create the main window class
+        self.__w = MainWindow()
+        # Make visible
         self.__w.show()
         
-        # Enter the event loop
+        # Enter the GUI event loop
         r = self.__qtapp.exec_()
+        
+        # Save the model
+        self.__m.save_model()
         
 #=====================================================
 # Entry point

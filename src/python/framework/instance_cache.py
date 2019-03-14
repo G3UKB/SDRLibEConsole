@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #
-# defs.py
+# instance_cache.py
 #
-# All common definitions for SDRLibEConsole
+# Python instance cache for the SdrScript SDR application
 # 
-# Copyright (C) 2019 by G3UKB Bob Cowdery
+# Copyright (C) 2014 by G3UKB Bob Cowdery
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -23,15 +23,32 @@
 #     bob@bobcowdery.plus.com
 #
 
-#=====================================================
-# Channel type
-CH_RX = 0
-CH_TX = 1
-CH_MON = 2
+"""
+Singletons
+"""
 
-#=====================================================
-# Frequency
-MIN_FREQ = 0.1
-MAX_FREQ = 60.0
-VFO_UP = 0
-VFO_DOWN = 1
+instCache = {}
+
+def addToCache(name, instance):
+    """
+    Add a class instance
+    
+    name        --  name of the instance
+    instance    --  the created and initialise instance
+    
+    """
+    
+    instCache[name] = instance
+    
+def getInstance(name):
+    """
+    Get the one and only class instance
+    
+    name    --  name of the instance
+    
+    """
+    
+    if name in instCache:
+        return instCache[name]
+    else:
+        return None
