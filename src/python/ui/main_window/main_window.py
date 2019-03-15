@@ -71,10 +71,19 @@ class MainWindow(QMainWindow):
         # Note add the grid directly as a layout not in a panel else space cannot be removed
         top_grid = QGridLayout()
         main_grid.addLayout(top_grid, 0, 0)
+        # Add buttons for mode etc
         self.mode_btn = QPushButton('Mode', self)
         self.mode_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
         top_grid.addWidget(self.mode_btn, 0, 0)
         self.mode_btn.clicked.connect(self.__mode_evnt)
+        self.filter_btn = QPushButton('Filter', self)
+        self.filter_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
+        top_grid.addWidget(self.filter_btn, 0, 1)
+        self.filter_btn.clicked.connect(self.__filter_evnt)
+        self.agc_btn = QPushButton('AGC', self)
+        self.agc_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
+        top_grid.addWidget(self.agc_btn, 0, 2)
+        self.agc_btn.clicked.connect(self.__agc_evnt)
     
         # Add VFO control
         vfo_grid = QGridLayout()
@@ -113,4 +122,10 @@ class MainWindow(QMainWindow):
     def __mode_evnt(self) :
         self.__mode_win.set_context(self.setMode, self.x(), self.y(), CH_RX, 1)
         self.__mode_win.show()
-        
+    
+    def __filter_evnt(self) :
+        pass
+    
+    def __agc_evnt(self) :
+        pass
+    
