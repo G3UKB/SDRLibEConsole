@@ -74,6 +74,10 @@ class AppMain:
         # Make visible
         self.__w.show()
         
+        # Test modes
+        m = Modes(con, CH_RX, 1)
+        m.show()
+        
         # Enter the GUI event loop
         r = self.__qtapp.exec_()
         

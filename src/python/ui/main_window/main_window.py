@@ -36,6 +36,7 @@ from PyQt5.QtGui import QPalette, QColor
 # Application imports
 from framework.instance_cache import *
 from ui.components.vfo import *
+from ui.components.modes import *
 from common.defs import *
 
 #==============================================================================================
@@ -52,7 +53,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.__con = getInstance('conn_inst')
-        
+       
         # Set the back colour
         palette = QPalette()
         palette.setColor(QPalette.Background, QColor(43,63,68,255))
