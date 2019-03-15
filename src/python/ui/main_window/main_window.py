@@ -36,6 +36,7 @@ from PyQt5.QtGui import QPalette, QColor
 # Application imports
 from framework.instance_cache import *
 from ui.components.vfo import *
+from ui.components.button_base import *
 from ui.components.modes import *
 from common.defs import *
 

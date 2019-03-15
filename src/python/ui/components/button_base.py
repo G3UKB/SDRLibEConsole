@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# modes.py
+# button_base.py
 #
-# Modes class for SDRLibEConnector server
+# Base class for button groups for modes, filters etc
 # 
 # Copyright (C) 2019 by G3UKB Bob Cowdery
 # This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@ from PyQt5.QtGui import QPalette, QColor
 # Application imports
 from common.defs import *
 from connector.connector import *
-from ui.components.button_base import *
 
 #==============================================================================================
-# Modes provides a button panel for the available modes
+# Provides a base for popup button panels
 #==============================================================================================
 
 #=====================================================
-# Modes main class
+# Button base main class
 #===================================================== 
-class Modes(ButtonBase):
+class ButtonBase(QWidget):
     
     #-------------------------------------------------
     # Constructor
@@ -53,62 +52,80 @@ class Modes(ButtonBase):
             
         """
         
-        super(Modes, self).__init__()
+        super(ButtonBase, self).__init__()
         
-        # Get the connector instance
-        self.__con = getInstance('conn_inst')
-        
-        # Add mode buttons
-        self.__btns = (
-            # btn(label), row, col, id 
-            (QPushButton('LSB', self), 0, 0, 0),
-            (QPushButton('USB', self), 0, 1, 1),
-            (QPushButton('DSB', self), 0, 2, 2),
-            (QPushButton('CW-L', self), 1, 0, 3),
-            (QPushButton('CW-U', self), 1, 1, 4),
-            (QPushButton('FM', self), 1, 2, 5),
-            (QPushButton('AM', self), 2, 0, 6),
-            (QPushButton('DIG-U', self), 2, 1, 7),
-            (QPushButton('DIG-L', self), 2, 2, 8),
-            (QPushButton('SPEC', self), 3, 0, 9),
-            (QPushButton('SAM', self), 3,  1, 10),
-            (QPushButton('DRM', self), 3, 2, 11),
+        # Set the back colour
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor(43,63,68,255))
+        self.setPalette(palette)
+        self.setWindowFlags(
+            Qt.CustomizeWindowHint |
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint
         )
-        for btn in self.__btns:
-           self.  add_button(btn[0], btn[1], btn[2], btn[3])
+        self.setWindowOpacity(0.7)
         
-        # Connect click event
-        self.btn_grp.buttonClicked.connect(self.__mode_evnt)
+        # Set the layout
+        self.__grid = QGridLayout()
+        self.__grid.setSpacing(0)
+        margins = QMargins()
+        margins.setLeft = 0
+        margins.setRight = 0
+        margins.setTop = 0
+        margins.setBottom = 0
+        self.__grid.setContentsMargins(margins)
+        self.setLayout(self.__grid)
+        
+        # Create an exclusive button group
+        self.btn_grp = QButtonGroup()
+        self.btn_grp.setExclusive(True)
     
     #==============================================================================================
     # PUBLIC
     #==============================================================================================
+    
+    #-------------------------------------------------
+    # Set context   
+    def set_context(self, callback, x, y, direction, id):
+        """
+        Set Context
+        
+        Arguments:  
+            callback    --  callback here with mode string
+            x           --  x coord of main window
+            y           --  y coord of main window
+            direction   --  RX or TX
+            id          --  the id of this instantiation (radio id)
+            
+        """
+        self.callback = callback
+        self.direction = direction
+        # Position at top right corner of invoking button
+        self.id = id
+        self.move( x + 30, y + 50)
     
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
         
     #-------------------------------------------------
-    # Button group click event
-    def __mode_evnt(self, btn) :
+    # Add a button to the grid   
+    def add_button(self, btn, row, col, id):
         """
-        Any button click event
+        Add button to grid
         
         Arguments:  
             btn --  the QButton
+            row --  grid row
+            col --  grid col
+            id  --  id to give button
             
         """
-        if self.direction == CH_RX:
-            if self.id == 1:
-                r = M_ID.R1_MODE
-            elif self.id == 2:
-                r = M_ID.R2_MODE
-            else:
-                r = M_ID.R3_MODE
-            # Execute mode change
-            self.__con.cmd_exchange(r, [self.btn_grp.id(btn)])
-            # Its a popup
-            self.hide()
-            # Tell parent what was selected
-            self.callback(btn.text())
+        btn.setCheckable(True)
+        btn.setStyleSheet("QPushButton {background-color: rgb(167,167,167); font: bold 12px}")
+        self.__grid.addWidget(btn, row, col)
+        self.btn_grp.addButton(btn)
+        self.btn_grp.setId(btn, id)
+    
+    
         
