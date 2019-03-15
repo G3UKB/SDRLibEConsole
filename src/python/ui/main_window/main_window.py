@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.__con = getInstance('conn_inst')
+        self.__mode_win = getInstance('mode_win')
        
         # Set the back colour
         palette = QPalette()
@@ -69,6 +70,10 @@ class MainWindow(QMainWindow):
         # Note add the grid directly as a layout not in a panel else space cannot be removed
         top_grid = QGridLayout()
         main_grid.addLayout(top_grid, 0, 0)
+        self.mode_btn = QPushButton('Mode', self)
+        self.mode_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
+        top_grid.addWidget(self.mode_btn, 0, 0)
+        self.mode_btn.clicked.connect(self.__mode_evnt)
     
         # Add VFO control
         vfo_grid = QGridLayout()
@@ -76,12 +81,35 @@ class MainWindow(QMainWindow):
         self.__vfo = Vfo(self.__con, CH_RX, 1)
         self.__vfo.addVfo(self, vfo_grid, 7.1)
     
+    #==============================================================================================
+    # PUBLIC
+    #==============================================================================================
+    
     #-------------------------------------------------
-    # Mouse wheel event for VFO    
+    # Callback for current mode
+    def setMode(self, mode):    
+        self.mode_btn.setText(mode)
+        
+    #==============================================================================================
+    # OVERRIDES
+    #==============================================================================================
+        
+    #-------------------------------------------------
+    # Mouse wheel event for VFO
     def wheelEvent(self, event):
         # Forward event to VFO
         if event.angleDelta().y() >= 0:
             self.__vfo.doWheelEvent(VFO_UP)
         else:
             self.__vfo.doWheelEvent(VFO_DOWN)
+    
+    #==============================================================================================
+    # EVENTS
+    #==============================================================================================
+                
+    #-------------------------------------------------
+    # Mode button event
+    def __mode_evnt(self) :
+        self.__mode_win.set_context(self.setMode, self.x(), self.y(), CH_RX, 1)
+        self.__mode_win.show()
         

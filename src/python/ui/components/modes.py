@@ -26,7 +26,7 @@
 # System imports
 import os,sys
 from PyQt5.QtCore import Qt, QObject, QEvent, QMargins
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
+from PyQt5.QtWidgets import QWidget, QPushButton, QButtonGroup, QGridLayout
 from PyQt5.QtGui import QPalette, QColor
 
 # Application imports
@@ -44,22 +44,18 @@ class Modes(QWidget):
     
     #-------------------------------------------------
     # Constructor
-    def __init__(self, connector, direction, modes_id):
+    def __init__(self):
         """
         Constructor
         
         Arguments:  
-            connector   --  ref to the connector instance
-            direction   --  CH_RX | CH_TX
-            modes_id    --  the rx or tx id for this mode panel
             
         """
         
         super(Modes, self).__init__()
         
-        self.__con = connector
-        self.__direction = direction
-        self.__modes_id = modes_id
+        # Get the connector instance
+        self.__con = getInstance('conn_inst')
         
         # Set the back colour
         palette = QPalette()
@@ -67,10 +63,12 @@ class Modes(QWidget):
         self.setPalette(palette)
         self.setWindowFlags(
             Qt.CustomizeWindowHint |
-            Qt.FramelessWindowHint
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint
         )
+        self.setWindowOpacity(0.7)
         
-        # Set the grid
+        # Set the layout
         self.__grid = QGridLayout()
         self.__grid.setSpacing(0)
         margins = QMargins()
@@ -81,34 +79,100 @@ class Modes(QWidget):
         self.__grid.setContentsMargins(margins)
         self.setLayout(self.__grid)
         
-        self.lsb_btn = QPushButton('LSB', self)
-        self.__add_button(self.lsb_btn, 0, 0)
-        self.usb_btn = QPushButton('USB', self)
-        self.__add_button(self.usb_btn, 0, 1)
-        self.dsb_btn = QPushButton('DSB', self)
-        self.__add_button(self.dsb_btn, 0, 2)
-        self.cwl_btn = QPushButton('CW-L', self)
-        self.__add_button(self.cwl_btn, 1, 0)
-        self.cwu_btn = QPushButton('CW-U', self)
-        self.__add_button(self.cwu_btn, 1, 1)
-        self.fm_btn = QPushButton('FM', self)
-        self.__add_button(self.fm_btn, 1, 2)
-        self.am_btn = QPushButton('AM', self)
-        self.__add_button(self.am_btn, 2, 0)
-        self.digu_btn = QPushButton('DIG-U', self)
-        self.__add_button(self.digu_btn, 2, 1)
-        self.spec_btn = QPushButton('DIG-L', self)
-        self.__add_button(self.spec_btn, 2, 2)
-        self.digl_btn = QPushButton('SPEC', self)
-        self.__add_button(self.digl_btn, 3, 0)
-        self.sam_btn = QPushButton('SAM', self)
-        self.__add_button(self.sam_btn, 3, 1)
-        self.drm_btn = QPushButton('DRM', self)
-        self.__add_button(self.drm_btn, 3, 2)
-    
-    def __add_button(self, button, row, col):
-        button.setCheckable(True)
-        button.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
-        self.__grid.addWidget(button, row, col)
+        # Create an exclusive button group
+        self.__btn_grp = QButtonGroup()
+        self.__btn_grp.setExclusive(True)
         
+        # Add mode buttons
+        self.__btns = (
+            # btn(label), row, col, id 
+            (QPushButton('LSB', self), 0, 0, 0),
+            (QPushButton('USB', self), 0, 1, 1),
+            (QPushButton('DSB', self), 0, 2, 2),
+            (QPushButton('CW-L', self), 1, 0, 3),
+            (QPushButton('CW-U', self), 1, 1, 4),
+            (QPushButton('FM', self), 1, 2, 5),
+            (QPushButton('AM', self), 2, 0, 6),
+            (QPushButton('DIG-U', self), 2, 1, 7),
+            (QPushButton('DIG-L', self), 2, 2, 8),
+            (QPushButton('SPEC', self), 3, 0, 9),
+            (QPushButton('SAM', self), 3,  1, 10),
+            (QPushButton('DRM', self), 3, 2, 11),
+        )
+        for btn in self.__btns:
+           self.  __add_button(btn[0], btn[1], btn[2], btn[3])
+        
+        # Connect click event
+        self.__btn_grp.buttonClicked.connect(self.__mode_evnt)
+    
+    #==============================================================================================
+    # PUBLIC
+    #==============================================================================================
+    
+    #-------------------------------------------------
+    # Set context   
+    def set_context(self, callback, x, y, direction, modes_id):
+        """
+        Set Context
+        
+        Arguments:  
+            callback    --  callback here with mode string
+            x           --  x coord of main window
+            y           --  y coord of main window
+            direction   --  RX or TX
+            modes_id    -- the id of this mode instantiation (radio id)
+            
+        """
+        self.__callback = callback
+        self.__direction = direction
+        # Position at top right corner of invoking button
+        self.__modes_id = modes_id
+        self.move( x + 30, y + 50)
+    
+    #==============================================================================================
+    # PRIVATE
+    #==============================================================================================
+        
+    #-------------------------------------------------
+    # Add a button to the grid   
+    def __add_button(self, btn, row, col, id):
+        """
+        Add button to grid
+        
+        Arguments:  
+            btn --  the QButton
+            row --  grid row
+            col --  grid col
+            id  --  id to give button
+            
+        """
+        btn.setCheckable(True)
+        btn.setStyleSheet("QPushButton {background-color: rgb(167,167,167); font: bold 12px}")
+        self.__grid.addWidget(btn, row, col)
+        self.__btn_grp.addButton(btn)
+        self.__btn_grp.setId(btn, id)
+    
+    #-------------------------------------------------
+    # Button group click event
+    def __mode_evnt(self, btn) :
+        """
+        Any button click event
+        
+        Arguments:  
+            btn --  the QButton
+            
+        """
+        if self.__direction == CH_RX:
+            if self.__modes_id == 1:
+                r = M_ID.R1_MODE
+            elif self.__modes_id == 2:
+                r = M_ID.R2_MODE
+            else:
+                r = M_ID.R3_MODE
+            # Execute mode change
+            self.__con.cmd_exchange(r, [self.__btn_grp.id(btn)])
+            # Its a popup
+            self.hide()
+            # Tell parent what was selected
+            self.__callback(btn.text())
         

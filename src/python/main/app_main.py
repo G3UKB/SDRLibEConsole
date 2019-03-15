@@ -69,14 +69,14 @@ class AppMain:
         print ("SRV_START", con.cmd_exchange(M_ID.SVR_START, []))
         print ("RADIO_START", con.cmd_exchange(M_ID.RADIO_START, [False]))
         
+        # Create the modes window
+        mode_win = Modes()
+        addToCache('mode_win', mode_win)
+        
         # Create the main window class
         self.__w = MainWindow()
         # Make visible
         self.__w.show()
-        
-        # Test modes
-        m = Modes(con, CH_RX, 1)
-        m.show()
         
         # Enter the GUI event loop
         r = self.__qtapp.exec_()
