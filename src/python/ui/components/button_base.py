@@ -102,7 +102,7 @@ class ButtonBase(QWidget):
         self.direction = direction
         # Position at top right corner of invoking button
         self.id = id
-        self.move( x + 30, y + 50)
+        self.move( x, y+50)
     
     #==============================================================================================
     # PRIVATE
