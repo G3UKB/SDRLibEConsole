@@ -33,6 +33,7 @@ from PyQt5.QtGui import QPalette, QColor
 from common.defs import *
 from connector.connector import *
 from ui.components.button_base import *
+from model.model import *
 
 #==============================================================================================
 # Modes provides a button panel for the available modes
@@ -61,29 +62,42 @@ class Modes(ButtonBase):
         # Add mode buttons
         self.__btns = (
             # btn(label), row, col, id 
-            (QPushButton('LSB', self), 0, 0, 0),
-            (QPushButton('USB', self), 0, 1, 1),
-            (QPushButton('DSB', self), 0, 2, 2),
-            (QPushButton('CW-L', self), 1, 0, 3),
-            (QPushButton('CW-U', self), 1, 1, 4),
-            (QPushButton('FM', self), 1, 2, 5),
-            (QPushButton('AM', self), 2, 0, 6),
-            (QPushButton('DIG-U', self), 2, 1, 7),
-            (QPushButton('DIG-L', self), 2, 2, 8),
-            (QPushButton('SPEC', self), 3, 0, 9),
-            (QPushButton('SAM', self), 3,  1, 10),
-            (QPushButton('DRM', self), 3, 2, 11),
+            (QPushButton(mode_lookup[CH_LSB][1], self), 0, 0, CH_LSB),
+            (QPushButton(mode_lookup[CH_USB][1], self), 0, 1, CH_USB),
+            (QPushButton(mode_lookup[CH_DSB][1], self), 0, 2, CH_DSB),
+            (QPushButton(mode_lookup[CH_CWL][1], self), 1, 0, CH_CWL),
+            (QPushButton(mode_lookup[CH_CWU][1], self), 1, 1, CH_CWU),
+            (QPushButton(mode_lookup[CH_FM][1], self), 1, 2, CH_FM),
+            (QPushButton(mode_lookup[CH_AM][1], self), 2, 0, CH_AM),
+            (QPushButton(mode_lookup[CH_DIGU][1], self), 2, 1, CH_DIGU),
+            (QPushButton(mode_lookup[CH_SPEC][1], self), 2, 2, CH_SPEC),
+            (QPushButton(mode_lookup[CH_DIGL][1], self), 3, 0, CH_DIGL),
+            (QPushButton(mode_lookup[CH_SAM][1], self), 3,  1, CH_SAM),
+            (QPushButton(mode_lookup[CH_DRM][1], self), 3, 2, CH_DRM),
         )
         for btn in self.__btns:
-           self.  add_button(btn[0], btn[1], btn[2], btn[3])
+           self.add_button(btn[0], btn[1], btn[2], btn[3])
         
         # Connect click event
         self.btn_grp.buttonClicked.connect(self.__mode_evnt)
+        
+        # Get radio model
+        self.__radio_model = Model.get_radio_model()
     
     #==============================================================================================
     # PUBLIC
     #==============================================================================================
     
+    #-------------------------------------------------
+    # Set context according to id
+    def set_context(self, callback, x, y, direction, id):
+        # Call base mathod
+        self.set_base_context(callback, x, y, direction, id)
+        # Select the appropriate button
+        button = self.btn_grp.button(self.__radio_model[id]['MODE'])
+        # Does not cause a click event
+        button.setDown(True)
+        
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
@@ -106,9 +120,12 @@ class Modes(ButtonBase):
             else:
                 r = M_ID.R3_MODE
             # Execute mode change
-            self.__con.cmd_exchange(r, [self.btn_grp.id(btn)])
+            mode_id = self.btn_grp.id(btn)
+            self.__con.cmd_exchange(r, [mode_id])
             # Its a popup
             self.hide()
             # Tell parent what was selected
             self.callback(btn.text())
+            # Update the model
+            self.__radio_model[self.id]['MODE'] = mode_id
         

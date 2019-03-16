@@ -86,7 +86,7 @@ class ButtonBase(QWidget):
     
     #-------------------------------------------------
     # Set context   
-    def set_context(self, callback, x, y, direction, id):
+    def set_base_context(self, callback, x, y, direction, id):
         """
         Set Context
         

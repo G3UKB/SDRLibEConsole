@@ -32,6 +32,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 # Application imports
+from framework.instance_cache import *
 
 #==============================================================================================
 # The model for SDRLibEConsole
@@ -78,6 +79,31 @@ class Model:
     # PUBLIC
     #==============================================================================================
     
+    #-------------------------------------------------
+    # Class methods
+    #-------------------------------------------------
+    # Get app model section 
+    @classmethod
+    def get_app_model(cls):
+        m = getInstance('model_inst')
+        return m.get_model()['APP']
+    
+    #-------------------------------------------------
+    # Get radio model section 
+    @classmethod
+    def get_radio_model(cls):
+        m = getInstance('model_inst')
+        return m.get_model()['RADIO']
+    
+    #-------------------------------------------------
+    # Get state model section 
+    @classmethod
+    def get_state_model(cls):
+        m = getInstance('model_inst')
+        return m.get_model()['STATE']
+    
+    #-------------------------------------------------
+    # Instance methods
     #-------------------------------------------------
     # Restore from disk   
     def restore_model(self):
@@ -149,4 +175,11 @@ class Model:
                 f.close()
             except:
                 pass
-            
+#==============================================================================================
+# GLOBAL
+#==============================================================================================
+ 
+def get_app_model(self):
+    m = getInstance('model_inst')
+    return m.get_model()['APP']
+                       

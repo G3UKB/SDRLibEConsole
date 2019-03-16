@@ -34,6 +34,7 @@ from enum import Enum, auto
 
 # Application imports
 from framework.instance_cache import *
+from model.model import *
 
 #==============================================================================================
 # The connector drives the SDRLibE/connector executable via a JSON UDP interface. This enables
@@ -184,16 +185,15 @@ class Connector:
     #-------------------------------------------------
     # Initialisation
     def __init__(self) :
-        # Get model instance
-        self.__m = getInstance('model_inst')
-        self.__model = self.__m.get_model()
+        # Get app model
+        app_model = Model.get_app_model()
         # Create the command socket
         self.__cmd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         # Set a default timeout
         self.__cmd_sock.settimeout(5)
         # IP and Port of server
-        self.__IP = self.__model['APP']['SERVER-IP']
-        self.__port = self.__model['APP']['SERVER-CMD-PORT']
+        self.__IP = app_model['SERVER-IP']
+        self.__port = app_model['SERVER-CMD-PORT']
         # Buffers
         self.__resp_data = bytearray(4096)
 

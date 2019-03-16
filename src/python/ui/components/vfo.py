@@ -31,6 +31,7 @@ from PyQt5.QtWidgets import QWidget, QLabel
 # Application imports
 from common.defs import *
 from connector.connector import *
+from model.model import *
 
 # Resources
 MHZ_FONT = 30
@@ -67,10 +68,12 @@ class Vfo:
         self.__vfo_id = vfo_id
         
         # Initialise variables
+        # Get radio model
+        self.__radio_model = Model.get_radio_model()
         # Set when the mouse is over a VFO digit to the respective increment
         self.__freq_inc = None
         # Tracks the current frequency
-        self.__current_freq = MIN_FREQ
+        self.__current_freq = None
         
         # Lookup table for increments in MHz
         self.__freq_inc_lookup = {
@@ -87,14 +90,13 @@ class Vfo:
         
     #-------------------------------------------------
     # Add a new VFO to the given grid
-    def addVfo(self, parent, grid, current_freq):
+    def addVfo(self, parent, grid):
         """
         Add a single VFO control
         
         Arguments:
             parent          --  parent widget
             grid            --  grid to add interactors to
-            current_freq    --  the current freq from the saved state
             
         """
         
@@ -154,9 +156,8 @@ class Vfo:
         self.__d_10Hz.installEventFilter(filter)
         self.__d_1Hz.installEventFilter(filter)
         
-        # Set the frequency from the saved state
-        self.__adjust_vfo(current_freq)
-        self.__current_freq = current_freq
+        # Set the radio frequency
+        self.set_freq(self.__radio_model[self.__vfo_id]['FREQ'])
     
     #==============================================================================================
     # PUBLIC
@@ -203,7 +204,10 @@ class Vfo:
                 r = M_ID.R2_FREQ
             else:
                 r = M_ID.R3_FREQ
+            # Tune radio
             self.__con.cmd_exchange(r, [int(self.__current_freq*1000000)])
+            # Update state
+            self.__radio_model[self.__vfo_id]['FREQ'] = self.__current_freq
     
     #==============================================================================================
     # PRIVATE

@@ -39,6 +39,7 @@ from ui.components.vfo import *
 from ui.components.button_base import *
 from ui.components.modes import *
 from common.defs import *
+from model.model import *
 
 #==============================================================================================
 # The main window for SDRLibEConsole
@@ -61,6 +62,9 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Background, QColor(43,63,68,255))
         self.setPalette(palette)
         
+        # Get radio model
+        self.__radio_model = Model.get_radio_model()
+        
         # Main panel and grid
         panel = QWidget()
         self.setCentralWidget(panel)
@@ -71,15 +75,18 @@ class MainWindow(QMainWindow):
         # Note add the grid directly as a layout not in a panel else space cannot be removed
         top_grid = QGridLayout()
         main_grid.addLayout(top_grid, 0, 0)
-        # Add buttons for mode etc
+        # Add mode button
         self.mode_btn = QPushButton('Mode', self)
         self.mode_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
         top_grid.addWidget(self.mode_btn, 0, 0)
         self.mode_btn.clicked.connect(self.__mode_evnt)
+        self.mode_btn.setText(mode_lookup[self.__radio_model[1]['MODE']][1])
+        # Add filter button
         self.filter_btn = QPushButton('Filter', self)
         self.filter_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
         top_grid.addWidget(self.filter_btn, 0, 1)
         self.filter_btn.clicked.connect(self.__filter_evnt)
+        # Add AGC button
         self.agc_btn = QPushButton('AGC', self)
         self.agc_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
         top_grid.addWidget(self.agc_btn, 0, 2)
@@ -89,7 +96,7 @@ class MainWindow(QMainWindow):
         vfo_grid = QGridLayout()
         main_grid.addLayout(vfo_grid, 1, 0)
         self.__vfo = Vfo(self.__con, CH_RX, 1)
-        self.__vfo.addVfo(self, vfo_grid, 7.1)
+        self.__vfo.addVfo(self, vfo_grid)
     
     #==============================================================================================
     # PUBLIC
