@@ -56,7 +56,7 @@ class ButtonBase(QWidget):
             Qt.FramelessWindowHint |
             Qt.WindowStaysOnTopHint
         )
-        self.setWindowOpacity(0.7)
+        self.setWindowOpacity(0.9)
         
         # Set the layout
         self.__grid = QGridLayout()
@@ -115,7 +115,8 @@ class ButtonBase(QWidget):
             
         """
         btn.setCheckable(True)
-        btn.setStyleSheet("QPushButton {background-color: rgb(167,167,167); font: bold 12px}")
+        #btn.setStyleSheet("QPushButton {background-color: rgb(167,167,167); font: bold 12px}")
+        btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
         self.__grid.addWidget(btn, row, col)
         self.btn_grp.addButton(btn)
         self.btn_grp.setId(btn, id)

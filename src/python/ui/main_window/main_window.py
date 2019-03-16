@@ -76,10 +76,15 @@ class MainWindow(QMainWindow):
     # Setup UI contents
     def __setup_ui(self, main_grid) :
         
+        # Top side button grid
+        # Note add the grid directly as a layout not in a panel else space cannot be removed
+        self.__top_grid = QGridLayout()
+        main_grid.addLayout(self.__top_grid, 0, 0)
+        
         # Left side button grid
         # Note add the grid directly as a layout not in a panel else space cannot be removed
         self.__side_grid = QGridLayout()
-        main_grid.addLayout(self.__side_grid, 0, 1)
+        main_grid.addLayout(self.__side_grid, 1, 1)
         self.__side_grid.setSpacing(0)
         margins = QMargins()
         margins.setLeft = 0
@@ -89,21 +94,30 @@ class MainWindow(QMainWindow):
         self.__side_grid.setContentsMargins(margins)
         
         #-------------------------------------------------
-        # Buttons
+        # Left side buttons
+        # Start button
+        self.start_btn = QPushButton('Start', self)
+        self.__set_button(self.__top_grid, self.start_btn, 0, 0, self.__start_evnt, 'Start', 2)
+        # Exit button
+        self.exit_btn = QPushButton('Exit', self)
+        self.__set_button(self.__top_grid, self.exit_btn, 0, 1, self.__exit_evnt, 'Exit', 2)
+        
+        #-------------------------------------------------
+        # Left side buttons
         # Mode button
         self.mode_btn = QPushButton('Mode', self)
-        self.__set_button(self.mode_btn, 0, 0, self.__mode_evnt, mode_lookup[self.__radio_model[1]['MODE']][1])
+        self.__set_button(self.__side_grid, self.mode_btn, 0, 0, self.__mode_evnt, mode_lookup[self.__radio_model[1]['MODE']][1], 1)
         # Filter button
         self.filter_btn = QPushButton('Filter', self)
-        self.__set_button(self.filter_btn, 1, 0, self.__filter_evnt, filter_lookup[self.__radio_model[1]['FILTER']][3])
+        self.__set_button(self.__side_grid, self.filter_btn, 1, 0, self.__filter_evnt, filter_lookup[self.__radio_model[1]['FILTER']][3], 1)
         # AGC button
         self.agc_btn = QPushButton('AGC', self)
-        self.__set_button(self.agc_btn, 2, 0, self.__agc_evnt, agc_lookup[self.__radio_model[1]['AGC']][1])
+        self.__set_button(self.__side_grid, self.agc_btn, 2, 0, self.__agc_evnt, agc_lookup[self.__radio_model[1]['AGC']][1], 1)
         
         #-------------------------------------------------
         # VFO control
         vfo_grid = QGridLayout()
-        main_grid.addLayout(vfo_grid, 0, 0)
+        main_grid.addLayout(vfo_grid, 1, 0)
         self.__vfo = Vfo(self.__con, CH_RX, 1)
         self.__vfo.addVfo(self, vfo_grid)
     
@@ -151,7 +165,17 @@ class MainWindow(QMainWindow):
     #==============================================================================================
     # EVENTS
     #==============================================================================================
-                
+    
+    #-------------------------------------------------
+    # Start button event
+    def __start_evnt(self) :
+        pass
+    
+    #-------------------------------------------------
+    # Exit button event
+    def __exit_evnt(self) :
+        QApplication.quit()
+    
     #-------------------------------------------------
     # Mode button event
     def __mode_evnt(self) :
@@ -176,9 +200,12 @@ class MainWindow(QMainWindow):
     
     #-------------------------------------------------
     # Set up button
-    def __set_button(self, button, row, col, callback, text ):
-        button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
-        self.__side_grid.addWidget(button, row, col)
+    def __set_button(self, grid, button, row, col, callback, text, style ):
+        if style == 1 :
+            button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
+        elif style == 2 :
+            button.setStyleSheet("QPushButton {background-color: rgb(100,106,13); color: rgb(14,20,22); font: bold 10px}")
+        grid.addWidget(button, row, col)
         button.clicked.connect(callback)
         button.setText(text)
         button.setMaximumSize(50,20)
