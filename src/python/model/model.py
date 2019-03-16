@@ -42,6 +42,10 @@ class Model:
         # This is the default model used for first run or after recovery
         self.__default_model = {
             'APP' : {
+                'X' : 100,
+                'Y' : 100,
+                'W' : 300,
+                'H' : 200,
             },
             'SERVER' : {
                 'SERVER-IP' : '127.0.0.1',

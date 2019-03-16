@@ -56,6 +56,11 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Background, QColor(43,63,68,255))
         self.setPalette(palette)
         
+        # Get app model
+        self.__app_model = Model.get_app_model()
+        # Set window metrics
+        self.setGeometry(self.__app_model['X'], self.__app_model['Y'], self.__app_model['W'], self.__app_model['H'])
+        
         # Get radio model
         self.__radio_model = Model.get_radio_model()
         
@@ -120,6 +125,15 @@ class MainWindow(QMainWindow):
     # Callback for current AGC setting
     def setAGC(self, agc):    
         self.agc_btn.setText(agc)
+    
+    #-------------------------------------------------
+    # Save window metrics
+    def setMetrics(self):
+        app_model = Model.get_app_model()
+        app_model['X'] = self.x()
+        app_model['Y'] = self.y()
+        app_model['W'] = self.width()
+        app_model['H'] = self.height()
         
     #==============================================================================================
     # OVERRIDES
@@ -147,13 +161,13 @@ class MainWindow(QMainWindow):
     #-------------------------------------------------
     # Filter button event
     def __filter_evnt(self) :
-        self.__filter_win.set_context(self.setFilter, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__filter_win.set_context(self.setFilter, self.x() + self.width(), self.y() + 20, CH_RX, 1)
         self.__filter_win.show()
     
     #-------------------------------------------------
     # AGC button event
     def __agc_evnt(self) :
-        self.__agc_win.set_context(self.setAGC, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__agc_win.set_context(self.setAGC, self.x() + self.width(), self.y() + 40, CH_RX, 1)
         self.__agc_win.show()
     
     #==============================================================================================
