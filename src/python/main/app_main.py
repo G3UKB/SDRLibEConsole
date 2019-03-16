@@ -55,7 +55,6 @@ class AppMain:
         print ("DISCOVER", con.cmd_exchange(M_ID.DISCOVER, []))
         print("SET AUDIO", set_audio(con))
         print ("SRV_START", con.cmd_exchange(M_ID.SVR_START, []))
-        print ("RADIO_START", con.cmd_exchange(M_ID.RADIO_START, [False]))
         
         # Create the modes window
         mode_win = Modes()

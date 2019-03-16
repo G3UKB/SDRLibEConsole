@@ -94,13 +94,14 @@ class MainWindow(QMainWindow):
         self.__side_grid.setContentsMargins(margins)
         
         #-------------------------------------------------
-        # Left side buttons
+        # Top buttons
         # Start button
         self.start_btn = QPushButton('Start', self)
         self.__set_button(self.__top_grid, self.start_btn, 0, 0, self.__start_evnt, 'Start', 2)
+        self.start_btn.setCheckable(True)
         # Exit button
         self.exit_btn = QPushButton('Exit', self)
-        self.__set_button(self.__top_grid, self.exit_btn, 0, 1, self.__exit_evnt, 'Exit', 2)
+        self.__set_button(main_grid, self.exit_btn, 0, 1, self.__exit_evnt, 'Exit', 2)
         
         #-------------------------------------------------
         # Left side buttons
@@ -168,9 +169,16 @@ class MainWindow(QMainWindow):
     
     #-------------------------------------------------
     # Start button event
-    def __start_evnt(self) :
-        pass
-    
+    def __start_evnt(self, state) :
+        if state:
+            self.__con.cmd_exchange(M_ID.RADIO_START, [False])
+            self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
+            self.start_btn.setText('Stop')
+        else:
+            self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
+            self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
+            self.start_btn.setText('Start')
+            
     #-------------------------------------------------
     # Exit button event
     def __exit_evnt(self) :
@@ -204,7 +212,7 @@ class MainWindow(QMainWindow):
         if style == 1 :
             button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
         elif style == 2 :
-            button.setStyleSheet("QPushButton {background-color: rgb(100,106,13); color: rgb(14,20,22); font: bold 10px}")
+            button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(242,79,0); font: bold 12px}")
         grid.addWidget(button, row, col)
         button.clicked.connect(callback)
         button.setText(text)
