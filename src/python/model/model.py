@@ -57,13 +57,17 @@ class Model:
                 1 : {
                     'FREQ' : 7100000,
                     'MODE' : 0,
-                    'FILTER' : 0,
+                    'FILTER' : 3,
                 },
                 2 : {
-                    
+                    'FREQ' : 7100000,
+                    'MODE' : 0,
+                    'FILTER' : 3,
                 },
                 3 : {
-                    
+                    'FREQ' : 7100000,
+                    'MODE' : 0,
+                    'FILTER' : 3,
                 }
             },
             'STATE' : {

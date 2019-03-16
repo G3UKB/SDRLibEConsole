@@ -72,6 +72,8 @@ class AppMain:
         # Create the modes window
         mode_win = Modes()
         addToCache('mode_win', mode_win)
+        filter_win = Filters()
+        addToCache('filter_win', filter_win)
         
         # Create the main window class
         self.__w = MainWindow()

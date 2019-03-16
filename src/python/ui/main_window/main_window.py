@@ -38,6 +38,7 @@ from framework.instance_cache import *
 from ui.components.vfo import *
 from ui.components.button_base import *
 from ui.components.modes import *
+from ui.components.filters import *
 from common.defs import *
 from model.model import *
 
@@ -56,6 +57,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.__con = getInstance('conn_inst')
         self.__mode_win = getInstance('mode_win')
+        self.__filter_win = getInstance('filter_win')
        
         # Set the back colour
         palette = QPalette()
@@ -86,6 +88,7 @@ class MainWindow(QMainWindow):
         self.filter_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
         top_grid.addWidget(self.filter_btn, 0, 1)
         self.filter_btn.clicked.connect(self.__filter_evnt)
+        self.filter_btn.setText(filter_lookup[self.__radio_model[1]['FILTER']][3])
         # Add AGC button
         self.agc_btn = QPushButton('AGC', self)
         self.agc_btn.setStyleSheet("QPushButton {background-color: rgb(140,21,38); font: bold 12px}")
@@ -106,6 +109,11 @@ class MainWindow(QMainWindow):
     # Callback for current mode
     def setMode(self, mode):    
         self.mode_btn.setText(mode)
+    
+    #-------------------------------------------------
+    # Callback for current filter
+    def setFilter(self, filter):    
+        self.filter_btn.setText(filter)
         
     #==============================================================================================
     # OVERRIDES
@@ -131,7 +139,8 @@ class MainWindow(QMainWindow):
         self.__mode_win.show()
     
     def __filter_evnt(self) :
-        pass
+        self.__filter_win.set_context(self.setFilter, self.x(), self.y(), CH_RX, 1)
+        self.__filter_win.show()
     
     def __agc_evnt(self) :
         pass
