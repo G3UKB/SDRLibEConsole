@@ -23,22 +23,10 @@
 #     bob@bobcowdery.plus.com
 #
 
-# System imports
-import os,sys
-import traceback
-from time import sleep
-import logging
-
-# Lib imports
-from PyQt5.QtWidgets import QApplication, QWidget
-
-# Application imports
+# Import all
+import sys
 sys.path.append('..')
-from common.defs import *
-from model.model import *
-from framework.instance_cache import *
-from connector.connector import *
-from ui.main_window.main_window import *
+from main.imports import *
 
 #==============================================================================================
 # The main application for SDRLibEConsole
@@ -74,6 +62,8 @@ class AppMain:
         addToCache('mode_win', mode_win)
         filter_win = Filters()
         addToCache('filter_win', filter_win)
+        agc_win = AGC()
+        addToCache('agc_win', agc_win)
         
         # Create the main window class
         self.__w = MainWindow()

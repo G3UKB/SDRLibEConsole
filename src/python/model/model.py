@@ -23,16 +23,8 @@
 #     bob@bobcowdery.plus.com
 #
 
-# System imports
-import os, sys
-import json
-import pickle
-import traceback
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-
-# Application imports
-from framework.instance_cache import *
+# Import all
+from main.imports import *
 
 #==============================================================================================
 # The model for SDRLibEConsole
@@ -50,24 +42,29 @@ class Model:
         # This is the default model used for first run or after recovery
         self.__default_model = {
             'APP' : {
+            },
+            'SERVER' : {
                 'SERVER-IP' : '127.0.0.1',
                 'SERVER-CMD-PORT' : 10010,
             },
             'RADIO' : {
                 1 : {
-                    'FREQ' : 7100000,
-                    'MODE' : 0,
-                    'FILTER' : 3,
+                    'FREQ' : 7.1,
+                    'MODE' : CH_LSB,
+                    'FILTER' : CH_2K4,
+                    'AGC' : CH_AGC_LONG,
                 },
                 2 : {
-                    'FREQ' : 7100000,
-                    'MODE' : 0,
-                    'FILTER' : 3,
+                    'FREQ' : 7.1,
+                    'MODE' : CH_LSB,
+                    'FILTER' : CH_2K4,
+                    'AGC' : CH_AGC_LONG,
                 },
                 3 : {
-                    'FREQ' : 7100000,
-                    'MODE' : 0,
-                    'FILTER' : 3,
+                    'FREQ' : 7.1,
+                    'MODE' : CH_LSB,
+                    'FILTER' : CH_2K4,
+                    'AGC' : CH_AGC_LONG,
                 }
             },
             'STATE' : {
@@ -91,6 +88,13 @@ class Model:
     def get_app_model(cls):
         m = getInstance('model_inst')
         return m.get_model()['APP']
+    
+    #-------------------------------------------------
+    # Get server model section 
+    @classmethod
+    def get_server_model(cls):
+        m = getInstance('model_inst')
+        return m.get_model()['SERVER']
     
     #-------------------------------------------------
     # Get radio model section 

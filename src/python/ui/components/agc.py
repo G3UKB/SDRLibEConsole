@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# button_base.py
+# agc.py
 #
-# Base class for button groups for modes, filters etc
+# Modes class for SDRLibEConnector server
 # 
 # Copyright (C) 2019 by G3UKB Bob Cowdery
 # This program is free software; you can redistribute it and/or modify
@@ -27,13 +27,13 @@
 from main.imports import *
 
 #==============================================================================================
-# Provides a base for popup button panels
+# AGC provides a button panel for the available modes
 #==============================================================================================
 
 #=====================================================
-# Button base main class
+# AGC main class
 #===================================================== 
-class ButtonBase(QWidget):
+class AGC(ButtonBase):
     
     #-------------------------------------------------
     # Constructor
@@ -45,80 +45,71 @@ class ButtonBase(QWidget):
             
         """
         
-        super(ButtonBase, self).__init__()
+        super(AGC, self).__init__()
         
-        # Set the back colour
-        palette = QPalette()
-        palette.setColor(QPalette.Background, QColor(43,63,68,255))
-        self.setPalette(palette)
-        self.setWindowFlags(
-            Qt.CustomizeWindowHint |
-            Qt.FramelessWindowHint |
-            Qt.WindowStaysOnTopHint
+        # Get the connector instance
+        self.__con = getInstance('conn_inst')
+        
+        # Add mode buttons
+        self.__btns = (
+            # btn(label), row, col, id 
+            (QPushButton(agc_lookup[CH_AGC_OFF][1], self), 0, 0, CH_AGC_OFF),
+            (QPushButton(agc_lookup[CH_AGC_LONG][1], self), 0, 1, CH_AGC_LONG),
+            (QPushButton(agc_lookup[CH_AGC_SLOW][1], self), 0, 2, CH_AGC_SLOW),
+            (QPushButton(agc_lookup[CH_AGC_MED][1], self), 1, 0, CH_AGC_MED),
+            (QPushButton(agc_lookup[CH_AGC_FAST][1], self), 1, 1, CH_AGC_FAST),
         )
-        self.setWindowOpacity(0.7)
+        for btn in self.__btns:
+           self.add_button(btn[0], btn[1], btn[2], btn[3])
         
-        # Set the layout
-        self.__grid = QGridLayout()
-        self.__grid.setSpacing(0)
-        margins = QMargins()
-        margins.setLeft = 0
-        margins.setRight = 0
-        margins.setTop = 0
-        margins.setBottom = 0
-        self.__grid.setContentsMargins(margins)
-        self.setLayout(self.__grid)
+        # Connect click event
+        self.btn_grp.buttonClicked.connect(self.__agc_evnt)
         
-        # Create an exclusive button group
-        self.btn_grp = QButtonGroup()
-        self.btn_grp.setExclusive(True)
+        # Get radio model
+        self.__radio_model = Model.get_radio_model()
     
     #==============================================================================================
     # PUBLIC
     #==============================================================================================
     
     #-------------------------------------------------
-    # Set context   
-    def set_base_context(self, callback, x, y, direction, id):
-        """
-        Set Context
+    # Set context according to id
+    def set_context(self, callback, x, y, direction, id):
+        # Call base mathod
+        self.set_base_context(callback, x, y, direction, id)
+        # Select the appropriate button
+        button = self.btn_grp.button(self.__radio_model[id]['AGC'])
+        # Does not cause a click event
+        button.setDown(True)
         
-        Arguments:  
-            callback    --  callback here with mode string
-            x           --  x coord of main window
-            y           --  y coord of main window
-            direction   --  RX or TX
-            id          --  the id of this instantiation (radio id)
-            
-        """
-        self.callback = callback
-        self.direction = direction
-        # Position at top right corner of invoking button
-        self.id = id
-        self.move( x, y+50)
-    
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
         
     #-------------------------------------------------
-    # Add a button to the grid   
-    def add_button(self, btn, row, col, id):
+    # Button group click event
+    def __agc_evnt(self, btn) :
         """
-        Add button to grid
+        Any button click event
         
         Arguments:  
             btn --  the QButton
-            row --  grid row
-            col --  grid col
-            id  --  id to give button
             
         """
-        btn.setCheckable(True)
-        btn.setStyleSheet("QPushButton {background-color: rgb(167,167,167); font: bold 12px}")
-        self.__grid.addWidget(btn, row, col)
-        self.btn_grp.addButton(btn)
-        self.btn_grp.setId(btn, id)
-    
-    
+        if self.direction == CH_RX:
+            if self.id == 1:
+                r = M_ID.R1_AGC
+            elif self.id == 2:
+                r = M_ID.R2_AGC
+            else:
+                r = M_ID.R3_AGC
+            # Execute AGC change
+            agc_id = self.btn_grp.id(btn)
+            self.__con.cmd_exchange(r, [agc_id])
+            # Its a popup
+            self.hide()
+            # Tell parent what was selected
+            self.callback(btn.text())
+            # Update the model
+            self.__radio_model[self.id]['AGC'] = agc_id
         

@@ -23,24 +23,8 @@
 #     bob@bobcowdery.plus.com
 #
 
-# System imports
-import os,sys
-import traceback
-from time import sleep
-import logging
-
-# Lib imports
-from PyQt5.QtWidgets import QWidget, QMainWindow, QGridLayout
-from PyQt5.QtGui import QPalette, QColor
-
-# Application imports
-from framework.instance_cache import *
-from ui.components.vfo import *
-from ui.components.button_base import *
-from ui.components.modes import *
-from ui.components.filters import *
-from common.defs import *
-from model.model import *
+# Import all
+from main.imports import *
 
 #==============================================================================================
 # The main window for SDRLibEConsole
@@ -48,16 +32,23 @@ from model.model import *
 
 #=====================================================
 # Main window class
+# The main window runs RX1 and has all common controls
+# Auxiliary windows run the other radios
 #=====================================================
 class MainWindow(QMainWindow):
     
     #-------------------------------------------------
     # Constructor
     def __init__(self):
+        
         super(MainWindow, self).__init__()
+        
+        # Get instances
         self.__con = getInstance('conn_inst')
         self.__mode_win = getInstance('mode_win')
         self.__filter_win = getInstance('filter_win')
+        self.__agc_win = getInstance('agc_win')
+        
         # Set title
         self.setWindowTitle('SDRLIbEConsole')
         # Set the back colour
@@ -79,40 +70,33 @@ class MainWindow(QMainWindow):
     #-------------------------------------------------
     # Setup UI contents
     def __setup_ui(self, main_grid) :
+        
         # Left side button grid
         # Note add the grid directly as a layout not in a panel else space cannot be removed
-        side_grid = QGridLayout()
-        main_grid.addLayout(side_grid, 0, 1)
-        side_grid.setSpacing(0)
+        self.__side_grid = QGridLayout()
+        main_grid.addLayout(self.__side_grid, 0, 1)
+        self.__side_grid.setSpacing(0)
         margins = QMargins()
         margins.setLeft = 0
         margins.setRight = 0
         margins.setTop = 0
         margins.setBottom = 0
-        side_grid.setContentsMargins(margins)
+        self.__side_grid.setContentsMargins(margins)
         
-        # Add mode button
+        #-------------------------------------------------
+        # Buttons
+        # Mode button
         self.mode_btn = QPushButton('Mode', self)
-        self.mode_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
-        side_grid.addWidget(self.mode_btn, 0, 0)
-        self.mode_btn.clicked.connect(self.__mode_evnt)
-        self.mode_btn.setText(mode_lookup[self.__radio_model[1]['MODE']][1])
-        self.mode_btn.setMaximumSize(50,20)
-        # Add filter button
+        self.__set_button(self.mode_btn, 0, 0, self.__mode_evnt, mode_lookup[self.__radio_model[1]['MODE']][1])
+        # Filter button
         self.filter_btn = QPushButton('Filter', self)
-        self.filter_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
-        side_grid.addWidget(self.filter_btn, 1, 0)
-        self.filter_btn.clicked.connect(self.__filter_evnt)
-        self.filter_btn.setText(filter_lookup[self.__radio_model[1]['FILTER']][3])
-        self.filter_btn.setMaximumSize(50,20)
-        # Add AGC button
+        self.__set_button(self.filter_btn, 1, 0, self.__filter_evnt, filter_lookup[self.__radio_model[1]['FILTER']][3])
+        # AGC button
         self.agc_btn = QPushButton('AGC', self)
-        self.agc_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
-        side_grid.addWidget(self.agc_btn, 2, 0)
-        self.agc_btn.clicked.connect(self.__agc_evnt)
-        self.agc_btn.setMaximumSize(50,20)
-    
-        # Add VFO control
+        self.__set_button(self.agc_btn, 2, 0, self.__agc_evnt, agc_lookup[self.__radio_model[1]['AGC']][1])
+        
+        #-------------------------------------------------
+        # VFO control
         vfo_grid = QGridLayout()
         main_grid.addLayout(vfo_grid, 0, 0)
         self.__vfo = Vfo(self.__con, CH_RX, 1)
@@ -131,6 +115,11 @@ class MainWindow(QMainWindow):
     # Callback for current filter
     def setFilter(self, filter):    
         self.filter_btn.setText(filter)
+    
+    #-------------------------------------------------
+    # Callback for current AGC setting
+    def setAGC(self, agc):    
+        self.agc_btn.setText(agc)
         
     #==============================================================================================
     # OVERRIDES
@@ -155,10 +144,28 @@ class MainWindow(QMainWindow):
         self.__mode_win.set_context(self.setMode, self.x() + self.width(), self.y(), CH_RX, 1)
         self.__mode_win.show()
     
+    #-------------------------------------------------
+    # Filter button event
     def __filter_evnt(self) :
         self.__filter_win.set_context(self.setFilter, self.x() + self.width(), self.y(), CH_RX, 1)
         self.__filter_win.show()
     
+    #-------------------------------------------------
+    # AGC button event
     def __agc_evnt(self) :
-        pass
+        self.__agc_win.set_context(self.setAGC, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__agc_win.show()
+    
+    #==============================================================================================
+    # PRIVATE
+    #==============================================================================================
+    
+    #-------------------------------------------------
+    # Set up button
+    def __set_button(self, button, row, col, callback, text ):
+        button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
+        self.__side_grid.addWidget(button, row, col)
+        button.clicked.connect(callback)
+        button.setText(text)
+        button.setMaximumSize(50,20)
     

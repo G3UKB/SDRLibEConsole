@@ -23,16 +23,10 @@
 #     bob@bobcowdery.plus.com
 #
 
-# System imports
-import os,sys
-from PyQt5.QtCore import QObject, QEvent
-from PyQt5.QtWidgets import QWidget, QLabel
+# Import all
+from main.imports import *
 
-# Application imports
-from common.defs import *
-from connector.connector import *
-from model.model import *
-
+#=====================================================
 # Resources
 MHZ_FONT = 30
 KHZ_FONT = 30

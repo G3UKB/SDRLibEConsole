@@ -23,17 +23,8 @@
 #     bob@bobcowdery.plus.com
 #
 
-# System imports
-import os,sys
-from PyQt5.QtCore import Qt, QObject, QEvent, QMargins
-from PyQt5.QtWidgets import QWidget, QPushButton, QButtonGroup, QGridLayout
-from PyQt5.QtGui import QPalette, QColor
-
-# Application imports
-from common.defs import *
-from connector.connector import *
-from ui.components.button_base import *
-from model.model import *
+# Import all
+from main.imports import *
 
 #==============================================================================================
 # Filters provides a button panel for the available modes
