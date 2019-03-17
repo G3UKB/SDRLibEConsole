@@ -61,6 +61,7 @@ class AppMain:
                 print("No radio hardware detected! We will try again on 'Start'")
             else:
                 state['DISCOVER'] = True
+                # Temporary fudge
                 if set_audio(con) == None:
                     print("Sorry, failed to set default audio, unable to continue!")
                     sys.exit()            

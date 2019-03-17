@@ -39,8 +39,8 @@ pp = pprint.PrettyPrinter(indent=4)
 #=====================================================
 # Lib imports
 from PyQt5.QtCore import Qt, QObject, QEvent, QMargins
-from PyQt5.QtGui import QPalette, QColor
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QLabel, QPushButton, QButtonGroup
+from PyQt5.QtGui import QPalette, QColor, QIcon
+from PyQt5.QtWidgets import QApplication, qApp, QWidget, QStyle, QStatusBar, QMainWindow, QAction, QGridLayout, QLabel, QPushButton, QButtonGroup
 
 #=====================================================
 # Application imports

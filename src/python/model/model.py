@@ -70,14 +70,17 @@ class Model:
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
                 }
-            },
-            'STATE' : {
-                'HAVE-SERVER' : False,
-                'SERVER-RUN' : False,
-                'DISCOVER' : False,
-                'RADIO-RUN' : False
             }
         }
+        
+        # The state model in not persisted.
+        self.__state = {
+            'HAVE-SERVER' : False,
+            'SERVER-RUN' : False,
+            'DISCOVER' : False,
+            'RADIO-RUN' : False
+        }
+        
         # Restore point
         self.__model = None
         # Model is saved to the current directory
@@ -115,7 +118,7 @@ class Model:
     @classmethod
     def get_state_model(cls):
         m = getInstance('model_inst')
-        return m.get_model()['STATE']
+        return m.get_state()
     
     #-------------------------------------------------
     # Instance methods
@@ -139,7 +142,12 @@ class Model:
     # Get model   
     def get_model(self):
         return self.__model 
-        
+    
+    #-------------------------------------------------
+    # Get state   
+    def get_state(self):
+        return self.__state
+    
     #==============================================================================================
     # PRIVATE
     #==============================================================================================

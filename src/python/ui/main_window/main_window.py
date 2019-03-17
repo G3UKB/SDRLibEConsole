@@ -43,12 +43,14 @@ class MainWindow(QMainWindow):
         
         super(MainWindow, self).__init__()
         
+        #-------------------------------------------------
         # Get instances
         self.__con = getInstance('conn_inst')
         self.__mode_win = getInstance('mode_win')
         self.__filter_win = getInstance('filter_win')
         self.__agc_win = getInstance('agc_win')
         
+        #-------------------------------------------------
         # Set title
         self.setWindowTitle('SDRLIbEConsole')
         # Set the back colour
@@ -56,22 +58,52 @@ class MainWindow(QMainWindow):
         palette.setColor(QPalette.Background, QColor(43,63,68,255))
         self.setPalette(palette)
         
-        # Get app model
-        self.__app_model = Model.get_app_model()
-        # Set window metrics
-        self.setGeometry(self.__app_model['X'], self.__app_model['Y'], self.__app_model['W'], self.__app_model['H'])
+        #-------------------------------------------------
+        # Status bar
+        self.statusBar = QStatusBar()
+        self.setStatusBar(self.statusBar)
+        self.statusBar.showMessage("Stopped",0)
+        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(225,225,225); color: red; font: bold 12px}")
         
-        # Get radio model
-        self.__radio_model = Model.get_radio_model()
+        #-------------------------------------------------
+        # Set up toolbar
+        exitAct = QAction(self.style().standardIcon(QStyle.SP_TitleBarCloseButton), 'Exit', self)
+        exitAct.setShortcut('Ctrl+Q')
+        exitAct.triggered.connect(qApp.quit)
         
-        # Main panel and grid
+        runAct = QAction(self.style().standardIcon(QStyle.SP_MediaPlay), 'Run', self)
+        runAct.setShortcut('Ctrl+R')
+        runAct.triggered.connect(self.__run)
+        
+        stopAct = QAction(self.style().standardIcon(QStyle.SP_MediaStop), 'Stop', self)
+        stopAct.setShortcut('Ctrl+S')
+        stopAct.triggered.connect(self.__stop)
+        
+        self.toolbar = self.addToolBar('Exit')
+        self.toolbar.addAction(exitAct)
+        self.toolbar.addAction(runAct)
+        self.toolbar.addAction(stopAct)
+        self.toolbar.setStyleSheet("QToolBar {background-color: rgb(225,225,225); color: red; font: bold 12px}")
+        
+        #-------------------------------------------------
+        # Set main panel and grid
         panel = QWidget()
         self.setCentralWidget(panel)
         main_grid = QGridLayout()
         panel.setLayout(main_grid)
-        # Contents
+        
+        #-------------------------------------------------
+        # Get app model
+        self.__app_model = Model.get_app_model()
+        # Set window metrics
+        self.setGeometry(self.__app_model['X'], self.__app_model['Y'], self.__app_model['W'], self.__app_model['H'])
+        # Get radio model
+        self.__radio_model = Model.get_radio_model()
+        
+        #-------------------------------------------------
+        # Populate
         self.__setup_ui(main_grid)
-    
+        
     #-------------------------------------------------
     # Setup UI contents
     def __setup_ui(self, main_grid) :
@@ -153,7 +185,7 @@ class MainWindow(QMainWindow):
     #==============================================================================================
     # OVERRIDES
     #==============================================================================================
-        
+    
     #-------------------------------------------------
     # Mouse wheel event for VFO
     def wheelEvent(self, event):
@@ -167,44 +199,66 @@ class MainWindow(QMainWindow):
     # EVENTS
     #==============================================================================================
     
+    def __run(self) :
+        print("Run")
+    def __stop(self):
+        print("Stop")
+        
     #-------------------------------------------------
     # Start button event
     def __start_evnt(self, btn_state) :
         
-        # See what we need to start first
+        error = False
         state = Model.get_state_model()
-        if not state['HAVE-SERVER']:
-            if self.__con.cmd_exchange(M_ID.POLL, []) == None:
-                print("Failed to connect to server! Please start the server and try again.")
-                return
-            else:
-                state['HAVE-SERVER'] = True
-        if not state['DISCOVER']:
-            if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                print("No radio hardware detected! Please start the radio and try again.")
-                return
-            else:
-                state['DISCOVER'] = True
-        if not state['SERVER-RUN']:
-            if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
-                print("Sorry, failed to start server! Please try a server restart.")
-                return
-            else:
-                state['SERVER-RUN'] = True
-        
-        # Good to go
         if btn_state:
-            # Start radio
-            self.__con.cmd_exchange(M_ID.RADIO_START, [False])
-            self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
-            self.start_btn.setText('Stop')
-            state['RADIO-RUN'] = True
-        else:
-            # Stop radio
-            self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
+            # See what we need to start first
+            if not state['HAVE-SERVER']:
+                if self.__con.cmd_exchange(M_ID.POLL, []) == None:
+                    print("Failed to connect to server! Please start the server and try again.")
+                    error = True
+                else:
+                    state['HAVE-SERVER'] = True
+                    if not state['DISCOVER']:
+                        if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
+                            print("No radio hardware detected! Please start the radio and try again.")
+                            error = True
+                        else:
+                            state['DISCOVER'] = True
+                            if not state['SERVER-RUN']:
+                                # Temporary fudge
+                                if set_audio(self.__con) == None:
+                                    print("Sorry, failed to set default audio! Please try a server restart.")
+                                    state['HAVE-SERVER'] = False
+                                    state['DISCOVER'] = False
+                                    error = True
+                                if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
+                                    print("Sorry, failed to start server! Please try a server restart.")
+                                    state['HAVE-SERVER'] = False
+                                    state['DISCOVER'] = False
+                                    error = True
+                                else:
+                                    state['SERVER-RUN'] = True
+                                    
+        if error:
+            # Ensure button is in deselect state
             self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
             self.start_btn.setText('Start')
+            self.start_btn.setChecked(False)
             state['RADIO-RUN'] = False
+        else:
+            # Good to go
+            if btn_state:
+                # Start radio
+                self.__con.cmd_exchange(M_ID.RADIO_START, [False])
+                self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
+                self.start_btn.setText('Stop')
+                state['RADIO-RUN'] = True
+            else:
+                # Stop radio
+                self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
+                self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
+                self.start_btn.setText('Start')
+                state['RADIO-RUN'] = False
             
     #-------------------------------------------------
     # Exit button event
