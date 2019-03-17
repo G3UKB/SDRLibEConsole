@@ -72,7 +72,10 @@ class Model:
                 }
             },
             'STATE' : {
-                
+                'HAVE-SERVER' : False,
+                'SERVER-RUN' : False,
+                'DISCOVER' : False,
+                'RADIO-RUN' : False
             }
         }
         # Restore point
@@ -187,11 +190,5 @@ class Model:
                 f.close()
             except:
                 pass
-#==============================================================================================
-# GLOBAL
-#==============================================================================================
- 
-def get_app_model(self):
-    m = getInstance('model_inst')
-    return m.get_model()['APP']
+
                        

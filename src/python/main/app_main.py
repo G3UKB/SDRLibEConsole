@@ -51,10 +51,23 @@ class AppMain:
         # Create a connector interface
         con = Connector()
         addToCache('conn_inst', con)
-        # and run a test script
-        print ("DISCOVER", con.cmd_exchange(M_ID.DISCOVER, []))
-        print("SET AUDIO", set_audio(con))
-        print ("SRV_START", con.cmd_exchange(M_ID.SVR_START, []))
+        # See if a server or simulator is running?
+        state = Model.get_state_model()
+        if con.cmd_exchange(M_ID.POLL, []) == None:
+            print("Failed to connect to server. We will try again on 'Start'")
+        else:
+            state['HAVE-SERVER'] = True
+            if con.cmd_exchange(M_ID.DISCOVER, []) == None:
+                print("No radio hardware detected! We will try again on 'Start'")
+            else:
+                state['DISCOVER'] = True
+                if set_audio(con) == None:
+                    print("Sorry, failed to set default audio, unable to continue!")
+                    sys.exit()            
+                if con.cmd_exchange(M_ID.SVR_START, []) == None:
+                    print("Sorry, failed to start server, unable to continue!")
+                    sys.exit()
+                state['SERVER-RUN'] = True
         
         # Create the modes window
         mode_win = Modes()

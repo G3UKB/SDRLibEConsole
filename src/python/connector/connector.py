@@ -214,7 +214,12 @@ class Connector:
     #-------------------------------------------------
     # Wait for data from server
     def __do_receive(self, cmd_str, resp_type):
-        nbytes, address = self.__cmd_sock.recvfrom_into(self.__resp_data)
+        
+        try:
+            nbytes, address = self.__cmd_sock.recvfrom_into(self.__resp_data)
+        except socket.error as e:
+            # print("Error receiving response %s!" % (str(e)))
+            return None
         if nbytes > 0 :
             if resp_type == M_ID.ACK_NAK:
                 # Boolean response for an ACK/NAK

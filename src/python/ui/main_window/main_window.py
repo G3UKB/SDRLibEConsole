@@ -169,15 +169,42 @@ class MainWindow(QMainWindow):
     
     #-------------------------------------------------
     # Start button event
-    def __start_evnt(self, state) :
-        if state:
+    def __start_evnt(self, btn_state) :
+        
+        # See what we need to start first
+        state = Model.get_state_model()
+        if not state['HAVE-SERVER']:
+            if self.__con.cmd_exchange(M_ID.POLL, []) == None:
+                print("Failed to connect to server! Please start the server and try again.")
+                return
+            else:
+                state['HAVE-SERVER'] = True
+        if not state['DISCOVER']:
+            if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
+                print("No radio hardware detected! Please start the radio and try again.")
+                return
+            else:
+                state['DISCOVER'] = True
+        if not state['SERVER-RUN']:
+            if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
+                print("Sorry, failed to start server! Please try a server restart.")
+                return
+            else:
+                state['SERVER-RUN'] = True
+        
+        # Good to go
+        if btn_state:
+            # Start radio
             self.__con.cmd_exchange(M_ID.RADIO_START, [False])
             self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
             self.start_btn.setText('Stop')
+            state['RADIO-RUN'] = True
         else:
+            # Stop radio
             self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
             self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
             self.start_btn.setText('Start')
+            state['RADIO-RUN'] = False
             
     #-------------------------------------------------
     # Exit button event
