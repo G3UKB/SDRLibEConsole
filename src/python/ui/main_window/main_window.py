@@ -55,7 +55,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('SDRLIbEConsole')
         # Set the back colour
         palette = QPalette()
-        palette.setColor(QPalette.Background, QColor(43,63,68,255))
+        #palette.setColor(QPalette.Background, QColor(43,63,68,255))
+        palette.setColor(QPalette.Background, QColor(59,59,59,255))
         self.setPalette(palette)
         
         #-------------------------------------------------
@@ -63,13 +64,13 @@ class MainWindow(QMainWindow):
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
         self.statusBar.showMessage("Stopped",0)
-        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(225,225,225); color: red; font: bold 12px}")
+        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
         
         #-------------------------------------------------
         # Set up toolbar
         exitAct = QAction(self.style().standardIcon(QStyle.SP_TitleBarCloseButton), 'Exit', self)
         exitAct.setShortcut('Ctrl+Q')
-        exitAct.triggered.connect(qApp.quit)
+        exitAct.triggered.connect(self.__exit_evnt)
         
         runAct = QAction(self.style().standardIcon(QStyle.SP_MediaPlay), 'Run', self)
         runAct.setShortcut('Ctrl+R')
@@ -79,11 +80,11 @@ class MainWindow(QMainWindow):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
-        self.toolbar = self.addToolBar('Exit')
+        self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
-        self.toolbar.setStyleSheet("QToolBar {background-color: rgb(225,225,225); color: red; font: bold 12px}")
+        self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
         #-------------------------------------------------
         # Set main panel and grid
@@ -108,15 +109,10 @@ class MainWindow(QMainWindow):
     # Setup UI contents
     def __setup_ui(self, main_grid) :
         
-        # Top side button grid
-        # Note add the grid directly as a layout not in a panel else space cannot be removed
-        self.__top_grid = QGridLayout()
-        main_grid.addLayout(self.__top_grid, 0, 0)
-        
-        # Left side button grid
+        # Right side button grid
         # Note add the grid directly as a layout not in a panel else space cannot be removed
         self.__side_grid = QGridLayout()
-        main_grid.addLayout(self.__side_grid, 1, 1)
+        main_grid.addLayout(self.__side_grid, 0, 1)
         self.__side_grid.setSpacing(0)
         margins = QMargins()
         margins.setLeft = 0
@@ -126,17 +122,7 @@ class MainWindow(QMainWindow):
         self.__side_grid.setContentsMargins(margins)
         
         #-------------------------------------------------
-        # Top buttons
-        # Start button
-        self.start_btn = QPushButton('Start', self)
-        self.__set_button(self.__top_grid, self.start_btn, 0, 0, self.__start_evnt, 'Start', 2)
-        self.start_btn.setCheckable(True)
-        # Exit button
-        self.exit_btn = QPushButton('Exit', self)
-        self.__set_button(main_grid, self.exit_btn, 0, 1, self.__exit_evnt, 'Exit', 2)
-        
-        #-------------------------------------------------
-        # Left side buttons
+        # Right side buttons
         # Mode button
         self.mode_btn = QPushButton('Mode', self)
         self.__set_button(self.__side_grid, self.mode_btn, 0, 0, self.__mode_evnt, mode_lookup[self.__radio_model[1]['MODE']][1], 1)
@@ -150,7 +136,7 @@ class MainWindow(QMainWindow):
         #-------------------------------------------------
         # VFO control
         vfo_grid = QGridLayout()
-        main_grid.addLayout(vfo_grid, 1, 0)
+        main_grid.addLayout(vfo_grid, 0, 0)
         self.__vfo = Vfo(self.__con, CH_RX, 1)
         self.__vfo.addVfo(self, vfo_grid)
     
@@ -199,10 +185,68 @@ class MainWindow(QMainWindow):
     # EVENTS
     #==============================================================================================
     
+    #-------------------------------------------------
+    # Run button event
     def __run(self) :
-        print("Run")
+        error = False
+        state = Model.get_state_model()
+        # See what we need to start first
+        if not state['HAVE-SERVER']:
+            if self.__con.cmd_exchange(M_ID.POLL, []) == None:
+                print("Failed to connect to server! Please start the server and try again.")
+                error = True
+            else:
+                state['HAVE-SERVER'] = True
+                if not state['DISCOVER']:
+                    if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
+                        print("No radio hardware detected! Please start the radio and try again.")
+                        error = True
+                    else:
+                        state['DISCOVER'] = True
+                        if not state['SERVER-RUN']:
+                            # Temporary fudge
+                            if set_audio(self.__con) == None:
+                                print("Sorry, failed to set default audio! Please try a server restart.")
+                                state['HAVE-SERVER'] = False
+                                state['DISCOVER'] = False
+                                error = True
+                            if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
+                                print("Sorry, failed to start server! Please try a server restart.")
+                                state['HAVE-SERVER'] = False
+                                state['DISCOVER'] = False
+                                error = True
+                            else:
+                                state['SERVER-RUN'] = True
+                                
+        if error:
+            # Ensure button is in deselect state
+            #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
+            #self.start_btn.setText('Start')
+            #self.start_btn.setChecked(False)
+            self.statusBar.showMessage("Stopped",0)
+            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
+            state['RADIO-RUN'] = False
+        else:
+            # Good to go
+            # Start radio
+            self.__con.cmd_exchange(M_ID.RADIO_START, [False])
+            #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
+            #self.start_btn.setText('Stop')
+            self.statusBar.showMessage("Running",0)
+            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(0,64,0); font: bold 12px}")
+            state['RADIO-RUN'] = True
+    
+    #-------------------------------------------------
+    # Stop button event        
     def __stop(self):
-        print("Stop")
+        # Stop radio
+        state = Model.get_state_model()
+        self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
+        #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
+        #self.start_btn.setText('Start')
+        self.statusBar.showMessage("Stopped",0)
+        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
+        state['RADIO-RUN'] = False
         
     #-------------------------------------------------
     # Start button event
@@ -291,9 +335,9 @@ class MainWindow(QMainWindow):
     # Set up button
     def __set_button(self, grid, button, row, col, callback, text, style ):
         if style == 1 :
-            button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(14,20,22); font: bold 10px}")
+            button.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(148,148,148); font: bold 10px}")
         elif style == 2 :
-            button.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: rgb(242,79,0); font: bold 12px}")
+            button.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(148,148,148); font: bold 12px}")
         grid.addWidget(button, row, col)
         button.clicked.connect(callback)
         button.setText(text)
