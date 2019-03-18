@@ -111,3 +111,11 @@ agc_lookup = (
     (CH_AGC_MED, 'MED'),
     (CH_AGC_FAST, 'FAST')       
 )
+
+#=====================================================
+# Audio
+HPSDR = 'HPSDR'
+LOCAL = 'LOCAL'
+LEFT = 'Left'
+RIGHT = 'Right'
+BOTH = 'Both'

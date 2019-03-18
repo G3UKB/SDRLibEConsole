@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
         self.__mode_win = getInstance('mode_win')
         self.__filter_win = getInstance('filter_win')
         self.__agc_win = getInstance('agc_win')
+        self.__audio_win = getInstance('audio_win')
         
         #-------------------------------------------------
         # Set title
@@ -80,10 +81,15 @@ class MainWindow(QMainWindow):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
+        audioAct = QAction(self.style().standardIcon(QStyle.SP_MediaVolume), 'Stop', self)
+        audioAct.setShortcut('Ctrl+A')
+        audioAct.triggered.connect(self.__audio_evnt)
+        
         self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
+        self.toolbar.addAction(audioAct)
         self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
         #-------------------------------------------------
@@ -160,6 +166,11 @@ class MainWindow(QMainWindow):
         self.agc_btn.setText(agc)
     
     #-------------------------------------------------
+    # Callback for audio setting
+    def setAudio(self, audio):    
+        pass
+        
+    #-------------------------------------------------
     # Save window metrics
     def setMetrics(self):
         app_model = Model.get_app_model()
@@ -219,10 +230,6 @@ class MainWindow(QMainWindow):
                                 state['SERVER-RUN'] = True
                                 
         if error:
-            # Ensure button is in deselect state
-            #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
-            #self.start_btn.setText('Start')
-            #self.start_btn.setChecked(False)
             self.statusBar.showMessage("Stopped",0)
             self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
             state['RADIO-RUN'] = False
@@ -230,8 +237,6 @@ class MainWindow(QMainWindow):
             # Good to go
             # Start radio
             self.__con.cmd_exchange(M_ID.RADIO_START, [False])
-            #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
-            #self.start_btn.setText('Stop')
             self.statusBar.showMessage("Running",0)
             self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(0,64,0); font: bold 12px}")
             state['RADIO-RUN'] = True
@@ -242,68 +247,16 @@ class MainWindow(QMainWindow):
         # Stop radio
         state = Model.get_state_model()
         self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
-        #self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
-        #self.start_btn.setText('Start')
         self.statusBar.showMessage("Stopped",0)
         self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
         state['RADIO-RUN'] = False
-        
+    
     #-------------------------------------------------
-    # Start button event
-    def __start_evnt(self, btn_state) :
+    # Audio button event
+    def __audio_evnt(self) :
+        self.__audio_win.set_context(self.setAudio, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__audio_win.show()
         
-        error = False
-        state = Model.get_state_model()
-        if btn_state:
-            # See what we need to start first
-            if not state['HAVE-SERVER']:
-                if self.__con.cmd_exchange(M_ID.POLL, []) == None:
-                    print("Failed to connect to server! Please start the server and try again.")
-                    error = True
-                else:
-                    state['HAVE-SERVER'] = True
-                    if not state['DISCOVER']:
-                        if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                            print("No radio hardware detected! Please start the radio and try again.")
-                            error = True
-                        else:
-                            state['DISCOVER'] = True
-                            if not state['SERVER-RUN']:
-                                # Temporary fudge
-                                if set_audio(self.__con) == None:
-                                    print("Sorry, failed to set default audio! Please try a server restart.")
-                                    state['HAVE-SERVER'] = False
-                                    state['DISCOVER'] = False
-                                    error = True
-                                if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
-                                    print("Sorry, failed to start server! Please try a server restart.")
-                                    state['HAVE-SERVER'] = False
-                                    state['DISCOVER'] = False
-                                    error = True
-                                else:
-                                    state['SERVER-RUN'] = True
-                                    
-        if error:
-            # Ensure button is in deselect state
-            self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
-            self.start_btn.setText('Start')
-            self.start_btn.setChecked(False)
-            state['RADIO-RUN'] = False
-        else:
-            # Good to go
-            if btn_state:
-                # Start radio
-                self.__con.cmd_exchange(M_ID.RADIO_START, [False])
-                self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: green; font: bold 12px}")
-                self.start_btn.setText('Stop')
-                state['RADIO-RUN'] = True
-            else:
-                # Stop radio
-                self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
-                self.start_btn.setStyleSheet("QPushButton {background-color: rgb(58,86,92); color: red; font: bold 12px}")
-                self.start_btn.setText('Start')
-                state['RADIO-RUN'] = False
-            
     #-------------------------------------------------
     # Exit button event
     def __exit_evnt(self) :

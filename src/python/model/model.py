@@ -57,18 +57,33 @@ class Model:
                     'MODE' : CH_LSB,
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
+                    'AUDIO' : {
+                        'SOURCE' : HPSDR,
+                        'DEV' : None,
+                        'CH': BOTH
+                    }
                 },
                 2 : {
                     'FREQ' : 7.1,
                     'MODE' : CH_LSB,
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
+                    'AUDIO' : {
+                        'SOURCE' : HPSDR,
+                        'DEV' : None,
+                        'CH': BOTH
+                    }
                 },
                 3 : {
                     'FREQ' : 7.1,
                     'MODE' : CH_LSB,
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
+                    'AUDIO' : {
+                        'SOURCE' : HPSDR,
+                        'DEV' : None,
+                        'CH': BOTH
+                    }
                 }
             }
         }
