@@ -60,7 +60,7 @@ class Model:
                     'AUDIO' : {
                         'SOURCE' : HPSDR,
                         'DEV' : None,
-                        'CH': BOTH
+                        'CH': None
                     }
                 },
                 2 : {
@@ -71,7 +71,7 @@ class Model:
                     'AUDIO' : {
                         'SOURCE' : HPSDR,
                         'DEV' : None,
-                        'CH': BOTH
+                        'CH': None
                     }
                 },
                 3 : {
@@ -82,7 +82,7 @@ class Model:
                     'AUDIO' : {
                         'SOURCE' : HPSDR,
                         'DEV' : None,
-                        'CH': BOTH
+                        'CH': None
                     }
                 }
             }

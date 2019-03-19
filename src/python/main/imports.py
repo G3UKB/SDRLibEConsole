@@ -42,7 +42,7 @@ from PyQt5.QtCore import Qt, QObject, QEvent, QMargins
 from PyQt5.QtGui import QPalette, QColor, QIcon
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtWidgets import QWidget, QStyle, QStatusBar, QMainWindow, QAction
-from PyQt5.QtWidgets import QGridLayout, QLabel, QPushButton, QButtonGroup, QComboBox, QCheckBox
+from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QButtonGroup, QComboBox, QCheckBox
 
 #=====================================================
 # Application imports
