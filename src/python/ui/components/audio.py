@@ -1,0 +1,283 @@
+#!/usr/bin/env python
+#
+# audio.py
+#
+# Audio option panel for SDRLibEConsole
+# 
+# Copyright (C) 2019 by G3UKB Bob Cowdery
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#    
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#    
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#    
+#  The author can be reached by email at:   
+#     bob@bobcowdery.plus.com
+#
+
+# Import all
+from main.imports import *
+
+#==============================================================================================
+# Audio provides a selection of available options per receiver and transmitter
+#==============================================================================================
+
+#=====================================================
+# Audio main class
+#===================================================== 
+class Audio(QWidget):
+    
+    #-------------------------------------------------
+    # Constructor
+    def __init__(self):
+        """
+        Constructor
+        
+        Arguments:  
+            
+        """
+        
+        super(Audio, self).__init__()
+        
+        # Get the connector instance
+        self.__con = getInstance('conn_inst')
+        
+        # Create the UI
+        # Set the back colour
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor(41,41,41,255))
+        self.setPalette(palette)
+        self.setWindowFlags(
+            Qt.CustomizeWindowHint |
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint
+        )
+        self.setWindowOpacity(0.97)
+        #self.setMinimumWidth(400)
+        # Set the layout
+        grid = QGridLayout()
+        self.setLayout(grid)
+        
+        # Get radio model audio section
+        self.__radio_1_audio_model = Model.get_radio_model()[1]['AUDIO']
+        self.__audio_model = Model.get_radio_model()[2]['AUDIO']
+        self.__audio_model = Model.get_radio_model()[3]['AUDIO']
+        
+        # Populate the grid
+        self.__setup_ui(grid)
+    
+    #-------------------------------------------------
+    # Populate the UI
+    def __setup_ui(self, grid) :
+        
+        # Output sinks
+        # Select HPSDR or Local
+        src_label = QLabel('Sink')
+        src_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
+        grid.addWidget(src_label, 0, 0)
+        self.sink_combo = QComboBox()
+        self.sink_combo.addItems((HPSDR, LOCAL))
+        grid.addWidget(self.sink_combo, 0, 1, 1, 3)
+        self.sink_combo.activated.connect(self.__sink_evnt)
+        
+        # Select the audio device
+        dev_label = QLabel('Device')
+        dev_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
+        grid.addWidget(dev_label, 1, 0)
+        self.__dev_combo = QComboBox()
+        output_list = self.__con.cmd_exchange(M_ID.ENUM_OUTPUTS, [])
+        devices = []
+        if output_list == None:
+            print("Failed to enumerate audio outputs!")
+        else:    
+            for device in output_list['outputs']:
+                devices.append('%s@%s' % (device['api'], device['name']))
+        self.__dev_combo.addItems(devices)
+        grid.addWidget(self.__dev_combo, 1, 1, 1, 3)
+        self.__dev_combo.activated.connect(self.__dev_evnt)
+        
+        # Assign channel
+        # Create an exclusive button group
+        self.btn_grp = QButtonGroup()
+        self.btn_grp.setExclusive(True)
+        btn_panel = QWidget()
+        btn_box = QHBoxLayout()
+        btn_panel.setLayout(btn_box)
+        grid.addWidget(btn_panel, 2, 1, 1, 3)
+        ch_label = QLabel('Ch')
+        ch_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
+        grid.addWidget(ch_label, 2, 0)
+        
+        ch_left = QCheckBox('Left')
+        self.btn_grp.addButton(ch_left)
+        self.btn_grp.setId(ch_left, 0)
+        ch_left.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(ch_left)
+        ch_left.setVisible(False)
+        
+        ch_right = QCheckBox('Right')
+        self.btn_grp.addButton(ch_right)
+        self.btn_grp.setId(ch_right, 1)
+        ch_right.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(ch_right)
+        
+        ch_both = QCheckBox('Both')
+        self.btn_grp.addButton(ch_both)
+        self.btn_grp.setId(ch_both, 2)
+        ch_both.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(ch_both)
+        
+        ch_none = QCheckBox('None')
+        self.btn_grp.addButton(ch_none)
+        self.btn_grp.setId(ch_none, 3)
+        ch_none.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(ch_none)
+        
+        self.btn_grp.buttonClicked.connect(self.__ch_evnt)
+        
+        # 'Apply' buttons
+        applybtn = QPushButton('Apply')
+        applybtn.setToolTip('Apply this audio configuration')
+        applybtn.resize(applybtn.sizeHint())
+        applybtn.setEnabled(True)
+        grid.addWidget(applybtn, 3, 2)
+        applybtn.clicked.connect(self.__apply_evnt)
+        applybtn.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(196,196,196); font: bold 10px}")
+        
+        # 'Cancel' buttons
+        cancelbtn = QPushButton('Cancel')
+        cancelbtn.setToolTip('Cancel changes')
+        cancelbtn.resize(cancelbtn.sizeHint())
+        cancelbtn.setEnabled(True)
+        grid.addWidget(cancelbtn, 3, 3)
+        cancelbtn.clicked.connect(self.__cancel_evnt)
+        cancelbtn.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(196,196,196); font: bold 10px}")
+        
+        # Update UI to last known state
+        # Source
+        self.sink_combo.setCurrentIndex(self.sink_combo.findText(self.__radio_1_audio_model['SOURCE']))
+        # Device
+        if self.__radio_1_audio_model['DEV'] != None:
+            index = self.__dev_combo.findText(self.__radio_1_audio_model['DEV'])
+        else:
+            index = 0
+        self.__dev_combo.setCurrentIndex(index)
+        # Available channels
+        # We have to check not only what the setting is for this receiver but what channels are available
+        # by checking all other recevers.
+        r1_ch = self.__radio_1_audio_model['CH']
+        if self.__radio_1_audio_model['DEV'] == None:
+            # No device defined so we can't set a channel
+            ch_left.setVisible(False)
+            ch_right.setVisible(False)
+            ch_both.setVisible(False)
+            ch_none.setVisible(False)
+        else :
+            # We have a device so check the saved channel
+            # Turn off other channels not allowed
+            if r1_ch == NONE:
+                ch_none.setCheckedState(Qt.Checked)
+            if r1_ch == LEFT:
+                ch_left.setCheckedState(Qt.Checked)
+                if self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
+                    ch_right.setVisible(False)
+                    ch_both.setVisible(False)
+            elif r1_ch == RIGHT:
+                ch_right.setCheckedState(Qt.Checked)
+                if self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
+                    ch_left.setVisible(False)
+                    ch_both.setVisible(False)
+            elif r1_ch == BOTH:
+                ch_both.setCheckedState(Qt.Checked)
+        
+    #==============================================================================================
+    # PUBLIC
+    #==============================================================================================
+    
+    #-------------------------------------------------
+    # Set context according to id
+    def set_context(self, callback, x, y, direction, id):
+        
+        """
+        Set Context
+        
+        Arguments:  
+            callback    --  callback here with mode string
+            x           --  x coord of main window
+            y           --  y coord of main window
+            direction   --  RX or TX
+            id          --  the id of this instantiation (radio id)
+            
+        """
+        self.callback = callback
+        self.direction = direction
+        # Position at top right corner of invoking button
+        self.id = id
+        self.move( x, y)
+        
+    #==============================================================================================
+    # PRIVATE
+    #==============================================================================================
+    
+    #-------------------------------------------------
+    # UI Events    
+    #-------------------------------------------------
+    # 
+    def __sink_evnt(self, e) :
+        """
+        Sink update
+        
+        Arguments:  
+            
+            
+        """
+        pass
+    
+    def __dev_evnt(self, e) :
+        """
+        Device update
+        
+        Arguments:  
+            
+            
+        """
+        pass
+    
+    def __ch_evnt(self, e) :
+        """
+        Ch update, any checkbox
+        
+        Arguments:  
+            
+            
+        """
+        pass
+    
+    def __apply_evnt(self, e) :
+        """
+        Any button click event
+        
+        Arguments:  
+            
+            
+        """
+        self.hide()
+    
+    def __cancel_evnt(self, e) :
+        """
+        Any button click event
+        
+        Arguments:  
+            
+            
+        """
+        self.hide()
+    
