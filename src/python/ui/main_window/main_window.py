@@ -56,7 +56,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('SDRLIbEConsole')
         # Set the back colour
         palette = QPalette()
-        #palette.setColor(QPalette.Background, QColor(43,63,68,255))
         palette.setColor(QPalette.Background, QColor(59,59,59,255))
         self.setPalette(palette)
         
@@ -254,30 +253,39 @@ class MainWindow(QMainWindow):
     #-------------------------------------------------
     # Audio button event
     def __audio_evnt(self) :
-        self.__audio_win.set_context(self.setAudio, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__audio_win.set_context(self.setAudio, self.x(), self.y() + 32 , CH_RX, 1)
         self.__audio_win.show()
         
     #-------------------------------------------------
     # Exit button event
+    def closeEvent(self, win) :
+       self. __exit_evnt()
+       
     def __exit_evnt(self) :
+        # Kill windows
+        self.__mode_win.hide()
+        self.__filter_win.hide()
+        self.__agc_win.hide()
+        self.__audio_win.hide()
         QApplication.quit()
+        qApp.quit()
     
     #-------------------------------------------------
     # Mode button event
     def __mode_evnt(self) :
-        self.__mode_win.set_context(self.setMode, self.x() + self.width(), self.y(), CH_RX, 1)
+        self.__mode_win.set_context(self.setMode, self.x(), self.y() + 32, CH_RX, 1)
         self.__mode_win.show()
     
     #-------------------------------------------------
     # Filter button event
     def __filter_evnt(self) :
-        self.__filter_win.set_context(self.setFilter, self.x() + self.width(), self.y() + 20, CH_RX, 1)
+        self.__filter_win.set_context(self.setFilter, self.x(), self.y() + 32, CH_RX, 1)
         self.__filter_win.show()
     
     #-------------------------------------------------
     # AGC button event
     def __agc_evnt(self) :
-        self.__agc_win.set_context(self.setAGC, self.x() + self.width(), self.y() + 40, CH_RX, 1)
+        self.__agc_win.set_context(self.setAGC, self.x(), self.y() + 32, CH_RX, 1)
         self.__agc_win.show()
     
     #==============================================================================================

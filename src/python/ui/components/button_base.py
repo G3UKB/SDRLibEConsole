@@ -49,18 +49,18 @@ class ButtonBase(QWidget):
         
         # Set the back colour
         palette = QPalette()
-        palette.setColor(QPalette.Background, QColor(43,63,68,255))
+        palette.setColor(QPalette.Background, QColor(41,41,41,255))
         self.setPalette(palette)
         self.setWindowFlags(
             Qt.CustomizeWindowHint |
             Qt.FramelessWindowHint |
             Qt.WindowStaysOnTopHint
         )
-        self.setWindowOpacity(0.9)
+        self.setWindowOpacity(0.97)
         
         # Set the layout
         self.__grid = QGridLayout()
-        self.__grid.setSpacing(0)
+        #self.__grid.setSpacing(0)
         margins = QMargins()
         margins.setLeft = 0
         margins.setRight = 0
@@ -95,7 +95,7 @@ class ButtonBase(QWidget):
         self.direction = direction
         # Position at top right corner of invoking button
         self.id = id
-        self.move( x, y+50)
+        self.move( x, y)
     
     #==============================================================================================
     # PRIVATE

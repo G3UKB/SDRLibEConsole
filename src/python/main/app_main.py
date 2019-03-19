@@ -90,6 +90,7 @@ class AppMain:
         
         # Save window metrics
         self.__w.setMetrics()
+        
         # Save the model
         self.__m.save_model()
         
