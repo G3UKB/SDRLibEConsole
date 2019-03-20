@@ -116,30 +116,30 @@ class Audio(QWidget):
         ch_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
         grid.addWidget(ch_label, 2, 0)
         
-        ch_left = QCheckBox('Left')
-        self.btn_grp.addButton(ch_left)
-        self.btn_grp.setId(ch_left, 0)
-        ch_left.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
-        btn_box.addWidget(ch_left)
-        ch_left.setVisible(False)
+        self.__ch_left = QCheckBox('Left')
+        self.btn_grp.addButton(self.__ch_left)
+        self.btn_grp.setId(self.__ch_left, 0)
+        self.__ch_left.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(self.__ch_left)
+        self.__ch_left.setVisible(False)
         
-        ch_right = QCheckBox('Right')
-        self.btn_grp.addButton(ch_right)
-        self.btn_grp.setId(ch_right, 1)
-        ch_right.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
-        btn_box.addWidget(ch_right)
+        self.__ch_right = QCheckBox('Right')
+        self.btn_grp.addButton(self.__ch_right)
+        self.btn_grp.setId(self.__ch_right, 1)
+        self.__ch_right.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(self.__ch_right)
         
-        ch_both = QCheckBox('Both')
-        self.btn_grp.addButton(ch_both)
-        self.btn_grp.setId(ch_both, 2)
-        ch_both.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
-        btn_box.addWidget(ch_both)
+        self.__ch_both = QCheckBox('Both')
+        self.btn_grp.addButton(self.__ch_both)
+        self.btn_grp.setId(self.__ch_both, 2)
+        self.__ch_both.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(self.__ch_both)
         
-        ch_none = QCheckBox('None')
-        self.btn_grp.addButton(ch_none)
-        self.btn_grp.setId(ch_none, 3)
-        ch_none.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
-        btn_box.addWidget(ch_none)
+        self.__ch_none = QCheckBox('None')
+        self.btn_grp.addButton(self.__ch_none)
+        self.btn_grp.setId(self.__ch_none, 3)
+        self.__ch_none.setStyleSheet("QCheckBox {color: rgb(196,196,196)}")
+        btn_box.addWidget(self.__ch_none)
         
         self.btn_grp.buttonClicked.connect(self.__ch_evnt)
         
@@ -171,32 +171,7 @@ class Audio(QWidget):
             index = 0
         self.__dev_combo.setCurrentIndex(index)
         # Available channels
-        # We have to check not only what the setting is for this receiver but what channels are available
-        # by checking all other recevers.
-        r1_ch = self.__radio_1_audio_model['CH']
-        if self.__radio_1_audio_model['DEV'] == None:
-            # No device defined so we can't set a channel
-            ch_left.setVisible(False)
-            ch_right.setVisible(False)
-            ch_both.setVisible(False)
-            ch_none.setVisible(False)
-        else :
-            # We have a device so check the saved channel
-            # Turn off other channels not allowed
-            if r1_ch == NONE:
-                ch_none.setCheckedState(Qt.Checked)
-            if r1_ch == LEFT:
-                ch_left.setCheckedState(Qt.Checked)
-                if self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
-                    ch_right.setVisible(False)
-                    ch_both.setVisible(False)
-            elif r1_ch == RIGHT:
-                ch_right.setCheckedState(Qt.Checked)
-                if self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
-                    ch_left.setVisible(False)
-                    ch_both.setVisible(False)
-            elif r1_ch == BOTH:
-                ch_both.setCheckedState(Qt.Checked)
+        self.__manage_ch()
         
     #==============================================================================================
     # PUBLIC
@@ -230,7 +205,7 @@ class Audio(QWidget):
     #-------------------------------------------------
     # UI Events    
     #-------------------------------------------------
-    # 
+    
     def __sink_evnt(self, e) :
         """
         Sink update
@@ -241,7 +216,7 @@ class Audio(QWidget):
         """
         pass
     
-    def __dev_evnt(self, e) :
+    def __dev_evnt(self, idx) :
         """
         Device update
         
@@ -249,7 +224,11 @@ class Audio(QWidget):
             
             
         """
-        pass
+  
+        api_dev = self.__dev_combo.currentText()
+        #(api, dev) = text.split('@')
+        self.__radio_1_audio_model['DEV'] = api_dev
+        self.__manage_ch()
     
     def __ch_evnt(self, e) :
         """
@@ -281,3 +260,36 @@ class Audio(QWidget):
         """
         self.hide()
     
+    #-------------------------------------------------
+    # Helpers
+    #-------------------------------------------------
+    def __manage_ch(self):
+        # Available channels
+        # We have to check not only what the setting is for this receiver but what channels are available
+        # by checking all other recevers.
+        r1_ch = self.__radio_1_audio_model['CH']
+        print(r1_ch)
+        if self.__radio_1_audio_model['DEV'] == None:
+            # No device defined so we can't set a channel
+            self.__ch_left.setVisible(False)
+            self.__ch_right.setVisible(False)
+            self.__ch_both.setVisible(False)
+            self.__ch_none.setVisible(False)
+        else :
+            # We have a device so check the saved channel
+            # Turn off other channels not allowed
+            if r1_ch == NONE:
+                ch_none.setCheckedState(Qt.Checked)
+            if r1_ch == LEFT:
+                self.__ch_left.setCheckedState(Qt.Checked)
+                if self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
+                    self.__ch_right.setVisible(False)
+                    self.__ch_both.setVisible(False)
+            elif r1_ch == RIGHT:
+                self.__ch_right.setCheckedState(Qt.Checked)
+                if self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
+                    self.__ch_left.setVisible(False)
+                    self.__ch_both.setVisible(False)
+            elif r1_ch == BOTH:
+                self.__ch_both.setCheckedState(Qt.Checked)
+                
