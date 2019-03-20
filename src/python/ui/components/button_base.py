@@ -115,7 +115,7 @@ class ButtonBase(QWidget):
             
         """
         btn.setCheckable(True)
-        btn.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(148,148,148); font: bold 10px}")
+        btn.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(148,148,148); font: bold 10px;} QPushButton:checked {background-color: rgb(98,98,98);}")
         self.__grid.addWidget(btn, row, col)
         self.btn_grp.addButton(btn)
         self.btn_grp.setId(btn, id)

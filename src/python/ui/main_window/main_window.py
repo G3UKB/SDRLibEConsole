@@ -80,15 +80,15 @@ class MainWindow(QMainWindow):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
-        audioAct = QAction(self.style().standardIcon(QStyle.SP_MediaVolume), 'Stop', self)
-        audioAct.setShortcut('Ctrl+A')
-        audioAct.triggered.connect(self.__audio_evnt)
+        #audioAct = QAction(self.style().standardIcon(QStyle.SP_MediaVolume), 'Stop', self)
+        #audioAct.setShortcut('Ctrl+A')
+        #audioAct.triggered.connect(self.__audio_evnt)
         
         self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
-        self.toolbar.addAction(audioAct)
+        #self.toolbar.addAction(audioAct)
         self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
         #-------------------------------------------------
@@ -129,14 +129,17 @@ class MainWindow(QMainWindow):
         #-------------------------------------------------
         # Right side buttons
         # Mode button
-        self.mode_btn = QPushButton('Mode', self)
+        self.mode_btn = QPushButton('Mode>', self)
         self.__set_button(self.__side_grid, self.mode_btn, 0, 0, self.__mode_evnt, mode_lookup[self.__radio_model[1]['MODE']][1], 1)
         # Filter button
-        self.filter_btn = QPushButton('Filter', self)
+        self.filter_btn = QPushButton('Filter>', self)
         self.__set_button(self.__side_grid, self.filter_btn, 1, 0, self.__filter_evnt, filter_lookup[self.__radio_model[1]['FILTER']][3], 1)
         # AGC button
-        self.agc_btn = QPushButton('AGC', self)
+        self.agc_btn = QPushButton('AGC>', self)
         self.__set_button(self.__side_grid, self.agc_btn, 2, 0, self.__agc_evnt, agc_lookup[self.__radio_model[1]['AGC']][1], 1)
+        # Audio button
+        self.audio_btn = QPushButton('Audio>', self)
+        self.__set_button(self.__side_grid, self.audio_btn, 3, 0, self.__audio_evnt, "Audio>", 1)
         
         #-------------------------------------------------
         # VFO control
@@ -252,9 +255,9 @@ class MainWindow(QMainWindow):
     
     #-------------------------------------------------
     # Audio button event
-    def __audio_evnt(self) :
-        self.__audio_win.set_context(self.setAudio, self.x(), self.y() + 32 , CH_RX, 1)
-        self.__audio_win.show()
+    #def __audio_evnt(self) :
+    #    self.__audio_win.set_context(self.setAudio, self.x(), self.y() + 32 , CH_RX, 1)
+    #    self.__audio_win.show()
         
     #-------------------------------------------------
     # Exit button event
@@ -273,21 +276,27 @@ class MainWindow(QMainWindow):
     #-------------------------------------------------
     # Mode button event
     def __mode_evnt(self) :
-        self.__mode_win.set_context(self.setMode, self.x(), self.y() + 32, CH_RX, 1)
+        self.__mode_win.set_context(self.setMode, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
         self.__mode_win.show()
     
     #-------------------------------------------------
     # Filter button event
     def __filter_evnt(self) :
-        self.__filter_win.set_context(self.setFilter, self.x(), self.y() + 32, CH_RX, 1)
+        self.__filter_win.set_context(self.setFilter, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
         self.__filter_win.show()
     
     #-------------------------------------------------
     # AGC button event
     def __agc_evnt(self) :
-        self.__agc_win.set_context(self.setAGC, self.x(), self.y() + 32, CH_RX, 1)
+        self.__agc_win.set_context(self.setAGC, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
         self.__agc_win.show()
     
+    #-------------------------------------------------
+    # Audio button event
+    def __audio_evnt(self) :
+        self.__audio_win.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX, 1)
+        self.__audio_win.show()
+        
     #==============================================================================================
     # PRIVATE
     #==============================================================================================

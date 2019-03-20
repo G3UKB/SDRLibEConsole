@@ -84,7 +84,7 @@ class Filters(ButtonBase):
         # Select the appropriate button
         button = self.btn_grp.button(self.__radio_model[id]['FILTER'])
         # Does not cause a click event
-        button.setDown(True)
+        button.setChecked(True)
         
     #==============================================================================================
     # PRIVATE

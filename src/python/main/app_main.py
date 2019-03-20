@@ -54,11 +54,11 @@ class AppMain:
         # See if a server or simulator is running?
         state = Model.get_state_model()
         if con.cmd_exchange(M_ID.POLL, []) == None:
-            print("Failed to connect to server. We will try again on 'Start'")
+            print("Failed to connect to server! Press 'Start' to try again.")
         else:
             state['HAVE-SERVER'] = True
             if con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                print("No radio hardware detected! We will try again on 'Start'")
+                print("No radio hardware detected! Press 'Start' to try again.")
             else:
                 state['DISCOVER'] = True
                 # Temporary fudge
