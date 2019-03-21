@@ -120,3 +120,5 @@ LEFT = 'Left'
 RIGHT = 'Right'
 BOTH = 'Both'
 NONE = 'None'
+DIR_INPUT = 0
+DIR_OUTPUT = 1

@@ -68,6 +68,8 @@ class Audio(QWidget):
         
         # Get radio model audio section
         self.__radio_1_audio_model = Model.get_radio_model()[1]['AUDIO']
+        self.__radio_2_audio_model = Model.get_radio_model()[2]['AUDIO']
+        self.__radio_3_audio_model = Model.get_radio_model()[3]['AUDIO']
         self.__audio_model = Model.get_radio_model()[2]['AUDIO']
         self.__audio_model = Model.get_radio_model()[3]['AUDIO']
         
@@ -83,10 +85,10 @@ class Audio(QWidget):
         src_label = QLabel('Sink')
         src_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
         grid.addWidget(src_label, 0, 0)
-        self.sink_combo = QComboBox()
-        self.sink_combo.addItems((HPSDR, LOCAL))
-        grid.addWidget(self.sink_combo, 0, 1, 1, 3)
-        self.sink_combo.activated.connect(self.__sink_evnt)
+        self.__sink_combo = QComboBox()
+        self.__sink_combo.addItems((HPSDR, LOCAL))
+        grid.addWidget(self.__sink_combo, 0, 1, 1, 3)
+        self.__sink_combo.activated.connect(self.__sink_evnt)
         
         # Select the audio device
         dev_label = QLabel('Device')
@@ -97,7 +99,8 @@ class Audio(QWidget):
         devices = []
         if output_list == None:
             print("Failed to enumerate audio outputs!")
-        else:    
+        else:
+            devices.append('No selection')
             for device in output_list['outputs']:
                 devices.append('%s@%s' % (device['api'], device['name']))
         self.__dev_combo.addItems(devices)
@@ -161,17 +164,8 @@ class Audio(QWidget):
         cancelbtn.clicked.connect(self.__cancel_evnt)
         cancelbtn.setStyleSheet("QPushButton {background-color: rgb(59,59,59); color: rgb(196,196,196); font: bold 10px}")
         
-        # Update UI to last known state
-        # Source
-        self.sink_combo.setCurrentIndex(self.sink_combo.findText(self.__radio_1_audio_model['SOURCE']))
-        # Device
-        if self.__radio_1_audio_model['DEV'] != None:
-            index = self.__dev_combo.findText(self.__radio_1_audio_model['DEV'])
-        else:
-            index = 0
-        self.__dev_combo.setCurrentIndex(index)
-        # Available channels
-        self.__manage_ch()
+        # Set UI state
+        self.__reset_state()
         
     #==============================================================================================
     # PUBLIC
@@ -197,6 +191,8 @@ class Audio(QWidget):
         # Position at top right corner of invoking button
         self.id = id
         self.move( x, y)
+        # Set UI state
+        self.__reset_state()
         
     #==============================================================================================
     # PRIVATE
@@ -206,7 +202,8 @@ class Audio(QWidget):
     # UI Events    
     #-------------------------------------------------
     
-    def __sink_evnt(self, e) :
+    #-------------------------------------------------
+    def __sink_evnt(self, idx) :
         """
         Sink update
         
@@ -214,8 +211,10 @@ class Audio(QWidget):
             
             
         """
-        pass
+        self.__sink = self.__sink_combo.currentText()
+        self.__update_state()
     
+    #-------------------------------------------------
     def __dev_evnt(self, idx) :
         """
         Device update
@@ -225,12 +224,11 @@ class Audio(QWidget):
             
         """
   
-        api_dev = self.__dev_combo.currentText()
-        #(api, dev) = text.split('@')
-        self.__radio_1_audio_model['DEV'] = api_dev
-        self.__manage_ch()
+        self.__dev = self.__dev_combo.currentText()
+        self.__update_state()
     
-    def __ch_evnt(self, e) :
+    #-------------------------------------------------
+    def __ch_evnt(self, btn) :
         """
         Ch update, any checkbox
         
@@ -238,8 +236,17 @@ class Audio(QWidget):
             
             
         """
-        pass
+        if self.btn_grp.id(btn) == 0:
+            ch = LEFT
+        elif self.btn_grp.id(btn) == 1:
+            ch = RIGHT
+        elif self.btn_grp.id(btn) == 2:
+            ch = BOTH
+        elif self.btn_grp.id(btn) == 3:
+            ch = NONE
+        self.__ch = ch
     
+    #-------------------------------------------------
     def __apply_evnt(self, e) :
         """
         Any button click event
@@ -248,8 +255,23 @@ class Audio(QWidget):
             
             
         """
+        
+        # Set the model
+        self.__radio_1_audio_model['SINK'] = self.__sink
+        self.__radio_1_audio_model['DEV'] = self.__dev
+        self.__radio_1_audio_model['CH'] = self.__ch
+        # Set the server audio route
+        (api, dev) = self.__dev.split('@')
+        if conn.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
+            # Bounce the server to make it current
+            if not conn.cmd_exchange(M_ID.SVR_BOUNCE, []):
+                print("Error boiuncing server")
+        else:
+            print("Error setting audio route!")
+        # Hide window
         self.hide()
     
+    #-------------------------------------------------
     def __cancel_evnt(self, e) :
         """
         Any button click event
@@ -258,38 +280,104 @@ class Audio(QWidget):
             
             
         """
+        
+        self.__sink = None
+        self.__dev = None
+        self.__ch = None
+        # Just hide the window
         self.hide()
     
     #-------------------------------------------------
     # Helpers
     #-------------------------------------------------
+    
+    #-------------------------------------------------
+    # Set UI to last model state
+    def __reset_state(self):
+        # Set holding values
+        self.__sink = self.__radio_1_audio_model['SINK']
+        self.__dev = self.__radio_1_audio_model['DEV']
+        self.__ch = self.__radio_1_audio_model['CH']
+        
+        # Update UI to last known state
+        # Sink
+        self.__sink_combo.setCurrentIndex(self.__sink_combo.findText(self.__sink))
+        # Device
+        if self.__radio_1_audio_model['DEV'] != None:
+            index = self.__dev_combo.findText(self.__dev)
+        else:
+            index = 0
+        self.__dev_combo.setCurrentIndex(index)
+        # Set widget context
+        self.__manage_dev()
+        self.__manage_ch()
+    
+    #-------------------------------------------------
+    # Set UI to last local state
+    def __update_state(self):
+        self.__manage_dev()
+        self.__manage_ch()
+        
+    #-------------------------------------------------
+    # Set device visability
+    def __manage_dev(self):
+        if self.__sink == HPSDR:
+            self.__dev_combo.setVisible(False)
+        else:
+            self.__dev_combo.setVisible(True)
+    
+    #-------------------------------------------------
+    # Set channel visibility
     def __manage_ch(self):
         # Available channels
         # We have to check not only what the setting is for this receiver but what channels are available
         # by checking all other recevers.
-        r1_ch = self.__radio_1_audio_model['CH']
-        print(r1_ch)
-        if self.__radio_1_audio_model['DEV'] == None:
-            # No device defined so we can't set a channel
+        r1_ch = self.__ch
+        if self.__dev == NONE or self.__sink == HPSDR:
+            # No device defined or not local so we can't set a channel
             self.__ch_left.setVisible(False)
             self.__ch_right.setVisible(False)
             self.__ch_both.setVisible(False)
             self.__ch_none.setVisible(False)
         else :
             # We have a device so check the saved channel
-            # Turn off other channels not allowed
+            # Set all visible first
+            self.__ch_left.setVisible(True)
+            self.__ch_right.setVisible(True)
+            self.__ch_both.setVisible(True)
+            self.__ch_none.setVisible(True)
+            # Set the channel according to model
             if r1_ch == NONE:
-                ch_none.setCheckedState(Qt.Checked)
-            if r1_ch == LEFT:
-                self.__ch_left.setCheckedState(Qt.Checked)
-                if self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
+                self.__ch_none.setCheckState(Qt.Checked)
+            elif r1_ch == LEFT:
+                self.__ch_left.setCheckState(Qt.Checked)                
+            elif r1_ch == RIGHT:
+                self.__ch_right.setCheckState(Qt.Checked)    
+            elif r1_ch == BOTH:
+                self.__ch_both.setCheckState(Qt.Checked)
+            
+            # Then turn off those which are allocated elsewhere
+            if  self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
+                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
+                    self.__dev == self.__radio_3_audio_model['DEV']:
+                    self.__ch_left.setVisible(False)
+                    if r1_ch == LEFT:
+                        print("Audio problem, more than one channel on the same device allocated LEFT ch!")
+            
+            if  self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
+                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
+                    self.__dev == self.__radio_3_audio_model['DEV']:
+                    self.__ch_right.setVisible(False)
+                    if r1_ch == RIGHT:
+                        print("Audio problem, more than one channel on the same device allocated RIGHT ch!")
+            
+            if  self.__radio_2_audio_model['CH'] == BOTH or self.__radio_3_audio_model['CH'] == BOTH:
+                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
+                    self.__dev == self.__radio_3_audio_model['DEV']:
+                    self.__ch_left.setVisible(False)
                     self.__ch_right.setVisible(False)
                     self.__ch_both.setVisible(False)
-            elif r1_ch == RIGHT:
-                self.__ch_right.setCheckedState(Qt.Checked)
-                if self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
-                    self.__ch_left.setVisible(False)
-                    self.__ch_both.setVisible(False)
-            elif r1_ch == BOTH:
-                self.__ch_both.setCheckedState(Qt.Checked)
+                    if r1_ch == LEFT or r1_ch == RIGHT or r1_ch == BOTH:
+                        print("Audio problem, more than one channel on the same device conflicts with BOTH ch!")
+                        
                 

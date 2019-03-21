@@ -58,9 +58,9 @@ class Model:
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
                     'AUDIO' : {
-                        'SOURCE' : HPSDR,
-                        'DEV' : None,
-                        'CH': None
+                        'SINK' : HPSDR,
+                        'DEV' : NONE,
+                        'CH': NONE
                     }
                 },
                 2 : {
@@ -69,9 +69,9 @@ class Model:
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
                     'AUDIO' : {
-                        'SOURCE' : HPSDR,
-                        'DEV' : None,
-                        'CH': None
+                        'SINK' : HPSDR,
+                        'DEV' : NONE,
+                        'CH': NONE
                     }
                 },
                 3 : {
@@ -80,9 +80,9 @@ class Model:
                     'FILTER' : CH_2K4,
                     'AGC' : CH_AGC_LONG,
                     'AUDIO' : {
-                        'SOURCE' : HPSDR,
-                        'DEV' : None,
-                        'CH': None
+                        'SINK' : HPSDR,
+                        'DEV' : NONE,
+                        'CH': NONE
                     }
                 }
             }
