@@ -49,15 +49,15 @@ class AppMain:
         self.__m.restore_model()
         
         # Create a connector interface
-        con = Connector()
-        addToCache('conn_inst', con)
+        self.__con = Connector()
+        addToCache('conn_inst', self.__con)
         # See if a server or simulator is running?
         state = Model.get_state_model()
-        if con.cmd_exchange(M_ID.POLL, []) == None:
+        if self.__con.cmd_exchange(M_ID.POLL, []) == None:
             print("Failed to connect to server! Press 'Start' to try again.")
         else:
             state['HAVE-SERVER'] = True
-            if con.cmd_exchange(M_ID.DISCOVER, []) == None:
+            if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
                 print("No radio hardware detected! Press 'Start' to try again.")
             else:
                 state['DISCOVER'] = True
@@ -67,7 +67,7 @@ class AppMain:
                 #if set_audio(con) == None:
                 #    print("Sorry, failed to set default audio, unable to continue!")
                 #    sys.exit()            
-                if con.cmd_exchange(M_ID.SVR_START, []) == None:
+                if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
                     print("Sorry, failed to start server, unable to continue!")
                     sys.exit()
                 state['SERVER-RUN'] = True
@@ -100,9 +100,9 @@ class AppMain:
     # Set all routes
     def set_audio_routes(self):
         radio_model = self.__m.get_radio_model()
-        if radio_model[1]['DEV'] != NONE:
-            (api, dev) = radio_model[1]['DEV'].split('@')
-            if not conn.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
+        if radio_model[1]['AUDIO']['DEV'] != NONE:
+            (api, dev) = radio_model[1]['AUDIO']['DEV'].split('@')
+            if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, radio_model[1]['AUDIO']['SINK'], 1, api, dev, radio_model[1]['AUDIO']['CH']]):
                 print("Failed to set audio route! Unable to continue")
                 sys.exit()
         

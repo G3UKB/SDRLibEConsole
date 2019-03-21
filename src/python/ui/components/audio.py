@@ -262,9 +262,9 @@ class Audio(QWidget):
         self.__radio_1_audio_model['CH'] = self.__ch
         # Set the server audio route
         (api, dev) = self.__dev.split('@')
-        if conn.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
+        if self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
             # Bounce the server to make it current
-            if not conn.cmd_exchange(M_ID.SVR_BOUNCE, []):
+            if not self.__con.cmd_exchange(M_ID.SVR_BOUNCE, []):
                 print("Error bouncing server")
         else:
             print("Error setting audio route!")
