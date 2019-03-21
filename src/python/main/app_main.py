@@ -61,10 +61,12 @@ class AppMain:
                 print("No radio hardware detected! Press 'Start' to try again.")
             else:
                 state['DISCOVER'] = True
+                # Set all audio routes
+                self.set_audio_routes()
                 # Temporary fudge
-                if set_audio(con) == None:
-                    print("Sorry, failed to set default audio, unable to continue!")
-                    sys.exit()            
+                #if set_audio(con) == None:
+                #    print("Sorry, failed to set default audio, unable to continue!")
+                #    sys.exit()            
                 if con.cmd_exchange(M_ID.SVR_START, []) == None:
                     print("Sorry, failed to start server, unable to continue!")
                     sys.exit()
@@ -93,6 +95,16 @@ class AppMain:
         
         # Save the model
         self.__m.save_model()
+    
+    #-------------------------------------------------
+    # Set all routes
+    def set_audio_routes(self):
+        radio_model = self.__m.get_radio_model()
+        if radio_model[1]['DEV'] != NONE:
+            (api, dev) = radio_model[1]['DEV'].split('@')
+            if not conn.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
+                print("Failed to set audio route! Unable to continue")
+                sys.exit()
         
 #=====================================================
 # Entry point

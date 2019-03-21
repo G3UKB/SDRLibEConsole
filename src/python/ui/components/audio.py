@@ -265,7 +265,7 @@ class Audio(QWidget):
         if conn.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
             # Bounce the server to make it current
             if not conn.cmd_exchange(M_ID.SVR_BOUNCE, []):
-                print("Error boiuncing server")
+                print("Error bouncing server")
         else:
             print("Error setting audio route!")
         # Hide window
