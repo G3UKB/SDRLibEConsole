@@ -116,9 +116,9 @@ agc_lookup = (
 # Audio
 HPSDR = 'HPSDR'
 LOCAL = 'LOCAL'
-LEFT = 'Left'
-RIGHT = 'Right'
-BOTH = 'Both'
-NONE = 'None'
+LEFT = 'left'
+RIGHT = 'right'
+BOTH = 'both'
+NONE = 'none'
 DIR_INPUT = 0
 DIR_OUTPUT = 1
