@@ -50,7 +50,6 @@ class M_ID(Enum):
     DISCOVER = auto(),
     SVR_START = auto(),
     SVR_STOP = auto(),
-    SVR_BOUNCE = auto(),
     RADIO_START = auto(),
     RADIO_STOP = auto(),
     NUM_RX = auto(),
@@ -97,6 +96,9 @@ class M_ID(Enum):
     REVERT_OUTPUTS = auto(),
     CHANGE_OUTPUTS = auto(),
     AUDIO_ROUTE = auto(),
+    LOCAL_AUDIO_RUN = auto(),
+    CLEAR_AUDIO_ROUTES = auto(),
+    RESTART_AUDIO_ROUTES = auto(),
     #---------------
     # Display
     DISP_WIDTH = auto(),
@@ -116,7 +118,6 @@ class M_LU:
             M_ID.DISCOVER : ("radio_discover", M_ID.ACK_NAK),
             M_ID.SVR_START : ("server_start", M_ID.ACK_NAK),
             M_ID.SVR_STOP : ("terminate", M_ID.ACK_NAK),
-            M_ID.SVR_BOUNCE : ("bounce", M_ID.ACK_NAK),
             M_ID.RADIO_START : ("radio_start", M_ID.ACK_NAK),
             M_ID.RADIO_STOP : ("radio_stop", M_ID.ACK_NAK),
             M_ID.NUM_RX : ("set_num_rx", M_ID.ACK_NAK),
@@ -163,6 +164,9 @@ class M_LU:
             M_ID.REVERT_OUTPUTS : ("revert_outputs", M_ID.ACK_NAK),
             M_ID.CHANGE_OUTPUTS : ("change_outputs", M_ID.ACK_NAK),
             M_ID.AUDIO_ROUTE : ("set_audio_route", M_ID.ACK_NAK),
+            M_ID.LOCAL_AUDIO_RUN : ("local_audio_run", M_ID.ACK_NAK),
+            M_ID.CLEAR_AUDIO_ROUTES : ("clear_audio_routes", M_ID.ACK_NAK),
+            M_ID.RESTART_AUDIO_ROUTES : ("restart_audio_routes", M_ID.ACK_NAK),  
             #---------------
             # Display
             M_ID.DISP_WIDTH : ("set_display_width", M_ID.ACK_NAK),

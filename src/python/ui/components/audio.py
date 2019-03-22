@@ -261,13 +261,18 @@ class Audio(QWidget):
         self.__radio_1_audio_model['DEV'] = self.__dev
         self.__radio_1_audio_model['CH'] = self.__ch
         # Set the server audio route
-        (api, dev) = self.__dev.split('@')
-        if self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
-            # Bounce the server to make it current
-            if not self.__con.cmd_exchange(M_ID.SVR_BOUNCE, []):
-                print("Error bouncing server")
+        # First clear down existing routes
+        if self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
+            # Set the new route
+            (api, dev) = self.__dev.split('@')
+            if self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, 1, api, dev, self.__ch]):
+                # Restart audio
+                if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
+                    print("Failed to restart audio!")
+            else:
+                print("Failed to set new audio route(s)!")
         else:
-            print("Error setting audio route!")
+            print("Failed to clear audio route(s)!")
         # Hide window
         self.hide()
     
