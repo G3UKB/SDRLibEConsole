@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# main_wimndow.py
+# window_base.py
 #
-# Main window for the SDRLibEConsole application
+# Base class for top level windows
 # 
 # Copyright (C) 2019 by G3UKB Bob Cowdery
 # This program is free software; you can redistribute it and/or modify
@@ -27,88 +27,56 @@
 from main.imports import *
 
 #==============================================================================================
-# The main window for SDRLibEConsole
+# Base window class for SDRLibEConsole
 #==============================================================================================
 
 #=====================================================
-# Main window class
-# The main window runs RX1 and has all common controls
-# Auxiliary windows run the other radios
+# Base window class
+# The base class for receiver and ytansmitter windows
 #=====================================================
-class MainWindow(QMainWindow):
+class WindowBase(QMainWindow):
     
     #-------------------------------------------------
     # Constructor
-    def __init__(self):
+    def __init__(self, title, id ):
         
-        super(MainWindow, self).__init__()
+        super(WindowBase, self).__init__()
+        
+        # The id is RX_1 to RX_3 or TX_1
+        self.__id = id
         
         #-------------------------------------------------
         # Get instances
-        self.__con = getInstance('conn_inst')
-        self.__mode_win = getInstance('mode_win')
-        self.__filter_win = getInstance('filter_win')
-        self.__agc_win = getInstance('agc_win')
-        self.__audio_win = getInstance('audio_win')
+        # TDB These need to be for each instance
+        self.con = getInstance('conn_inst')
+        self.mode_win = getInstance('mode_win')
+        self.filter_win = getInstance('filter_win')
+        self.agc_win = getInstance('agc_win')
+        self.audio_win = getInstance('audio_win')
         
         #-------------------------------------------------
         # Set title
-        self.setWindowTitle('SDRLIbEConsole')
+        self.setWindowTitle(title)
         # Set the back colour
         palette = QPalette()
         palette.setColor(QPalette.Background, QColor(59,59,59,255))
         self.setPalette(palette)
         
         #-------------------------------------------------
-        # Status bar
-        self.statusBar = QStatusBar()
-        self.setStatusBar(self.statusBar)
-        self.statusBar.showMessage("Stopped",0)
-        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
-        
-        #-------------------------------------------------
-        # Set up toolbar
-        exitAct = QAction(self.style().standardIcon(QStyle.SP_TitleBarCloseButton), 'Exit', self)
-        exitAct.setShortcut('Ctrl+Q')
-        exitAct.triggered.connect(self.__exit_evnt)
-        
-        runAct = QAction(self.style().standardIcon(QStyle.SP_MediaPlay), 'Run', self)
-        runAct.setShortcut('Ctrl+R')
-        runAct.triggered.connect(self.__run)
-        
-        stopAct = QAction(self.style().standardIcon(QStyle.SP_MediaStop), 'Stop', self)
-        stopAct.setShortcut('Ctrl+S')
-        stopAct.triggered.connect(self.__stop)
-        
-        self.toolbar = self.addToolBar('ToolBar')
-        self.toolbar.addAction(exitAct)
-        self.toolbar.addAction(runAct)
-        self.toolbar.addAction(stopAct)
-        #self.toolbar.addAction(audioAct)
-        self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
-        
-        #-------------------------------------------------
-        # Set main panel and grid
-        panel = QWidget()
-        self.setCentralWidget(panel)
-        main_grid = QGridLayout()
-        panel.setLayout(main_grid)
-        
-        #-------------------------------------------------
         # Get app model
         self.__app_model = Model.get_app_model()
+        
         # Set window metrics
-        self.setGeometry(self.__app_model['X'], self.__app_model['Y'], self.__app_model['W'], self.__app_model['H'])
+        metrics = Model.get_app_model()['METRICS']
+        if id in metrics:
+            self.setGeometry(metrics[id][0], metrics[id][1], metrics[id][2], metrics[id][3])
+        
         # Get radio model
         self.__radio_model = Model.get_radio_model()
         
-        #-------------------------------------------------
-        # Populate
-        self.__setup_ui(main_grid)
-        
     #-------------------------------------------------
     # Setup UI contents
-    def __setup_ui(self, main_grid) :
+    def setup_ui(self, main_grid) :
         
         # Right side button grid
         # Note add the grid directly as a layout not in a panel else space cannot be removed
@@ -139,15 +107,18 @@ class MainWindow(QMainWindow):
         
         #-------------------------------------------------
         # VFO control
+        # TDB This needs to be for each instance
         vfo_grid = QGridLayout()
         main_grid.addLayout(vfo_grid, 0, 0)
-        self.__vfo = Vfo(self.__con, CH_RX, 1)
+        self.__vfo = Vfo(self.con, CH_RX, self.__id)
         self.__vfo.addVfo(self, vfo_grid)
     
     #==============================================================================================
     # PUBLIC
     #==============================================================================================
     
+    #-------------------------------------------------
+    # Callbacks
     #-------------------------------------------------
     # Callback for current mode
     def setMode(self, mode):    
@@ -167,15 +138,15 @@ class MainWindow(QMainWindow):
     # Callback for audio setting
     def setAudio(self, audio):    
         pass
-        
+    
+    #-------------------------------------------------
+    # Window metrics
+    #-------------------------------------------------
+    
     #-------------------------------------------------
     # Save window metrics
-    def setMetrics(self):
-        app_model = Model.get_app_model()
-        app_model['X'] = self.x()
-        app_model['Y'] = self.y()
-        app_model['W'] = self.width()
-        app_model['H'] = self.height()
+    def saveMetrics(self):
+        Model.get_app_model()['METRICS'][self.__id] = [self.x(),self.y(),self.width(),self.height()]
         
     #==============================================================================================
     # OVERRIDES
@@ -193,99 +164,30 @@ class MainWindow(QMainWindow):
     #==============================================================================================
     # EVENTS
     #==============================================================================================
-    
-    #-------------------------------------------------
-    # Run button event
-    def __run(self) :
-        error = False
-        state = Model.get_state_model()
-        # See what we need to start first
-        if not state['HAVE-SERVER']:
-            if self.__con.cmd_exchange(M_ID.POLL, []) == None:
-                print("Failed to connect to server! Please start the server and try again.")
-                error = True
-            else:
-                state['HAVE-SERVER'] = True
-                if not state['DISCOVER']:
-                    if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                        print("No radio hardware detected! Please start the radio and try again.")
-                        error = True
-                    else:
-                        state['DISCOVER'] = True
-                        if not state['SERVER-RUN']:
-                            # Temporary fudge
-                            if set_audio(self.__con) == None:
-                                print("Sorry, failed to set default audio! Please try a server restart.")
-                                state['HAVE-SERVER'] = False
-                                state['DISCOVER'] = False
-                                error = True
-                            if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
-                                print("Sorry, failed to start server! Please try a server restart.")
-                                state['HAVE-SERVER'] = False
-                                state['DISCOVER'] = False
-                                error = True
-                            else:
-                                state['SERVER-RUN'] = True
-                                
-        if error:
-            self.statusBar.showMessage("Stopped",0)
-            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
-            state['RADIO-RUN'] = False
-        else:
-            # Good to go
-            # Start radio
-            self.__con.cmd_exchange(M_ID.RADIO_START, [False])
-            self.statusBar.showMessage("Running",0)
-            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(0,64,0); font: bold 12px}")
-            state['RADIO-RUN'] = True
-    
-    #-------------------------------------------------
-    # Stop button event        
-    def __stop(self):
-        # Stop radio
-        state = Model.get_state_model()
-        self.__con.cmd_exchange(M_ID.RADIO_STOP, [])
-        self.statusBar.showMessage("Stopped",0)
-        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
-        state['RADIO-RUN'] = False
-        
-    #-------------------------------------------------
-    # Exit button event
-    def closeEvent(self, win) :
-       self. __exit_evnt()
-       
-    def __exit_evnt(self) :
-        # Kill windows
-        self.__mode_win.hide()
-        self.__filter_win.hide()
-        self.__agc_win.hide()
-        self.__audio_win.hide()
-        QApplication.quit()
-        qApp.quit()
-    
+
     #-------------------------------------------------
     # Mode button event
     def __mode_evnt(self) :
-        self.__mode_win.set_context(self.setMode, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.__mode_win.show()
+        self.mode_win.set_context(self.setMode, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
+        self.mode_win.show()
     
     #-------------------------------------------------
     # Filter button event
     def __filter_evnt(self) :
-        self.__filter_win.set_context(self.setFilter, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.__filter_win.show()
+        self.filter_win.set_context(self.setFilter, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
+        self.filter_win.show()
     
     #-------------------------------------------------
     # AGC button event
     def __agc_evnt(self) :
-        self.__agc_win.set_context(self.setAGC, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.__agc_win.show()
+        self.agc_win.set_context(self.setAGC, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
+        self.agc_win.show()
     
     #-------------------------------------------------
     # Audio button event
     def __audio_evnt(self) :
-        self.__audio_win.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX, 1)
-        self.__audio_win.show()
+        self.audio_win.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX, 1)
+        self.audio_win.show()
         
     #==============================================================================================
     # PRIVATE

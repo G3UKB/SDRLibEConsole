@@ -62,11 +62,7 @@ class AppMain:
             else:
                 state['DISCOVER'] = True
                 # Set all audio routes
-                self.set_audio_routes()
-                # Temporary fudge
-                #if set_audio(con) == None:
-                #    print("Sorry, failed to set default audio, unable to continue!")
-                #    sys.exit()            
+                self.set_audio_routes()        
                 if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
                     print("Sorry, failed to start server, unable to continue!")
                     sys.exit()
@@ -91,7 +87,7 @@ class AppMain:
         r = self.__qtapp.exec_()
         
         # Save window metrics
-        self.__w.setMetrics()
+        self.__w.saveMetrics()
         
         # Save the model
         self.__m.save_model()

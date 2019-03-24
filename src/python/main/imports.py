@@ -61,7 +61,10 @@ from ui.components.modes import *
 from ui.components.filters import *
 from ui.components.agc import *
 from ui.components.audio import *
-from ui.main_window.main_window import *
+# Windows
+#from ui.main_window.main_window import *
+from ui.windows.window_base import *
+from ui.windows.main_window import *
 
 
 
