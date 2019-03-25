@@ -147,11 +147,6 @@ class MainWindow(WindowBase):
        self. __exit_evnt()
        
     def __exit_evnt(self) :
-        # Kill windows
-        self.mode_win.hide()
-        self.filter_win.hide()
-        self.agc_win.hide()
-        self.audio_win.hide()
         QApplication.quit()
         qApp.quit()
         

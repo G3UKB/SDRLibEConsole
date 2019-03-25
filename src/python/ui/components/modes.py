@@ -113,10 +113,10 @@ class Modes(ButtonBase):
             # Execute mode change
             mode_id = self.btn_grp.id(btn)
             self.__con.cmd_exchange(r, [mode_id])
-            # Its a popup
-            self.hide()
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
             self.__radio_model[self.id]['MODE'] = mode_id
+            # Its a popup
+            self.close()
         

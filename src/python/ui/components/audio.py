@@ -273,8 +273,8 @@ class Audio(QWidget):
                 print("Failed to set new audio route(s)!")
         else:
             print("Failed to clear audio route(s)!")
-        # Hide window
-        self.hide()
+        # It's a popup
+        self.close()
     
     #-------------------------------------------------
     def __cancel_evnt(self, e) :
@@ -289,8 +289,8 @@ class Audio(QWidget):
         self.__sink = None
         self.__dev = None
         self.__ch = None
-        # Just hide the window
-        self.hide()
+        # It's a popup
+        self.close()
     
     #-------------------------------------------------
     # Helpers

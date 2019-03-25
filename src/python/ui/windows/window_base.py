@@ -168,26 +168,30 @@ class WindowBase(QMainWindow):
     #-------------------------------------------------
     # Mode button event
     def __mode_evnt(self) :
-        self.mode_win.set_context(self.setMode, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.mode_win.show()
+        self.__modes = Modes()
+        self.__modes.set_context(self.setMode, self.x() + self.width() + 20, self.y() + 32, CH_RX, RX_1)
+        self.__modes.show()
     
     #-------------------------------------------------
     # Filter button event
     def __filter_evnt(self) :
-        self.filter_win.set_context(self.setFilter, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.filter_win.show()
+        self.__filter = Filters()
+        self.__filter.set_context(self.setFilter, self.x() + self.width() + 20, self.y() + 32, CH_RX, RX_1)
+        self.__filter.show()
     
     #-------------------------------------------------
     # AGC button event
     def __agc_evnt(self) :
-        self.agc_win.set_context(self.setAGC, self.x() + self.width() + 20, self.y() + 32, CH_RX, 1)
-        self.agc_win.show()
+        self.agc = AGC()
+        self.agc.set_context(self.setAGC, self.x() + self.width() + 20, self.y() + 32, CH_RX, RX_1)
+        self.agc.show()
     
     #-------------------------------------------------
     # Audio button event
     def __audio_evnt(self) :
-        self.audio_win.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX, 1)
-        self.audio_win.show()
+        self.audio = Audio()
+        self.audio.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX, RX_1)
+        self.audio.show()
         
     #==============================================================================================
     # PRIVATE

@@ -110,10 +110,10 @@ class Filters(ButtonBase):
             # Execute filter change
             filt_id = self.btn_grp.id(btn)
             self.__con.cmd_exchange(r, [filter_lookup[filt_id][1], filter_lookup[filt_id][2]])
-            # Its a popup
-            self.hide()
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
             self.__radio_model[self.id]['FILTER'] = filt_id
+            # Its a popup
+            self.close()
         

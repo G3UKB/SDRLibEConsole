@@ -68,16 +68,6 @@ class AppMain:
                     sys.exit()
                 state['SERVER-RUN'] = True
         
-        # Create the component popup windows
-        mode_win = Modes()
-        addToCache('mode_win', mode_win)
-        filter_win = Filters()
-        addToCache('filter_win', filter_win)
-        agc_win = AGC()
-        addToCache('agc_win', agc_win)
-        audio_win = Audio()
-        addToCache('audio_win', audio_win)
-        
         # Create the main window class
         self.__w = MainWindow()
         # Make visible
