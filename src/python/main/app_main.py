@@ -74,9 +74,12 @@ class AppMain:
         self.__w.show()
         
         # Create an aux window for testing
-        self.__aw = AuxWindow("Aux [RX-2]", 0, 2)
+        self.__aw2 = AuxWindow("Aux [RX-2]", 0, 2)
         # Make visible
-        self.__aw.show()
+        self.__aw2.show()
+        self.__aw3 = AuxWindow("Aux [RX-3]", 0, 3)
+        # Make visible
+        self.__aw3.show()
         
         # Enter the GUI event loop
         r = self.__qtapp.exec_()
