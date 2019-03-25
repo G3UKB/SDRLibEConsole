@@ -64,6 +64,7 @@ from ui.components.audio import *
 # Windows
 from ui.windows.window_base import *
 from ui.windows.main_window import *
+from ui.windows.aux_window import *
 
 
 
