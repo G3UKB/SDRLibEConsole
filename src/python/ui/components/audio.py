@@ -258,18 +258,19 @@ class Audio(QWidget):
         self.__radio_1_audio_model['SINK'] = self.__sink
         self.__radio_1_audio_model['DEV'] = self.__dev
         self.__radio_1_audio_model['CH'] = self.__ch
-        # Set the server audio route
+        # Reset the server audio route
+        self.__con.set_audio_routes(True)
         # First clear down existing routes
-        if self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
-            # Set the new route for this radio
-            self.__set_route(RX_1, self.__radio_1_audio_model['SINK'], self.__radio_1_audio_model['DEV'] = self.__dev, self.__radio_1_audio_model['CH'])
-            self.__set_route(RX_2, self.__radio_2_audio_model['SINK'], self.__radio_2_audio_model['DEV'] = self.__dev, self.__radio_2_audio_model['CH'])
-            self.__set_route(RX_3, self.__radio_3_audio_model['SINK'], self.__radio_3_audio_model['DEV'] = self.__dev, self.__radio_3_audio_model['CH'])
-            # Restart audio
-            if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
-                print("Failed to restart audio!")
-        else:
-            print("Failed to clear audio route(s)!")
+        #if self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
+        #    # Set the new route for this radio
+        #    self.__set_route(RX_1, self.__radio_1_audio_model['SINK'], self.__radio_1_audio_model['DEV'], self.__radio_1_audio_model['CH'])
+        #    self.__set_route(RX_2, self.__radio_2_audio_model['SINK'], self.__radio_2_audio_model['DEV'], self.__radio_2_audio_model['CH'])
+        #    self.__set_route(RX_3, self.__radio_3_audio_model['SINK'], self.__radio_3_audio_model['DEV'], self.__radio_3_audio_model['CH'])
+        #    # Restart audio
+        #    if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
+        #        print("Failed to restart audio!")
+        #else:
+        #    print("Failed to clear audio route(s)!")
         # It's a popup
         self.close()
     
@@ -384,10 +385,11 @@ class Audio(QWidget):
                         
     #-------------------------------------------------
     # Set audio route
-    def __set_route(self, radio, sink, dev, ch):
-        
-        if dev != None:
-            (api, dev) = dev.split('@')
-            if self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, radio, api, dev, self.__ch]):
-                print("Error setting route for radio %d", radio)
+    #def __set_route(self, radio, sink, dev, ch):
+    #    
+    #    print("__set_route: ", radio, sink, dev, ch)
+    #    if dev != NONE and ch != NONE:
+    #        (api, dev) = dev.split('@')
+    #        if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, radio, api, dev, self.__ch]):
+    #            print("Error setting route for radio %d" % [radio])
             

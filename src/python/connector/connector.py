@@ -208,7 +208,28 @@ class Connector:
         msg = self.__get_message(cmd_str, params)
         self.__cmd_sock.sendto(msg, 0, (self.__IP, self.__port))
         return self.__do_receive(cmd_str, resp_type)
+    
+    #-------------------------------------------------
+    def set_audio_routes(self, reset):
+        # Set all server audio route
+        if reset:
+            # First clear down existing routes
+            if not self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
+                print("Failed to clear audio route(s)!")
+                return
         
+        # Set the new route for all radios
+        self.__set_route(RX_1, self.__radio_1_audio_model['SINK'], self.__radio_1_audio_model['DEV'], self.__radio_1_audio_model['CH'])
+        self.__set_route(RX_2, self.__radio_2_audio_model['SINK'], self.__radio_2_audio_model['DEV'], self.__radio_2_audio_model['CH'])
+        self.__set_route(RX_3, self.__radio_3_audio_model['SINK'], self.__radio_3_audio_model['DEV'], self.__radio_3_audio_model['CH'])
+        print("All audio routes set")
+        
+        if reset:    
+            # Restart audio
+            if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
+                 print("Failed to restart audio!")
+        
+            
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
@@ -240,6 +261,16 @@ class Connector:
         else :
             return None
 
+    #-------------------------------------------------
+    # Set one audio route
+    def __set_route(self, radio, sink, dev, ch):
+        
+        print("__set_route: ", radio, sink, dev, ch)
+        if dev != NONE and ch != NONE:
+            (api, dev) = dev.split('@')
+            if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, radio, api, dev, self.__ch]):
+                print("Error setting route for radio %d" % [radio])
+                
 #==============================================================================================
 # TESTING
 #==============================================================================================

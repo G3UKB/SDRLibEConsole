@@ -107,7 +107,6 @@ class WindowBase(QMainWindow):
         
         #-------------------------------------------------
         # VFO control
-        # TDB This needs to be for each instance
         vfo_grid = QGridLayout()
         main_grid.addLayout(vfo_grid, 0, 0)
         self.__vfo = Vfo(self.con, CH_RX, self.__id)

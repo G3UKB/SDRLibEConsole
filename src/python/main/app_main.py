@@ -61,8 +61,11 @@ class AppMain:
                 print("No radio hardware detected! Press 'Start' to try again.")
             else:
                 state['DISCOVER'] = True
+                # Set to 3 receivers for now as isn't dynamic
+                if self.__con.cmd_exchange(M_ID.NUM_RX, [3]) == None:
+                    print("Sorry, failed to set to 3 receivers!")
                 # Set all audio routes
-                self.set_audio_routes()        
+                self.__con.set_audio_routes(False)        
                 if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
                     print("Sorry, failed to start server, unable to continue!")
                     sys.exit()
@@ -92,13 +95,13 @@ class AppMain:
     
     #-------------------------------------------------
     # Set all routes
-    def set_audio_routes(self):
-        radio_model = self.__m.get_radio_model()
-        if radio_model[1]['AUDIO']['DEV'] != NONE:
-            (api, dev) = radio_model[1]['AUDIO']['DEV'].split('@')
-            if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, radio_model[1]['AUDIO']['SINK'], 1, api, dev, radio_model[1]['AUDIO']['CH']]):
-                print("Failed to set audio route! Unable to continue")
-                sys.exit()
+    #def set_audio_routes(self):
+    #    radio_model = self.__m.get_radio_model()
+    #    if radio_model[1]['AUDIO']['DEV'] != NONE:
+    #        (api, dev) = radio_model[1]['AUDIO']['DEV'].split('@')
+    #        if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, radio_model[1]['AUDIO']['SINK'], 1, api, dev, radio_model[1]['AUDIO']['CH']]):
+    #            print("Failed to set audio route! Unable to continue")
+    #            sys.exit()
         
 #=====================================================
 # Entry point
