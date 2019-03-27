@@ -375,6 +375,7 @@ class Audio(QWidget):
                 if  self.__dev == other_radio_1['DEV'] or \
                     self.__dev == other_radio_2['DEV']:
                     self.__ch_left.setVisible(False)
+                    self.__ch_both.setVisible(False)
                     if self.__ch == LEFT:
                         print("Audio problem, more than one channel on the same device allocated LEFT ch!")
             
@@ -382,6 +383,7 @@ class Audio(QWidget):
                 if  self.__dev == other_radio_1['DEV'] or \
                     self.__dev == other_radio_2['DEV']:
                     self.__ch_right.setVisible(False)
+                    self.__ch_both.setVisible(False)
                     if self.__ch == RIGHT:
                         print("Audio problem, more than one channel on the same device allocated RIGHT ch!")
             
