@@ -219,6 +219,11 @@ class Connector:
                 return
         
         # Set the new route for all radios
+        # Get radio model audio sections
+        self.__radio_1_audio_model = Model.get_radio_model()[1]['AUDIO']
+        self.__radio_2_audio_model = Model.get_radio_model()[2]['AUDIO']
+        self.__radio_3_audio_model = Model.get_radio_model()[3]['AUDIO']
+        # Set routes
         self.__set_route(RX_1, self.__radio_1_audio_model['SINK'], self.__radio_1_audio_model['DEV'], self.__radio_1_audio_model['CH'])
         self.__set_route(RX_2, self.__radio_2_audio_model['SINK'], self.__radio_2_audio_model['DEV'], self.__radio_2_audio_model['CH'])
         self.__set_route(RX_3, self.__radio_3_audio_model['SINK'], self.__radio_3_audio_model['DEV'], self.__radio_3_audio_model['CH'])
@@ -268,7 +273,7 @@ class Connector:
         print("__set_route: ", radio, sink, dev, ch)
         if dev != NONE and ch != NONE:
             (api, dev) = dev.split('@')
-            if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, radio, api, dev, self.__ch]):
+            if not self.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, sink, radio, api, dev, ch]):
                 print("Error setting route for radio %d" % [radio])
                 
 #==============================================================================================

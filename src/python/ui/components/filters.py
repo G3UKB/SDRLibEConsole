@@ -37,15 +37,17 @@ class Filters(ButtonBase):
     
     #-------------------------------------------------
     # Constructor
-    def __init__(self):
+    def __init__(self, id):
         """
         Constructor
         
         Arguments:  
             
-        """
-        
+        """ 
         super(Filters, self).__init__()
+        
+        # radio id
+        self.__id = id
         
         # Get the connector instance
         self.__con = getInstance('conn_inst')
@@ -78,11 +80,11 @@ class Filters(ButtonBase):
     
     #-------------------------------------------------
     # Set context according to id
-    def set_context(self, callback, x, y, direction, id):
+    def set_context(self, callback, x, y, direction):
         # Call base mathod
-        self.set_base_context(callback, x, y, direction, id)
+        self.set_base_context(callback, x, y, direction, self.__id)
         # Select the appropriate button
-        button = self.btn_grp.button(self.__radio_model[id]['FILTER'])
+        button = self.btn_grp.button(self.__radio_model[self.__id]['FILTER'])
         # Does not cause a click event
         button.setChecked(True)
         

@@ -37,15 +37,18 @@ class Audio(QWidget):
     
     #-------------------------------------------------
     # Constructor
-    def __init__(self):
+    def __init__(self, id):
         """
         Constructor
         
-        Arguments:  
+        Arguments:
+            id  -- the radio id
             
         """
-        
         super(Audio, self).__init__()
+        
+        # radio id
+        self.__id = id
         
         # Get the connector instance
         self.__con = getInstance('conn_inst')
@@ -171,7 +174,7 @@ class Audio(QWidget):
     
     #-------------------------------------------------
     # Set context according to id
-    def set_context(self, callback, x, y, direction, id):
+    def set_context(self, callback, x, y, direction):
         
         """
         Set Context
@@ -181,13 +184,12 @@ class Audio(QWidget):
             x           --  x coord of main window
             y           --  y coord of main window
             direction   --  RX or TX
-            id          --  the id of this instantiation (radio id)
             
         """
         self.callback = callback
         self.direction = direction
         # Position at top right corner of invoking button
-        self.id = id
+
         self.move( x, y)
         # Set UI state
         self.__reset_state()
@@ -298,15 +300,21 @@ class Audio(QWidget):
     # Set UI to last model state
     def __reset_state(self):
         # Set holding values
-        self.__sink = self.__radio_1_audio_model['SINK']
-        self.__dev = self.__radio_1_audio_model['DEV']
-        self.__ch = self.__radio_1_audio_model['CH']
+        if self.__id == RX_1:
+            radio = self.__radio_1_audio_model
+        elif self.__id == RX_2:
+            radio = self.__radio_2_audio_model
+        else:
+            radio = self.__radio_3_audio_model
+        self.__sink = radio['SINK']
+        self.__dev = radio['DEV']
+        self.__ch = radio['CH']
         
         # Update UI to last known state
         # Sink
         self.__sink_combo.setCurrentIndex(self.__sink_combo.findText(self.__sink))
         # Device
-        if self.__radio_1_audio_model['DEV'] != None:
+        if radio['DEV'] != None:
             index = self.__dev_combo.findText(self.__dev)
         else:
             index = 0
@@ -332,6 +340,7 @@ class Audio(QWidget):
     #-------------------------------------------------
     # Set channel visibility
     def __manage_ch(self):
+        # NO, use id and other radios
         # Available channels
         # We have to check not only what the setting is for this receiver but what channels are available
         # by checking all other recevers.
