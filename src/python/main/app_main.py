@@ -93,16 +93,6 @@ class AppMain:
         # Save the model
         self.__m.save_model()
     
-    #-------------------------------------------------
-    # Set all routes
-    #def set_audio_routes(self):
-    #    radio_model = self.__m.get_radio_model()
-    #    if radio_model[1]['AUDIO']['DEV'] != NONE:
-    #        (api, dev) = radio_model[1]['AUDIO']['DEV'].split('@')
-    #        if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, radio_model[1]['AUDIO']['SINK'], 1, api, dev, radio_model[1]['AUDIO']['CH']]):
-    #            print("Failed to set audio route! Unable to continue")
-    #            sys.exit()
-        
 #=====================================================
 # Entry point
 #=====================================================

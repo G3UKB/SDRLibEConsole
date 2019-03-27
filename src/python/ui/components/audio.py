@@ -64,7 +64,6 @@ class Audio(QWidget):
             Qt.WindowStaysOnTopHint
         )
         self.setWindowOpacity(0.97)
-        #self.setMinimumWidth(400)
         # Set the layout
         grid = QGridLayout()
         self.setLayout(grid)
@@ -257,22 +256,12 @@ class Audio(QWidget):
         """
         
         # Set the model
-        self.__radio_1_audio_model['SINK'] = self.__sink
-        self.__radio_1_audio_model['DEV'] = self.__dev
-        self.__radio_1_audio_model['CH'] = self.__ch
-        # Reset the server audio route
+        radio = self.__get_model()
+        radio['SINK'] = self.__sink
+        radio['DEV'] = self.__dev
+        radio['CH'] = self.__ch
+        # Reset the server audio routes
         self.__con.set_audio_routes(True)
-        # First clear down existing routes
-        #if self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
-        #    # Set the new route for this radio
-        #    self.__set_route(RX_1, self.__radio_1_audio_model['SINK'], self.__radio_1_audio_model['DEV'], self.__radio_1_audio_model['CH'])
-        #    self.__set_route(RX_2, self.__radio_2_audio_model['SINK'], self.__radio_2_audio_model['DEV'], self.__radio_2_audio_model['CH'])
-        #    self.__set_route(RX_3, self.__radio_3_audio_model['SINK'], self.__radio_3_audio_model['DEV'], self.__radio_3_audio_model['CH'])
-        #    # Restart audio
-        #    if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
-        #        print("Failed to restart audio!")
-        #else:
-        #    print("Failed to clear audio route(s)!")
         # It's a popup
         self.close()
     
@@ -297,15 +286,28 @@ class Audio(QWidget):
     #-------------------------------------------------
     
     #-------------------------------------------------
+    def __get_model(self):
+        if self.__id == RX_1:
+            return self.__radio_1_audio_model
+        elif self.__id == RX_2:
+            return self.__radio_2_audio_model
+        else:
+            return self.__radio_3_audio_model
+    
+    #-------------------------------------------------
+    def __get_other_models(self):
+        if self.__id == RX_1:
+            return self.__radio_2_audio_model, self.__radio_3_audio_model
+        elif self.__id == RX_2:
+            return self.__radio_1_audio_model, self.__radio_3_audio_model
+        else:
+            return self.__radio_1_audio_model, self.__radio_2_audio_model
+        
+    #-------------------------------------------------
     # Set UI to last model state
     def __reset_state(self):
         # Set holding values
-        if self.__id == RX_1:
-            radio = self.__radio_1_audio_model
-        elif self.__id == RX_2:
-            radio = self.__radio_2_audio_model
-        else:
-            radio = self.__radio_3_audio_model
+        radio = self.__get_model()
         self.__sink = radio['SINK']
         self.__dev = radio['DEV']
         self.__ch = radio['CH']
@@ -344,7 +346,7 @@ class Audio(QWidget):
         # Available channels
         # We have to check not only what the setting is for this receiver but what channels are available
         # by checking all other recevers.
-        r1_ch = self.__ch
+        other_radio_1, other_radio_2 = self.__get_other_models()
         if self.__dev == NONE or self.__sink == HPSDR:
             # No device defined or not local so we can't set a channel
             self.__ch_left.setVisible(False)
@@ -359,46 +361,36 @@ class Audio(QWidget):
             self.__ch_both.setVisible(True)
             self.__ch_none.setVisible(True)
             # Set the channel according to model
-            if r1_ch == NONE:
+            if self.__ch == NONE:
                 self.__ch_none.setCheckState(Qt.Checked)
-            elif r1_ch == LEFT:
+            elif self.__ch == LEFT:
                 self.__ch_left.setCheckState(Qt.Checked)                
-            elif r1_ch == RIGHT:
+            elif self.__ch == RIGHT:
                 self.__ch_right.setCheckState(Qt.Checked)    
-            elif r1_ch == BOTH:
+            elif self.__ch == BOTH:
                 self.__ch_both.setCheckState(Qt.Checked)
             
             # Then turn off those which are allocated elsewhere
-            if  self.__radio_2_audio_model['CH'] == LEFT or self.__radio_3_audio_model['CH'] == LEFT:
-                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
-                    self.__dev == self.__radio_3_audio_model['DEV']:
+            if  other_radio_1['CH'] == LEFT or other_radio_2['CH'] == LEFT:
+                if  self.__dev == other_radio_1['DEV'] or \
+                    self.__dev == other_radio_2['DEV']:
                     self.__ch_left.setVisible(False)
-                    if r1_ch == LEFT:
+                    if self.__ch == LEFT:
                         print("Audio problem, more than one channel on the same device allocated LEFT ch!")
             
-            if  self.__radio_2_audio_model['CH'] == RIGHT or self.__radio_3_audio_model['CH'] == RIGHT:
-                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
-                    self.__dev == self.__radio_3_audio_model['DEV']:
+            if  other_radio_1['CH'] == RIGHT or other_radio_2['CH'] == RIGHT:
+                if  self.__dev == other_radio_1['DEV'] or \
+                    self.__dev == other_radio_2['DEV']:
                     self.__ch_right.setVisible(False)
-                    if r1_ch == RIGHT:
+                    if self.__ch == RIGHT:
                         print("Audio problem, more than one channel on the same device allocated RIGHT ch!")
             
-            if  self.__radio_2_audio_model['CH'] == BOTH or self.__radio_3_audio_model['CH'] == BOTH:
-                if  self.__dev == self.__radio_2_audio_model['DEV'] or \
-                    self.__dev == self.__radio_3_audio_model['DEV']:
+            if  other_radio_1['CH'] == BOTH or other_radio_2['CH'] == BOTH:
+                if  self.__dev == other_radio_1['DEV'] or \
+                    self.__dev == other_radio_2['DEV']:
                     self.__ch_left.setVisible(False)
                     self.__ch_right.setVisible(False)
                     self.__ch_both.setVisible(False)
-                    if r1_ch == LEFT or r1_ch == RIGHT or r1_ch == BOTH:
+                    if self.__ch == LEFT or self.__ch == RIGHT or self.__ch == BOTH:
                         print("Audio problem, more than one channel on the same device conflicts with BOTH ch!")
                         
-    #-------------------------------------------------
-    # Set audio route
-    #def __set_route(self, radio, sink, dev, ch):
-    #    
-    #    print("__set_route: ", radio, sink, dev, ch)
-    #    if dev != NONE and ch != NONE:
-    #        (api, dev) = dev.split('@')
-    #        if not self.__con.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, self.__sink, radio, api, dev, self.__ch]):
-    #            print("Error setting route for radio %d" % [radio])
-            

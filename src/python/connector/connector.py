@@ -214,7 +214,7 @@ class Connector:
         # Set all server audio route
         if reset:
             # First clear down existing routes
-            if not self.__con.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
+            if not self.cmd_exchange(M_ID.CLEAR_AUDIO_ROUTES, []):
                 print("Failed to clear audio route(s)!")
                 return
         
@@ -231,7 +231,7 @@ class Connector:
         
         if reset:    
             # Restart audio
-            if not self.__con.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
+            if not self.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
                  print("Failed to restart audio!")
         
             

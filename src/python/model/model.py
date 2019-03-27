@@ -188,7 +188,6 @@ class Model:
                     f.close()
                 except:
                     pass
-        print (model)
         return model
 
     #-------------------------------------------------
