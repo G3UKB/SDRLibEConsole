@@ -270,7 +270,6 @@ class Connector:
     # Set one audio route
     def __set_route(self, radio, sink, dev, ch):
         
-        print("__set_route: ", radio, sink, dev, ch)
         if dev != NONE and ch != NONE:
             (api, dev) = dev.split('@')
             if not self.cmd_exchange(M_ID.AUDIO_ROUTE, [DIR_OUTPUT, sink, radio, api, dev, ch]):

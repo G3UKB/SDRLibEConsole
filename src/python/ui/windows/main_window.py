@@ -64,10 +64,20 @@ class MainWindow(WindowBase):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
+        r2Act = QAction('Radio-2', self)
+        r2Act.setShortcut('Ctrl+2')
+        r2Act.triggered.connect(self.__r2)
+        
+        r3Act = QAction('Radio-3', self)
+        r3Act.setShortcut('Ctrl+3')
+        r3Act.triggered.connect(self.__r3)
+        
         self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
+        self.toolbar.addAction(r2Act)
+        self.toolbar.addAction(r3Act)
         #self.toolbar.addAction(audioAct)
         self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
@@ -149,6 +159,14 @@ class MainWindow(WindowBase):
     def __exit_evnt(self) :
         QApplication.quit()
         qApp.quit()
+    
+    #-------------------------------------------------
+    # Invoke radios 2-3
+    def __r2(self):
+        getInstance('aw2_inst').show()
+        
+    def __r3(self):
+        getInstance('aw3_inst').show()
         
     #==============================================================================================
     # PRIVATE

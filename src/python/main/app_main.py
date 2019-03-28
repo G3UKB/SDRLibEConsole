@@ -78,17 +78,17 @@ class AppMain:
         
         # Create an aux window for testing
         self.__aw2 = AuxWindow("Aux [RX-2]", 0, 2)
-        # Make visible
-        self.__aw2.show()
+        addToCache('aw2_inst', self.__aw2)
         self.__aw3 = AuxWindow("Aux [RX-3]", 0, 3)
-        # Make visible
-        self.__aw3.show()
+        addToCache('aw3_inst', self.__aw3)
         
         # Enter the GUI event loop
         r = self.__qtapp.exec_()
         
         # Save window metrics
         self.__w.saveMetrics()
+        self.__aw2.saveMetrics()
+        self.__aw3.saveMetrics()
         
         # Save the model
         self.__m.save_model()
