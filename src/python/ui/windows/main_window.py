@@ -104,48 +104,15 @@ class MainWindow(WindowBase):
     #-------------------------------------------------
     # Run button event
     def __run(self) :
-        error = False
-        state = Model.get_state_model()
-        # See what we need to start first
-        if not state['HAVE-SERVER']:
-            if self.con.cmd_exchange(M_ID.POLL, []) == None:
-                print("Failed to connect to server! Please start the server and try again.")
-                error = True
-            else:
-                state['HAVE-SERVER'] = True
-                if not state['DISCOVER']:
-                    if self.con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                        print("No radio hardware detected! Please start the radio and try again.")
-                        error = True
-                    else:
-                        state['DISCOVER'] = True
-                        if not state['SERVER-RUN']:
-                            # Temporary fudge
-                            if set_audio(self.con) == None:
-                                print("Sorry, failed to set default audio! Please try a server restart.")
-                                state['HAVE-SERVER'] = False
-                                state['DISCOVER'] = False
-                                error = True
-                            if self.con.cmd_exchange(M_ID.SVR_START, []) == None:
-                                print("Sorry, failed to start server! Please try a server restart.")
-                                state['HAVE-SERVER'] = False
-                                state['DISCOVER'] = False
-                                error = True
-                            else:
-                                state['SERVER-RUN'] = True
-                                
-        if error:
-            self.statusBar.showMessage("Stopped",0)
-            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
-            state['RADIO-RUN'] = False
-        else:
-            # Good to go
-            # Start radio
-            self.con.cmd_exchange(M_ID.RADIO_START, [False])
+        
+        # Perform a server warmstart
+        if self.con.warmstart():
             self.statusBar.showMessage("Running",0)
             self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(0,64,0); font: bold 12px}")
-            state['RADIO-RUN'] = True
-    
+        else:
+            self.statusBar.showMessage("Stopped",0)
+            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
+        
     #-------------------------------------------------
     # Stop button event        
     def __stop(self):
@@ -169,7 +136,7 @@ class MainWindow(WindowBase):
     # Set number of radios
     def __num_rx_evnt(self):
         # Potentially the number of receivers has changed.
-        num_rx = int(self.__num_rx_evt.currentText())
+        num_rx = int(self.__num_rx.currentText())
         if num_rx != Model.get_num_rx():
             # Changed
             Model.set_num_rx(num_rx)
