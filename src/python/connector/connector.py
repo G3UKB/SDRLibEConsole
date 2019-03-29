@@ -194,6 +194,8 @@ class Connector:
         self.__port = server_model['SERVER-CMD-PORT']
         # Buffers
         self.__resp_data = bytearray(4096)
+        # Server instance
+        self.__server = None
 
     #==============================================================================================
     # PUBLIC
@@ -233,7 +235,48 @@ class Connector:
             # Restart audio
             if not self.cmd_exchange(M_ID.RESTART_AUDIO_ROUTES, []):
                  print("Failed to restart audio!")
+    
+    #-------------------------------------------------
+    # Server cold start
+    def coldstart(self):
+        # Start the server
+        self.__server = Popen("SDRLibEConnector.exe", creationflags=CREATE_NEW_CONSOLE)
+        addToCache('server_inst', self.__server)
         
+        # Check if the server has started correctly?
+        state = Model.get_state_model()
+        if self.cmd_exchange(M_ID.POLL, []) == None:
+            print("Failed to connect to server! Press 'Start' to try again.")
+        else:
+            state['HAVE-SERVER'] = True
+            if self.cmd_exchange(M_ID.DISCOVER, []) == None:
+                print("No radio hardware detected! Press 'Start' to try again.")
+            else:
+                state['DISCOVER'] = True
+                # Set to configured number of receivers
+                if self.cmd_exchange(M_ID.NUM_RX, [Model.get_num_rx()]) == None:
+                    print("Sorry, failed to set to %d receiver(s)!" % [self.__m.get_num_rx()])
+                # Set all audio routes
+                self.set_audio_routes(False)        
+                if self.cmd_exchange(M_ID.SVR_START, []) == None:
+                    print("Sorry, failed to start server, unable to continue!")
+                    sys.exit()
+                state['SERVER-RUN'] = True
+                
+    #-------------------------------------------------
+    # Bounce the server
+    def restart(self):
+        
+        if self.__server != None:
+            self.__server.terminate()
+            self.coldstart()
+    
+    #-------------------------------------------------
+    # Terminate the server
+    def terminate(self):
+        
+        if self.__server != None:
+            self.__server.terminate()
             
     #==============================================================================================
     # PRIVATE

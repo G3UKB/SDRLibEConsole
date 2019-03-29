@@ -64,6 +64,11 @@ class MainWindow(WindowBase):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
+        self.__num_rx = QComboBox()
+        self.__num_rx.addItems(('1','2','3'))
+        self.__num_rx.activated.connect(self.__num_rx_evnt)
+        self.__num_rx.setStyleSheet("QComboBox {background-color: rgb(59,59,59); selection-background-color: rgb(59,59,59)}")
+        
         r2Act = QAction('Radio-2', self)
         r2Act.setShortcut('Ctrl+2')
         r2Act.triggered.connect(self.__r2)
@@ -76,9 +81,9 @@ class MainWindow(WindowBase):
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
+        self.toolbar.addWidget(self.__num_rx)
         self.toolbar.addAction(r2Act)
         self.toolbar.addAction(r3Act)
-        #self.toolbar.addAction(audioAct)
         self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
         #-------------------------------------------------
@@ -160,6 +165,19 @@ class MainWindow(WindowBase):
         QApplication.quit()
         qApp.quit()
     
+    #-------------------------------------------------
+    # Set number of radios
+    def __num_rx_evnt(self):
+        # Potentially the number of receivers has changed.
+        num_rx = int(self.__num_rx_evt.currentText())
+        if num_rx != Model.get_num_rx():
+            # Changed
+            Model.set_num_rx(num_rx)
+            # Stop and restart the server and set up everything again
+            if not self.con.restart():
+                print("Failed to restart server!")
+            # Change the UI enablement and close aux receivers
+        
     #-------------------------------------------------
     # Invoke radios 2-3
     def __r2(self):

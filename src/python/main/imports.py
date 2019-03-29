@@ -30,6 +30,7 @@ import traceback
 import socket
 import json
 import pickle
+from subprocess import Popen, CREATE_NEW_CONSOLE 
 from enum import Enum, auto
 from time import sleep
 import logging

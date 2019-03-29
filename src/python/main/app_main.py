@@ -51,25 +51,9 @@ class AppMain:
         # Create a connector interface
         self.__con = Connector()
         addToCache('conn_inst', self.__con)
-        # See if a server or simulator is running?
-        state = Model.get_state_model()
-        if self.__con.cmd_exchange(M_ID.POLL, []) == None:
-            print("Failed to connect to server! Press 'Start' to try again.")
-        else:
-            state['HAVE-SERVER'] = True
-            if self.__con.cmd_exchange(M_ID.DISCOVER, []) == None:
-                print("No radio hardware detected! Press 'Start' to try again.")
-            else:
-                state['DISCOVER'] = True
-                # Set to 3 receivers for now as isn't dynamic
-                if self.__con.cmd_exchange(M_ID.NUM_RX, [3]) == None:
-                    print("Sorry, failed to set to 3 receivers!")
-                # Set all audio routes
-                self.__con.set_audio_routes(False)        
-                if self.__con.cmd_exchange(M_ID.SVR_START, []) == None:
-                    print("Sorry, failed to start server, unable to continue!")
-                    sys.exit()
-                state['SERVER-RUN'] = True
+        
+        # Start the server
+        self.__con.coldstart()
         
         # Create the main window class
         self.__w = MainWindow()
@@ -84,6 +68,9 @@ class AppMain:
         
         # Enter the GUI event loop
         r = self.__qtapp.exec_()
+        
+        # Close the server
+        self.__con.terminate()
         
         # Save window metrics
         self.__w.saveMetrics()

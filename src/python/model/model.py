@@ -50,6 +50,7 @@ class Model:
                 'SERVER-CMD-PORT' : 10010,
             },
             'RADIO' : {
+                'NUM_RX' : 1,
                 1 : {
                     'FREQ' : 7.1,
                     'MODE' : CH_LSB,
@@ -125,6 +126,20 @@ class Model:
     def get_radio_model(cls):
         m = getInstance('model_inst')
         return m.get_model()['RADIO']
+    
+    #-------------------------------------------------
+    # Get num receivers
+    @classmethod
+    def get_num_rx(cls):
+        m = getInstance('model_inst')
+        return m.get_model()['RADIO']['NUM_RX']
+    
+    #-------------------------------------------------
+    # Set num receivers
+    @classmethod
+    def set_num_rx(cls, num_rx):
+        m = getInstance('model_inst')
+        m.get_model()['RADIO']['NUM_RX'] = num_rx
     
     #-------------------------------------------------
     # Get state model section 
