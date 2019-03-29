@@ -240,6 +240,7 @@ class Connector:
     # Server cold start
     def coldstart(self):
         # Start the server
+        success = True
         self.__server = Popen("SDRLibEConnector.exe", creationflags=CREATE_NEW_CONSOLE)
         addToCache('server_inst', self.__server)
         sleep(1)
@@ -247,38 +248,42 @@ class Connector:
         state = Model.get_state_model()
         if self.cmd_exchange(M_ID.POLL, []) == None:
             print("Failed to connect to server! Press 'Start' to try again.")
+            success = False
         else:
             state['HAVE-SERVER'] = True
             if self.cmd_exchange(M_ID.DISCOVER, []) == None:
                 print("No radio hardware detected! Press 'Start' to try again.")
+                success = False
             else:
                 state['DISCOVER'] = True
                 # Set to configured number of receivers
                 if self.cmd_exchange(M_ID.NUM_RX, [Model.get_num_rx()]) == None:
                     print("Sorry, failed to set to %d receiver(s)!" % [self.__m.get_num_rx()])
+                    success = False
                 # Set all audio routes
                 self.set_audio_routes(False)        
                 if self.cmd_exchange(M_ID.SVR_START, []) == None:
                     print("Sorry, failed to start server, unable to continue!")
                     sys.exit()
                 state['SERVER-RUN'] = True
+        return success
       
     #-------------------------------------------------
     # Server warm start
     def warmstart(self):
-        error = False
+        success = True
         state = Model.get_state_model()
         # See what we need to start first
         if not state['HAVE-SERVER']:
             if self.cmd_exchange(M_ID.POLL, []) == None:
                 print("Failed to connect to server! Please start the server and try again.")
-                error = True
+                success = False
             else:
                 state['HAVE-SERVER'] = True
                 if not state['DISCOVER']:
                     if self.cmd_exchange(M_ID.DISCOVER, []) == None:
                         print("No radio hardware detected! Please start the radio and try again.")
-                        error = True
+                        success = False
                     else:
                         state['DISCOVER'] = True
                         if not state['SERVER-RUN']:
@@ -288,19 +293,19 @@ class Connector:
                                 print("Sorry, failed to start server! Please try a server restart.")
                                 state['HAVE-SERVER'] = False
                                 state['DISCOVER'] = False
-                                error = True
+                                success = False
                             else:
                                 state['SERVER-RUN'] = True
                                 
-        if error:
-            state['RADIO-RUN'] = False
-        else:
+        if success:
             # Good to go
             # Start radio
             self.cmd_exchange(M_ID.RADIO_START, [False])
             state['RADIO-RUN'] = True
+        else:
+            state['RADIO-RUN'] = False
             
-        return error
+        return success
             
     #-------------------------------------------------
     # Bounce the server
@@ -311,7 +316,7 @@ class Connector:
             self.__server.terminate()
             sleep(2)
             print("Restarting server...")
-            self.coldstart()
+            return self.coldstart()
     
     #-------------------------------------------------
     # Terminate the server

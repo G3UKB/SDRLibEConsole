@@ -68,22 +68,23 @@ class MainWindow(WindowBase):
         self.__num_rx.addItems(('1','2','3'))
         self.__num_rx.activated.connect(self.__num_rx_evnt)
         self.__num_rx.setStyleSheet("QComboBox {background-color: rgb(59,59,59); selection-background-color: rgb(59,59,59)}")
+        self.__num_rx.setCurrentIndex(self.__num_rx.findText(str(Model.get_num_rx())))
         
-        r2Act = QAction('Radio-2', self)
-        r2Act.setShortcut('Ctrl+2')
-        r2Act.triggered.connect(self.__r2)
+        self.__r2Act = QAction('Radio-2', self)
+        self.__r2Act.setShortcut('Ctrl+2')
+        self.__r2Act.triggered.connect(self.__r2)
         
-        r3Act = QAction('Radio-3', self)
-        r3Act.setShortcut('Ctrl+3')
-        r3Act.triggered.connect(self.__r3)
+        self.__r3Act = QAction('Radio-3', self)
+        self.__r3Act.setShortcut('Ctrl+3')
+        self.__r3Act.triggered.connect(self.__r3)
         
         self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
         self.toolbar.addWidget(self.__num_rx)
-        self.toolbar.addAction(r2Act)
-        self.toolbar.addAction(r3Act)
+        self.toolbar.addAction(self.__r2Act)
+        self.toolbar.addAction(self.__r3Act)
         self.toolbar.setStyleSheet("QToolBar {background-color: rgb(102,102,102); color: red; font: bold 12px}")
         
         #-------------------------------------------------
@@ -97,6 +98,10 @@ class MainWindow(WindowBase):
         # Populate
         self.setup_ui(main_grid)
     
+        #-------------------------------------------------
+        # Set visibility
+        self.__set_visibility(Model.get_num_rx())
+        
     #==============================================================================================
     # EVENTS
     #==============================================================================================
@@ -144,7 +149,28 @@ class MainWindow(WindowBase):
             if not self.con.restart():
                 print("Failed to restart server!")
             # Change the UI enablement and close aux receivers
-        
+            self.__set_visibility(num_rx)
+            
+    #-------------------------------------------------
+    # Set number of radios
+    def __set_visibility(self, num_rx):
+       
+        if num_rx == 1:
+            self.__r2Act.setEnabled(False)
+            self.__r3Act.setEnabled(False)
+            if getInstance('aw2_inst') != None: getInstance('aw2_inst').hide()
+            if getInstance('aw3_inst') != None: getInstance('aw3_inst').hide()
+        elif num_rx == 2:
+            self.__r2Act.setEnabled(True)
+            self.__r3Act.setEnabled(False)
+            if getInstance('aw23_inst') != None: getInstance('aw3_inst').hide()
+        if num_rx== 3:
+            self.__r2Act.setEnabled(True)
+            self.__r3Act.setEnabled(True)
+        # Show stopped
+        self.statusBar.showMessage("Stopped",0)
+        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
+                
     #-------------------------------------------------
     # Invoke radios 2-3
     def __r2(self):

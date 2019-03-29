@@ -53,7 +53,8 @@ class AppMain:
         addToCache('conn_inst', self.__con)
         
         # Start the server
-        self.__con.coldstart()
+        if not self.__con.coldstart():
+            print("Failed to coldstart server!")
         
         # Create the main window class
         self.__w = MainWindow()
