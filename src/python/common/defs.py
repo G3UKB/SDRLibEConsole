@@ -122,8 +122,9 @@ agc_lookup = (
 #=====================================================
 # Audio
 HPSDR = 'HPSDR'
-LOCAL_AF = 'LOCAL/AF'
-LOCAL_IQ = 'LOCAL/IQ'
+LOCAL = 'Local'
+LOCAL_AF = 'Local/AF'
+LOCAL_IQ = 'Local/IQ'
 LEFT = 'left'
 RIGHT = 'right'
 BOTH = 'both'
