@@ -86,7 +86,7 @@ class Audio(QWidget):
         src_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
         grid.addWidget(src_label, 0, 0)
         self.__sink_combo = QComboBox()
-        self.__sink_combo.addItems((HPSDR, LOCAL))
+        self.__sink_combo.addItems((HPSDR, LOCAL_AF, LOCAL_IQ))
         grid.addWidget(self.__sink_combo, 0, 1, 1, 3)
         self.__sink_combo.activated.connect(self.__sink_evnt)
         
