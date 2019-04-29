@@ -39,7 +39,7 @@ class AppMain:
     
     #-------------------------------------------------
     # Start processing and wait for user to exit the application
-    def main(self):
+    def main(self, auto):
         # The one and only QT application
         self.__qtapp = QApplication([])
         
@@ -52,9 +52,10 @@ class AppMain:
         self.__con = Connector()
         addToCache('conn_inst', self.__con)
         
-        # Start the server
-        if not self.__con.coldstart():
-            print("Failed to coldstart server!")
+        # Start the server unless manual start
+        if auto:
+            if not self.__con.coldstart():
+                print("Failed to coldstart server!")
         
         # Create the main window class
         self.__w = MainWindow()
@@ -88,9 +89,13 @@ class AppMain:
 #-------------------------------------------------
 # Start processing and wait for user to exit the application
 def main():
-    try:  
+    try:
+        arg = True
+        if len(sys.argv) > 1:
+            if sys.argv[1] == "manual":
+                arg = False
         app = AppMain()
-        sys.exit(app.main())
+        sys.exit(app.main(arg))
         
     except Exception as e:
         print ('Exception from main code','Exception [%s][%s]' % (str(e), traceback.format_exc()))
