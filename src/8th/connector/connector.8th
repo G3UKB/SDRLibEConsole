@@ -1,0 +1,408 @@
+(* 
+	connector.8th
+ 
+  A general purpose server to be used for all tasks that require the
+  messaging infrastructure.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+  
+  GEN_SERVER application -
+		The connector drives the SDRLibE/connector executable via a JSON UDP interface. This enables
+		distribution if required and also makes it a managed server which will execute on its own
+		once its setup is complete which could be a command line client or a GUI client. It is also
+		much more ameanable to multi-language implementation as the interface remains the same on the
+		client side rather than an implementation for each language ffi implementation. 
+	
+*)
+
+\ ========================================
+\ Testing only
+true var, connector_test
+
+\ ----------------------------------
+connector_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Set namespace
+ns: sdr
+with: fr.gs
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__conn_
+\ 						message handlers start: do_conn_
+\							event handlers start: 	__conn_evnt_
+\ ===============================================================================
+
+\ ========================================
+\ Initialisation
+
+\ Create UDP socket
+: __conn_create_socket	SED: --
+	\ in: 	none
+	\ out:	none
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! ;
+	
+\ Get command socket
+: __conn_cmd_sock@	SED: -- net
+	\ in: 	none
+	\ out:	s0 - command socket
+	"udp_cmd_sock" t:@ ;
+
+\ ========================================
+\ Buffers
+
+\ Create response buffer
+: __conn_create_resp_buf	SED: --
+	\ in: 	none
+	\ out:	none
+	5000 b:new 0x0 b:fill "b_resp_buffer" t:! ;
+
+\ ----------------------------------	
+\ Get response buffer
+: __conn_resp_buf@	SED: --
+	\ in: 	none
+	\ out:	none	
+	"b_resp_buffer" t:@ ;
+	
+\ ========================================
+\ Json encoded request messages
+
+: __conn_push_one_param 	SED: * a -- 
+	\ in:		0: m - empty message
+	\				1: * - p1
+	\ out:	none
+	"params" m:@ a:clear rot a:push drop ;
+
+\ ----------------------------------
+: __conn_push_two_param 	SED: * * a -- 
+	\ in:		0: m - empty message
+	\				1: * - p1
+	\				2: * - p2
+	\ out:	none
+	"params" m:@ a:clear rot a:push rot a:push drop ;
+	
+\ ========================================
+\ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
+\ No params
+: __conn_poll_msg { "cmd" : "poll" , "params" : [] } >json ;
+: __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
+: __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
+: __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
+: __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
+: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+: __conn_revert_audio_outputs_msg { "cmd" : "revert_outputs" , "params" : [] } >json ;
+\ One param
+: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
+: __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_tx_freq_msg { "cmd" : "set_tx_freq" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_mode_msg { "cmd" : "set_rx1_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_one_param >json ;
+: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_one_param >json ;
+: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
+: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
+: __conn_alex_auto_msg { "cmd" : "set_alex_auto" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hf_bypass_msg { "cmd" : "set_hf_bypass" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_30_20_msg { "cmd" : "set_lpf_30_20" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_60_40_msg { "cmd" : "set_lpf_60_40" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_80_msg { "cmd" : "set_lpf_80" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_160_msg { "cmd" : "set_lpf_160" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_6_msg { "cmd" : "set_lpf_6" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_12_10_msg { "cmd" : "set_lpf_12_10" , "params" : [] } __conn_push_one_param >json ;
+: __conn_lpf_17_15_msg { "cmd" : "set_lpf_17_15" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_13_msg { "cmd" : "set_hpf_13" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_20_msg { "cmd" : "set_hpf_20" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_9_5_msg { "cmd" : "set_hpf_9_5" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_6_5_msg { "cmd" : "set_hpf_6_5" , "params" : [] } __conn_push_one_param >json ;
+: __conn_hpf_1_5_msg { "cmd" : "set_hpf_1_5" , "params" : [] } __conn_push_one_param >json ;
+\ Two params
+: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+: __conn_change_audio_outputs_msg { "cmd" : "change_outputs" , "params" : [] } __conn_push_two_param >json ;
+
+
+\ Complex messages
+\ ----------------------------------	
+: __conn_default_route_msg	SED: s s -- s
+	\ in:		0: s - audio api i.e. "MME"
+	\				1: s - audio device name string
+	\ out:	0: s - json encoded default route message
+	>r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
+	"params" m:@ 3 r> a:! 4 r> a:! drop >json ;
+
+\ ----------------------------------	
+: __conn_audio_route_msg	SED: a -- s
+	\ in:		0: a - [source, rx, dev,ch]
+	\ out:	0: s - json encoded default route message
+	>r { "cmd" : "set_audio_route" , "params" : [1] }
+	"params" m:@ 
+	r@ 0 a:@ nip s:uc a:push
+	r@ 1 a:@ nip >n a:push
+	r@ 2 a:@ nip ":" s:/ 0 a:@ nip a:push
+	r@ 2 a:@ nip ":" s:/ 2 a:@ nip a:push
+	r> 3 a:@ nip s:uc a:push drop
+	>json ;
+	
+\ ----------------------------------		
+: __conn_disp_state_msg SED: T T T -- s
+	{ "cmd" : "set_disp_state" , "params" : [] }
+	"params" m:@ rot a:push rot a:push rot a:push drop >json ;
+
+\ ========================================
+\ Network 
+
+\ ========================================
+\ Address management
+: __conn_cmd_ip	SED: -- n
+	\ in: 	none
+	\ out:	s0 - cmd ip
+	"127.0.0.1" ;
+	\ "192.168.1.8" ;
+
+\ ----------------------------------		
+\ Return the command port
+: __conn_cmd_port	SED: -- n
+	\ in: 	none
+	\ out:	s0 - cmd port
+	10010 ;
+
+\ ----------------------------------	
+\ Return the display data receiver 1 port	
+: __conn_data_1_port	SED: -- n
+	\ in: 	none
+	\ out:	s0 - display data receiver 1 port
+	10011 ;
+
+\ ----------------------------------	
+\ Return the display data receiver 2 port
+: __conn_data_2_port	SED: -- n
+	\ in: 	none
+	\ out:	s0 - display data receiver 2 port
+	10012 ;
+
+\ ----------------------------------	
+\ Return the display data receiver 3 port
+: __conn_data_3_port	SED: -- n
+	\ in: 	none
+	\ out:	s0 - display data receiver 3 port
+	10013 ;
+	
+\ ----------------------------------	
+\ Return the command address info
+: __conn_cmd_addr		SED: -- X
+	\ in: 	none
+	\ out:	s0 - cmd address info
+	__conn_cmd_ip __conn_cmd_port net:getaddrinfo ;
+	
+\ ----------------------------------	
+\ Return the display data receiver 1 address info	
+: __conn_data_1_addr	SED: -- X
+	\ in: 	none
+	\ out:	s0 - Data 1 address info
+	__conn_cmd_ip __conn_data_1_port net:getaddrinfo ;
+
+\ ----------------------------------	
+\ Return the display data receiver 2 address info		
+: __conn_data_2_addr	SED: -- X
+	\ in: 	none
+	\ out:	s0 - Data 2 address info
+	__conn_cmd_ip __conn_data_2_port net:getaddrinfo ;
+
+\ ----------------------------------	
+\ Return the display data receiver 3 address info	
+: __conn_data_3_addr	SED: -- X
+	\ in: 	none
+	\ out:	s0 - Data 3 address info
+	__conn_cmd_ip __conn_data_3_port net:getaddrinfo ;
+
+\ ========================================
+\ Message send/receive
+
+\ Send given command
+: __conn_send_cmd_msg	SED: s --
+	\ in: 	so - json encoded message string
+	\ out:	s0 - none
+	s:len >r
+	__conn_cmd_sock@ __conn_cmd_addr rot 0 net:sendto nip
+	r> n:= not if "Short send!" log then ;
+
+\ ----------------------------------	
+\ Wait for read data available from cmd socket
+: __conn_net_wait_recv_cmd	SED:  -- net T
+	\ in: 	none
+	\ out:	s0 - true if wait successful
+	\				s1 - the target socket
+	__conn_cmd_sock@ true 5000 net:wait ;
+
+\ ----------------------------------	
+\ Receive data from the given socket
+: __conn_recv_from	SED:  net -- m T
+	\ in: 	0: s - socket
+	\ out:	0: T - true if response received
+	\				1: m - the response structure (map in this case)
+	\ pre: 	read data ready condition true
+	__conn_resp_buf@ 0 net:recvfrom null? if 
+		2drop "Error in read from device!" r@ if throw else log {"resp":"NAK"} then
+	else
+		drop nip nip json>
+	then ;
+
+\ ----------------------------------			
+\ Wait for and read cmd response
+: __conn_wait_resp_with_timeout	SED: T -- m T
+	\ in: 	0: T - if true throw on error
+	\ out:	0: T - true if response received
+	\				1: m - the response structure (map in this case)
+	>r __conn_net_wait_recv_cmd if
+		__conn_recv_from
+	else
+		"Timeout waiting for response from device!" r@ if throw else log drop {"resp":"NAK"} then
+	then rdrop ;
+	
+\ ===============================================================================
+\ Protocol words
+\ Return the audio info for all output devices
+: __conn_get_audio_output_info	SED: -- m T
+	\ in: 	none
+	\ out:	s0 - true if successful
+	\ out:	s1 - the audio info map
+	__conn_enum_outputs_msg __conn_send_cmd_msg false __conn_wait_resp_with_timeout ;
+
+\ ----------------------------------	
+\ Return the default route audio parameters
+: __conn_get_default_route	SED:  -- s s
+	\ in: 	none
+	\ out:	s0 - the audio api
+	\				s1 - the audio device
+	__conn_get_audio_output_info
+	\ Return api and dev for the default device
+	\ Note, we should select for this aka gui interface
+	"outputs" m:@ nip 1 a:@ nip
+	"api" m:@ swap "name" m:@ nip ;
+
+\ ===============================================================================
+\ Message handlers
+
+\ ========================================
+\ Audio functions
+
+\ ----------------------------------	
+: t_conn_enum_audio_outputs	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_enum_outputs_msg false swap 
+	__conn_send_cmd_msg
+	__conn_wait_resp_with_timeout
+	response!
+;
+	
+\ ========================================
+\ Initialise the connector at task level
+: t_conn_init	SED: a --
+	\ in: 	message
+	\ out:	none
+	drop 
+	__conn_create_socket 
+	__conn_create_resp_buf 
+	"ConnTask initialised" log
+;
+
+\ ----------------------------------
+\ Run SOD
+: t_conn_sod	SED: a --
+	\ in: 	message
+	\ out:	none
+	drop 
+;
+	
+\ ===============================================================================
+\ ===============================================================================
+\ PUBLIC Call level Interface
+\ ===============================================================================
+
+\ ===============================================================================
+\ Initialisation and termination of gen-server 
+
+\ ----------------------------------
+\ Module initialisation
+: conn_init	SED: --
+	\ in: 	none
+	\ out:	none
+	
+	\ Create the connector gen-server
+	"ConnTask" gen_server_new
+	\ Ask the connector to initialise itself
+	"ConnTask" ' t_conn_init null msg!
+	"ConnTask" ' t_conn_sod null msg!
+;
+
+\ ----------------------------------
+\ Module close
+: conn_term	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Tidy close the connector
+	"ConnTask" gen_server_term
+;
+
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+connector_test @ #if
+	with: sdr
+	4 json-pretty
+
+	: w
+		.s
+	;
+	
+	conn_init
+	1 sleep
+	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! response@ 
+	3 sleep
+	conn_term
+	bye
