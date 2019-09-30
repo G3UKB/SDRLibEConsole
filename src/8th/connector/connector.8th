@@ -395,14 +395,19 @@ ns: user
 connector_test @ #if
 	with: sdr
 	4 json-pretty
+	
+	\ Must register REPL in the task repos to be able to reply
+	t:curtask t:name@ reg!
+	\ Set q to null on empty
+	t:getq false q:throwing
 
 	: w
-		.s
+		. cr
 	;
 	
 	conn_init
 	1 sleep
-	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! response@ 
+	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! 0.1 sleep response@ 
 	3 sleep
 	conn_term
 	bye
