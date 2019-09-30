@@ -321,7 +321,7 @@ with: fr.gs
 \ Message handlers
 
 \ ========================================
-\ Audio functions
+\ Audio words
 
 \ ----------------------------------	
 : t_conn_enum_audio_outputs	SED: a --
@@ -333,8 +333,11 @@ with: fr.gs
 	__conn_wait_resp_with_timeout
 	response!
 ;
-	
+
 \ ========================================
+\ Startup words
+
+\ ----------------------------------
 \ Initialise the connector at task level
 : t_conn_init	SED: a --
 	\ in: 	message
@@ -407,7 +410,7 @@ connector_test @ #if
 	
 	conn_init
 	1 sleep
-	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! 0.1 sleep response@ 
+	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! response@ 
 	3 sleep
 	conn_term
 	bye
