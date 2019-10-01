@@ -31,6 +31,8 @@
 	
 *)
 
+needs stack/3drop
+
 \ ========================================
 \ Testing only
 true var, connector_test
@@ -296,26 +298,21 @@ with: fr.gs
 		"Timeout waiting for response from device!" r@ if throw else log drop {"resp":"NAK"} then
 	then rdrop ;
 	
-\ ===============================================================================
-\ Protocol words
-\ Return the audio info for all output devices
-: __conn_get_audio_output_info	SED: -- m T
-	\ in: 	none
-	\ out:	s0 - true if successful
-	\ out:	s1 - the audio info map
-	__conn_enum_outputs_msg __conn_send_cmd_msg false __conn_wait_resp_with_timeout ;
+\ ----------------------------------
+\ Do response
+: __con_do_response	SED: -- 
+	__conn_wait_resp_with_timeout
+	response! 
+;
 
-\ ----------------------------------	
-\ Return the default route audio parameters
-: __conn_get_default_route	SED:  -- s s
-	\ in: 	none
-	\ out:	s0 - the audio api
-	\				s1 - the audio device
-	__conn_get_audio_output_info
-	\ Return api and dev for the default device
-	\ Note, we should select for this aka gui interface
-	"outputs" m:@ nip 1 a:@ nip
-	"api" m:@ swap "name" m:@ nip ;
+\ ----------------------------------
+\ Do exchange
+: __con_do_exchange	SED: T m --
+	\ in: 	0: m - message to send	
+	\				1: T - if true then throw on error
+	\ out: 	none
+	__conn_send_cmd_msg __con_do_response 
+;
 
 \ ===============================================================================
 \ Message handlers
@@ -323,15 +320,35 @@ with: fr.gs
 \ ========================================
 \ Audio words
 
-\ ----------------------------------	
+\ Return the audio info for all output devices
+: __conn_get_audio_output_info	SED: -- m T
+	\ in: 	none
+	\ out:	s0 - true if successful
+	\ out:	s1 - the audio info map
+	__conn_enum_outputs_msg __conn_send_cmd_msg false __conn_wait_resp_with_timeout 
+;
+
+\ ----------------------------------
+\ Return audio output data
 : t_conn_enum_audio_outputs	SED: a --
 	a:open
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_enum_outputs_msg false swap 
-	__conn_send_cmd_msg
-	__conn_wait_resp_with_timeout
-	response!
+	__conn_enum_outputs_msg 
+	false swap __con_do_exchange
+;
+
+\ ----------------------------------	
+\ Return the default route audio parameters
+: t_conn_get_default_route	SED:  -- s s
+	\ in: 	none
+	\ out:	s0 - the audio api
+	\				s1 - the audio device
+	__conn_get_audio_output_info
+	\ Return api and dev for the default device
+	\ Note, we should select for this aka gui interface
+	"outputs" m:@ nip 1 a:@ nip
+	"api" m:@ swap "name" m:@ nip 
 ;
 
 \ ========================================
@@ -355,6 +372,24 @@ with: fr.gs
 	\ out:	none
 	drop 
 ;
+
+\ ========================================
+\ Poll - is there anybody there
+: t_conn_poll	SED: a --
+	a:open
+	\ in: 	0: s - sender (task name, w)
+	\ out: 	q: * - "Timeout" or response data
+	__conn_poll_msg
+	false swap __conn_send_cmd_msg
+	__conn_cmd_sock@ __conn_resp_buf@ 0 net:recvfrom null? if
+		\ No server running or communications problem
+		"SDRLibE server is not running or cannot be contacted!" log
+		3drop {"resp" : "NAK"}
+	else
+		\ Got a response
+		drop json> >r 2drop drop r>
+	then
+	response! ;
 	
 \ ===============================================================================
 \ ===============================================================================
@@ -402,15 +437,23 @@ connector_test @ #if
 	\ Must register REPL in the task repos to be able to reply
 	t:curtask t:name@ reg!
 	\ Set q to null on empty
-	t:getq false q:throwing
+	t:getq false q:throwing \ do not drop q else crashes
 
 	: w
 		. cr
 	;
 	
+	: w1
+		. cr
+	;
+	
 	conn_init
 	1 sleep
-	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! response@ 
+	"POLL" . cr
+	"ConnTask" ' t_conn_poll [null] ' w +sender msg! response@
+	1 sleep
+	"AUDIO" . cr
+	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w1 +sender msg! response@
 	3 sleep
 	conn_term
 	bye
