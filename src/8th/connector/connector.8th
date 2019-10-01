@@ -320,14 +320,6 @@ with: fr.gs
 \ ========================================
 \ Audio words
 
-\ Return the audio info for all output devices
-: __conn_get_audio_output_info	SED: -- m T
-	\ in: 	none
-	\ out:	s0 - true if successful
-	\ out:	s1 - the audio info map
-	__conn_enum_outputs_msg __conn_send_cmd_msg false __conn_wait_resp_with_timeout 
-;
-
 \ ----------------------------------
 \ Return audio output data
 : t_conn_enum_audio_outputs	SED: a --
@@ -344,11 +336,18 @@ with: fr.gs
 	\ in: 	none
 	\ out:	s0 - the audio api
 	\				s1 - the audio device
-	__conn_get_audio_output_info
+	\ Extract task name and word to call
+	1 a:@ swap 2 a:@ nip
+	__conn_enum_outputs_msg 
+	__conn_send_cmd_msg 
+	false __conn_wait_resp_with_timeout 
 	\ Return api and dev for the default device
-	\ Note, we should select for this aka gui interface
-	"outputs" m:@ nip 1 a:@ nip
-	"api" m:@ swap "name" m:@ nip 
+	\ Note, this is when we have no GUI for selection
+	"outputs" m:@ nip 1 a:@ nip "api" m:@ swap "name" m:@ nip
+	\ Put result in an array
+	2 a:close
+	\ Respons 'task name, w, data'
+	response!
 ;
 
 \ ========================================
@@ -442,10 +441,8 @@ connector_test @ #if
 	: w
 		. cr
 	;
-	
-	: w1
-		. cr
-	;
+	\ Have to increase the ref count or word decreffed to 0!!
+	' w ' w
 	
 	conn_init
 	1 sleep
@@ -453,7 +450,9 @@ connector_test @ #if
 	"ConnTask" ' t_conn_poll [null] ' w +sender msg! response@
 	1 sleep
 	"AUDIO" . cr
-	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w1 +sender msg! response@
-	3 sleep
+	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w +sender msg! response@
+	"ConnTask" ' t_conn_get_default_route [null] ' w +sender msg! response@
+	1 sleep
 	conn_term
+	1 sleep
 	bye
