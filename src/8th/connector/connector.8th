@@ -66,13 +66,15 @@ with: fr.gs
 : __conn_create_socket	SED: --
 	\ in: 	none
 	\ out:	none
-	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! ;
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket "udp_cmd_sock" t:! 
+;
 	
 \ Get command socket
 : __conn_cmd_sock@	SED: -- net
 	\ in: 	none
 	\ out:	s0 - command socket
-	"udp_cmd_sock" t:@ ;
+	"udp_cmd_sock" t:@ 
+;
 
 \ ========================================
 \ Buffers
@@ -81,14 +83,16 @@ with: fr.gs
 : __conn_create_resp_buf	SED: --
 	\ in: 	none
 	\ out:	none
-	5000 b:new 0x0 b:fill "b_resp_buffer" t:! ;
+	5000 b:new 0x0 b:fill "b_resp_buffer" t:! 
+;
 
 \ ----------------------------------	
 \ Get response buffer
 : __conn_resp_buf@	SED: --
 	\ in: 	none
 	\ out:	none	
-	"b_resp_buffer" t:@ ;
+	"b_resp_buffer" t:@ 
+;
 	
 \ ========================================
 \ Json encoded request messages
@@ -97,7 +101,8 @@ with: fr.gs
 	\ in:		0: m - empty message
 	\				1: * - p1
 	\ out:	none
-	"params" m:@ a:clear rot a:push drop ;
+	"params" m:@ a:clear rot a:push drop 
+;
 
 \ ----------------------------------
 : __conn_push_two_param 	SED: * * a -- 
@@ -107,58 +112,58 @@ with: fr.gs
 	\ out:	none
 	"params" m:@ a:clear rot a:push rot a:push drop ;
 	
-\ ========================================
-\ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
-\ No params
-: __conn_poll_msg { "cmd" : "poll" , "params" : [] } >json ;
-: __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
-: __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
-: __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
-: __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
-: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
-: __conn_revert_audio_outputs_msg { "cmd" : "revert_outputs" , "params" : [] } >json ;
-\ One param
-: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
-: __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
-: __conn_tx_freq_msg { "cmd" : "set_tx_freq" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r1_mode_msg { "cmd" : "set_rx1_mode" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
-: __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_one_param >json ;
-: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_one_param >json ;
-: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_one_param >json ;
-: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
-: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
-: __conn_alex_auto_msg { "cmd" : "set_alex_auto" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hf_bypass_msg { "cmd" : "set_hf_bypass" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_30_20_msg { "cmd" : "set_lpf_30_20" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_60_40_msg { "cmd" : "set_lpf_60_40" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_80_msg { "cmd" : "set_lpf_80" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_160_msg { "cmd" : "set_lpf_160" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_6_msg { "cmd" : "set_lpf_6" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_12_10_msg { "cmd" : "set_lpf_12_10" , "params" : [] } __conn_push_one_param >json ;
-: __conn_lpf_17_15_msg { "cmd" : "set_lpf_17_15" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hpf_13_msg { "cmd" : "set_hpf_13" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hpf_20_msg { "cmd" : "set_hpf_20" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hpf_9_5_msg { "cmd" : "set_hpf_9_5" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hpf_6_5_msg { "cmd" : "set_hpf_6_5" , "params" : [] } __conn_push_one_param >json ;
-: __conn_hpf_1_5_msg { "cmd" : "set_hpf_1_5" , "params" : [] } __conn_push_one_param >json ;
-\ Two params
-: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
-: __conn_change_audio_outputs_msg { "cmd" : "change_outputs" , "params" : [] } __conn_push_two_param >json ;
-
+	\ ========================================
+	\ Simple messages with zero-two parameters, same SED: ... -- s (a Json encoded string)
+	\ No params
+	: __conn_poll_msg { "cmd" : "poll" , "params" : [] } >json ;
+	: __conn_discover_msg { "cmd" : "radio_discover" , "params" : [] } >json ;
+	: __conn_server_start_msg { "cmd" : "server_start" , "params" : [] } >json ;
+	: __conn_enum_inputs_msg { "cmd" : "enum_inputs" , "params" : [] } >json ;
+	: __conn_enum_outputs_msg { "cmd" : "enum_outputs" , "params" : [] } >json ;	
+	: __conn_radio_stop_msg { "cmd" : "radio_stop" , "params" : [] } >json ;
+	: __conn_revert_audio_outputs_msg { "cmd" : "revert_outputs" , "params" : [] } >json ;
+	\ One param
+	: __conn_radio_start_msg { "cmd" : "radio_start" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_set_num_rx_msg { "cmd" : "set_num_rx" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r1_freq_msg { "cmd" : "set_rx1_freq" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r2_freq_msg { "cmd" : "set_rx2_freq" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r3_freq_msg { "cmd" : "set_rx3_freq" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_tx_freq_msg { "cmd" : "set_tx_freq" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r1_mode_msg { "cmd" : "set_rx1_mode" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r2_mode_msg { "cmd" : "set_rx2_mode" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r3_mode_msg { "cmd" : "set_rx3_mode" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_tx_mode_msg { "cmd" : "set_tx_mode" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r1_agc_msg { "cmd" : "set_rx1_agc" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r2_agc_msg { "cmd" : "set_rx2_agc" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r3_agc_msg { "cmd" : "set_rx3_agc" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r1_gain_msg { "cmd" : "set_rx1_gain" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r2_gain_msg { "cmd" : "set_rx2_gain" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_r3_gain_msg { "cmd" : "set_rx3_gain" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hf_pre_msg { "cmd" : "set_hf_pre" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_attn_msg { "cmd" : "set_attn" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_disp_width_msg { "cmd" : "set_display_width" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_disp_period_msg { "cmd" : "set_disp_period" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_alex_auto_msg { "cmd" : "set_alex_auto" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hf_bypass_msg { "cmd" : "set_hf_bypass" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_30_20_msg { "cmd" : "set_lpf_30_20" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_60_40_msg { "cmd" : "set_lpf_60_40" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_80_msg { "cmd" : "set_lpf_80" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_160_msg { "cmd" : "set_lpf_160" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_6_msg { "cmd" : "set_lpf_6" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_12_10_msg { "cmd" : "set_lpf_12_10" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_lpf_17_15_msg { "cmd" : "set_lpf_17_15" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hpf_13_msg { "cmd" : "set_hpf_13" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hpf_20_msg { "cmd" : "set_hpf_20" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hpf_9_5_msg { "cmd" : "set_hpf_9_5" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hpf_6_5_msg { "cmd" : "set_hpf_6_5" , "params" : [] } __conn_push_one_param >json ;
+	: __conn_hpf_1_5_msg { "cmd" : "set_hpf_1_5" , "params" : [] } __conn_push_one_param >json ;
+	\ Two params
+	: __conn_r1_filt_msg { "cmd" : "set_rx1_filter" , "params" : [] } __conn_push_two_param >json ;
+	: __conn_r2_filt_msg { "cmd" : "set_rx2_filter" , "params" : [] } __conn_push_two_param >json ;
+	: __conn_r3_filt_msg { "cmd" : "set_rx3_filter" , "params" : [] } __conn_push_two_param >json ;
+	: __conn_tx_filt_msg { "cmd" : "set_tx_filter" , "params" : [] } __conn_push_two_param >json ;
+	: __conn_change_audio_outputs_msg { "cmd" : "change_outputs" , "params" : [] } __conn_push_two_param >json 
+;
 
 \ Complex messages
 \ ----------------------------------	
@@ -167,7 +172,8 @@ with: fr.gs
 	\				1: s - audio device name string
 	\ out:	0: s - json encoded default route message
 	>r >r { "cmd" : "set_audio_route" , "params" : [1, "LOCAL", 1, "", "", "BOTH"] }
-	"params" m:@ 3 r> a:! 4 r> a:! drop >json ;
+	"params" m:@ 3 r> a:! 4 r> a:! drop >json 
+;
 
 \ ----------------------------------	
 : __conn_audio_route_msg	SED: a -- s
@@ -180,12 +186,14 @@ with: fr.gs
 	r@ 2 a:@ nip ":" s:/ 0 a:@ nip a:push
 	r@ 2 a:@ nip ":" s:/ 2 a:@ nip a:push
 	r> 3 a:@ nip s:uc a:push drop
-	>json ;
+	>json 
+;
 	
 \ ----------------------------------		
 : __conn_disp_state_msg SED: T T T -- s
 	{ "cmd" : "set_disp_state" , "params" : [] }
-	"params" m:@ rot a:push rot a:push rot a:push drop >json ;
+	"params" m:@ rot a:push rot a:push rot a:push drop >json 
+;
 
 \ ========================================
 \ Network 
@@ -195,64 +203,73 @@ with: fr.gs
 : __conn_cmd_ip	SED: -- n
 	\ in: 	none
 	\ out:	s0 - cmd ip
-	"127.0.0.1" ;
-	\ "192.168.1.8" ;
+	"127.0.0.1"
+	\ "192.168.1.8"
+;
 
 \ ----------------------------------		
 \ Return the command port
 : __conn_cmd_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - cmd port
-	10010 ;
+	10010
+;
 
 \ ----------------------------------	
 \ Return the display data receiver 1 port	
 : __conn_data_1_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 1 port
-	10011 ;
+	10011 
+;
 
 \ ----------------------------------	
 \ Return the display data receiver 2 port
 : __conn_data_2_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 2 port
-	10012 ;
+	10012 
+;
 
 \ ----------------------------------	
 \ Return the display data receiver 3 port
 : __conn_data_3_port	SED: -- n
 	\ in: 	none
 	\ out:	s0 - display data receiver 3 port
-	10013 ;
+	10013 
+;
 	
 \ ----------------------------------	
 \ Return the command address info
 : __conn_cmd_addr		SED: -- X
 	\ in: 	none
 	\ out:	s0 - cmd address info
-	__conn_cmd_ip __conn_cmd_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_cmd_port net:getaddrinfo 
+;
 	
 \ ----------------------------------	
 \ Return the display data receiver 1 address info	
 : __conn_data_1_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 1 address info
-	__conn_cmd_ip __conn_data_1_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_1_port net:getaddrinfo 
+;
 
 \ ----------------------------------	
 \ Return the display data receiver 2 address info		
 : __conn_data_2_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 2 address info
-	__conn_cmd_ip __conn_data_2_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_2_port net:getaddrinfo
+;
 
 \ ----------------------------------	
 \ Return the display data receiver 3 address info	
 : __conn_data_3_addr	SED: -- X
 	\ in: 	none
 	\ out:	s0 - Data 3 address info
-	__conn_cmd_ip __conn_data_3_port net:getaddrinfo ;
+	__conn_cmd_ip __conn_data_3_port net:getaddrinfo 
+;
 
 \ ========================================
 \ Message send/receive
@@ -263,7 +280,8 @@ with: fr.gs
 	\ out:	s0 - none
 	s:len >r
 	__conn_cmd_sock@ __conn_cmd_addr rot 0 net:sendto nip
-	r> n:= not if "Short send!" log then ;
+	r> n:= not if "Short send!" log then 
+;
 
 \ ----------------------------------	
 \ Wait for read data available from cmd socket
@@ -271,7 +289,8 @@ with: fr.gs
 	\ in: 	none
 	\ out:	s0 - true if wait successful
 	\				s1 - the target socket
-	__conn_cmd_sock@ true 5000 net:wait ;
+	__conn_cmd_sock@ true 5000 net:wait 
+;
 
 \ ----------------------------------	
 \ Receive data from the given socket
@@ -284,7 +303,8 @@ with: fr.gs
 		2drop "Error in read from device!" r@ if throw else log {"resp":"NAK"} then
 	else
 		drop nip nip json>
-	then ;
+	then 
+;
 
 \ ----------------------------------			
 \ Wait for and read cmd response
@@ -296,7 +316,8 @@ with: fr.gs
 		__conn_recv_from
 	else
 		"Timeout waiting for response from device!" r@ if throw else log drop {"resp":"NAK"} then
-	then rdrop ;
+	then rdrop 
+;
 	
 \ ----------------------------------
 \ Do response
@@ -338,6 +359,7 @@ with: fr.gs
 	\ out:	s0 - the audio api
 	\				s1 - the audio device
 	\ Extract task name and word to call
+	\ ToDo check for NAK
 	a:open rot drop
 	__conn_enum_outputs_msg 
 	__conn_send_cmd_msg 
@@ -355,11 +377,12 @@ with: fr.gs
 	\ in: 	none
 	\ out:	s0 - the audio api
 	\				s1 - the audio device
-	__conn_enum_outputs_msg 
-	__conn_send_cmd_msg 
-	false __conn_wait_resp_with_timeout 
+	__conn_enum_outputs_msg
+	__conn_send_cmd_msg
+	false __conn_wait_resp_with_timeout
 	\ Return api and dev for the default device
 	\ Note, this is when we have no GUI for selection
+	\ ToDo check for NAK!
 	"outputs" m:@ nip 1 a:@ nip "api" m:@ swap "name" m:@ nip
 ;
 
@@ -368,8 +391,8 @@ with: fr.gs
 	a:open rot drop
 	\ in: 	0: s - sender (task name)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_get_default_route __conn_default_route_msg false swap __con_do_exchange ;
-	
+	__conn_get_default_route __conn_default_route_msg false swap __con_do_exchange 
+;	
 
 \ ========================================
 \ Basic radio words
@@ -379,7 +402,8 @@ with: fr.gs
 	a:open rot drop
 	\ in: 	0: s - sender (task name, w)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_discover_msg false swap __con_do_exchange ;
+	__conn_discover_msg false swap __con_do_exchange 
+;
 
 \ ----------------------------------
 \ Start the server 
@@ -387,7 +411,8 @@ with: fr.gs
 	a:open rot drop
 	\ in: 	0: s - sender (task name, w)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_server_start_msg false swap __con_do_exchange ;
+	__conn_server_start_msg false swap __con_do_exchange 
+;
 
 \ ----------------------------------
 \ Start the radio
@@ -396,7 +421,8 @@ with: fr.gs
 	\ in: 	0: s - sender (task name, w)
 	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_radio_start_msg false swap __con_do_exchange ;
+	rot __conn_radio_start_msg false swap __con_do_exchange 
+;
 	
 \ ----------------------------------
 \ Stop the radio
@@ -404,7 +430,8 @@ with: fr.gs
 	a:open rot drop
 	\ in: 	0: s - sender (task name, w)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_radio_stop_msg false swap __con_do_exchange ;
+	__conn_radio_stop_msg false swap __con_do_exchange 
+;
 	
 \ ========================================
 \ Startup words
@@ -444,7 +471,8 @@ with: fr.gs
 		\ Got a response
 		drop json> >r 2drop drop r>
 	then
-	response! ;
+	response! 
+;
 	
 \ ===============================================================================
 \ ===============================================================================
@@ -489,34 +517,43 @@ connector_test @ #if
 	with: sdr
 	4 json-pretty
 	
-	\ Must register REPL in the task repos to be able to reply
-	t:curtask t:name@ reg!
-	\ Set q to null on empty
-	t:getq false q:throwing \ do not drop q else crashes
+	: reg_task
+		\ Must register REPL in the task repos to be able to reply
+		t:curtask t:name@ reg!
+		\ Set q to null on empty
+		t:getq false q:throwing \ do not drop q else crashes
+	;
 
+	\ All responses here
 	: w
 		log
 	;
-	\ Have to increase the ref count or word decreffed to 0!!
-	' w ' w ' w ' w ' w ' w ' w ' w ' w
 	
+	\ Send a message, get a rsponse
 	: sender
-		a:new swap a:push ' w +sender msg! response@ 
+		a:new swap a:push ' w  +sender msg! response@ 
 	;
 	
-	conn_init
-	1 sleep
-	"POLL" . cr
-	\ "ConnTask" ' t_conn_poll [null] ' w +sender msg! response@
-	1 sleep
-	"AUDIO" . cr
-	"ConnTask" ' t_conn_enum_audio_outputs null sender "Enum outputs" log
-	"ConnTask" ' t_conn_get_default_route null sender  "Get dafault route" log
-	"ConnTask" ' t_conn_set_default_route null sender  "Set default route" log
-	"ConnTask" ' t_conn_discover null sender  "Discover" log
-	"ConnTask" ' t_conn_start_server null sender  "Start server" log
-	"ConnTask" ' t_conn_start_radio 0 sender  "Start radio" log
-	1 sleep
-	conn_term
-	1 sleep
+	\ basic start radio with default audio
+	: script
+		reg_task
+		conn_init
+		1 sleep
+		"POLL" . cr
+		"ConnTask" ' t_conn_poll [null] ' w  +sender msg! response@
+		1 sleep
+		"AUDIO" . cr
+		"ConnTask" ' t_conn_enum_audio_outputs null sender "Enum outputs" log
+		"ConnTask" ' t_conn_get_default_route null sender "Get default route" log
+		"ConnTask" ' t_conn_set_default_route null sender "Set default route" log
+		"ConnTask" ' t_conn_discover null sender "Discover" log
+		"ConnTask" ' t_conn_start_server null sender "Start server" log
+		"ConnTask" ' t_conn_start_radio 0 sender "Start radio" log
+		1 sleep
+		conn_term
+		1 sleep
+	;
+	
+	\ Run test and exit
+	script
 	bye
