@@ -42,6 +42,7 @@ connector_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../common/radio_defs.8th"  f:include
 	\ gen_server.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
@@ -479,6 +480,85 @@ with: fr.ps
 	\ out: 	q: * - "Timeout" or response data
 	rot __conn_tx_freq_msg false swap __con_do_exchange 
 ;
+
+\ ========================================
+\ MODES
+
+\ ----------------------------------
+\ Set R1 mode
+: t_conn_r1_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R1 mode id
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r1_mode_msg false swap __con_do_exchange
+;
+	
+\ ----------------------------------
+\ Set R2 mode
+: t_conn_r2_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 mode id
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r2_mode_msg false swap __con_do_exchange 
+;
+	
+\ ----------------------------------
+\ Set R3 mode
+: t_conn_r3_mode	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 mode id
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r3_mode_msg false swap __con_do_exchange 
+;
+
+\ ========================================
+\ FILTERS
+
+\ Set R1 filter
+: t_conn_r1_filter	SED: a --
+	a:open
+	\ in: 	0: s - sender task name, w
+	\				2: n - R1 filter high
+	\				3: n - R1 filter low
+	\ out: 	q: * - "Timeout" or response data
+	2over __conn_r1_filt_msg false swap __con_do_exchange 2drop
+;
+	
+\ ----------------------------------
+\ Set R2 filter
+: t_conn_r2_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R2 filter high
+	\				2: s - R2 filter low
+	\ out: 	q: * - "Timeout" or response data
+	2over rot __conn_r2_filt_msg false swap __con_do_exchange 2drop 
+;
+	
+\ ----------------------------------
+\ Set R3 filter
+: t_conn_r3_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - R3 filter high
+	\				2: s - R3 filter low
+	\ out: 	q: * - "Timeout" or response data
+	2over rot __conn_r3_filt_msg false swap __con_do_exchange 2drop 
+;
+	
+\ ----------------------------------
+\ Set TX filter
+: t_conn_tx_filter	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: s - TX filter high
+	\				2: s - TX filter low
+	\ out: 	q: * - "Timeout" or response data
+	2over rot  __conn_tx_filt_msg false swap __con_do_exchange 2drop 
+;
 	
 \ ========================================
 \ Startup words
@@ -500,6 +580,8 @@ with: fr.ps
 	\ out:	none
 	drop 
 	t:name@ ' t_conn_r1_freq "SYS_R1_FREQ" subscribe
+	t:name@ ' t_conn_r1_mode "SYS_R1_MODE" subscribe
+	t:name@ ' t_conn_r1_filter "SYS_R1_FILTER" subscribe
 	"ConnTask subscriptions complete" log
 ;
 
@@ -611,7 +693,11 @@ connector_test @ #if
 		"ConnTask" ' t_conn_start_radio 0 sender "Start radio" log
 		"EVENTS" log
 		["7150000"] ' w  +sender "SYS_R1_FREQ" publish response@ "Event Set freq" log
+		[ ` "LSB" mode_for_name ` ] ' w  +sender "SYS_R1_MODE" publish response@ "Event Set mode LSB" log
 		1 sleep
+		[ ` "AM" mode_for_name ` ] ' w  +sender "SYS_R1_MODE" publish response@ "Event Set mode AM" log
+		1 sleep
+		"6.0KHz" filter_bounds_for_name a:open a:new swap a:push swap a:push a:rev ' w  +sender "SYS_R1_FILTER" publish response@ "Event Set filter 6.0KHz" log
 		conn_term
 		1 sleep
 	;
