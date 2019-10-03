@@ -41,6 +41,7 @@ true var, connector_test
 connector_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
 	\ gen_server.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
@@ -52,6 +53,7 @@ connector_test @ #if
 \ Set namespace
 ns: sdr
 with: fr.gs
+with: fr.ps
 
 \ ===============================================================================
 \ PRIVATE
@@ -333,7 +335,7 @@ with: fr.gs
 	\ in: 	0: m - message to send	
 	\				1: T - if true then throw on error
 	\ out: 	none
-	__conn_send_cmd_msg __con_do_response 
+	__conn_send_cmd_msg __con_do_response
 ;
 
 \ ===============================================================================
@@ -376,6 +378,8 @@ with: fr.gs
 	response!
 ;
 
+\ ----------------------------------	
+\ Set the default route audio parameters
 : t_conn_set_default_route	SED: a --
 	a:open rot drop
 	\ in: 	0: s - sender (task name)
@@ -430,6 +434,51 @@ with: fr.gs
 	\ out: 	q: * - "Timeout" or response data
 	__conn_radio_stop_msg false swap __con_do_exchange 
 ;
+
+\ ========================================
+\ Receiver functions
+
+\ ========================================
+\ FREQUENCY
+
+\ Set R1 frequency
+: t_conn_r1_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name, w)
+	\				1: s - R1 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r1_freq_msg false swap __con_do_exchange 
+;
+
+\ ----------------------------------
+\ Set R2 frequency
+: t_conn_r2_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name, w)
+	\				1: s - R2 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r2_freq_msg false swap __con_do_exchange 
+;
+
+\ ----------------------------------
+\ Set R3 frequency
+: t_conn_r3_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name, w)
+	\				1: s - R3 freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_r3_freq_msg false swap __con_do_exchange 
+;
+	
+\ ----------------------------------
+\ Set TX frequency
+: t_conn_tx_freq	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name, w)
+	\				1: s - TX freq in Hz
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_tx_freq_msg false swap __con_do_exchange 
+;
 	
 \ ========================================
 \ Startup words
@@ -445,12 +494,22 @@ with: fr.gs
 	"ConnTask initialised" log
 ;
 
+\ Subscribe to events
+: t_conn_subscribe SED: a --
+	\ in: 	message
+	\ out:	none
+	drop 
+	t:name@ ' t_conn_r1_freq "SYS_R1_FREQ" subscribe
+	"ConnTask subscriptions complete" log
+;
+
 \ ----------------------------------
 \ Run SOD
 : t_conn_sod	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop 
+	drop
+	"ConnTask start-of-day complete" log
 ;
 
 \ ========================================
@@ -489,6 +548,7 @@ with: fr.gs
 	\ Create the connector gen-server
 	"ConnTask" gen_server_new
 	\ Ask the connector to initialise itself
+	"ConnTask" ' t_conn_subscribe null msg!
 	"ConnTask" ' t_conn_init null msg!
 	"ConnTask" ' t_conn_sod null msg!
 ;
@@ -513,6 +573,8 @@ ns: user
 
 connector_test @ #if
 	with: sdr
+	with: fr.ps
+	
 	4 json-pretty
 	
 	: reg_task
@@ -527,8 +589,6 @@ connector_test @ #if
 		log
 	;
 	
-	\ (*
-	\ Working test
 	\ Send a message, get a rsponse
 	: sender
 		a:new swap a:push ' w  +sender msg! response@ 
@@ -539,16 +599,18 @@ connector_test @ #if
 		reg_task
 		conn_init
 		1 sleep
-		"POLL" . cr
+		"POLL" log
 		"ConnTask" ' t_conn_poll null sender
 		1 sleep
-		"AUDIO" . cr
+		"AUDIO" log
 		"ConnTask" ' t_conn_enum_audio_outputs null sender "Enum outputs" log
 		"ConnTask" ' t_conn_get_default_route null sender "Get default route" log
 		"ConnTask" ' t_conn_set_default_route null sender "Set default route" log
 		"ConnTask" ' t_conn_discover null sender "Discover" log
 		"ConnTask" ' t_conn_start_server null sender "Start server" log
 		"ConnTask" ' t_conn_start_radio 0 sender "Start radio" log
+		"EVENTS" log
+		["7150000"] ' w  +sender "SYS_R1_FREQ" publish response@ "Event Set freq" log
 		1 sleep
 		conn_term
 		1 sleep
@@ -556,28 +618,4 @@ connector_test @ #if
 	
 	\ Run test and exit
 	script
-	\ *)
-	
-	(*
-	\ ==============================
-	\ Failing test - comment out sender and script above
-	reg_task
-	conn_init
-	1 sleep
-	"POLL" . cr
-	"ConnTask" ' t_conn_poll [null] ' w  +sender msg! response@ 
-	1 sleep
-	"AUDIO" . cr
-	"ConnTask" ' t_conn_enum_audio_outputs [null] ' w .s +sender msg! response@  "Enum outputs" log
-	"ConnTask" ' t_conn_get_default_route [null] ' w +sender msg! response@  "Get default route" log
-	"ConnTask" ' t_conn_set_default_route [null] ' w  +sender msg! response@  "Set default route" log
-	"ConnTask" ' t_conn_discover [null] ' w  +sender msg! response@  "Discover" log
-	"ConnTask" ' t_conn_start_server [null] ' w  +sender msg! response@  "Start server" log
-	"ConnTask" ' t_conn_start_radio [0] ' w  +sender msg! response@  "Start radio" log
-	1 sleep
-	conn_term
-	1 sleep
-	\ ===============================
-	*)
-	
 	bye
