@@ -1,0 +1,267 @@
+(* 
+	radio_defs.8th
+ 
+  Modes, filters etc
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+needs utils/enums
+
+\ ========================================
+\ Testing only
+false var, radio_defs_test
+radio_defs_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
+\ ========================================
+\ Define our SDR namespace
+ns: sdr
+
+\ ========================================
+\  WBS start modes
+: WITH_WBS 1 ;
+: NO_WBS 0 ;
+
+\ ========================================
+\  RX modes
+\ Mode id's as understood by the DSP
+0 enum:
+	CH_LSB
+	CH_USB
+	CH_DSB
+	CH_CWL
+	CH_CWU
+	CH_FM
+	CH_AM
+	CH_DIGU
+	CH_SPEC
+	CH_DIGL
+	CH_SAM
+	CH_DRM
+enum;
+
+\ ----------------------------------
+\ Translate a mode id as understood by the DSP to a mode name as understood by the app
+: name_for_mode	SED: n -- s
+	\ in: 	0: n - mode id
+	\ out: 	0: s - mode name
+	dup >r
+	["LSB","USB","DSB","CW-L","CW-U","FM","AM","DIGU","SPEC","DIGL","SAM","DRM"]
+	swap a:@ nip null? if
+		"Invalid mode - name_for_mode:" r> >s s:+ throw
+	then rdrop ;
+
+\ ----------------------------------
+\ Translate a mode name as understood by the app to a mode id as understood by the DSP
+: mode_for_name	SED: s -- n
+	\ in: 	0: s - mode name
+	\ out: 	0: n - mode id
+	dup >r
+	{
+		"LSB" : 	` CH_LSB `,
+		"USB" : 	` CH_USB `,
+		"DSB" : 	` CH_DSB `,
+		"CW-L" : 	` CH_CWL `,
+		"CW-U" : 	` CH_CWU `,
+		"FM" : 		` CH_FM `,
+		"AM" : 		` CH_AM `,
+		"DIGU" : 	` CH_DIGU `,
+		"SPEC" : 	` CH_SPEC `,
+		"DIGL" : 	` CH_DIGL `,
+		"SAM" : 	` CH_SAM `,
+		"DRM" : 	` CH_DRM `
+	} swap m:@ nip null? if
+		"Invalid mode - mode_for_name:" r> >s s:+ throw
+	then rdrop ;
+
+\ ========================================
+\ Filters
+\ Filter id's used to index the lookup table
+0 enum:
+	CH_6K0
+	CH_4K0
+	CH_2K7
+	CH_2K4
+	CH_2K1
+	CH_1K0
+	CH_500
+	CH_250
+	CH_100
+enum;
+
+\ ----------------------------------
+\ Translate a filter id to high/low limits and filter name
+: filter_lookup	SED: n -- a
+	\ in: 	0: n - filter id
+	\ out: 	0: a - [ low, high, name]
+	dup >r
+	[
+		[ 100, 6100, "6.0KHz"],
+		[ 100, 4100, "4.0KHz"],
+		[ 300, 3000, "2.7KHz"],
+		[ 300, 2700, "2.4KHz"],
+		[ 300, 2400, "2.1KHz"],
+		[ 300, 1300, "1.0KHz"],
+		[ 500, 1000, "500Hz"],
+		[ 600, 850, "250Hz"],
+		[ 700, 800, "100Hz"]
+	] swap a:@ nip null? if
+		"Invalid filter - filter_lookup:" r> >s s:+ throw
+	then rdrop ;
+
+\ ----------------------------------
+\ Translate a filter name to a filter id
+: filter_for_name	SED: s -- n
+	\ in: 	0: s - filter name
+	\ out: 	0: n - filter id
+	dup >r
+	{
+		"6.0KHz" : ` CH_6K0 `,
+		"4.0KHz" : ` CH_4K0 `,
+		"2.7KHz" : ` CH_2K7 `,
+		"2.4KHz" : ` CH_2K4 `,
+		"2.1KHz" : ` CH_2K1 `,
+		"1.0KHz" : ` CH_1K0 `,
+		"500Hz" : ` CH_500 `,
+		"250Hz" : ` CH_250 `,
+		"100Hz" : ` CH_100 `
+	} swap m:@ nip null? if
+		"Invalid filter - filter_for_name:" r> >s s:+ throw
+	then rdrop ;
+
+\ ----------------------------------
+\ Translate a filter name to a filter id
+: filter_bounds_for_name	SED: s -- a
+	\ in: 	0: s - filter name
+	\ out: 	0: a - filter bounds
+	dup >r
+	{
+		"6.0KHz" : [ 100, 6100 ],
+		"4.0KHz" : [ 100, 4100 ],
+		"2.7KHz" : [ 300, 3000 ],
+		"2.4KHz" : [ 300, 2700 ],
+		"2.1KHz" : [ 300, 2400 ],
+		"1.0KHz" : [ 300, 1300 ],
+		"500Hz" : [ 500, 1000 ],
+		"250Hz" : [ 600, 850 ],
+		"100Hz" : [ 700, 800 ]
+	} swap m:@ nip null? if
+		"Invalid filter - filter_bounds_for_name:" r> >s s:+ throw
+	then rdrop ;
+	
+\ ========================================
+\ AGC
+\ AGC id's as understood by the DSP
+0 enum:
+	CH_AGC_OFF
+	CH_AGC_LONG
+	CH_AGC_SLOW
+	CH_AGC_MED
+	CH_AGC_FAST
+enum;
+
+\ ----------------------------------
+\ Translate an AGC id as understood by the DSP to an AGC name as understood by the app
+: name_for_agc	SED: n -- s
+	\ in: 	0: n - AGC id
+	\ out: 	0: s - AGC name
+	dup >r
+	["Off","Long","Slow","Med","Fast"]
+	swap a:@ nip null? if
+		"Invalid AGC - name_for_agc:" r> >s s:+ throw
+	then rdrop ;
+
+\ ----------------------------------
+\ Translate an AGC name as understood by the app to an AGC id as understood by the DSP
+: agc_for_name	SED: s -- n
+	\ in: 	0: s - AGC name
+	\ out: 	0: n - AGC id
+	dup >r
+	{
+		"Off" : 	` CH_AGC_OFF `,
+		"Long" : 	` CH_AGC_LONG `,
+		"Slow" : 	` CH_AGC_SLOW `,
+		"Med" : 	` CH_AGC_MED `,
+		"Fast" : 	` CH_AGC_FAST `
+	} swap m:@ nip null? if
+		"Invalid AGC - agc_for_name:" r> >s s:+ throw
+	then rdrop ;
+
+\ ========================================
+\ Attenuator id to corresponding db attenuation
+: ATTN_NONE 0 ;
+: ATTN_10 10 ;
+: ATTN_20 20 ;
+: ATTN_30 30 ;
+
+\ ========================================
+\ Preamp on/off id's
+: PRE_OFF 0 ;
+: PRE_ON 1 ;
+
+\ ========================================
+\ Alex auto
+0 enum:
+	ALEX-AUTO
+	ALEX-MANUAL
+enum;
+
+\ Alex HPF bypass
+0 enum:
+	ALEX-HPF-DISABLE
+	ALEX-HPF-ENABLE
+enum;
+
+\ Alex LPF/HPF select
+0 enum:
+	ALEX-FILT-DISABLE
+	ALEX-FILT-ENABLE
+enum;
+
+\ ========================================
+\ Restore namespace	
+ns: user	
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+radio_defs_test @ #if
+
+	sdr:CH_LSB sdr:name_for_mode . cr
+	\ 20 sdr:name_for_mode
+	"LSB" sdr:mode_for_name . cr
+	\ "LLSB" sdr:mode_for_name
+	
+	sdr:CH_2K4 sdr:filter_lookup . cr
+	\ 20 sdr:filter_lookup
+	"2.7KHz" sdr:filter_for_name . cr
+	\ "22.7KHz" sdr:filter_for_name
+
+	sdr:CH_AGC_LONG sdr:name_for_agc . cr
+	\ 20 sdr:name_for_agc
+	"Long" sdr:agc_for_name . cr
+	\ "Longish" sdr:agc_for_name
+	
+	bye
+#then
