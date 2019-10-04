@@ -42,8 +42,8 @@ connector_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../common/radio_defs.8th"  f:include
-	\ gen_server.8th" f:include
+	"../common/radio_defs.8th" f:include
+	"../common/ps_events.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -579,9 +579,9 @@ with: fr.ps
 	\ in: 	message
 	\ out:	none
 	drop 
-	t:name@ ' t_conn_r1_freq "SYS_R1_FREQ" subscribe
-	t:name@ ' t_conn_r1_mode "SYS_R1_MODE" subscribe
-	t:name@ ' t_conn_r1_filter "SYS_R1_FILTER" subscribe
+	t:name@ ' t_conn_r1_freq SYS_R1_FREQ subscribe
+	t:name@ ' t_conn_r1_mode SYS_R1_MODE subscribe
+	t:name@ ' t_conn_r1_filter SYS_R1_FILT subscribe
 	"ConnTask subscriptions complete" log
 ;
 
@@ -692,12 +692,12 @@ connector_test @ #if
 		"ConnTask" ' t_conn_start_server null sender "Start server" log
 		"ConnTask" ' t_conn_start_radio 0 sender "Start radio" log
 		"EVENTS" log
-		["7150000"] ' w  +sender "SYS_R1_FREQ" publish response@ "Event Set freq" log
-		[ ` "LSB" mode_for_name ` ] ' w  +sender "SYS_R1_MODE" publish response@ "Event Set mode LSB" log
+		["7150000"] ' w  +sender SYS_R1_FREQ publish response@ "Event Set freq" log
+		[ ` "LSB" mode_for_name ` ] ' w  +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log
 		1 sleep
-		[ ` "AM" mode_for_name ` ] ' w  +sender "SYS_R1_MODE" publish response@ "Event Set mode AM" log
+		[ ` "AM" mode_for_name ` ] ' w  +sender SYS_R1_MODE publish response@ "Event Set mode AM" log
 		1 sleep
-		"6.0KHz" filter_bounds_for_name a:open a:new swap a:push swap a:push a:rev ' w  +sender "SYS_R1_FILTER" publish response@ "Event Set filter 6.0KHz" log
+		"6.0KHz" filter_bounds_for_name a:open a:new swap a:push swap a:push a:rev ' w  +sender SYS_R1_FILT publish response@ "Event Set filter 6.0KHz" log
 		conn_term
 		1 sleep
 	;

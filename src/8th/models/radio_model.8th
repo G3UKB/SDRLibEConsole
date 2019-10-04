@@ -28,7 +28,6 @@
 			2. The model is saved at end of day and may be saved at other times as a precaution.
 			3. This model contains all the data and settings for the radio state. It is used to both populate the
 			UI and to set the current values.
-	
 *)
 
 \ ========================================
@@ -38,6 +37,11 @@ true var, radio_model_test
 \ ----------------------------------
 radio_model_test @ #if
 	\ Includes
+	"../common/radio_defs.8th" f:include
+	"../common/ps_events.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -145,35 +149,86 @@ with: fr.ps
 
 \ ----------------------------------
 \ Get model
-: __app_model@	SED: -- m
+: __radio_model@	SED: -- m
 	\ in: 	none
 	\ out:	model
-	"app_model" t:@ 
+	"radio_model" t:@ 
 ;
 
 \ ----------------------------------
 \ Save model
-: __app_model!	SED: m -- 
+: __radio_model!	SED: m -- 
 	\ in: 	model
 	\ out:	none
-	"app_model" t:! 
+	"radio_model" t:! 
 ;
 	
 \ ----------------------------------
 \ Restore model else use the default
-: __app_model_restore	SED: --
+: __radio_model_restore	SED: --
 	\ in: 	none
 	\ out:	none
 	\ Restore the application model or use default if no saved model
-	__app_model_default APP_MODEL_FILENAME restore_model_data __app_model! 
+	__radio_model_default RADIO_MODEL_FILENAME restore_model_data __app_model! 
 ;
 
 \ ----------------------------------
 \ Save current model 
-: __app_model_save	SED: --
+: __radio_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	__app_model@ APP_MODEL_FILENAME save_model_data drop 
+	__radio_model@ RADIO_MODEL_FILENAME save_model_data drop 
+;
+
+\ ===============================================================================
+\ Message handlers
+
+\ ========================================
+\ Initialisation and termination
+
+\ Initialise the radio model
+: t_radio_init	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __radio_model_restore
+;
+
+\ ----------------------------------
+\ Send system events
+: t_radio_sys_evnts	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __radio_model_sys_evnts
+;
+
+\ ----------------------------------
+\ Send UI events
+: t_radio_ui_evnts	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __radio_model_ui_evnts
+;
+
+\ ----------------------------------
+\ Send SYS events
+: __radio_model_sys_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+;
+
+\ ----------------------------------
+\ Send UI events
+: __radio_model_ui_evnts	SED: --
+	\ in: 	none
+	\ out:	none
+;
+
+\ ----------------------------------
+\ Close the app model at task level
+: do_app_close	SED: m --
+	\ in: 	message
+	\ out:	none
+	drop __radio_model_save
 ;
 
 \ ===============================================================================
@@ -190,12 +245,13 @@ with: fr.ps
 	\ in: 	none
 	\ out:	none
 	
-	\ Create the connector gen-server
+	\ Create the model gen-server
 	"RadioModelTask" gen_server_new
-	\ Ask the connector to initialise itself
-	"RadioModelTask" ' t_conn_subscribe null msg!
+	\ Ask the model to initialise itself
 	"RadioModelTask" ' t_conn_init null msg!
-	"RadioModelTask" ' t_conn_sod null msg!
+	\ Send events
+	"RadioModelTask" ' t_radio_sys_evnts null msg!
+	"RadioModelTask" ' t_radio_ui_evnts null msg!
 ;
 
 \ ----------------------------------
@@ -224,9 +280,9 @@ connector_test @ #if
 	
 	\ Basic test
 	: script
-		conn_init
+		radio_model_init
 		1 sleep
-		conn_term
+		radio_model_term
 		1 sleep
 	;
 	
