@@ -1,0 +1,190 @@
+(*
+	persist.8th
+ 
+  Models save/restore for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+\ ============================================================================
+
+\ ========================================
+\ Testing only
+false var, persist_test
+
+persist_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+#then
+\ ========================================
+
+\ Set namespace
+ns: sdr
+
+(*
+	Save and restore 8th structures representing the various models.
+	Format is Json strings. The models will reside in .../8th/conf
+	relative to the current directory.
+*)
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start __persist_
+\ ===============================================================================
+
+\ ===============================================================================
+\ File names
+: APP_MODEL_FILENAME "app-model.cfg" ;
+: OPTION_MODEL_FILENAME "option-model.cfg" ;
+
+\ ----------------------------------
+\ Step path back n directory __persist_levels
+: __persist_pbk	SED: s n -- s
+	\ in: 	0: n - number of __persist_levels to step back
+	\ 			1: s - given path
+	\ out:	new path
+	repeat
+		swap ".." s:+
+		f:sep s:+ swap n:1- 
+	while 
+	drop
+;
+
+\ ----------------------------------
+\ Find 8th directory index in path components array
+: __persist_levels	\ SED: n s -- s n | empty SED: can't cope with this
+	\ in: 	0: s - directory
+	\ 			1: n - idx
+	\ out:	0: s - directory	(match)
+	\				1: n - idx
+	\				OR empty					(no match)
+	dup "8th" s:= if break
+	else 2drop then
+;
+
+\ ----------------------------------	
+\ Create model file
+: __persist_create	SED: s -- s
+	\ in: 	0: s - model path
+	\ out:	0: s - model path
+	dup f:create null? if
+		"Failed to create the model file!" throw
+	then	
+	f:close ;
+
+\ ----------------------------------
+\ Save model data as a Json string
+: __persist_save	SED: * s -- s
+	\ in: 	0: s - model path
+	\				1: * - model data
+	\ out:	0: s - model path
+	dup f:open rot >json f:write drop f:close 
+;
+
+\ ----------------------------------
+\ Create fully qualified path
+: __persist_make_path	SED: s -- *
+	\ in: 	0: s - filename
+	\ out:	0: s - qualified path | throw
+	\ Separate the current working directory into a path component array
+	getcwd "" f:sep s:+ s:/ 
+	\ Iterate the array and return the level idx of /8th in the array
+	a:rev ' __persist_levels a:each	
+	1 pick "8th" s:= if
+		\ Found, so leave number of levels back on TOS
+		2drop
+		\ Get relative path back to 8th
+		"" swap __persist_pbk
+		\ Get fully qualified path to conf directory and check if directory exists
+		"conf" s:+ dup f:exists? not if
+			\ No, so make directory
+			dup f:mkdir not if 
+				"Failed to make /conf directory!" throw
+			then
+		then
+		\ Add the target filename to the path
+		f:sep s:+ swap s:+
+		\ Check if it exists and create if not
+		dup f:exists? not if "Creating model file" log __persist_create then
+	else
+		\ Failed to find /8th directory
+		2drop "Failed to locate /8th directory working backwards from current directory." throw
+	then ;
+
+\ ===============================================================================
+\ PUBLIC
+\ Public procedural interface
+\ ===============================================================================
+
+\ ----------------------------------
+\ Save model data as a Json string
+: save_model_data	SED: * s -- s
+	\ in: 	0: s - model path
+	\				1: * - model data
+	\ out:	0: s - model path
+	__persist_make_path __persist_save ;
+
+\ ----------------------------------
+\ Restore model data and convert to 8th data
+: restore_model_data	SED: * s -- *
+	\ in: 	0: s - model filename
+	\				1: s - default data
+	\ out:	0: * - model data | throw
+	__persist_make_path dup >r
+	f:size 0 n:= if
+		\ No data so use default data
+		\ Return data as given, no conversion required
+		drop r> 2dup __persist_save 2drop
+	else
+		\ We have data so read from file
+		rdrop
+		\ Use open/read pre 19.01 as slurp leaves the file open with no way to close it.
+		nip 
+		\ f:open 1000 b:new 1000 f:read drop swap f:close 
+		f:slurp
+		json>
+	then ;
+
+\ ========================================
+\ Restore namespace	
+ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+persist_test @ #if
+	
+	: run_test
+		cr cr "Run test: " swap >s s:+ log		
+		[1,2,3,4,5] "option-model.cfg" sdr:restore_model_data dup . cr
+		"option-model.cfg" sdr:save_model_data drop
+	;
+
+	: run_tests
+		' run_test 0 100 loop
+	;
+	
+	run_tests
+	
+	bye
+#then	
+

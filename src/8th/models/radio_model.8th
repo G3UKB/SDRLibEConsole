@@ -1,0 +1,57 @@
+(* 
+	radio_model.8th
+ 
+  Persisted radio state.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+  
+  GEN_SERVER application -
+		The connector drives the SDRLibE/connector executable via a JSON UDP interface. This enables
+		distribution if required and also makes it a managed server which will execute on its own
+		once its setup is complete which could be a command line client or a GUI client. It is also
+		much more ameanable to multi-language implementation as the interface remains the same on the
+		client side rather than an implementation for each language ffi implementation. 
+	
+*)
+
+\ ========================================
+\ Testing only
+true var, radio_model_test
+
+\ ----------------------------------
+radio_model_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Set namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__conn_
+\ 						message handlers start: do_conn_
+\							event handlers start: 	__conn_evnt_
+\ ===============================================================================
