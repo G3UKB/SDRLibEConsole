@@ -676,7 +676,7 @@ connector_test @ #if
 		a:new swap a:push ' w  +sender msg! response@ 
 	;
 	
-	\ basic start radio with default audio
+	\ Basic start radio with default audio
 	: script
 		reg_task
 		conn_init
@@ -705,3 +705,4 @@ connector_test @ #if
 	\ Run test and exit
 	script
 	bye
+#then
