@@ -30,28 +30,28 @@
 	
 *)
 
-\ ========================================
-\ Testing only
-true var, model_common_test
-
-\ ----------------------------------
-model_common_test @ #if
-	\ Includes
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Set namespace
 ns: sdr
-with: fr.gs
-with: fr.ps
 
-\ ===============================================================================
-\ PRIVATE
-\ Convention: private words start: 		__conn_
-\ 						message handlers start: do_conn_
-\							event handlers start: 	__conn_evnt_
-\ ===============================================================================
+\ ========================================
+\ Option Model Route constants
+: sink_idx 0 ;
+: rx_idx 1 ;
+: dev_idx 2 ;
+: ch_idx 3 ;
+
+\ ========================================
+\ Radio model index constants
+: radio_1 0 ;
+: radio_2 1 ;
+: radio_3 2 ;
+: src_idx 0 ;
+: dyn_idx 1 ;
+: val_or_idx 0 ;
+: sod_idx 1 ;
+: lst_idx 2 ;
+: data_idx 2 ;
+
+\ ========================================
+\ Restore namespace	
+ns: user

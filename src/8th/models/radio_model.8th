@@ -45,6 +45,7 @@ radio_model_test @ #if
 	"E:/Projects/Framework/trunk/src/8th/struct_manip.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
 	"../connector/connector.8th" f:include
+	"model_common.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -187,22 +188,26 @@ with: fr.p
 
 \ ===============================================================================
 \ Helpers
-: __do_publish	SED: a w s --
 
+\ ----------------------------------
+\ Response handler
+: radio_model_response	SED: * --
+	log
+;
+
+\ ----------------------------------
+\ Publish event
+: __do_publish	SED:  s a --
+	a:new __radio_model@ rot val@ a:push ' radio_model_response +sender swap publish
 ;
 
 \ ===============================================================================
 \ Message handlers
 
 \ ========================================
-\ Response handler
-: radio_model_response	SED: * --
-	log
-;
-
-\ ========================================
 \ Initialisation and termination
 
+\ ----------------------------------
 \ Initialise the radio model
 : t_radio_init	SED: m --
 	\ in: 	message
@@ -215,8 +220,10 @@ with: fr.p
 : t_radio_sys_evnts	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop
-	 a:new __radio_model@ ["radio-state",0,1,2,"freq"] val@ a:push ' radio_model_response +sender SYS_R1_FREQ publish 
+	drop 
+	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
+	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
+	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
 ;
 
 \ ----------------------------------
