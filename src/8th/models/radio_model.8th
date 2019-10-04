@@ -37,6 +37,7 @@ true var, radio_model_test
 \ ----------------------------------
 radio_model_test @ #if
 	\ Includes
+	"../common/app_defs.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"../common/ps_events.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
@@ -53,6 +54,7 @@ radio_model_test @ #if
 ns: sdr
 with: fr.gs
 with: fr.ps
+with: fr.p
 
 \ ===============================================================================
 \ PRIVATE
@@ -169,7 +171,7 @@ with: fr.ps
 	\ in: 	none
 	\ out:	none
 	\ Restore the application model or use default if no saved model
-	__radio_model_default RADIO_MODEL_FILENAME restore_model_data __app_model! 
+	__radio_model_default RADIO_MODEL_PATH restore_model_data __radio_model! 
 ;
 
 \ ----------------------------------
@@ -177,7 +179,7 @@ with: fr.ps
 : __radio_model_save	SED: --
 	\ in: 	none
 	\ out:	none
-	__radio_model@ RADIO_MODEL_FILENAME save_model_data drop 
+	__radio_model@ RADIO_MODEL_PATH save_model_data drop 
 ;
 
 \ ===============================================================================
@@ -198,7 +200,7 @@ with: fr.ps
 : t_radio_sys_evnts	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __radio_model_sys_evnts
+	drop
 ;
 
 \ ----------------------------------
@@ -206,7 +208,7 @@ with: fr.ps
 : t_radio_ui_evnts	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __radio_model_ui_evnts
+	drop
 ;
 
 \ ----------------------------------
@@ -248,7 +250,7 @@ with: fr.ps
 	\ Create the model gen-server
 	"RadioModelTask" gen_server_new
 	\ Ask the model to initialise itself
-	"RadioModelTask" ' t_conn_init null msg!
+	"RadioModelTask" ' t_radio_init null msg!
 	\ Send events
 	"RadioModelTask" ' t_radio_sys_evnts null msg!
 	"RadioModelTask" ' t_radio_ui_evnts null msg!
@@ -272,9 +274,8 @@ ns: user
 \ Testing
 \ ===============================================================================
 
-connector_test @ #if
+radio_model_test @ #if
 	with: sdr
-	with: fr.ps
 	
 	4 json-pretty
 	
