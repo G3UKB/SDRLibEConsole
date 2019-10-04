@@ -35,7 +35,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, connector_test
+false var, connector_test
 
 \ ----------------------------------
 connector_test @ #if
@@ -685,12 +685,12 @@ connector_test @ #if
 		"ConnTask" ' t_conn_poll null sender
 		1 sleep
 		"AUDIO" log
-		"ConnTask" ' t_conn_enum_audio_outputs null sender "Enum outputs" log
-		"ConnTask" ' t_conn_get_default_route null sender "Get default route" log
-		"ConnTask" ' t_conn_set_default_route null sender "Set default route" log
-		"ConnTask" ' t_conn_discover null sender "Discover" log
-		"ConnTask" ' t_conn_start_server null sender "Start server" log
-		"ConnTask" ' t_conn_start_radio 0 sender "Start radio" log
+		CONNECTOR_TASK ' t_conn_enum_audio_outputs null sender "Enum outputs" log
+		CONNECTOR_TASK ' t_conn_get_default_route null sender "Get default route" log
+		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
+		CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
+		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
+		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 		"EVENTS" log
 		["7150000"] ' w  +sender SYS_R1_FREQ publish response@ "Event Set freq" log
 		[ ` "LSB" mode_for_name ` ] ' w  +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log

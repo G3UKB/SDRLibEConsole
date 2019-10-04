@@ -42,7 +42,9 @@ radio_model_test @ #if
 	"../common/ps_events.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/struct_manip.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
+	"../connector/connector.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -54,6 +56,7 @@ radio_model_test @ #if
 ns: sdr
 with: fr.gs
 with: fr.ps
+with: fr.sm
 with: fr.p
 
 \ ===============================================================================
@@ -183,7 +186,19 @@ with: fr.p
 ;
 
 \ ===============================================================================
+\ Helpers
+: __do_publish	SED: a w s --
+
+;
+
+\ ===============================================================================
 \ Message handlers
+
+\ ========================================
+\ Response handler
+: radio_model_response	SED: * --
+	log
+;
 
 \ ========================================
 \ Initialisation and termination
@@ -201,6 +216,7 @@ with: fr.p
 	\ in: 	message
 	\ out:	none
 	drop
+	 a:new __radio_model@ ["radio-state",0,1,2,"freq"] val@ a:push ' radio_model_response +sender SYS_R1_FREQ publish 
 ;
 
 \ ----------------------------------
@@ -212,22 +228,8 @@ with: fr.p
 ;
 
 \ ----------------------------------
-\ Send SYS events
-: __radio_model_sys_evnts	SED: --
-	\ in: 	none
-	\ out:	none
-;
-
-\ ----------------------------------
-\ Send UI events
-: __radio_model_ui_evnts	SED: --
-	\ in: 	none
-	\ out:	none
-;
-
-\ ----------------------------------
 \ Close the app model at task level
-: do_app_close	SED: m --
+: t_radio_model_close	SED: m --
 	\ in: 	message
 	\ out:	none
 	drop __radio_model_save
@@ -248,12 +250,12 @@ with: fr.p
 	\ out:	none
 	
 	\ Create the model gen-server
-	"RadioModelTask" gen_server_new
+	RADIO_MODEL_TASK gen_server_new
 	\ Ask the model to initialise itself
-	"RadioModelTask" ' t_radio_init null msg!
+	RADIO_MODEL_TASK ' t_radio_init null msg!
 	\ Send events
-	"RadioModelTask" ' t_radio_sys_evnts null msg!
-	"RadioModelTask" ' t_radio_ui_evnts null msg!
+	RADIO_MODEL_TASK ' t_radio_sys_evnts null msg!
+	RADIO_MODEL_TASK ' t_radio_ui_evnts null msg!
 ;
 
 \ ----------------------------------
@@ -262,6 +264,7 @@ with: fr.p
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the connector
+	RADIO_MODEL_TASK ' t_radio_model_close null msg!
 	"RadioModelTask" gen_server_term
 ;
 
@@ -281,8 +284,14 @@ radio_model_test @ #if
 	
 	\ Basic test
 	: script
+		\ Create connector
+		conn_init
+		\ Initialise model
 		radio_model_init
 		1 sleep
+		\ Terminate connector
+		conn_term
+		\ Terminate model
 		radio_model_term
 		1 sleep
 	;

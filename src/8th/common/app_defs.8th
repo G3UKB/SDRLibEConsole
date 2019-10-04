@@ -27,3 +27,8 @@
 : RADIO_MODEL_PATH "../models/radio-model.cfg" ;
 : OPTION_MODEL_PATH "../models/option-model.cfg" ;
 
+
+\ ===============================================================================
+\ Task names
+: CONNECTOR_TASK "ConnTask" ;
+: RADIO_MODEL_TASK "RadioModelTask" ;
