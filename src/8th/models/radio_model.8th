@@ -289,6 +289,7 @@ with: fr.p
 	\ Tidy close the connector
 	RADIO_MODEL_TASK ' t_radio_model_close null msg!
 	RADIO_MODEL_TASK gen_server_term
+	0.1 sleep
 ;
 
 \ ========================================

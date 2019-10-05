@@ -30,5 +30,8 @@
 
 \ ===============================================================================
 \ Task names
-: CONNECTOR_TASK "ConnTask" ;
+: MAIN_TASK "MainTask" ;
+: STARTUP_TASK "StartupTask" ;
+: CLEANUP_TASK "CleanupTask" ;
+: CONNECTOR_TASK "ConnectorTask" ;
 : RADIO_MODEL_TASK "RadioModelTask" ;

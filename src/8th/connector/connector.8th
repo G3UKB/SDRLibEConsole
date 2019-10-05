@@ -42,6 +42,7 @@ connector_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
 	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../common/app_defs.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"../common/ps_events.8th" f:include
 	\ needs debug/sed
@@ -327,7 +328,7 @@ with: fr.ps
 \ Do response
 : __con_do_response	SED: -- 
 	__conn_wait_resp_with_timeout
-	response! 
+	response!
 ;
 
 \ ----------------------------------
@@ -523,8 +524,8 @@ with: fr.ps
 	\ in: 	0: s - sender task name, w
 	\				2: n - R1 filter id
 	\ out: 	q: * - "Timeout" or response data
-	rot filter_lookup 0 a:@ swap 1 a:@ nip
-	__conn_r1_filt_msg false swap __con_do_exchange drop
+	rot filter_lookup 1 a:@ swap 0 a:@ nip
+	__conn_r1_filt_msg false swap __con_do_exchange
 ;
 	
 \ ----------------------------------
@@ -559,7 +560,7 @@ with: fr.ps
 	rot filter_lookup 0 a:@ swap 1 a:@ nip
 	__conn_tx_filt_msg false swap __con_do_exchange drop 
 ;
-	
+
 \ ========================================
 \ Startup words
 
@@ -629,7 +630,7 @@ with: fr.ps
 	\ out:	none
 	
 	\ Create the connector gen-server
-	"ConnTask" gen_server_new
+	CONNECTOR_TASK gen_server_new
 	\ Ask the connector to initialise itself
 	CONNECTOR_TASK ' t_conn_subscribe null msg!
 	CONNECTOR_TASK ' t_conn_init null msg!
@@ -643,8 +644,9 @@ with: fr.ps
 	\ out:	none
 	\ Tidy close the connector
 	CONNECTOR_TASK gen_server_term
+	0.1 sleep
 ;
-
+	
 \ ========================================
 \ Reset namespace
 ns: user
@@ -656,6 +658,7 @@ ns: user
 
 connector_test @ #if
 	with: sdr
+	with: fr.gs
 	with: fr.ps
 	
 	4 json-pretty
@@ -683,9 +686,11 @@ connector_test @ #if
 		conn_init
 		1 sleep
 		"POLL" log
+		
 		CONNECTOR_TASK ' t_conn_poll null sender
 		1 sleep
 		"AUDIO" log
+		
 		CONNECTOR_TASK ' t_conn_enum_audio_outputs null sender "Enum outputs" log
 		CONNECTOR_TASK ' t_conn_get_default_route null sender "Get default route" log
 		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
@@ -694,16 +699,22 @@ connector_test @ #if
 		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 		"EVENTS" log
 		["7150000"] ' w +sender SYS_R1_FREQ publish response@ "Event Set freq" log
-		[ CH_LSB ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log
+		[ ` CH_LSB ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log
 		1 sleep
-		[ CH_AM ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode AM" log
+		[ ` CH_AM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode AM" log
 		1 sleep
-		[ CH_2K4 ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 2.4KHz" log
+		[ ` CH_6K0 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 6.0KHz" log
+		1 sleep
+		[ ` CH_FM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode FM" log
+		1 sleep
+		[ ` CH_2K4 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 2.4KHz" log
+		1 sleep
 		conn_term
 		1 sleep
 	;
-	
+
 	\ Run test and exit
 	script
+	1 sleep
 	bye
 #then
