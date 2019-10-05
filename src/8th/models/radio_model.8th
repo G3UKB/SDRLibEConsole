@@ -212,7 +212,10 @@ with: fr.p
 : t_radio_init	SED: m --
 	\ in: 	message
 	\ out:	none
-	drop __radio_model_restore
+	drop 
+	t:curtask log
+	__radio_model_restore
+	"Radio Model initialised" log
 ;
 
 \ ----------------------------------
@@ -224,6 +227,7 @@ with: fr.p
 	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
 	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
 	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
+	"Radio Model SYS events" log
 ;
 
 \ ----------------------------------
@@ -284,7 +288,7 @@ with: fr.p
 	\ out:	none
 	\ Tidy close the connector
 	RADIO_MODEL_TASK ' t_radio_model_close null msg!
-	"RadioModelTask" gen_server_term
+	RADIO_MODEL_TASK gen_server_term
 ;
 
 \ ========================================

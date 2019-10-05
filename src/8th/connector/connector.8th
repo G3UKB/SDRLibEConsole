@@ -568,10 +568,11 @@ with: fr.ps
 : t_conn_init	SED: a --
 	\ in: 	message
 	\ out:	none
-	drop 
+	drop
+	t:curtask log
 	__conn_create_socket 
 	__conn_create_resp_buf 
-	"ConnTask initialised" log
+	"Connector Task initialised" log
 ;
 
 \ Subscribe to events
@@ -582,7 +583,7 @@ with: fr.ps
 	t:name@ ' t_conn_r1_freq SYS_R1_FREQ subscribe
 	t:name@ ' t_conn_r1_mode SYS_R1_MODE subscribe
 	t:name@ ' t_conn_r1_filter SYS_R1_FILT subscribe
-	"ConnTask subscriptions complete" log
+	"Connector Task subscriptions complete" log
 ;
 
 \ ----------------------------------
@@ -591,7 +592,7 @@ with: fr.ps
 	\ in: 	message
 	\ out:	none
 	drop
-	"ConnTask start-of-day complete" log
+	"Connector Task start-of-day complete" log
 ;
 
 \ ========================================
@@ -630,9 +631,9 @@ with: fr.ps
 	\ Create the connector gen-server
 	"ConnTask" gen_server_new
 	\ Ask the connector to initialise itself
-	"ConnTask" ' t_conn_subscribe null msg!
-	"ConnTask" ' t_conn_init null msg!
-	"ConnTask" ' t_conn_sod null msg!
+	CONNECTOR_TASK ' t_conn_subscribe null msg!
+	CONNECTOR_TASK ' t_conn_init null msg!
+	CONNECTOR_TASK ' t_conn_sod null msg!
 ;
 
 \ ----------------------------------
@@ -641,7 +642,7 @@ with: fr.ps
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the connector
-	"ConnTask" gen_server_term
+	CONNECTOR_TASK gen_server_term
 ;
 
 \ ========================================
@@ -682,7 +683,7 @@ connector_test @ #if
 		conn_init
 		1 sleep
 		"POLL" log
-		"ConnTask" ' t_conn_poll null sender
+		CONNECTOR_TASK ' t_conn_poll null sender
 		1 sleep
 		"AUDIO" log
 		CONNECTOR_TASK ' t_conn_enum_audio_outputs null sender "Enum outputs" log
