@@ -1,0 +1,168 @@
+(* 
+	app_main.8th
+ 
+  Main program for SDRLibEConsole.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Entry point for the SDRLibEConsole application. This sets up the entire application
+	and then hands control over to the GUI by exiting app:main whereupon the GUI event
+	loop is entered.
+	
+*)
+
+\ Include all include files
+"includes.8th" f:include
+
+\ Make this a gui app
+\ true app:isgui !
+\ Log as separate task
+true log-async
+
+\ Set namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+with: fr.sm
+
+\ ----------------------------------
+\ We start all gen-server tasks from the startup task
+: startup_task	SED: --
+	\ in: 	none
+	\ out:	none
+	
+	\ Add our task to the task registry so play comms
+	"STARTUP_TASK" t:name!
+	t:curtask "STARTUP_TASK" reg!
+	
+	\ Make sure the task Q does not throw
+	t:getq false q:throwing drop
+	
+	\ ----------------------------------
+	"Creating gen-server tasks..." log
+	
+	\ ----------------------------------
+	\ Connector init and subscriptions
+	conn_init
+	
+	\ ----------------------------------
+	\ Models in it only, publishing is done later in startup
+	radio_model_init
+	
+	(*
+	\ ----------------------------------
+	\ See if we have a server or simulator running
+	conn_poll not if
+		"\n\n\***The console cannot run without SDRLibEConnector server or a simulator." log
+		"***Please start the server or simulator and then restart the console." log
+		"***Press any key to exit the application\n\n" log
+		"STARTUP_TASK" gs_reg_rm
+		con:key
+		bye
+	then
+	*)
+	
+	\ ----------------------------------
+	\ Once UI is stable we can populate it with the UI event data
+	radio_model_sys_events
+	
+	\ We have started multiple tasks from the startup task
+	\ We keep a reference to it and close it at the end of
+	\ the shutdown before waiting for all tasks.
+	-1 sleep
+	
+	\ Exit message
+	"STARTUP_TASK - exiting..." log 
+;
+
+\ ----------------------------------
+\ We cleanup all gen-server tasks
+\ Has to be a separate task so we can reeceive responses
+: cleanup_task	SED: --
+	\ in: 	none
+	\ out:	none
+	\ So we know who we are
+	"CLEANUP_TASK" t:name!
+	\ Otherwise messages are lost in closedown
+	false log-async
+	
+	"Shutdown in progress at: " d:new >s s:+ log
+	\ Close gen-server tasks
+	\ Connector
+	conn_term
+	\ Models
+	radio_model_term
+	
+	"Cleanup task - exiting..." log 
+;
+	
+\ ----------------------------------
+\ Called on application exit
+: cleanup	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Otherwise messages are lost in closedown
+	false log-async
+	\ Run the cleanup task and wait for it to complete
+	' cleanup_task t:task t:wait
+	1.0 sleep
+	\ Finally close the Startup task
+	"STARTUP_TASK" t:@ t:notify
+	\ Wait for all tasks to terminate
+	wait_all
+	"Shutdown complete" log
+	\ Wait for messages to flush
+	0.2 sleep 
+;
+	
+\ ===============================================================================
+\ Application entry point  
+: app:main	SED: --
+	\ in: 	none
+	\ out:	none
+	
+	\ ----------------------------------
+	\ Set our task name
+	\ "Main_Thrd" t:name!
+	"MAIN_TASK" t:name!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	t:curtask log
+	
+	\ ----------------------------------
+	\ Start the startup task which starts all gen_server tasks
+	\ This cannot itself be a gen-server task as the framework
+	\ is not instantiated yet.
+	' startup_task t:task dup "STARTUP_TASK" t:!
+
+	\ Temp until we add the UI
+	"Any key to close" log
+	con:key
+	
+	\ ----------------------------------
+	\ Set our cleanup word
+	' cleanup onexit
+
+	\ On exit from app:main the GUI event loop is started
+  "Exiting app_main" log
+;
+
+\ ========================================
+\ Reset namespace
+ns: user

@@ -32,7 +32,7 @@
 
 \ ========================================
 \ Testing only
-true var, radio_model_test
+false var, radio_model_test
 
 \ ----------------------------------
 radio_model_test @ #if
@@ -255,13 +255,25 @@ with: fr.p
 : radio_model_init	SED: --
 	\ in: 	none
 	\ out:	none
-	
 	\ Create the model gen-server
 	RADIO_MODEL_TASK gen_server_new
 	\ Ask the model to initialise itself
 	RADIO_MODEL_TASK ' t_radio_init null msg!
-	\ Send events
+;
+
+\ ----------------------------------
+\ System events
+: radio_model_sys_events	SED: --
+	\ in: 	none
+	\ out:	none
 	RADIO_MODEL_TASK ' t_radio_sys_evnts null msg!
+;
+
+\ ----------------------------------
+\ UI events
+: radio_model_ui_events	SED: --
+	\ in: 	none
+	\ out:	none
 	RADIO_MODEL_TASK ' t_radio_ui_evnts null msg!
 ;
 
