@@ -47,7 +47,8 @@ ns: sdr
     >r 2drop
   then
   r> const
-  g:setfont ;
+  g:setfont 
+ ;
   
 \ Restore namespace	
 ns: user

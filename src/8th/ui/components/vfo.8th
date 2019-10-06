@@ -235,7 +235,8 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Append an index to the digit array
-: __append_child	\ parent digit_array ix child_index -- parent digit_array
+\ parent digit_array ix child_index -- parent digit_array
+: __append_child	SED: g a n n -- g a
 	3 pick swap		\ parent digit_array ix parent child_index
 	g:child				\ parent digit_array ix digit-gui
 	a:!						\ parent digit_array
@@ -243,7 +244,8 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Write the list of indexes which correspond to actual digits to the digit array
-: __enumerate_digits	\ parent -- parent
+\ parent -- parent
+: __enumerate_digits	SED: g -- g
 	\ Get array
 	"digits" g:m@
 	\ Indexes of digit children
@@ -264,7 +266,10 @@ vfo_separator @ g:+kind
 \ Action helper words
 
 \ ----------------------------------
-: __set_digit \ array-children ix freq-digit -- array-children
+\ array-children ix freq-digit -- array-children
+\ Set a single digit in the array
+\ array-children ix freq-digit -- array-children
+: __set_digit	SED: a n n -- a 
 	\ Set the freq-digit in array-children[ix]
 	-rot 								\ freq-digit array-children ix 
 	a:@ 								\ freq-digit array-children child-digit-ob 
@@ -275,58 +280,38 @@ vfo_separator @ g:+kind
 ;
 
 \ ----------------------------------
-: __reset_all_digits						\ parent-gui -- parent-gui
+\ Reset all digits to the current frequency
+\ parent-gui -- parent-gui
+: __reset_all_digits	SED: g -- g
 	\ Get the frequency in Hz
 	"freq" g:m@	n:int								\ parent-gui freq-in-hz
 	\ Make it a 9 digit array with leading 0's
-	"%09d" s:strfmt null s:/		\ parent-gui array-freq-in-hz
+	"%09d" s:strfmt null s:/				\ parent-gui array-freq-in-hz
 	\ Work through the array and set each digit value
-	swap 												\ array-freq-in-hz parent-gui
-	"digits" g:m@ 							\ array-freq-in-hz parent-gui array-digit-obj
-	rot													\ parent-gui array-digit-obj array-freq-in-hz
-	' __set_digit a:each 2drop		\ parent-gui
+	swap 														\ array-freq-in-hz parent-gui
+	"digits" g:m@ 									\ array-freq-in-hz parent-gui array-digit-obj
+	rot															\ parent-gui array-digit-obj array-freq-in-hz
+	' __set_digit a:each 2drop			\ parent-gui
 ;
 
 \ ----------------------------------
-: __repaint_child	\ gui --
-	g:invalidate
+\ Invalidate component
+\ gui --
+: __repaint_child	SED: g -- 
+	g:invalidate drop
 ;
 
 \ ----------------------------------
-: vfo_r1 \ vfo-id -- 
-	dup "VFO-R1" s:= if drop false true else false then
+\ Publish frequency update
+\ freq-in-hz -- 
+: publish_freq SED: n -- 
+	a:new swap a:push SYS_R1_FREQ publish
 ;
 
 \ ----------------------------------
-: vfo_r2 \ vfo-id --
-	dup "VFO-R2" s:= if drop false true else false then
-;
-
-\ ----------------------------------
-: vfo_r3 \ vfo-id --
-	dup "VFO-R3" s:= if drop false true else false then 
-;
-
-\ ----------------------------------
-: vfo_tx \ vfo-id --
-	dup "VFO-TX" s:= if drop false true else false then 
-;
-
-\ ----------------------------------
-\ Update the frequency on the appropriate radio model
-\ : update_model	\ new-freq parent --  
-\ 	"id" g:m@ nip
-\ 	[ ' vfo_r1 , ' app_model_r1_set_freq , ' vfo_r2 , ' app_model_r2_set_freq ,  ' vfo_r3 , ' app_model_r3_set_freq ,  ' vfo_tx , ' app_model_tx_set_freq ]
-\ 	a:when
-\ 	drop
-\ ;
-
-: publish_freq SED: freq
-	drop a:new swap a:push SYS_R1_FREQ publish
-;
-
-\ ----------------------------------
-: update_freq_value 			\ increment(Hz) gui -- increment(Hz) gui
+\ Update frequency digits to new frequency and publish
+\ increment(Hz) gui -- increment(Hz) gui
+: update_freq_value	SED: n g -- n g
 	dup g:parent "freq"			\ increment(Hz) gui parent "freq"
 	g:m@								 		\ increment(Hz) gui parent freq-value
 	3 pick 							 		\ increment(Hz) gui parent freq-value increment(Hz)
@@ -338,38 +323,44 @@ vfo_separator @ g:+kind
 	-rot										\ increment(Hz) gui parent new-freq parent "freq" new-freq
 	g:m!										\ increment(Hz) gui parent new-freq parent
 	drop swap								\ increment(Hz) gui new-freq parent
-	publish_freq		 				\ increment(Hz) gui
+	drop publish_freq	 			\ 
 ;
 
-\ ===============================================================
+\ ========================================
 \ Action implementation
+
+\ ----------------------------------
 \ Increment/decrement the value
-: do_inc	 										\ gui value increment(MHz) -- gui
-	\ "Inc" log
-	rot 												\ gui value increment(MHz) -- value increment(MHz) gui 
+\ gui value increment(MHz) -- value increment(MHz) gui
+: do_inc	SED: g n n -- n n g 										
+	rot 										\ gui value increment(MHz) -- value increment(MHz) gui 
 	g:invalidate
-	update_freq_value						\ value increment(MHz) gui -- gui
+	update_freq_value				\ value increment(MHz) gui -- value increment(MHz) gui
 ;
 
+\ ----------------------------------
 \ Repaint all
-: do_repaint	 									\ gui value increment(MHz) -- gui
-	\ "Repaint" log
-	rot														\ gui value increment(MHz) -- value increment(MHz) gui
-	dup >r update_freq_value r>		\ value increment(MHz) gui -- value increment(MHz) gui
+\ gui value increment(MHz) -- value increment(MHz) gui
+: do_repaint	SED: g n n -- n n g 									
+	rot																\ gui value increment(MHz) -- value increment(MHz) gui
+	dup >r update_freq_value r>				\ value increment(MHz) gui -- value increment(MHz) gui
 	\ We now need to reset all the values in the digits for the new frequency
-	g:parent __reset_all_digits		\ value increment(MHz) gui -- value increment(MHz) gui parent-gui
+	g:parent __reset_all_digits				\ value increment(MHz) gui -- value increment(MHz) gui parent-gui
 	\ Then we repaint all children
-	' __repaint_child g:each	drop \ value increment(MHz) gui parent-gui -- value increment(MHz) gui
+	' __repaint_child g:each drop 		\ value increment(MHz) gui parent-gui -- value increment(MHz) gui
 ;
 
-\ Ignore
-: do_range	 										\ gui value increment(MHz) -- gui
-	\ "Range" log
+\ ----------------------------------
+\ Ignore out of frequency range
+\ gui value increment(MHz) -- value increment(MHz) gui
+: do_range	SED: g n n -- n n g 										
 	2drop
 ;
 
 \ ========================================
 \ Frequency check implementation
+
+\ ----------------------------------
 \ Is frequency within the allowed range
 : freq_out_of_range 				\	lower upper freq increment -- f
 	2dup n:+ dup							\ lower upper freq increment -- lower upper freq increment f+i f+i
@@ -389,6 +380,7 @@ vfo_separator @ g:+kind
 	true											\ -- f
 ;
 
+\ ----------------------------------
 \ Has the digit rolled over
 : freq_rollover	\ value -- value f
 	dup 9 n:> not if
@@ -783,18 +775,23 @@ vfo_test @ #if
 		"EVNT_TASK" ' evnt_subscribe null msg!
 		\ Wait until told to close at EOD so refs are maintained
 		-1 sleep
+		"Startup task exiting..." log
+		0.1 sleep
 	;
 	
 	\ ----------------------------------
 	\ onexit callback
 	: term_callback
+		\ Else messages get lost
+		false log-async
 		\ Terminate gen_server
 		"EVNT_TASK" gen_server_term
+		0.1 sleep
 		\ Terminate startup task
-		"startup_task" t:@ t:notify
+		"startup_task" t:@ dup t:notify t:wait
 		\ Wait for tasks to go
 		wait_all
-		\ Messagr flush
+		\ Messages flush
 		0.1 sleep
 	;
 	
