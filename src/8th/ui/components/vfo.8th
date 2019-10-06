@@ -92,7 +92,6 @@ with: fr.ps
   "bg" : "gray10",
   "rot" : 0,
   "font" : "Arial 14",
-  "draw" : "sdr:vfo_draw",
   "children" : [
 		{
 			"kind" : "Digit",
@@ -452,7 +451,8 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Mouse wheel helpers, inc/dec and store the current value
-: wheel_value					\ delta gui -- new-value gui 
+\ delta gui -- new-value gui
+: wheel_value	SED: n g -- n g
 	"value" g:m@ 				\ delta gui current-value
 	rot									\ gui current-value delta
 	0 n:< if						\ gui current-value
@@ -470,35 +470,19 @@ vfo_separator @ g:+kind
 \ Drawing event handlers
 
 \ ----------------------------------
-\ Draw any outer text etc to the cntainer
-: vfo_draw	\ gui -- 
-	\ "red" g:scolor
-	\ "id" g:m@ "VFO-R1-A" s:=ic if
-	\ 	3 5 "VFO-A" g:draw-text-at
-	\ else
-	\ 	3 5 "VFO-B" g:draw-text-at
-	\ then
-;
-
 \ Draw an individual digit according to highlight and value
-: digit_draw_old	\ gui -- 
-	"highlight" g:m@ if
-		"font-hi" g:m@ g:setfont
-	else
-		"font" g:m@ g:setfont
-	then
+\ gui -- gui
+: digit_draw	SED: g -- g
+	"highlight" g:m@ if "font-hi" else "font" then
+  g:m@ mysetfont
 	"scolor" g:m@ g:scolor
 	"value" g:m@ G:>s 10 20 rot g:draw-text-at
 ;
 
-: digit_draw	\ gui --
-	"highlight" g:m@ if "font-hi" else "font" then
-  g:m@ mysetfont
-	"scolor" g:m@ g:scolor
-	"value" g:m@ G:>s 10 20 rot g:draw-text-at ;
-	
+\ ----------------------------------	
 \ Draw a separator between digit groups
-: sep_draw	\ gui -- 
+\ gui -- gui
+: sep_draw	SED: g -- g
 	"grey42" g:scolor
 	"grey42" g:fcolor
 	1 g:line-width
@@ -511,17 +495,20 @@ vfo_separator @ g:+kind
 \ Mouse event handlers
 \ Enter, leave and wheel for each digit
 \ 100 MHz
-: mouseenter_100_MHz	\ gui -- 
+\ gui -- gui
+: mouseenter_100_MHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_100_MHz	\ gui -- 
+\ gui -- gui
+: mouseexit_100_MHz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_100_MHz						\ gui reversed? deltaX deltaY posX posY -- gui
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_100_MHz	SED: g T n n n n -- g						
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -531,21 +518,24 @@ vfo_separator @ g:+kind
 		100000000							\ new-value gui	100000000
 	then
 	rot swap								\ gui new-value 100000000 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui 
 ;
 
 \ 10 MHz
-: mouseenter_10_MHz	\ gui -- 
+\ gui -- gui
+: mouseenter_10_MHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_10_MHz	\ gui -- 
+\ gui -- gui
+: mouseexit_10_MHz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_10_MHz						\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_10_MHz	SED: g T n n n n -- g	
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -555,21 +545,24 @@ vfo_separator @ g:+kind
 		10000000							\ new-value gui	10000000
 	then
 	rot swap								\ gui new-value 10000000 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui 
 ;
 
 \ 1 MHz
-: mouseenter_1_MHz	\ gui -- 
+\ gui -- gui
+: mouseenter_1_MHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_1_MHz	\ gui -- 
+\ gui -- gui
+: mouseexit_1_MHz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_1_MHz							\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_1_MHz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -579,21 +572,24 @@ vfo_separator @ g:+kind
 		1000000								\ new-value gui	1000000
 	then
 	rot swap								\ gui new-value 1000000 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui 
 ;
 
 \ 100KHz
-: mouseenter_100_KHz	\ gui -- 
+\ gui -- gui
+: mouseenter_100_KHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_100_KHz	\ gui -- 
+\ gui -- gui
+: mouseexit_100_KHz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_100_KHz						\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_100_KHz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -603,21 +599,24 @@ vfo_separator @ g:+kind
 		100000								\ new-value gui	100000
 	then
 	rot swap								\ gui new-value 100000 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui 
 ;
 
 \ 10KHz
-: mouseenter_10_KHz	\ gui -- 
+\ gui -- gui
+: mouseenter_10_KHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_10_KHz	\ gui -- 
+\ gui -- gui
+: mouseexit_10_KHz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_10_KHz						\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_10_KHz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -627,21 +626,24 @@ vfo_separator @ g:+kind
 		10000									\ new-value gui	10000
 	then
 	rot swap								\ gui new-value 10000
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui  
 ;
 
 \ 1KHz
-: mouseenter_1_KHz	\ gui -- 
+\ gui -- gui
+: mouseenter_1_KHz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_1_KHz	\ gui -- 
+\ gui -- gui
+: mouseexit_1_KHz	SED: g -- g
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_1_KHz							\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_1_KHz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -651,21 +653,24 @@ vfo_separator @ g:+kind
 		1000									\ new-value gui	1000
 	then
 	rot swap								\ gui new-value 1000
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui  
 ;
 
 \ 100Hz
-: mouseenter_100_Hz	\ gui -- 
+\ gui -- gui
+: mouseenter_100_Hz	SED: g -- g
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_100_Hz	\ gui -- 
+\ gui -- gui
+: mouseexit_100_Hz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_100_Hz						\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_100_Hz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -675,21 +680,24 @@ vfo_separator @ g:+kind
 		100										\ new-value gui	100
 	then
 	rot swap								\ gui new-value 100 
-	update_freq							\	gui  
+	update_freq	nip nip			\	gui   
 ;
 
 \ 10Hz
-: mouseenter_10_Hz	\ gui -- 
+\ gui -- gui
+: mouseenter_10_Hz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_10_Hz	\ gui -- 
+\ gui -- gui
+: mouseexit_10_Hz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_10_Hz							\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_10_Hz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -699,21 +707,24 @@ vfo_separator @ g:+kind
 		10										\ new-value gui	10
 	then
 	rot swap								\ gui new-value 10 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui  
 ;
 
 \ 1Hz
-: mouseenter_1_Hz	\ gui -- 
+\ gui -- gui
+: mouseenter_1_Hz	SED: g -- g 
   "highlight" true g:m!
   g:invalidate
 ;
 
-: mouseexit_1_Hz	\ gui -- 
+\ gui -- gui
+: mouseexit_1_Hz	SED: g -- g 
   "highlight" false g:m!
   g:invalidate
 ;
 
-: wheel_1_Hz							\ gui reversed? deltaX deltaY posX posY --
+\ gui reversed? deltaX deltaY posX posY -- gui
+: wheel_1_Hz	SED: g T n n n n -- g
 	2drop nip nip dup rot		\ deltaY deltaY gui 
 	wheel_value 						\	deltaY new-value gui
 	rot											\ new-value gui	deltaY
@@ -723,14 +734,16 @@ vfo_separator @ g:+kind
 		1											\ new-value gui	1
 	then
 	rot swap								\ gui new-value 1 
-	update_freq							\	gui 
+	update_freq	nip nip			\	gui 
 ;
 
 \ ============================================================================
 \ Initialisation
-\ Create a VFO
 
-: vfo_new										\ id bounds -- new-vfo-gui
+\ ----------------------------------
+\ Create a VFO
+\ id bounds -- new-vfo-gui
+: vfo_new	SED: s s -- g										
 	vfo_panel @ G:clone nip		\ id bounds vfo-clone
 	"id" 3 pick m:!
 	"name" 3 pick m:!
@@ -738,12 +751,15 @@ vfo_separator @ g:+kind
 	nip nip g:new
 ;
 
+\ ----------------------------------
 \ Initialise a VFO instance
-: vfo_init	\  gui -- gui
+\  gui -- gui
+: vfo_init	SED: g -- g
   __enumerate_digits
   __reset_all_digits
 ;
 
+\ ===============================================================================
 \ Restore namespace	
 ns: user	
 
