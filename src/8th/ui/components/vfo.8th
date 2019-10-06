@@ -362,7 +362,8 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Is frequency within the allowed range
-: freq_out_of_range 				\	lower upper freq increment -- f
+\	lower upper freq increment -- flag
+: freq_out_of_range	SED: n n n n -- T
 	2dup n:+ dup							\ lower upper freq increment -- lower upper freq increment f+i f+i
 	5 pick										\ lower upper freq increment f+i -- lower upper freq increment f+i f+i lower
 	n:< not if 								\ lower upper freq increment f+i f+i lower -- lower upper freq increment f+i
@@ -382,7 +383,8 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Has the digit rolled over
-: freq_rollover	\ value -- value f
+\ digit-value -- digit-value flag
+: freq_rollover	SED: n -- n T
 	dup 9 n:> not if
 		dup 0 n:< not if
 			false ;;
@@ -392,6 +394,8 @@ vfo_separator @ g:+kind
 ;
 
 \ ========================================
+\ Action determination
+
 \ Apply the frequency increment and determin the correct action to take.
 \ One of Inc/Dec, Full Repaint or Ignore if moves outside the valid range.
 \ Actions
@@ -399,7 +403,10 @@ vfo_separator @ g:+kind
 : ACTION_REPAINT 1 ;			\ Allowed but digit rolledover/under so a full adjust and repaint is required
 : ACTION_OUT_OF_RANGE 2 ;	\ Ignore because the increment would take the frequency outside the permitted range
 
-: do_freq_checks								\ gui value increment(MHz) -- gui value increment(MHz) action
+\ ----------------------------------
+\ Check frequency and take appropriate action
+\ gui value increment(MHz) -- gui value increment(MHz) action
+: do_freq_checks	SED: g n n -- g n n n
 	\ Check freq in range
 	rot														\ gui value increment(MHz) -- value increment(MHz) gui
 	dup g:parent 									\ value increment(MHz) gui -- value increment(MHz) gui parent-gui
@@ -424,7 +431,8 @@ vfo_separator @ g:+kind
 \ Update entry point
 \ Updates the stored frequency and the visual representation
 \ Called from mouse wheel events
-: update_freq	\	gui value increment(MHz) -- gui
+\	gui value increment(MHz) -- value increment(MHz) gui
+: update_freq	SED: g n n -- n n g
 	\ Value is the digit value which can be +ve or -ve
 	\ Increment is the increment value of the digit i.e. 100MHz
 	\ Increment can be +ve or -ve depending on the mouse wheel
@@ -434,11 +442,15 @@ vfo_separator @ g:+kind
 	\ Switch on action
 	[ ' do_inc , ' do_repaint , ' do_range ] swap
 	caseof
-	\ Event stack so no need to clean up
 ;	
 
 \ ======================================================================================
-\ Event helpers
+\ GUI Events
+
+\ ========================================
+\ Helpers
+
+\ ----------------------------------
 \ Mouse wheel helpers, inc/dec and store the current value
 : wheel_value					\ delta gui -- new-value gui 
 	"value" g:m@ 				\ delta gui current-value
@@ -456,6 +468,8 @@ vfo_separator @ g:+kind
 
 \ ========================================
 \ Drawing event handlers
+
+\ ----------------------------------
 \ Draw any outer text etc to the cntainer
 : vfo_draw	\ gui -- 
 	\ "red" g:scolor
