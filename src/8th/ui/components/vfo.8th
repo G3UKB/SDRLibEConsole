@@ -739,6 +739,42 @@ vfo_separator @ g:+kind
 ;
 
 \ ============================================================================
+\ Events
+
+\ ----------------------------------
+\ Get frequency from event data
+\ {"cb" w, "data" [data, sender, w|null] --
+: __data_get_freq	SED: m --
+	"data" m:@ nip 0 a:@ nip
+;
+
+\ ----------------------------------
+\ Get gui ref for this VFO
+\ gui-name --
+: __vfo_gui_ref	SED: s --
+	g_cache_get
+;
+
+\ ----------------------------------
+\ Update frequency in the VFO gui object
+\ freq vfo-gui --
+: __update_gui_map	SED: n g --
+	"freq" rot g:m!
+;
+
+\ ----------------------------------
+\ Update radio 1 frequency
+\ {"cb" w, "data" [data, sender, w|null] --
+: vfo_r1_freq	SED: m --
+	__data_get_freq
+	VFO-1 __vfo_gui_ref
+	__update_gui_map
+	__reset_all_digits
+	g:invalidate
+;
+	
+
+\ ============================================================================
 \ Initialisation
 
 \ ----------------------------------
@@ -749,7 +785,7 @@ vfo_separator @ g:+kind
 	"id" 3 pick m:!
 	"name" 3 pick m:!
 	"bounds" 2 pick m:!
-	nip nip g:new
+	nip g:new dup 2 pick swap g_cache_add nip
 ;
 
 \ ----------------------------------
@@ -761,9 +797,9 @@ vfo_separator @ g:+kind
 ;
 
 \ Subscribe to events
-\ : vfo_subscribe
-
-
+: vfo_subscribe	SED: --
+	t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
+;
 
 \ ===============================================================================
 \ Restore namespace	
@@ -815,6 +851,16 @@ vfo_test @ #if
 		0.1 sleep
 	;
 	
+	\ ========================================
+	\ Send periodic updates
+	: update_task
+		\ Send frequency updates
+		repeat
+			[10000000] t:name@ a:push null a:push UI_R1_FREQ publish drop
+			5 sleep
+		again
+	;
+	
 	\ ----------------------------------
 	\ onexit callback
 	: term_callback
@@ -853,11 +899,15 @@ vfo_test @ #if
 			"children" : []
 		} g:new
 		\ Create the test VFO
-		"radio-1" "0,0,300,50" vfo_new dup
+		VFO-1 "0,0,300,50" vfo_new dup
 		\ Add to the window
 		rot swap g:+child	
 		\ Initialise
 		1 pick vfo_init
+		vfo_subscribe
+		\ Start a periodic update task to publish frequency
+		1 sleep
+		' update_task t:task "update_task" t:!	
 		\ Cleanup and save the window ref
 		drop "win" t:! drop
 		\ Enter event loop

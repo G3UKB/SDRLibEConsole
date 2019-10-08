@@ -70,7 +70,7 @@ with: fr.ps
 		"children" : []
 	} g:new
 	\ Create the test VFO
-	"VFO-1" "0,0,300,50" vfo_new dup
+	VFO-1 "0,0,300,50" vfo_new dup
 	\ Add to the window
 	rot swap g:+child	
 	\ Initialise

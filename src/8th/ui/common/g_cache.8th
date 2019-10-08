@@ -44,8 +44,16 @@ g_cache_test @ #if
 \ Set namespace
 ns: sdr
 
+\ ========================================
+\ GUI component names
+: VFO-1 "VFO-1" ;
+
+\ ========================================
 \ Cache entries
 {} var, g_cache
+
+\ ========================================
+\ PUBLIC interface
 
 \ ----------------------------------
 \ Add to cache
