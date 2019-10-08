@@ -29,7 +29,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, vfo_test
+true var, vfo_test
 
 \ ----------------------------------
 vfo_test @ #if
@@ -41,6 +41,7 @@ vfo_test @ #if
 	"../../common/ps_events.8th" f:include
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
+	"../common/g_cache.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -760,7 +761,7 @@ vfo_separator @ g:+kind
 ;
 
 \ Subscribe to events
-: vfo_subscribe
+\ : vfo_subscribe
 
 
 
@@ -787,7 +788,7 @@ vfo_test @ #if
 	\ ----------------------------------
 	\ Called by published frequency changes
 	: evnt_freq
-		a:pop nip log
+		0 a:@ nip log
 	;
 	
 	\ ----------------------------------
@@ -833,7 +834,6 @@ vfo_test @ #if
 	\ ========================================
 	\ Test program entry point
 	: app:main
-	
 		\ Create startup task and keep reference
 		' startup_task t:task "startup_task" t:!
 		\ Set exit handler

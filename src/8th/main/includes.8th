@@ -49,6 +49,7 @@
 \ Common
 "../ui/common/layout.8th" f:include
 "../ui/common/font_cache.8th" f:include
+"../ui/common/g_cache.8th" f:include
 \ Components
 "../ui/components/vfo.8th" f:include
 \ Main

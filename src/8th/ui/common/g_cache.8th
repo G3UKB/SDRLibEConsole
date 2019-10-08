@@ -27,35 +27,67 @@
   here for quick easy named access. 
 *)
 
+\ ========================================
+\ Testing only
+false var, g_cache_test
+
+\ ----------------------------------
+g_cache_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
 \ Set namespace
 ns: sdr
 
+\ Cache entries
 {} var, g_cache
 
-: g_cache_add	\ name g --
+\ ----------------------------------
+\ Add to cache
+\ name g --
+: g_cache_add	SED: s * --
 	g_cache @ -rot m:! drop
 ;
 
-: g_cache_get \ name -- g
+\ ----------------------------------
+\ Retrieve from cache
+\ name -- g
+: g_cache_get SED: s -- *
 	g_cache @ 1 pick m:exists? if
 		swap m:@ nip
 	else
+		\ Treat as fatal. If we need the component then it should be cached.
 		drop "Not found GUI component %s!" s:strfmt throw
 	then
 ;
 
+\ ========================================
 \ Restore namespace	
 ns: user
 
-"1" "abc" g_cache_add
-"2" "def" g_cache_add
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
 
-"1" g_cache_get . cr
-"2" g_cache_get . cr
-"1" g_cache_get . cr
-"2" g_cache_get . cr
-\ "3" g_cache_get . cr
-\ "4" g_cache_get . cr
-.s
+g_cache_test @ #if
+
+	\ Pull in the namespaces
+	with: sdr
+	
+	"1" "abc" g_cache_add
+	"2" "def" g_cache_add
+
+	"1" g_cache_get . cr
+	"2" g_cache_get . cr
+	"1" g_cache_get . cr
+	"2" g_cache_get . cr
+	"3" g_cache_get . cr
+	.s
 bye
-		
+#then		
