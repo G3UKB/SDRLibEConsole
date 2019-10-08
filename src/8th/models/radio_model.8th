@@ -227,6 +227,9 @@ with: fr.p
 	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
 	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
 	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
+	UI_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
+	UI_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
+	UI_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
 	"Radio Model SYS events" log
 ;
 

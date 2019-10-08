@@ -31,7 +31,7 @@
 "includes.8th" f:include
 
 \ Make this a gui app
-\ true app:isgui !
+true app:isgui !
 \ Log as separate task
 true log-async
 
@@ -147,8 +147,8 @@ with: fr.sm
 	\ "Main_Thrd" t:name!
 	MAIN_TASK t:name!
 	\ Make sure the q does not throw
-	t:getq false q:throwing drop
-	t:curtask log
+	\ t:getq false q:throwing drop
+	\ t:curtask log
 	
 	\ ----------------------------------
 	\ Start the startup task which starts all gen_server tasks
@@ -157,16 +157,15 @@ with: fr.sm
 	' startup_task t:task dup STARTUP_TASK t:!
 
 	\ ----------------------------------
+	\ Start UI
+	main_window
+	
+	\ ----------------------------------
 	\ Set our cleanup word
 	' cleanup onexit
 	
-	\ Temp until we add the UI
-	"Any key to close" log
-	con:key
-	
 	\ On exit from app:main the GUI event loop is started
   "Exiting app_main" log
-  bye
 ;
 
 \ ========================================

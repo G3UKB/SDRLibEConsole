@@ -326,16 +326,27 @@ with: fr.ps
 	
 \ ----------------------------------
 \ Do response
-: __con_do_response	SED: -- 
+: __con_do_response	SED: s w -- 
+\ in:		1: w - word to call for response
+\				2: s - ask name for response
+\ out: 	none
 	__conn_wait_resp_with_timeout
-	response!
+	1 pick null? if
+		\ A null word to call means no response required
+		4drop
+	else
+		\ Do response
+		drop response!
+	then
 ;
 
 \ ----------------------------------
 \ Do exchange
-: __con_do_exchange	SED: T m --
+: __con_do_exchange	SED: s w T m --
 	\ in: 	0: m - message to send	
 	\				1: T - if true then throw on error
+	\				2: w - word to call for response
+	\				3: s - task name for response
 	\ out: 	none
 	__conn_send_cmd_msg __con_do_response
 ;
@@ -449,7 +460,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R1 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_r1_freq_msg false swap __con_do_exchange 
+	rot >s __conn_r1_freq_msg false swap __con_do_exchange 
 ;
 
 \ ----------------------------------
@@ -459,7 +470,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R2 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_r2_freq_msg false swap __con_do_exchange 
+	rot >s __conn_r2_freq_msg false swap __con_do_exchange 
 ;
 
 \ ----------------------------------
@@ -469,7 +480,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R3 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_r3_freq_msg false swap __con_do_exchange 
+	rot >s __conn_r3_freq_msg false swap __con_do_exchange 
 ;
 	
 \ ----------------------------------
@@ -479,7 +490,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - TX freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_tx_freq_msg false swap __con_do_exchange 
+	rot >s __conn_tx_freq_msg false swap __con_do_exchange 
 ;
 
 \ ========================================
@@ -698,19 +709,22 @@ connector_test @ #if
 		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
 		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 		"EVENTS" log
-		["7150000"] ' w +sender SYS_R1_FREQ publish response@ "Event Set freq" log
+		[7150000] ' w +sender SYS_R1_FREQ publish response@ "Event Set freq" log
+		0.1 sleep
 		[ ` CH_LSB ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log
-		1 sleep
+		0.1 sleep
 		[ ` CH_AM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode AM" log
-		1 sleep
+		0.1 sleep
 		[ ` CH_6K0 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 6.0KHz" log
-		1 sleep
+		0.1 sleep
 		[ ` CH_FM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode FM" log
-		1 sleep
+		0.1 sleep
 		[ ` CH_2K4 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 2.4KHz" log
-		1 sleep
+		0.1 sleep
+		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
+		0.1 sleep
 		conn_term
-		1 sleep
+		0.1 sleep
 	;
 
 	\ Run test and exit

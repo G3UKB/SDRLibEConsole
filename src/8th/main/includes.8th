@@ -44,3 +44,12 @@
 
 \ Application modules
 "../connector/connector.8th" f:include
+
+\ UI
+\ Common
+"../ui/common/layout.8th" f:include
+"../ui/common/font_cache.8th" f:include
+\ Components
+"../ui/components/vfo.8th" f:include
+\ Main
+"../ui/main_window/main_window.8th" f:include

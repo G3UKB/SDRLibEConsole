@@ -29,7 +29,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, vfo_test
+false var, vfo_test
 
 \ ----------------------------------
 vfo_test @ #if
@@ -47,7 +47,6 @@ vfo_test @ #if
 	\ dbg:line-info
 #then
 \ ========================================
-
 
 \ Use SDR namespace
 ns: sdr
@@ -303,8 +302,9 @@ vfo_separator @ g:+kind
 \ ----------------------------------
 \ Publish frequency update
 \ freq-in-hz -- 
-: publish_freq SED: n -- 
-	a:new swap a:push SYS_R1_FREQ publish
+: publish_freq SED: n --
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R1_FREQ publish
 ;
 
 \ ----------------------------------
@@ -758,6 +758,11 @@ vfo_separator @ g:+kind
   __enumerate_digits
   __reset_all_digits
 ;
+
+\ Subscribe to events
+: vfo_subscribe
+
+
 
 \ ===============================================================================
 \ Restore namespace	

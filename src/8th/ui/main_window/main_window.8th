@@ -1,0 +1,176 @@
+(*
+	main_window.8th
+ 
+  Main window for the SDRLibEConsole application
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This component can be multi-instanced to provide a 9 digit VFO that can be
+	scrolled with the mouse wheel. It publishes frequency events as it goes.
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+false var, main_window_test
+
+\ ----------------------------------
+main_window_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../../common/app_defs.8th" f:include
+	"../../common/radio_defs.8th" f:include
+	"../../common/ps_events.8th" f:include
+	"../common/layout.8th" f:include
+	"../common/font_cache.8th" f:include
+	"../components/vfo/vfo.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+: main_window
+	\ A minimal window to hold our component
+	{
+		"kind" : "win",
+		"title" : "SDRLibEConsole",
+		"visible" : true,
+		"ontop" : false,
+		"bg" : "gray10",
+		"resize-corner" : 20,
+		"wide" : 400,
+		"high" : 200,
+		"top" : 100,
+		"left" : 100,
+		"children" : []
+	} g:new
+	\ Create the test VFO
+	"VFO-1" "0,0,300,50" vfo_new dup
+	\ Add to the window
+	rot swap g:+child	
+	\ Initialise
+	1 pick vfo_init
+	\ Cleanup and save the window ref
+	drop "win" t:! drop
+;
+	
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+main_window_test @ #if
+
+	\ Pull in the namespaces
+	with: sdr
+	with: fr.gs
+	with: fr.ps
+	true app:isgui !
+	
+	\ ========================================
+	\ These are gen_server words for the EVNT_TASK gen_server
+	
+	\ ----------------------------------
+	\ Called by published frequency changes
+	: evnt_freq
+		a:pop nip log
+	;
+	
+	\ ----------------------------------
+	\ Called from a gen_server message to subscribe to the frequency change
+	: evnt_subscribe
+		t:name@ ' evnt_freq SYS_R1_FREQ subscribe
+	;
+	
+	\ ========================================
+	\ Startup/terminate
+	
+	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
+	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
+	\ never seeing the notify.
+	\ We srtart the gen_server here in a separate startup task.
+	: startup_task
+		\ Create gen_server
+		"EVNT_TASK" gen_server_new
+		\ Tell it to do subscriptions
+		"EVNT_TASK" ' evnt_subscribe null msg!
+		\ Wait until told to close at EOD so refs are maintained
+		-1 sleep
+		"Startup task exiting..." log
+		0.1 sleep
+	;
+	
+	\ ----------------------------------
+	\ onexit callback
+	: term_callback
+		\ Else messages get lost
+		false log-async
+		\ Terminate gen_server
+		"EVNT_TASK" gen_server_term
+		0.1 sleep
+		\ Terminate startup task
+		"startup_task" t:@ dup t:notify t:wait
+		\ Wait for tasks to go
+		wait_all
+		\ Messages flush
+		0.1 sleep
+	;
+	
+	\ ========================================
+	\ Test program entry point
+	: app:main
+	
+		\ Create startup task and keep reference
+		' startup_task t:task "startup_task" t:!
+		\ Set exit handler
+		' term_callback onexit
+		\ A minimal window to hold our test component
+		{
+			"kind" : "win",
+			"title" : "SDRLibEConsole",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new
+		\ Create the test VFO
+		"radio-1" "0,0,300,50" vfo_new dup
+		\ Add to the window
+		rot swap g:+child	
+		\ Initialise
+		1 pick vfo_init
+		\ Cleanup and save the window ref
+		drop "win" t:! drop
+		\ Enter event loop
+	;
+#then

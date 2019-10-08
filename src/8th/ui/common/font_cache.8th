@@ -20,9 +20,6 @@
  
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
-     
-  This component can be multi-instanced to provide a 9 digit VFO that can be
-	scrolled with the mouse wheel. It publishes frequency events as it goes.
 *)
 
 \ Set namespace
