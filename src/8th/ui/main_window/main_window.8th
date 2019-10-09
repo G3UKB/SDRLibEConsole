@@ -169,6 +169,7 @@ main_window_test @ #if
 		rot swap g:+child	
 		\ Initialise
 		1 pick vfo_init
+		vfo_subscribe
 		\ Cleanup and save the window ref
 		drop "win" t:! drop
 		\ Enter event loop
