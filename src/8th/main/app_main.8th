@@ -41,6 +41,11 @@ with: fr.gs
 with: fr.ps
 with: fr.sm
 
+\ Temp to get going
+: sender
+	a:new swap a:push null +sender msg!
+;
+	
 \ ----------------------------------
 \ We start all gen-server tasks from the startup task
 : startup_task	SED: --
@@ -61,6 +66,13 @@ with: fr.sm
 	\ ----------------------------------
 	\ Connector init and subscriptions
 	conn_init
+	1 sleep
+	\ Temp to get radio going before we send other events.
+	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
+	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
+	CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
+	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
+	1 sleep
 	
 	\ ----------------------------------
 	\ Models in it only, publishing is done later in startup
@@ -155,7 +167,9 @@ with: fr.sm
 	\ This cannot itself be a gen-server task as the framework
 	\ is not instantiated yet.
 	' startup_task t:task dup STARTUP_TASK t:!
-
+	\ Need a better way to wait for sync
+	2 sleep
+	
 	\ ----------------------------------
 	\ Start UI
 	main_window

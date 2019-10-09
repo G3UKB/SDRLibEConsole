@@ -387,7 +387,7 @@ with: fr.ps
 		\ Put result in an array
 		2 a:close
 	then
-	\ Respons 'task name, w, data' or NAK
+	\ Response 'task name, w, data' or NAK
 	response!
 ;
 
@@ -406,7 +406,6 @@ with: fr.ps
 		"outputs" m:@ nip 1 a:@ nip "api" m:@ swap "name" m:@ nip
 		__conn_default_route_msg false swap __con_do_exchange
 	then
-	response!
 ;	
 
 \ ========================================
@@ -460,7 +459,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R1 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot >s __conn_r1_freq_msg false swap __con_do_exchange 
+	rot >n __conn_r1_freq_msg false swap __con_do_exchange 
 ;
 
 \ ----------------------------------
@@ -470,7 +469,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R2 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot >s __conn_r2_freq_msg false swap __con_do_exchange 
+	rot >n __conn_r2_freq_msg false swap __con_do_exchange 
 ;
 
 \ ----------------------------------
@@ -480,7 +479,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R3 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot >s __conn_r3_freq_msg false swap __con_do_exchange 
+	rot >n __conn_r3_freq_msg false swap __con_do_exchange 
 ;
 	
 \ ----------------------------------
@@ -490,7 +489,7 @@ with: fr.ps
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - TX freq in Hz
 	\ out: 	q: * - "Timeout" or response data
-	rot >s __conn_tx_freq_msg false swap __con_do_exchange 
+	rot >n __conn_tx_freq_msg false swap __con_do_exchange 
 ;
 
 \ ========================================
