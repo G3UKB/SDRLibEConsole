@@ -202,6 +202,13 @@ with: fr.p
 ;
 
 \ ===============================================================================
+\ Model updates
+\ freq --
+: t_radio_r1_freq	SED: n --
+	\ >r __radio_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ] "freq" r> val!
+;
+
+\ ===============================================================================
 \ Message handlers
 
 \ ========================================
@@ -215,6 +222,8 @@ with: fr.p
 	drop 
 	t:curtask log
 	__radio_model_restore
+	
+	t:name@ ' t_radio_r1_freq SYS_R1_FREQ subscribe
 	"Radio Model initialised" log
 ;
 
@@ -227,9 +236,6 @@ with: fr.p
 	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
 	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
 	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
-	UI_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
-	UI_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
-	UI_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
 	"Radio Model SYS events" log
 ;
 
@@ -239,6 +245,9 @@ with: fr.p
 	\ in: 	message
 	\ out:	none
 	drop
+	UI_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
+	UI_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
+	UI_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
 ;
 
 \ ----------------------------------

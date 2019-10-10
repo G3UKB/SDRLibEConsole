@@ -797,8 +797,9 @@ vfo_separator @ g:+kind
 ;
 
 \ Subscribe to events
-: vfo_subscribe	SED: --
-	t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
+\ task-name --
+: vfo_subscribe	SED: s  --
+	 t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
 ;
 
 \ ===============================================================================

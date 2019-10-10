@@ -67,7 +67,7 @@ with: fr.sm
 	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 	1 sleep
 	\ ----------------------------------
-	\ Models in it only, publishing is done later in startup
+	\ Models init only
 	radio_model_init
 	(*
 	\ ----------------------------------
@@ -81,10 +81,14 @@ with: fr.sm
 		bye
 	then
 	*)
-	
+		
 	\ ----------------------------------
+	\ Wait to be informed that the UI is fully running
+	-1 sleep
 	\ Once UI is stable we can populate it with the UI event data
+	\ The sys event data could be sent earlier but this is a good sync point
 	radio_model_sys_events
+	radio_model_ui_events
 	\ We have started multiple tasks from the startup task
 	\ We keep a reference to it and close it at the end of
 	\ the shutdown before waiting for all tasks.
