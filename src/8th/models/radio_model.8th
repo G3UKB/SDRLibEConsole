@@ -205,7 +205,7 @@ with: fr.p
 \ Model updates
 \ freq --
 : t_radio_r1_freq	SED: n --
-	\ >r __radio_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ] "freq" r> val!
+	0 a:@ nip >r __radio_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ] "freq" r> val!
 ;
 
 \ ===============================================================================
