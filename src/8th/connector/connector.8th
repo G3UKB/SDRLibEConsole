@@ -642,9 +642,17 @@ with: fr.ps
 	\ Create the connector gen-server
 	CONNECTOR_TASK gen_server_new
 	\ Ask the connector to initialise itself
-	CONNECTOR_TASK ' t_conn_subscribe null msg!
 	CONNECTOR_TASK ' t_conn_init null msg!
 	CONNECTOR_TASK ' t_conn_sod null msg!
+;
+
+\ ----------------------------------
+\ Subscriptions
+: conn_subscribe	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Ask the connector to do subscriptions
+	CONNECTOR_TASK ' t_conn_subscribe null msg!
 ;
 
 \ ----------------------------------

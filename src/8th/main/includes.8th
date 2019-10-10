@@ -52,5 +52,9 @@
 "../ui/common/g_cache.8th" f:include
 \ Components
 "../ui/components/vfo.8th" f:include
-\ Main
+\ Main window
 "../ui/main_window/main_window.8th" f:include
+
+\ Main coce
+"startup.8th" f:include
+"cleanup.8th" f:include

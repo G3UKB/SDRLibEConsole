@@ -40,113 +40,6 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 with: fr.sm
-
-\ Temp to get going
-: sender
-	a:new swap a:push null +sender msg!
-;
-	
-\ ----------------------------------
-\ We start all gen-server tasks from the startup task
-: startup_task	SED: --
-	\ in: 	none
-	\ out:	none
-	
-	\ Add our task to the task registry so play comms
-	"STARTUP_TASK" t:name!
-	t:curtask STARTUP_TASK reg!
-	t:curtask log
-	
-	\ Make sure the task Q does not throw
-	t:getq false q:throwing drop
-	
-	\ ----------------------------------
-	"Creating gen-server tasks..." log
-	
-	\ ----------------------------------
-	\ Connector init and subscriptions
-	conn_init
-	1 sleep
-	\ Temp to get radio going before we send other events.
-	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
-	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
-	CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
-	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
-	1 sleep
-	
-	\ ----------------------------------
-	\ Models in it only, publishing is done later in startup
-	radio_model_init
-	
-	(*
-	\ ----------------------------------
-	\ See if we have a server or simulator running
-	conn_poll not if
-		"\n\n\***The console cannot run without SDRLibEConnector server or a simulator." log
-		"***Please start the server or simulator and then restart the console." log
-		"***Press any key to exit the application\n\n" log
-		"STARTUP_TASK" gs_reg_rm
-		con:key
-		bye
-	then
-	*)
-	
-	\ ----------------------------------
-	\ Once UI is stable we can populate it with the UI event data
-	radio_model_sys_events
-	
-	\ We have started multiple tasks from the startup task
-	\ We keep a reference to it and close it at the end of
-	\ the shutdown before waiting for all tasks.
-	-1 sleep
-	
-	\ Exit message
-	"Startup task - exiting..." log 
-;
-
-\ ----------------------------------
-\ We cleanup all gen-server tasks
-\ Has to be a separate task so we can reeceive responses
-: cleanup_task	SED: --
-	\ in: 	none
-	\ out:	none
-	\ So we know who we are
-	CLEANUP_TASK t:name!
-	t:curtask log
-	\ Otherwise messages are lost in closedown
-	false log-async
-	
-	"Shutdown in progress at: " d:new >s s:+ log
-	\ Close gen-server tasks
-	\ Connector
-	conn_term
-	\ Models
-	radio_model_term
-	
-	"Cleanup task - exiting..." log 
-	\ Wait for messages to flush
-	0.1 sleep 
-;
-	
-\ ----------------------------------
-\ Called on application exit
-: cleanup	SED: --
-	\ in: 	none
-	\ out:	none
-	\ Otherwise messages are lost in closedown
-	false log-async
-	\ Run the cleanup task and wait for it to complete
-	' cleanup_task t:task t:wait
-	1.0 sleep
-	\ Finally close the Startup task
-	STARTUP_TASK t:@ t:notify
-	\ Wait for all tasks to terminate
-	0.1 sleep
-	wait_all
-	"Shutdown complete" log
-	\ Wait for messages to flush
-	0.1 sleep 
-;
 	
 \ ===============================================================================
 \ Application entry point  
@@ -156,11 +49,10 @@ with: fr.sm
 	
 	\ ----------------------------------
 	\ Set our task name
-	\ "Main_Thrd" t:name!
 	MAIN_TASK t:name!
 	\ Make sure the q does not throw
-	\ t:getq false q:throwing drop
-	\ t:curtask log
+	t:getq false q:throwing drop
+	t:curtask log
 	
 	\ ----------------------------------
 	\ Start the startup task which starts all gen_server tasks

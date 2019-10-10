@@ -1,0 +1,80 @@
+(* 
+	cleanup.8th
+ 
+  Cleanup on application terminate.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Application startup is largely asyncronous as there are many tasks which
+  initialise and communicate via messages. As things have to happen the righ
+  order i.e Subscriptions before Publications the startup is synchronised.
+  	
+*)
+
+\ Set namespace
+ns: sdr
+
+
+\ ===============================================================================
+\ Runs on its own thread to cleanup gen-server tasks..
+\ ----------------------------------
+: cleanup_task	SED: --
+	\ in: 	none
+	\ out:	none
+	\ So we know who we are
+	CLEANUP_TASK t:name!
+	t:curtask log
+	\ Otherwise messages are lost in closedown
+	false log-async
+	
+	"Shutdown in progress at: " d:new >s s:+ log
+	\ Close gen-server tasks
+	\ Connector
+	conn_term
+	\ Models
+	radio_model_term
+	
+	"Cleanup task - exiting..." log 
+	\ Wait for messages to flush
+	0.1 sleep 
+;
+
+\ ----------------------------------
+\ Callback on application exit
+: cleanup	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Otherwise messages are lost in closedown
+	false log-async
+	\ Run the cleanup task and wait for it to complete
+	' cleanup_task t:task t:wait
+	1.0 sleep
+	\ Finally close the Startup task
+	STARTUP_TASK t:@ t:notify
+	\ Wait for all tasks to terminate
+	0.1 sleep
+	wait_all
+	"Shutdown complete" log
+	\ Wait for messages to flush
+	0.1 sleep 
+;
+
+\ ========================================
+\ Reset namespace
+ns: user
