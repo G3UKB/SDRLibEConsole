@@ -78,8 +78,6 @@ with: fr.ps
 	vfo_subscribe
 	\ Cleanup and save the window ref
 	drop "win" t:! drop
-	\ As we are in startup, tell the startup task it's ok to start publishing
-	STARTUP_TASK t:@ t:notify
 ;
 
 \ ===============================================================================

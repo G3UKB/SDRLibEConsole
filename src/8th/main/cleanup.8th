@@ -44,13 +44,17 @@ ns: sdr
 	false log-async
 	
 	"Shutdown in progress at: " d:new >s s:+ log
+	
 	\ Close gen-server tasks
 	\ Connector
 	conn_term
 	\ Models
 	radio_model_term
+	\ Startup
+	STARTUP_TASK gen_server_term
 	
 	"Cleanup task - exiting..." log 
+	
 	\ Wait for messages to flush
 	0.1 sleep 
 ;
@@ -65,8 +69,6 @@ ns: sdr
 	\ Run the cleanup task and wait for it to complete
 	' cleanup_task t:task t:wait
 	1.0 sleep
-	\ Finally close the Startup task
-	STARTUP_TASK t:@ t:notify
 	\ Wait for all tasks to terminate
 	0.1 sleep
 	wait_all

@@ -44,6 +44,7 @@
 
 \ Application modules
 "../connector/connector.8th" f:include
+"../connector/radio_manager.8th" f:include
 
 \ UI
 \ Common

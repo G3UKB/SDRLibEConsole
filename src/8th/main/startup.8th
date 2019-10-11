@@ -45,12 +45,7 @@ with: fr.sm
 : startup_task	SED: --
 	\ in: 	none
 	\ out:	none
-	\ Add our task to the task registry so we can use the messaging system
-	"STARTUP_TASK" t:name!
-	t:curtask STARTUP_TASK reg!
 	t:curtask log
-	\ Make sure the task Q does not throw
-	t:getq false q:throwing drop
 	
 	\ ----------------------------------
 	"Creating gen-server tasks..." log
@@ -60,6 +55,7 @@ with: fr.sm
 	\ Connector init and subscriptions
 	conn_init
 	conn_subscribe
+	radio_default_startup
 	\ Temp to get radio going before we send other events.
 	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
 	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
@@ -69,33 +65,33 @@ with: fr.sm
 	\ ----------------------------------
 	\ Models init only
 	radio_model_init
-	(*
 	\ ----------------------------------
-	\ See if we have a server or simulator running
-	conn_poll not if
-		"\n\n\***The console cannot run without SDRLibEConnector server or a simulator." log
-		"***Please start the server or simulator and then restart the console." log
-		"***Press any key to exit the application\n\n" log
-		"STARTUP_TASK" gs_reg_rm
-		con:key
-		bye
-	then
-	*)
-		
-	\ ----------------------------------
-	\ Wait to be informed that the UI is fully running
-	-1 sleep
-	\ Once UI is stable we can populate it with the UI event data
-	\ The sys event data could be sent earlier but this is a good sync point
+	\ Finished all we need to do, the gen-server will just wait for termination.
+	"Startup complete ..." log 
+;
+
+\ ----------------------------------
+\ Send model SYS events
+: startup_sys_events	SED: --
 	radio_model_sys_events
+;
+
+\ ----------------------------------
+\ Send model UI events
+: startup_ui_events	SED: --
 	radio_model_ui_events
-	\ We have started multiple tasks from the startup task
-	\ We keep a reference to it and close it at the end of
-	\ the shutdown before waiting for all tasks.
-	-1 sleep
-	
-	\ Exit message
-	"Startup task - exiting..." log 
+;
+
+\ ===============================================================================
+\ The proxy starts the STARTUP_TASK as gen-servers cannot be started from the main
+\ thread as a GUI app prevents events to the main thread. 
+: startup_proxy	SED: --
+	\ Start the gen-server task
+	STARTUP_TASK gen_server_new
+	STARTUP_TASK ' startup_task [null] msg!
+	STARTUP_TASK ' startup_sys_events [null] msg!
+	2 sleep
+	STARTUP_TASK ' startup_ui_events [null] msg!
 ;
 
 \ ========================================

@@ -58,12 +58,16 @@ with: fr.sm
 	\ Start the startup task which starts all gen_server tasks
 	\ This cannot itself be a gen-server task as the framework
 	\ is not instantiated yet.
-	' startup_task t:task dup STARTUP_TASK t:!
+	\ ' startup_task t:task dup STARTUP_TASK t:!
+	' startup_proxy t:task
+	\ STARTUP_TASK gen_server_new
+	\ STARTUP_TASK ' startup_task [null] msg!
 	\ Need a better way to wait for sync
-	2 sleep
+	\ 4 sleep
 	
 	\ ----------------------------------
 	\ Start UI
+	\ true app:isgui !
 	main_window
 	
 	\ ----------------------------------
@@ -72,6 +76,7 @@ with: fr.sm
 	
 	\ On exit from app:main the GUI event loop is started
   "Exiting app_main" log
+  
 ;
 
 \ ========================================
