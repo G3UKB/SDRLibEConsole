@@ -24,6 +24,8 @@
   Application startup is largely asyncronous as there are many tasks which
   initialise and communicate via messages. As things have to happen the righ
   order i.e Subscriptions before Publications the startup is synchronised.
+  
+  Startup is a gen-server task.
   	
 *)
 
@@ -33,16 +35,12 @@ with: fr.gs
 with: fr.ps
 with: fr.sm
 
-\ Temp to get going
-: sender
-	a:new swap a:push null +sender msg!
-;
-
 \ ===============================================================================
-\ Runs on its own thread and then waits for closedown before exiting.
-\ All gen-server tasks are started here but this task is not itself a
-\ gen-server.
-: startup_task	SED: --
+\ Message Handlers
+
+\ ----------------------------------
+\ Main startup initialisation.
+: startup_init	SED: --
 	\ in: 	none
 	\ out:	none
 	t:curtask log
@@ -55,13 +53,7 @@ with: fr.sm
 	\ Connector init and subscriptions
 	conn_init
 	conn_subscribe
-	radio_default_startup
-	\ Temp to get radio going before we send other events.
-	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
-	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
-	CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
-	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
-	1 sleep
+	
 	\ ----------------------------------
 	\ Models init only
 	radio_model_init
@@ -82,15 +74,28 @@ with: fr.sm
 	radio_model_ui_events
 ;
 
+\ ----------------------------------
+\ Radio startup
+: startup_radio	SED: --
+	rm_default_startup
+;
+
 \ ===============================================================================
+\ Transient task run from app_main.
 \ The proxy starts the STARTUP_TASK as gen-servers cannot be started from the main
-\ thread as a GUI app prevents events to the main thread. 
+\ thread as a GUI app prevents events on the main thread. 
 : startup_proxy	SED: --
-	\ Start the gen-server task
+	\ Create the gen-server task
 	STARTUP_TASK gen_server_new
-	STARTUP_TASK ' startup_task [null] msg!
+	\ Main startup
+	STARTUP_TASK ' startup_init [null] msg!
+	2 sleep
+	\ Try to init and start radio before we send events
+	STARTUP_TASK ' startup_radio [null] msg!
+	\ SYS EVENTS
 	STARTUP_TASK ' startup_sys_events [null] msg!
 	2 sleep
+	\ UI EVENTS
 	STARTUP_TASK ' startup_ui_events [null] msg!
 ;
 

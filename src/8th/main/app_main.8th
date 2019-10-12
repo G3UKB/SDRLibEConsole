@@ -76,7 +76,6 @@ with: fr.sm
 	
 	\ On exit from app:main the GUI event loop is started
   "Exiting app_main" log
-  
 ;
 
 \ ========================================

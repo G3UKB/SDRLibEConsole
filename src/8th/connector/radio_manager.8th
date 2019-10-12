@@ -1,0 +1,96 @@
+(* 
+	radio_manager.8th
+ 
+  Manage startup and radio start/stop
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+	
+	radio startup determins if the server is running.
+		- running - issues start up sequence to make the radio operational.
+		- not running - output a message dialog but allow the GUI to continue.
+*)
+
+needs gui/msgdlg
+\ true dbg:line-info
+\ Set namespace
+ns: sdr
+
+\ ===============================================================================
+\ PRIVATE
+
+\ ----------------------------------
+\ Dialog response
+: __rm_msg_resp	SED: g n --
+	drop g:hide
+;
+
+\ ----------------------------------
+\ Called on main thread to put up dialog
+: __rm_do_msg	SED: --
+	{
+		"title" : "Radio Status",
+		"top" : 200,
+		"left" : 100,
+		"high" : 150,
+		"wide" : 400,
+		"font" : "Arial 12",
+		"bg" : "gray",
+		"fg" : "red",
+		"msg" : "SDRLibEConnector server is not running. Please start in order to use the radio"
+	}
+	"parent"  "win" t:@ m:!
+	"cb" ' __rm_msg_resp m:!
+	g:msgdlg	
+;
+
+\ ----------------------------------
+\ Helper to dispatch message
+: __rm_sender	SED: s w * -- 
+	a:new swap a:push null +sender msg!
+;
+
+\ ----------------------------------
+\ Response from default startup
+: __rm_poll_response	SED: * --
+	"resp" m:@ "NAK" s:= nip if
+		\ No server, we can still run but can't really do very much
+		' __rm_do_msg g:do
+	else
+		\ Startup minimal system
+		CONNECTOR_TASK ' t_conn_set_default_route null __rm_sender "Set default route" log
+		CONNECTOR_TASK ' t_conn_discover null __rm_sender "Discover" log
+		CONNECTOR_TASK ' t_conn_start_server null __rm_sender "Start server" log
+		CONNECTOR_TASK ' t_conn_start_radio 0 __rm_sender "Start radio" log
+	then	
+;
+
+\ ===============================================================================
+\ PUBLIC
+
+\ ----------------------------------
+\ Start server and radio with default audio
+: rm_default_startup	SED: --
+	
+	\ See if we have a server or simulator running
+	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
+;
+	
+\ ========================================
+\ Reset namespace
+ns: user
