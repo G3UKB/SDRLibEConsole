@@ -55,15 +55,11 @@ with: fr.sm
 	t:curtask log
 	
 	\ ----------------------------------
-	\ Start the startup task which starts all gen_server tasks
-	\ This cannot itself be a gen-server task as the framework
-	\ is not instantiated yet.
-	\ ' startup_task t:task dup STARTUP_TASK t:!
+	\ Start the startup proxy task which starts
+	\ the gen-server STARTUP_TASK. This cannot be
+	\ done directly as in a GUI task events like
+	\ t:notify do not work.
 	' startup_proxy t:task
-	\ STARTUP_TASK gen_server_new
-	\ STARTUP_TASK ' startup_task [null] msg!
-	\ Need a better way to wait for sync
-	\ 4 sleep
 	
 	\ ----------------------------------
 	\ Start UI

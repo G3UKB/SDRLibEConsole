@@ -220,10 +220,9 @@ with: fr.p
 	\ in: 	message
 	\ out:	none
 	drop 
-	t:curtask log
 	__radio_model_restore
 	
-	t:name@ ' t_radio_r1_freq SYS_R1_FREQ subscribe
+	t:name@ ' t_radio_r1_freq SYS_R1_FREQ subscribe drop
 	"Radio Model initialised" log
 ;
 
@@ -233,10 +232,10 @@ with: fr.p
 	\ in: 	message
 	\ out:	none
 	drop 
-	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
-	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
-	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
-	"Radio Model SYS events" log
+	SYS_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish drop
+	SYS_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish drop
+	SYS_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish drop
+	"Sent Radio Model SYS events" log
 ;
 
 \ ----------------------------------
@@ -245,9 +244,10 @@ with: fr.p
 	\ in: 	message
 	\ out:	none
 	drop
-	UI_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish
-	UI_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish
-	UI_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish
+	UI_R1_FREQ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ,"freq"] __do_publish drop
+	UI_R1_MODE ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"mode"] __do_publish drop
+	UI_R1_FILT ["radio-state",` radio_1 ` ,` dyn_idx ` ,` data_idx ` ,"filter"] __do_publish drop
+	"Sent Radio Model UI events" log
 ;
 
 \ ----------------------------------

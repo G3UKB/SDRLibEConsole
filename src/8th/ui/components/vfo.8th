@@ -83,7 +83,7 @@ with: fr.ps
 {
   "kind" : "VFO",
   \ Additional state
-  "freq" : 7000000,
+  "freq" : 0000000,
   "low-limit" : 100000,
   "high-limit" : 500000000,
   "digits" : [],

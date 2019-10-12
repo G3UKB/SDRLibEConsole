@@ -40,10 +40,10 @@ with: fr.sm
 
 \ ----------------------------------
 \ Main startup initialisation.
-: startup_init	SED: --
+: startup_init	SED: * --
 	\ in: 	none
 	\ out:	none
-	t:curtask log
+	drop
 	
 	\ ----------------------------------
 	"Creating gen-server tasks..." log
@@ -64,20 +64,20 @@ with: fr.sm
 
 \ ----------------------------------
 \ Send model SYS events
-: startup_sys_events	SED: --
-	radio_model_sys_events
+: startup_sys_events	SED: * --
+	drop radio_model_sys_events
 ;
 
 \ ----------------------------------
 \ Send model UI events
-: startup_ui_events	SED: --
-	radio_model_ui_events
+: startup_ui_events	SED: * --
+	drop radio_model_ui_events
 ;
 
 \ ----------------------------------
 \ Radio startup
-: startup_radio	SED: --
-	rm_default_startup
+: startup_radio	SED: * --
+	drop rm_default_startup
 ;
 
 \ ===============================================================================
@@ -87,12 +87,14 @@ with: fr.sm
 : startup_proxy	SED: --
 	\ Create the gen-server task
 	STARTUP_TASK gen_server_new
+	\ Now message it to perform the startup tasks
+	\ ToDo: Need better sync than sleeps here!
 	\ Main startup
 	STARTUP_TASK ' startup_init [null] msg!
-	2 sleep
 	\ Try to init and start radio before we send events
 	STARTUP_TASK ' startup_radio [null] msg!
 	\ SYS EVENTS
+	2 sleep
 	STARTUP_TASK ' startup_sys_events [null] msg!
 	2 sleep
 	\ UI EVENTS

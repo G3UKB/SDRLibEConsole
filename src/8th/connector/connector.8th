@@ -580,7 +580,6 @@ with: fr.ps
 	\ in: 	message
 	\ out:	none
 	drop
-	t:curtask log
 	__conn_create_socket 
 	__conn_create_resp_buf 
 	"Connector Task initialised" log

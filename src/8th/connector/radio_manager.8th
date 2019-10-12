@@ -49,7 +49,8 @@ ns: sdr
 		"left" : 100,
 		"high" : 150,
 		"wide" : 400,
-		"font" : "Arial 12",
+		"font" : "Arial 14",
+		"button-font" : "Arial 12",
 		"bg" : "gray",
 		"fg" : "red",
 		"msg" : "SDRLibEConnector server is not running. Please start in order to use the radio"
