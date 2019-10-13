@@ -87,6 +87,13 @@ with: fr.ps
 	a:new swap ' __add_child a:each! drop
 ;
 
+\ ----------------------------------
+\ Get item from spec map
+\ button-spec item-name -- item
+: __get_item SED: m s -- *
+	m:@ nip
+;
+
 \ ===============================================================================
 \ PUBLIC
 \ ===============================================================================
@@ -97,14 +104,20 @@ with: fr.ps
 \ ----------------------------------
 \ Create a new button box according to the spec
 \ button-spec rows cols  -- gui
-: new_button_box	SED: a n n -- g
+: new_button_box	SED: m -- g
 	\ Add grid attributes to panel
-	m:new "cols" rot m:! "rows" rot m:!  
+	>r
+	m:new
+	"id" r@ "id" __get_item m:!
+	"bounds" r@ "bounds" __get_item m:!
+	"rows" r@ "rows" __get_item m:! 
+	"cols" r@ "cols" __get_item m:! 
 	button_panel @ "grid" rot m:!
 	\ Add button children to panel
 	swap __make_children "children" swap m:!
 	\ Make it a new gui panel
 	const g:new
+	dup r@ "id" __get_item swap g_cache_add
 ;
 
 \ ===============================================================================
@@ -127,17 +140,24 @@ buttons_test @ #if
 	\ This call would be made from the application to create a new button box from the spec.
 	\ --
 	: make_component	SED: -- g
-		[
-			["160",1900000, ( button_click ) ],
-			["80",3700000, ( button_click ) ],
-			["60",5276000, ( button_click ) ],
-			["40",7100000,  ( button_click ) ],
-			["30",10200000, ( button_click ) ],
-			["20",14200000, ( button_click ) ],
-			["17",18100000, ( button_click ) ],
-			["15",21200000, ( button_click ) ],
-			["10",29000000, ( button_click ) ]
-		] 3 3 new_button_box
+		{
+			"ID" : "BB1",
+			"bounds" : "0,0,200,200",
+			"rows" : 3, 
+			"cols" : 3,
+			"spec" : [
+				["160",1900000, ( button_click ) ],
+				["80",3700000, ( button_click ) ],
+				["60",5276000, ( button_click ) ],
+				["40",7100000,  ( button_click ) ],
+				["30",10200000, ( button_click ) ],
+				["20",14200000, ( button_click ) ],
+				["17",18100000, ( button_click ) ],
+				["15",21200000, ( button_click ) ],
+				["10",29000000, ( button_click ) ]
+			] 
+		} new_button_box
+
 	;
 
 	\ ----------------------------------
