@@ -34,6 +34,7 @@ true var, buttons_test
 \ ----------------------------------
 buttons_test @ #if
 	\ Includes
+	"../common/g_cache.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -90,8 +91,15 @@ with: fr.ps
 \ ----------------------------------
 \ Get item from spec map
 \ button-spec item-name -- item
-: __get_item SED: m s -- *
+: __get_item_from_spec SED: m s -- *
 	m:@ nip
+;
+
+\ ----------------------------------
+\ Get item from spec map
+\ button-spec item -- item
+: __store_item_to_panel SED: item key --
+	button_panel @ swap rot m:! nip
 ;
 
 \ ===============================================================================
@@ -103,21 +111,22 @@ with: fr.ps
 
 \ ----------------------------------
 \ Create a new button box according to the spec
-\ button-spec rows cols  -- gui
+\ button-spec  -- gui
 : new_button_box	SED: m -- g
-	\ Add grid attributes to panel
+	\ Add attributes to panel
 	>r
 	m:new
-	"id" r@ "id" __get_item m:!
-	"bounds" r@ "bounds" __get_item m:!
-	"rows" r@ "rows" __get_item m:! 
-	"cols" r@ "cols" __get_item m:! 
-	button_panel @ "grid" rot m:!
+	"rows" r@ "rows" __get_item_from_spec m:! 
+	"cols" r@ "cols" __get_item_from_spec m:! 
+	"grid" __store_item_to_panel	
+	r@ "id" __get_item_from_spec "id" __store_item_to_panel
+	r@ "bounds" __get_item_from_spec "bounds" __store_item_to_panel
+	
 	\ Add button children to panel
-	swap __make_children "children" swap m:!
+	r@ "spec" __get_item_from_spec __make_children "children" __store_item_to_panel
 	\ Make it a new gui panel
-	const g:new
-	dup r@ "id" __get_item swap g_cache_add
+	button_panel @ const g:new
+	dup r> "id" __get_item_from_spec swap g_cache_add nip
 ;
 
 \ ===============================================================================
@@ -141,7 +150,7 @@ buttons_test @ #if
 	\ --
 	: make_component	SED: -- g
 		{
-			"ID" : "BB1",
+			"id" : "BB1",
 			"bounds" : "0,0,200,200",
 			"rows" : 3, 
 			"cols" : 3,
@@ -157,7 +166,6 @@ buttons_test @ #if
 				["10",29000000, ( button_click ) ]
 			] 
 		} new_button_box
-
 	;
 
 	\ ----------------------------------
@@ -182,6 +190,6 @@ buttons_test @ #if
 			\ Create the test button box
 			make_component
 			\ Add to the window
-			g:+child	 
+			"win" t:@ swap g:+child	 
 	;
 #then
