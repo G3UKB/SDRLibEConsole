@@ -29,19 +29,11 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, buttons_test
+true var, buttons_test
 
 \ ----------------------------------
-vfo_test @ #if
+buttons_test @ #if
 	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../../common/app_defs.8th" f:include
-	"../../common/radio_defs.8th" f:include
-	"../../common/ps_events.8th" f:include
-	"../common/layout.8th" f:include
-	"../common/font_cache.8th" f:include
-	"../common/g_cache.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -54,56 +46,65 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 
+\ ========================================
+\ Variables
 
-: button_children \ -- arr
-  a:new
-  (
-    >r
-    m:new 
-      "kind" "btn" m:!
-      "label" band_lookup r@ a:@ nip 0 a:@ nip m:!
-      "freq" band_lookup r> a:@ nip 1 a:@ nip m:!
-      "font" 14 m:!
-      "bg" "lightcyan4" m:!
-      "fg" "blue" m:!
-      "alpha" 0.8 m:!
-      "click" "sdr:new_band" m:!
-    a:push
-  ) 0 8 loop 
-;
-
-\ Be nice to use a new kind but layouts not supported yet 
+\ ----------------------------------
+\ Semi-populated box to hold buttons
 {
 	"kind" : "box",
-	"alpha" : 0.5,
+	"alpha" : 1.0,
 	"bg" : "lightcyan4",
-	"visible" : false,
-	"grid" : {"cols" : 9 , "rows" : 1 },
-	"children" : ` band-children `
+	"visible" : true
 } var, button_panel
 
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+
+\ ----------------------------------
+\ Add one button child to the child array
+\ child-array [label user-data, click] -- child-array
+: __add_child	SED: a a -- a
+	swap >r a:open
+	m:new
+	"kind" "btn" m:!
+	"click" rot m:!
+	"user-data" rot m:!
+	"label" rot m:!
+	"font" 14 m:!
+	"bg" "lightcyan4" m:!
+	"fg" "blue" m:!
+	"alpha" 0.8 m:!
+	r> swap a:push
+;
+
+\ ----------------------------------
+\ Make the child array
+\ button-spec -- child-array
+: __make_children	SED: a -- a
+	a:new swap ' __add_child a:each! drop
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
 \ ============================================================================
-\ GUI Events
-\ FIXME - get the correct band frequency.
-: new_band	\ g --
-	\ Get the target freq
-	"freq" g:m@ >r 
-	\ Hide the popup
-	g:parent 
-	"id" g:m@ >r
-	g:hide 
-	g:parent
-	\ Toggle the parent button on again
-	{"BAND-R1" : "r1-band-btn", "BAND-R2" : "r2-band-btn", "BAND-R3" : "r3-band-btn"}
-	r@ caseof
-	g:child false g:on
-	\ Set the frequency
-	r> r> false
-	{"BAND-R1" : ' app_model_r1_set_freq , "BAND-R2" : ' app_model_r2_set_freq , "BAND-R3" : ' app_model_r3_set_freq }
-	3 pick caseof
-	true
-	{"BAND-R1" : ' app_model_r1_set_freq , "BAND-R2" : ' app_model_r2_set_freq , "BAND-R3" : ' app_model_r3_set_freq }
-	3 pick caseof
+\ Initialisation
+
+\ ----------------------------------
+\ Create a new button box according to the spec
+\ button-spec rows cols  -- gui
+: new_button_box	SED: a n n -- g
+	\ Add grid attributes to panel
+	m:new "cols" rot m:! "rows" rot m:!  
+	button_panel @ "grid" rot m:!
+	\ Add button children to panel
+	swap __make_children "children" swap m:!
+	\ Make it a new gui panel
+	const g:new
 ;
 
 \ ===============================================================================
@@ -112,105 +113,55 @@ with: fr.ps
 \ ===============================================================================
 
 buttons_test @ #if
+	4 json-pretty
 
-	\ Pull in the namespaces
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-	true app:isgui !
-	
-	\ ========================================
-	\ These are gen_server words for the EVNT_TASK gen_server
-	
 	\ ----------------------------------
-	\ Called by published clicks
-	: evnt_click
-		0 a:@ nip log
+	\ Called as given by spec
+	\ Generally the user data will be required
+	\ g -- g
+	: button_click	SED: g -- g
+		"user-data" g:m@ . cr
 	;
-	
+
 	\ ----------------------------------
-	\ Called from a gen_server message to subscribe to the button change
-	: evnt_subscribe
-		t:name@ ' evnt_freq SYS_R1_FREQ subscribe
+	\ This call would be made from the application to create a new button box from the spec.
+	\ --
+	: make_component	SED: -- g
+		[
+			["160",1900000, ( button_click ) ],
+			["80",3700000, ( button_click ) ],
+			["60",5276000, ( button_click ) ],
+			["40",7100000,  ( button_click ) ],
+			["30",10200000, ( button_click ) ],
+			["20",14200000, ( button_click ) ],
+			["17",18100000, ( button_click ) ],
+			["15",21200000, ( button_click ) ],
+			["10",29000000, ( button_click ) ]
+		] 3 3 new_button_box
 	;
-	
-	\ ========================================
-	\ Startup/terminate
-	
-	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
-	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
-	\ never seeing the notify.
-	\ We srtart the gen_server here in a separate startup task.
-	: startup_task
-		\ Create gen_server
-		"EVNT_TASK" gen_server_new
-		\ Tell it to do subscriptions
-		"EVNT_TASK" ' evnt_subscribe null msg!
-		\ Wait until told to close at EOD so refs are maintained
-		-1 sleep
-		"Startup task exiting..." log
-		0.1 sleep
-	;
-	
-	\ ========================================
-	\ Send periodic updates
-	: update_task
-		\ Send frequency updates
-		repeat
-			[10000000] t:name@ a:push null a:push UI_R1_FREQ publish drop
-			5 sleep
-		again
-	;
-	
+
 	\ ----------------------------------
-	\ onexit callback
-	: term_callback
-		\ Else messages get lost
-		false log-async
-		\ Terminate gen_server
-		"EVNT_TASK" gen_server_term
-		0.1 sleep
-		\ Terminate startup task
-		"startup_task" t:@ dup t:notify t:wait
-		\ Wait for tasks to go
-		wait_all
-		\ Messages flush
-		0.1 sleep
-	;
-	
-	\ ========================================
-	\ Test program entry point
+	\ Entry point 
+	\ Create a test window and add the button box
 	: app:main
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		\ Set exit handler
-		' term_callback onexit
-		\ A minimal window to hold our test component
-		{
-			"kind" : "win",
-			"title" : "SDRLibEConsole",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new
-		\ Create the test VFO
-		VFO-1 "0,0,300,50" vfo_new dup
-		\ Add to the window
-		rot swap g:+child	
-		\ Initialise
-		1 pick vfo_init
-		vfo_subscribe
-		\ Start a periodic update task to publish frequency
-		1 sleep
-		' update_task t:task "update_task" t:!	
-		\ Cleanup and save the window ref
-		drop "win" t:! drop
-		\ Enter event loop
+
+			\ A minimal window to hold our test component
+			{
+				"kind" : "win",
+				"title" : "ButtonBox",
+				"visible" : true,
+				"ontop" : false,
+				"bg" : "gray10",
+				"resize-corner" : 20,
+				"wide" : 400,
+				"high" : 200,
+				"top" : 100,
+				"left" : 100,
+				"children" : []
+			} g:new dup "win" t:!
+			\ Create the test button box
+			make_component
+			\ Add to the window
+			g:+child	 
 	;
 #then
