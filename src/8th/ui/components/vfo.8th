@@ -792,7 +792,7 @@ vfo_test @ #if
 		\ A minimal window to hold our test component
 		{
 			"kind" : "win",
-			"title" : "SDRLibEConsole",
+			"title" : "VFO Component Test",
 			"visible" : true,
 			"ontop" : false,
 			"bg" : "gray10",

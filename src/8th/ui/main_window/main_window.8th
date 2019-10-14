@@ -29,7 +29,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, main_window_test
+false var, main_window_test
 
 \ ----------------------------------
 main_window_test @ #if
@@ -45,6 +45,7 @@ main_window_test @ #if
 	"../components/buttons.8th" f:include
 	"../components/vfo.8th" f:include
 	"../fragments/main_control.8th" f:include
+	"../fragments/vfo_1.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -57,8 +58,11 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 
-: main_window
-	\ A minimal window to hold our component
+\ ----------------------------------
+\ Create main window and position fragments
+\ -- main-gui
+: main_window	SED: -- g
+	\ A minimal window to hold our test component
 	{
 		"kind" : "win",
 		"title" : "SDRLibEConsole",
@@ -71,17 +75,15 @@ with: fr.ps
 		"top" : 100,
 		"left" : 100,
 		"children" : []
-	} g:new
-	\ Create the test VFO
-	VFO-1 "0,51,300,50" vfo_new dup
+	} g:new dup "win" t:!
+	\ Create the vfo
+	"0,30,300,80" vfo_1_new
 	\ Add to the window
-	rot swap g:+child	
-	\ Initialise
-	1 pick vfo_init
-	vfo_subscribe nip drop nip
-	"0,0,100,50" new_mc_control g:+child
-	\ Cleanup and save the window ref
-	"win" t:! drop
+	"win" t:@ swap g:+child
+	\ Create main control
+	"0,0,100,30" mc_new
+	\ Add to window
+	g:+child drop
 ;
 
 \ ===============================================================================
@@ -94,23 +96,26 @@ ns: user
 \ ===============================================================================
 
 main_window_test @ #if
-
-	\ Pull in the namespaces
 	with: sdr
 	with: fr.gs
 	with: fr.ps
-	
+
 	true app:isgui !
+	4 json-pretty
+	
+	\ This is the main window with test code to simulate the rest of the system that interact
+	\ with the main window components.
+	\ See Fragments for more explanation of each fragment interaction.
 	
 	\ ========================================
 	\ These are gen_server words for the EVNT_TASK gen_server
-	
+
 	\ ----------------------------------
 	\ Called by published frequency changes
 	: evnt_freq
-		a:pop nip log
+		0 a:@ nip log
 	;
-	
+
 	\ ----------------------------------
 	\ Called from a gen_server message to subscribe to the frequency change
 	: evnt_subscribe
@@ -119,11 +124,11 @@ main_window_test @ #if
 	
 	\ ========================================
 	\ Startup/terminate
-	
+
 	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
 	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
 	\ never seeing the notify.
-	\ We srtart the gen_server here in a separate startup task.
+	\ We srart the gen_server here in a separate startup task.
 	: startup_task
 		\ Create gen_server
 		"EVNT_TASK" gen_server_new
@@ -152,36 +157,26 @@ main_window_test @ #if
 	;
 	
 	\ ========================================
-	\ Test program entry point
-	: app:main
+	\ Send periodic updates
+	: update_task
+		\ Send frequency updates
+		repeat
+			5 sleep
+			[10000000] t:name@ a:push null a:push UI_R1_FREQ publish drop
+		again
+	;
 	
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		\ Set exit handler
-		' term_callback onexit
-		\ A minimal window to hold our test component
-		{
-			"kind" : "win",
-			"title" : "SDRLibEConsole",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new
-		\ Create the test VFO
-		"radio-1" "0,0,300,50" vfo_new dup
-		\ Add to the window
-		rot swap g:+child	
-		\ Initialise
-		1 pick vfo_init
-		vfo_subscribe
-		\ Cleanup and save the window ref
-		drop "win" t:! drop
-		\ Enter event loop
+	\ ----------------------------------
+	\ Entry point 
+	\ Create a test window and add the button box
+	: app:main
+			\ Create startup task and keep reference
+			' startup_task t:task "startup_task" t:!
+			\ Set exit handler
+			' term_callback onexit
+			\ Create window
+			main_window
+			\ VFO update task
+			' update_task t:task "update_task" t:!
 	;
 #then

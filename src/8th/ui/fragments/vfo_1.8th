@@ -31,7 +31,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, vfo_1_test
+false var, vfo_1_test
 
 \ ----------------------------------
 vfo_1_test @ #if
@@ -249,6 +249,7 @@ vfo_1_test @ #if
 			"0,0,300,50" vfo_1_new
 			\ Add to the window
 			"win" t:@ swap g:+child
+			\ VFO update task
 			' update_task t:task "update_task" t:!
 	;
 #then

@@ -87,7 +87,7 @@ with: fr.ps
 
 \ New button box according to spec
 \ bounds -- main-control-gui
-: new_mc_control	SED: s -- g
+: mc_new	SED: s -- g
 	\ Pop in the bounds
 	mc_button_spec "bounds" rot m:!
 	new_button_box
@@ -118,7 +118,7 @@ main_control_test @ #if
 			\ A minimal window to hold our test component
 			{
 				"kind" : "win",
-				"title" : "ButtonBox",
+				"title" : "Main Control Test",
 				"visible" : true,
 				"ontop" : false,
 				"bg" : "gray10",
@@ -130,7 +130,7 @@ main_control_test @ #if
 				"children" : []
 			} g:new dup "win" t:!
 			\ Create the test button box
-			"0,0,200,100" new_mc_control
+			"0,0,200,100" mc_new
 			\ Add to the window
 			"win" t:@ swap g:+child	 
 	;
