@@ -41,7 +41,9 @@ main_window_test @ #if
 	"../../common/ps_events.8th" f:include
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
-	"../components/vfo/vfo.8th" f:include
+	"../common/g_cache.8th" f:include
+	"../components/buttons.8th" f:include
+	"../components/vfo.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -70,15 +72,20 @@ with: fr.ps
 		"children" : []
 	} g:new
 	\ Create the test VFO
-	VFO-1 "0,0,300,50" vfo_new dup
+	VFO-1 "0,51,300,50" vfo_new dup
 	\ Add to the window
 	rot swap g:+child	
 	\ Initialise
 	1 pick vfo_init
-	vfo_subscribe
+	vfo_subscribe nip drop nip
+	"0,0,100,50" new_mc_control g:+child
 	\ Cleanup and save the window ref
-	drop "win" t:! drop
+	"win" t:! drop
 ;
+
+\ ===============================================================================
+\ Restore namespace	
+ns: user	
 
 \ ===============================================================================
 \ ===============================================================================
@@ -91,6 +98,7 @@ main_window_test @ #if
 	with: sdr
 	with: fr.gs
 	with: fr.ps
+	
 	true app:isgui !
 	
 	\ ========================================

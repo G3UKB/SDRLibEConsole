@@ -817,6 +817,7 @@ vfo_test @ #if
 	with: sdr
 	with: fr.gs
 	with: fr.ps
+	
 	true app:isgui !
 	
 	\ ========================================

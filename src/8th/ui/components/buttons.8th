@@ -99,7 +99,7 @@ with: fr.ps
 \ Get item from spec map
 \ button-spec item -- item
 : __store_item_to_panel SED: item key --
-	button_panel @ swap rot m:! nip
+	button_panel @ swap rot m:! drop
 ;
 
 \ ===============================================================================
@@ -116,9 +116,9 @@ with: fr.ps
 	\ Add attributes to panel
 	>r
 	m:new
-	"rows" r@ "rows" __get_item_from_spec m:! 
+	"rows" r@ "rows" __get_item_from_spec m:!
 	"cols" r@ "cols" __get_item_from_spec m:! 
-	"grid" __store_item_to_panel	
+	"grid" __store_item_to_panel
 	r@ "id" __get_item_from_spec "id" __store_item_to_panel
 	r@ "bounds" __get_item_from_spec "bounds" __store_item_to_panel
 	
@@ -126,8 +126,12 @@ with: fr.ps
 	r@ "spec" __get_item_from_spec __make_children "children" __store_item_to_panel
 	\ Make it a new gui panel
 	button_panel @ const g:new
-	dup r> "id" __get_item_from_spec swap g_cache_add nip
+	dup r> "id" __get_item_from_spec swap g_cache_add
 ;
+
+\ ===============================================================================
+\ Restore namespace	
+ns: user	
 
 \ ===============================================================================
 \ ===============================================================================
@@ -135,6 +139,11 @@ with: fr.ps
 \ ===============================================================================
 
 buttons_test @ #if
+	with: sdr
+	with: fr.gs
+	with: fr.ps
+	
+	true app:isgui !
 	4 json-pretty
 
 	\ ----------------------------------
