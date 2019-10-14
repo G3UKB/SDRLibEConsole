@@ -38,12 +38,11 @@ vfo_test @ #if
 	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
 	"../../common/app_defs.8th" f:include
 	"../../common/radio_defs.8th" f:include
-	"../../common/ps_events.8th" f:include
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
-	needs debug/sed
-	true SED-CHECK
+	\ needs debug/sed
+	\ true SED-CHECK
 	\ needs debug/trace
 	\ dbg:line-info
 #then
@@ -83,7 +82,7 @@ with: fr.ps
 {
   "kind" : "VFO",
   \ Additional state
-  "freq" : 0000000,
+  "freq" : 1000000,
   "low-limit" : 100000,
   "high-limit" : 500000000,
   "digits" : [],
@@ -302,10 +301,10 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Publish frequency update
-\ freq-in-hz -- 
-: publish_freq SED: n --
+\ freq-in-hz vfo-gui -- 
+: publish_freq SED: n g --
 	\ Set null callback word as no response required.
-	a:new swap a:push null +sender SYS_R1_FREQ publish drop
+	"callback" g:m@ nip w:exec
 ;
 
 \ ----------------------------------
@@ -323,7 +322,7 @@ vfo_separator @ g:+kind
 	-rot										\ increment(Hz) gui parent new-freq parent "freq" new-freq
 	g:m!										\ increment(Hz) gui parent new-freq parent
 	drop swap								\ increment(Hz) gui new-freq parent
-	drop publish_freq	 			\ 
+	publish_freq	 					\ 
 ;
 
 \ ========================================
@@ -333,9 +332,9 @@ vfo_separator @ g:+kind
 \ Increment/decrement the value
 \ gui value increment(MHz) -- value increment(MHz) gui
 : do_inc	SED: g n n -- n n g 										
-	rot 										\ gui value increment(MHz) -- value increment(MHz) gui 
+	rot 									\ gui value increment(MHz) -- value increment(MHz) gui 
 	g:invalidate
-	update_freq_value				\ value increment(MHz) gui -- value increment(MHz) gui
+	update_freq_value			\ value increment(MHz) gui -- value increment(MHz) gui
 ;
 
 \ ----------------------------------
@@ -431,7 +430,7 @@ vfo_separator @ g:+kind
 \ Update entry point
 \ Updates the stored frequency and the visual representation
 \ Called from mouse wheel events
-\	gui value increment(MHz) -- value increment(MHz) gui
+\	gui value increment(Hz) -- value increment(Hz) gui
 : update_freq	SED: g n n -- n n g
 	\ Value is the digit value which can be +ve or -ve
 	\ Increment is the increment value of the digit i.e. 100MHz
@@ -739,53 +738,22 @@ vfo_separator @ g:+kind
 ;
 
 \ ============================================================================
-\ Events
-
-\ ----------------------------------
-\ Get frequency from event data
-\ {"cb" w, "data" [data, sender, w|null] -- freq-in-hz
-: __data_get_freq	SED: m -- n
-	"data" m:@ nip 0 a:@ nip
-;
-
-\ ----------------------------------
-\ Get gui ref for this VFO
-\ gui-name -- gui
-: __vfo_gui_ref	SED: s -- g
-	g_cache_get
-;
-
-\ ----------------------------------
-\ Update frequency in the VFO gui object
-\ freq vfo-gui -- vfo-gui
-: __update_gui_map	SED: n g -- g
-	"freq" rot g:m!
-;
-
-\ ----------------------------------
-\ Update radio 1 frequency
-\ {"cb" w, "data" [data, sender, w|null] -- 
-: vfo_r1_freq	SED: m -- 
-	__data_get_freq
-	VFO-1 __vfo_gui_ref
-	__update_gui_map
-	__reset_all_digits
-	g:invalidate drop
-;
-	
-
-\ ============================================================================
 \ Initialisation
 
 \ ----------------------------------
 \ Create a VFO
-\ id bounds -- new-vfo-gui
-: vfo_new	SED: s s -- g										
-	vfo_panel @ G:clone nip		\ id bounds vfo-clone
-	"id" 3 pick m:!
-	"name" 3 pick m:!
-	"bounds" 2 pick m:!
-	nip g:new dup 2 pick swap g_cache_add nip
+\ id bounds callback -- new-vfo-gui
+: vfo_new	SED: s s w -- g										
+	vfo_panel @ G:clone nip 	\ id bounds callback vfo-clone
+	\ Populate panel with additional info
+	"id" 4 pick m:!
+	"name" 4 pick m:!
+	"bounds" 3 pick m:!
+	"callback" 2 pick m:!
+	nip nip 	\ id vfo-clone
+	g:new dup
+	\ Add to gui cache
+	rot swap g_cache_add
 ;
 
 \ ----------------------------------
@@ -794,12 +762,6 @@ vfo_separator @ g:+kind
 : vfo_init	SED: g -- g
   __enumerate_digits
   __reset_all_digits
-;
-
-\ Subscribe to events
-\  --
-: vfo_subscribe	SED:  --
-	 t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
 ;
 
 \ ===============================================================================
@@ -815,77 +777,18 @@ vfo_test @ #if
 
 	\ Pull in the namespaces
 	with: sdr
-	with: fr.gs
-	with: fr.ps
 	
+	4 json-pretty
 	true app:isgui !
 	
-	\ ========================================
-	\ These are gen_server words for the EVNT_TASK gen_server
-	
-	\ ----------------------------------
-	\ Called by published frequency changes
-	: evnt_freq
-		0 a:@ nip log
-	;
-	
-	\ ----------------------------------
-	\ Called from a gen_server message to subscribe to the frequency change
-	: evnt_subscribe
-		t:name@ ' evnt_freq SYS_R1_FREQ subscribe
-	;
-	
-	\ ========================================
-	\ Startup/terminate
-	
-	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
-	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
-	\ never seeing the notify.
-	\ We srtart the gen_server here in a separate startup task.
-	: startup_task
-		\ Create gen_server
-		"EVNT_TASK" gen_server_new
-		\ Tell it to do subscriptions
-		"EVNT_TASK" ' evnt_subscribe null msg!
-		\ Wait until told to close at EOD so refs are maintained
-		-1 sleep
-		"Startup task exiting..." log
-		0.1 sleep
-	;
-	
-	\ ========================================
-	\ Send periodic updates
-	: update_task
-		\ Send frequency updates
-		repeat
-			[10000000] t:name@ a:push null a:push UI_R1_FREQ publish drop
-			5 sleep
-		again
-	;
-	
-	\ ----------------------------------
-	\ onexit callback
-	: term_callback
-		\ Else messages get lost
-		false log-async
-		\ Terminate gen_server
-		"EVNT_TASK" gen_server_term
-		0.1 sleep
-		\ Terminate startup task
-		"startup_task" t:@ dup t:notify t:wait
-		\ Wait for tasks to go
-		wait_all
-		\ Messages flush
-		0.1 sleep
+	\ Callback for publishing frequency
+	: callback
+		. cr
 	;
 	
 	\ ========================================
 	\ Test program entry point
 	: app:main
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		\ Set exit handler
-		' term_callback onexit
 		\ A minimal window to hold our test component
 		{
 			"kind" : "win",
@@ -901,15 +804,11 @@ vfo_test @ #if
 			"children" : []
 		} g:new
 		\ Create the test VFO
-		VFO-1 "0,0,300,50" vfo_new dup
+		VFO-1 "0,0,300,50" ' callback vfo_new dup
 		\ Add to the window
 		rot swap g:+child	
 		\ Initialise
 		1 pick vfo_init
-		vfo_subscribe
-		\ Start a periodic update task to publish frequency
-		1 sleep
-		' update_task t:task "update_task" t:!	
 		\ Cleanup and save the window ref
 		drop "win" t:! drop
 		\ Enter event loop

@@ -57,14 +57,14 @@ ns: sdr
 
 \ ----------------------------------
 \ Add to cache
-\ name g --
+\ task-name g --
 : g_cache_add	SED: s * --
 	g_cache @ -rot m:! drop
 ;
 
 \ ----------------------------------
 \ Retrieve from cache
-\ name -- g
+\ task-name -- g
 : g_cache_get SED: s -- *
 	g_cache @ 1 pick m:exists? if
 		swap m:@ nip

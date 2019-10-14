@@ -21,8 +21,10 @@
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
      
-  This component can be multi-instanced to provide an array of buttons in a 
-  container with given layout matrix.
+  Fragment - a UI fragment is a composable component that can be arranged into
+	a window for rendering. The fragment itself may use a generic component part
+	such as a vfo or button box. The fragment is responsible for interactions with 
+  the rest of the system by sending and receiving events.
 *)
 
 needs stack/3drop
