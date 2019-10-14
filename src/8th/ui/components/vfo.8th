@@ -42,8 +42,8 @@ vfo_test @ #if
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
+	needs debug/sed
+	true SED-CHECK
 	\ needs debug/trace
 	\ dbg:line-info
 #then
@@ -268,7 +268,7 @@ vfo_separator @ g:+kind
 \ array-children ix freq-digit -- array-children
 \ Set a single digit in the array
 \ array-children ix freq-digit -- array-children
-: __set_digit	SED: a n n -- a 
+: __set_digit	SED: a n s -- a 
 	\ Set the freq-digit in array-children[ix]
 	-rot 								\ freq-digit array-children ix 
 	a:@ 								\ freq-digit array-children child-digit-ob 
@@ -305,7 +305,7 @@ vfo_separator @ g:+kind
 \ freq-in-hz -- 
 : publish_freq SED: n --
 	\ Set null callback word as no response required.
-	a:new swap a:push null +sender SYS_R1_FREQ publish
+	a:new swap a:push null +sender SYS_R1_FREQ publish drop
 ;
 
 \ ----------------------------------
@@ -743,34 +743,34 @@ vfo_separator @ g:+kind
 
 \ ----------------------------------
 \ Get frequency from event data
-\ {"cb" w, "data" [data, sender, w|null] --
-: __data_get_freq	SED: m --
+\ {"cb" w, "data" [data, sender, w|null] -- freq-in-hz
+: __data_get_freq	SED: m -- n
 	"data" m:@ nip 0 a:@ nip
 ;
 
 \ ----------------------------------
 \ Get gui ref for this VFO
-\ gui-name --
-: __vfo_gui_ref	SED: s --
+\ gui-name -- gui
+: __vfo_gui_ref	SED: s -- g
 	g_cache_get
 ;
 
 \ ----------------------------------
 \ Update frequency in the VFO gui object
-\ freq vfo-gui --
-: __update_gui_map	SED: n g --
+\ freq vfo-gui -- vfo-gui
+: __update_gui_map	SED: n g -- g
 	"freq" rot g:m!
 ;
 
 \ ----------------------------------
 \ Update radio 1 frequency
-\ {"cb" w, "data" [data, sender, w|null] --
-: vfo_r1_freq	SED: m --
+\ {"cb" w, "data" [data, sender, w|null] -- 
+: vfo_r1_freq	SED: m -- 
 	__data_get_freq
 	VFO-1 __vfo_gui_ref
 	__update_gui_map
 	__reset_all_digits
-	g:invalidate
+	g:invalidate drop
 ;
 	
 
@@ -797,8 +797,8 @@ vfo_separator @ g:+kind
 ;
 
 \ Subscribe to events
-\ task-name --
-: vfo_subscribe	SED: s  --
+\  --
+: vfo_subscribe	SED:  --
 	 t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
 ;
 

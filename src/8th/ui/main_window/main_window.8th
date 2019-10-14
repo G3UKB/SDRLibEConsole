@@ -29,7 +29,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, main_window_test
+true var, main_window_test
 
 \ ----------------------------------
 main_window_test @ #if
@@ -44,6 +44,7 @@ main_window_test @ #if
 	"../common/g_cache.8th" f:include
 	"../components/buttons.8th" f:include
 	"../components/vfo.8th" f:include
+	"../fragments/main_control.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace

@@ -96,9 +96,9 @@ with: fr.ps
 ;
 
 \ ----------------------------------
-\ Get item from spec map
-\ button-spec item -- item
-: __store_item_to_panel SED: item key --
+\ Store item to button_panel
+\ button-spec-item item-name -- 
+: __store_item_to_panel SED: * s --
 	button_panel @ swap rot m:! drop
 ;
 
