@@ -155,15 +155,15 @@ buttons_test @ #if
 			"rows" : 3, 
 			"cols" : 3,
 			"spec" : [
-				["160",1900000, ( button_click ) ],
-				["80",3700000, ( button_click ) ],
-				["60",5276000, ( button_click ) ],
-				["40",7100000,  ( button_click ) ],
-				["30",10200000, ( button_click ) ],
-				["20",14200000, ( button_click ) ],
-				["17",18100000, ( button_click ) ],
-				["15",21200000, ( button_click ) ],
-				["10",29000000, ( button_click ) ]
+				["160", 1900000, ' button_click ],
+				["80", 3700000, ' button_click ],
+				["60", 5276000, ' button_click ],
+				["40", 7100000, ' button_click ],
+				["30", 10200000, ' button_click ],
+				["20", 14200000, ' button_click ],
+				["17", 18100000, ' button_click ],
+				["15", 21200000, ' button_click ],
+				["10", 29000000, ' button_click ]
 			] 
 		} new_button_box
 	;

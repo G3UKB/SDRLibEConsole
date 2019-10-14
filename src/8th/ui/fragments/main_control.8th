@@ -1,0 +1,126 @@
+(*
+	main_control.8th
+ 
+  Main buttons for radio control
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This component can be multi-instanced to provide an array of buttons in a 
+  container with given layout matrix.
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+false var, main_control_test
+
+\ ----------------------------------
+main_control_test @ #if
+	\ Includes
+	"../common/g_cache.8th" f:include
+	"../components/buttons.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+
+\ ========================================
+\ Events
+\ All buttons click in group
+\ gui -- gui
+: mc_button_click	SED: g -- g
+	"user-data" g:m@ . cr
+;
+
+\ ========================================
+\ Helpers
+: mc_button_spec	SED: -- g
+	{
+		"id" : "BB-MAIN",
+		"rows" : 1, 
+		"cols" : 2,
+		"spec" : [
+			["Start", "start", ' mc_button_click ],
+			["Stop", "stop", ' mc_button_click ]
+		] 
+	}
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ New button box according to spec
+\ bounds -- main-control-gui
+: new_mc_control	SED: s -- g
+	\ Pop in the bounds
+	mc_button_spec "bounds" rot m:!
+	new_button_box
+;
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+main_control_test @ #if
+	4 json-pretty
+	
+	\ ----------------------------------
+	\ Entry point 
+	\ Create a test window and add the button box
+	: app:main
+
+			\ A minimal window to hold our test component
+			{
+				"kind" : "win",
+				"title" : "ButtonBox",
+				"visible" : true,
+				"ontop" : false,
+				"bg" : "gray10",
+				"resize-corner" : 20,
+				"wide" : 400,
+				"high" : 200,
+				"top" : 100,
+				"left" : 100,
+				"children" : []
+			} g:new dup "win" t:!
+			\ Create the test button box
+			"0,0,200,100" new_mc_control
+			\ Add to the window
+			"win" t:@ swap g:+child	 
+	;
+#then
