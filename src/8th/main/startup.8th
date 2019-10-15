@@ -77,7 +77,17 @@ with: fr.sm
 \ ----------------------------------
 \ Radio startup
 : startup_radio	SED: * --
-	drop rm_default_startup
+	drop
+	SEQUENCER_TASK gen_server_new
+	RESPONDER_TASK gen_server_new
+
+	\ Run the startup sequence in background
+	\ Flags wil be set in run_state
+	SEQUENCER_TASK ' rm_start_sequence null msg!
+	1 sleep
+	SEQUENCER_TASK ' rm_start_radio null msg!
+	1 sleep
+	rst_status
 ;
 
 \ ===============================================================================

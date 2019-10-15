@@ -123,6 +123,15 @@ ns: sdr
 ; 
 
 \ ========================================
+\ Status
+: rst_status	SED: --
+	rst_server@ if "Server: running" log else "Server: stopped" log then
+	rst_online@ if "Radio: discovered" log else "Radio: not found" log then
+	rst_audio@ if "Audio: set" log else "Audio: not set" log then
+	rst_running@ if "Radio: running" log else "Radio: stopped" log then
+;		
+
+\ ========================================
 \ Reset namespace
 ns: user
 

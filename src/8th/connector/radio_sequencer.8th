@@ -1,5 +1,5 @@
 (* 
-	radio_manager.8th
+	radio_sequencer.8th
  
   Manage startup and radio start/stop
  
@@ -67,7 +67,7 @@ with: fr.ps
 \ Called on main thread to put up warning dialog when server is not found
 \ {w,msg} --
 : __rm_do_msg	SED: s --
-	\ "msg" m:@ nip
+	"msg" m:@ nip
 	{
 		"title" : "Radio Status",
 		"top" : 200,
@@ -87,7 +87,7 @@ with: fr.ps
 ;
 
 \ ========================================
-\ Response words
+\ Response handlers for sequencer task
 
 \ ----------------------------------
 \ Decode response
@@ -103,8 +103,7 @@ with: fr.ps
 		false rst_running!
 	else
 		\ Failed to stop radio
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to stop radio!" } g:do
-		"SDRLibEConnector failed to stop radio!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to stop radio!" } g:do
 		true rst_running!
 	then	
 ;
@@ -116,8 +115,7 @@ with: fr.ps
 		true rst_running!
 	else
 		\ Failed to start radio
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to start radio!" } g:do
-		 "SDRLibEConnector failed to start radio!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to start radio!" } g:do
 		false rst_running!
 	then	
 ;
@@ -129,8 +127,7 @@ with: fr.ps
 		true rst_server!
 	else
 		\ Failed to start server, we can still run but can't really do very much
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
-		"SDRLibEConnector failed to set default audio route!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
 		false rst_server!
 	then	
 ;
@@ -143,8 +140,7 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
-		"SDRLibEConnector failed to discover radio hardware!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
 		false rst_online!
 	then	
 ;
@@ -157,8 +153,7 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_discover [null] ' __rm_discover_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
-		"SDRLibEConnector failed to set default audio route!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
 		false rst_audio!
 	then	
 ;
@@ -171,15 +166,15 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector server is not running or cannot be contacted!" } g:do
-		"SDRLibEConnector server is not running or cannot be contacted!" __rm_do_msg
+		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector server is not running or cannot be contacted!" } g:do
 		false rst_server!
 	then	
 ;
 		
 \ ===============================================================================
-\ PUBLIC
-
+\ Message handlers for SEQUENCER task
+\ These words are called from the startup task or in real life the GUI as well
+\ 
 \ ----------------------------------
 \ Run the radio start sequence
 : rm_start_sequence	SED: --
@@ -213,23 +208,63 @@ ns: user
 \ Testing
 \ ===============================================================================
 radio_manager_test @ #if
-
 	with: sdr
 	with: fr.gs
-	with: fr.ps 
-	
+	with: fr.ps
+
 	true app:isgui !
 	4 json-pretty
 	
+	\ Runs like the startup process
 	
-	: reg_task
-		\ Must register REPL in the task repos to be able to reply
-		t:curtask t:name@ reg!
-		\ Set q to null on empty
-		t:getq false q:throwing \ do not drop q else crashes
+	\ ========================================
+	\ Startup/terminate
+
+	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
+	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
+	\ never seeing the notify.
+	\ We srart the gen_server here in a separate startup task.
+	: startup_task
+	
+		\ Create gen_servers
+		conn_init
+		SEQUENCER_TASK gen_server_new
+		RESPONDER_TASK gen_server_new
+		
+		\ Run the startup sequence in background
+		\ Flags wil be set in run_state
+		SEQUENCER_TASK ' rm_start_sequence null msg!
+		1 sleep
+		SEQUENCER_TASK ' rm_start_radio null msg!
+		1 sleep
+		rst_status
+		\ Wait until told to close at EOD so refs are maintained
+		-1 sleep
+		"Startup task exiting..." log
+		0.1 sleep
 	;
 	
-	: run_test
+	\ ----------------------------------
+	\ onexit callback
+	: term_callback
+		\ Else messages get lost
+		false log-async
+		\ Terminate gen_server
+		RESPONDER_TASK gen_server_term
+		SEQUENCER_TASK gen_server_term
+		conn_term
+		0.1 sleep
+		\ Terminate startup task
+		"startup_task" t:@ dup t:notify t:wait
+		\ Wait for tasks to go
+		wait_all
+		\ Messages flush
+		0.1 sleep
+	;
+	
+	\ ----------------------------------
+	\ GUI as we need to raise a dialog
+	: main_window
 		\ A minimal window so we can raise dialog
 		{
 			"kind" : "win",
@@ -244,28 +279,17 @@ radio_manager_test @ #if
 			"left" : 100,
 			"children" : []
 		} g:new dup "win" t:!
-
-		reg_task
-		conn_init
-		1 sleep
-
-		rm_start_sequence
-		1 sleep
-		rst_server@ if
-			1 sleep
-			rst_online@ if
-				rm_start_radio
-				"Any key to stop radio" log
-				con:key
-				rm_stop_radio
-				1 sleep
-			then
-		then
-		conn_term
-		3 sleep
 	;
 	
-	run_test
-	bye
-	
+	\ ----------------------------------
+	\ Entry point 
+	\ Create a test window and add the button box
+	: app:main
+			\ Create startup task and keep reference
+			' startup_task t:task "startup_task" t:!
+			\ Set exit handler
+			' term_callback onexit
+			\ Create window
+			main_window
+	;
 #then
