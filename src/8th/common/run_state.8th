@@ -1,0 +1,168 @@
+(*
+	run_state.8th
+ 
+  Current run state for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This tracks state during startup to both synchronise the startup process 
+  and to put the application into the correct post-startup state according to 
+  the final startup state.
+  State is purely runtime so is not persisted.
+*)
+
+\ ========================================
+\ Testing only
+true var, runstate_test
+runstate_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
+\ ========================================
+\ Set namespace
+ns: sdr
+
+\ ========================================
+\ Main startup states
+{
+	"SERVER_RUNNING" : false ,
+	"RADIO_ONLINE" : false ,
+	"RADIO_RUNNING" : false ,
+	"AUDIO_CONFIGURED" : false ,
+	"STARTUP_SYS_EVENTS" : false ,
+	"STARTUP_UI_EVENTS" : false
+} var, run_state
+
+\ ========================================
+\ Multiple readers/writers so structure must be locked
+: run_state_lock@
+	run_state lock @ ;
+	
+: run_state_unlock
+	run_state unlock drop ;
+
+\ ========================================
+\ Get/Set words
+
+\ ----------------------------------	
+: rst_server@	SED: -- T
+	run_state_lock@ "SERVER_RUNNING" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_server!	SED: T  -- 
+	run_state_lock@ "SERVER_RUNNING" rot m:! drop run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_online@	SED: -- T
+	run_state_lock@ "RADIO_ONLINE" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_online!	SED: T  -- 
+	run_state_lock@ "RADIO_ONLINE" rot m:! drop run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_running@	SED: -- T
+	run_state_lock@ "RADIO_RUNNING" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_running!	SED: T  -- 
+	run_state_lock@ "RADIO_RUNNING" rot m:! drop run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_audio@	SED: -- T
+	run_state_lock@ "AUDIO_CONFIGURED" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_audio!	SED: T  -- 
+	run_state_lock@ "AUDIO_CONFIGURED" rot m:! drop run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_sys@	SED: -- T
+	run_state_lock@ "STARTUP_SYS_EVENTS" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_sys!	SED: T  -- 
+	run_state_lock@ "STARTUP_SYS_EVENTS" rot m:! drop run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_ui@	SED: -- T
+	run_state_lock@ "STARTUP_UI_EVENTS" m:@ nip run_state_unlock 
+; 
+
+\ ----------------------------------	
+: rst_ui!	SED: T  -- 
+	run_state_lock@ "STARTUP_UI_EVENTS" rot m:! drop run_state_unlock 
+; 
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+runstate_test @ #if
+	
+	: run_test
+		rst_server@ . cr
+		true rst_server!
+		rst_server@ . cr
+		
+		rst_online@ . cr
+		true rst_online!
+		rst_online@ . cr
+		
+		rst_running@ . cr
+		true rst_running!
+		rst_running@ . cr
+		
+		rst_audio@ . cr
+		true rst_audio!
+		rst_audio@ . cr
+		
+		rst_sys@ . cr
+		true rst_sys!
+		rst_sys@ . cr
+		
+		rst_ui@ . cr
+		true rst_ui!
+		rst_ui@ . cr
+	;
+	
+	(*
+	: run_tests
+		"***TEST***: " swap >s s:+ log
+		' run_test t:task
+	;
+	
+	' run_tests 1 50 loop
+ 	10 sleep
+ 	*)
+ 	run_test
+	bye
+#then

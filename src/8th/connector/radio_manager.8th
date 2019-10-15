@@ -37,11 +37,12 @@ ns: sdr
 \ ----------------------------------
 \ Dialog response
 : __rm_msg_resp	SED: g n --
+	\ Just hide the dialog
 	drop g:hide
 ;
 
 \ ----------------------------------
-\ Called on main thread to put up dialog
+\ Called on main thread to put up warning dialog
 : __rm_do_msg	SED: --
 	{
 		"title" : "Radio Status",
@@ -86,12 +87,20 @@ ns: sdr
 
 \ ----------------------------------
 \ Start server and radio with default audio
+: rm_connect?	SED: --
+	
+	\ See if we have a server or simulator running
+	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
+;
+
+\ ----------------------------------
+\ Start server and radio with default audio
 : rm_default_startup	SED: --
 	
 	\ See if we have a server or simulator running
 	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
 ;
-	
+
 \ ========================================
 \ Reset namespace
 ns: user
