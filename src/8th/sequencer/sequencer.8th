@@ -1,0 +1,108 @@
+(* 
+	sequencer.8th
+ 
+  Sequencer all startup and shutdown processes, maintains state and
+  provides other runtime commands.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Application startup is largely asynchronous as there are many tasks which
+  initialise and communicate via messages. As things have to happen the righ
+  order i.e Subscriptions before Publications the startup is synchronised.
+  
+  Sequencer is a gen-server task.
+  	
+*)
+
+\ Set namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+with: fr.sm
+
+\ ===============================================================================
+\ Message Handlers
+
+\ ----------------------------------
+\ Startup initialisation.
+: seq_init	SED: * --
+	\ in: 	none
+	\ out:	none
+	drop
+	
+	\ ----------------------------------
+	"Creating gen-server tasks..." log
+	
+	\ ----------------------------------
+	\ The connector task is our interface to the SDRLibE server.
+	\ Connector init and subscriptions
+	conn_init
+	conn_subscribe
+	
+	\ ----------------------------------
+	\ Models init only
+	radio_model_init
+	
+	\ ----------------------------------
+	\ Finished all we need to do, the gen-server will just wait for termination.
+	"Startup complete ..." log 
+;
+
+\ ----------------------------------
+\ Send model SYS events
+: seq_sys_events	SED: * --
+	drop radio_model_sys_events
+;
+
+\ ----------------------------------
+\ Send model UI events
+: seq_ui_events	SED: * --
+	drop radio_model_ui_events
+;
+
+\ ----------------------------------
+\ Radio startup
+: startup_radio	SED: * --
+	drop rm_default_startup
+;
+
+\ ===============================================================================
+\ Transient task run from app_main.
+\ The proxy starts the STARTUP_TASK as gen-servers cannot be started from the main
+\ thread as a GUI app prevents events on the main thread. 
+: startup_proxy	SED: --
+	\ Create the gen-server task
+	SEQUENCER_TASK gen_server_new
+	\ Now message it to perform the startup tasks
+	\ ToDo: Need better sync than sleeps here!
+	\ Main startup
+	SEQUENCER_TASK ' startup_init [null] msg!
+	\ Try to init and start radio before we send events
+	SEQUENCER_TASK ' startup_radio [null] msg!
+	\ SYS EVENTS
+	2 sleep
+	SEQUENCER_TASK ' startup_sys_events [null] msg!
+	2 sleep
+	\ UI EVENTS
+	SEQUENCER_TASK ' startup_ui_events [null] msg!
+;
+
+\ ========================================
+\ Reset namespace
+ns: user

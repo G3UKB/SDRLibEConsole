@@ -31,7 +31,7 @@ needs gui/msgdlg
 
 \ ========================================
 \ Testing only
-false var, radio_manager_test
+true var, radio_manager_test
 radio_manager_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
@@ -39,7 +39,8 @@ radio_manager_test @ #if
 	"../common/app_defs.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"../common/ps_events.8th" f:include
-	"connector" f:include
+	"../common/run_state.8th" f:include
+	"connector.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 #then
@@ -65,8 +66,8 @@ with: fr.ps
 \ ----------------------------------
 \ Called on main thread to put up warning dialog when server is not found
 \ {w,msg} --
-: __rm_do_msg	SED: m --
-	"msg" m:@ nip
+: __rm_do_msg	SED: s --
+	\ "msg" m:@ nip
 	{
 		"title" : "Radio Status",
 		"top" : 200,
@@ -76,7 +77,7 @@ with: fr.ps
 		"font" : "Arial 14",
 		"button-font" : "Arial 12",
 		"bg" : "gray",
-		"fg" : "red",
+		"fg" : "red"
 		\ "msg" : "SDRLibEConnector server is not running. Please start in order to use the radio"
 	}
 	"msg" rot m:!
@@ -102,7 +103,8 @@ with: fr.ps
 		false rst_running!
 	else
 		\ Failed to stop radio
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to stop radio!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to stop radio!" } g:do
+		"SDRLibEConnector failed to stop radio!" __rm_do_msg
 		true rst_running!
 	then	
 ;
@@ -114,7 +116,8 @@ with: fr.ps
 		true rst_running!
 	else
 		\ Failed to start radio
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to start radio!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to start radio!" } g:do
+		 "SDRLibEConnector failed to start radio!" __rm_do_msg
 		false rst_running!
 	then	
 ;
@@ -126,7 +129,8 @@ with: fr.ps
 		true rst_server!
 	else
 		\ Failed to start server, we can still run but can't really do very much
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		"SDRLibEConnector failed to set default audio route!" __rm_do_msg
 		false rst_server!
 	then	
 ;
@@ -139,7 +143,8 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
+		"SDRLibEConnector failed to discover radio hardware!" __rm_do_msg
 		false rst_online!
 	then	
 ;
@@ -152,7 +157,8 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_discover [null] ' __rm_discover_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		"SDRLibEConnector failed to set default audio route!" __rm_do_msg
 		false rst_audio!
 	then	
 ;
@@ -165,7 +171,8 @@ with: fr.ps
 		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
-		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector server is not running!" } g:do
+		\ { "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector server is not running or cannot be contacted!" } g:do
+		"SDRLibEConnector server is not running or cannot be contacted!" __rm_do_msg
 		false rst_server!
 	then	
 ;
@@ -205,18 +212,60 @@ ns: user
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
-runstate_test @ #if
+radio_manager_test @ #if
 
 	with: sdr
 	with: fr.gs
 	with: fr.ps 
 	
-	rm_start_sequence
-	5 sleep
-	rm_start_radio
-	5 sleep
-	rm_stop_radio
-	1 sleep
+	true app:isgui !
+	4 json-pretty
+	
+	
+	: reg_task
+		\ Must register REPL in the task repos to be able to reply
+		t:curtask t:name@ reg!
+		\ Set q to null on empty
+		t:getq false q:throwing \ do not drop q else crashes
+	;
+	
+	: run_test
+		\ A minimal window so we can raise dialog
+		{
+			"kind" : "win",
+			"title" : "SDRLibEConsole",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new dup "win" t:!
+
+		reg_task
+		conn_init
+		1 sleep
+
+		rm_start_sequence
+		1 sleep
+		rst_server@ if
+			1 sleep
+			rst_online@ if
+				rm_start_radio
+				"Any key to stop radio" log
+				con:key
+				rm_stop_radio
+				1 sleep
+			then
+		then
+		conn_term
+		3 sleep
+	;
+	
+	run_test
 	bye
 	
 #then

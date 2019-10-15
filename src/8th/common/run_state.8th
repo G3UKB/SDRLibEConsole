@@ -65,7 +65,7 @@ ns: sdr
 \ ----------------------------------	
 : rst_server@	SED: -- T
 	run_state_lock@ "SERVER_RUNNING" m:@ nip run_state_unlock 
-; 
+;
 
 \ ----------------------------------	
 : rst_server!	SED: T  -- 
@@ -122,11 +122,16 @@ ns: sdr
 	run_state_lock@ "STARTUP_UI_EVENTS" rot m:! drop run_state_unlock 
 ; 
 
+\ ========================================
+\ Reset namespace
+ns: user
+
 \ ===============================================================================
 \ ===============================================================================
 \ Testing
 \ ===============================================================================
 runstate_test @ #if
+	with: sdr
 	
 	: set_false
 		false rst_server!
