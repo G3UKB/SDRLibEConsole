@@ -28,11 +28,32 @@
 
 needs gui/msgdlg
 \ true dbg:line-info
+
+\ ========================================
+\ Testing only
+false var, radio_manager_test
+radio_manager_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../common/app_defs.8th" f:include
+	"../common/radio_defs.8th" f:include
+	"../common/ps_events.8th" f:include
+	"connector" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
 \ Set namespace
 ns: sdr
+with: fr.gs
+with: fr.ps
 
 \ ===============================================================================
 \ PRIVATE
+
+\ ========================================
+\ User messages
 
 \ ----------------------------------
 \ Dialog response
@@ -42,8 +63,10 @@ ns: sdr
 ;
 
 \ ----------------------------------
-\ Called on main thread to put up warning dialog
-: __rm_do_msg	SED: --
+\ Called on main thread to put up warning dialog when server is not found
+\ {w,msg} --
+: __rm_do_msg	SED: m --
+	"msg" m:@ nip
 	{
 		"title" : "Radio Status",
 		"top" : 200,
@@ -54,53 +77,146 @@ ns: sdr
 		"button-font" : "Arial 12",
 		"bg" : "gray",
 		"fg" : "red",
-		"msg" : "SDRLibEConnector server is not running. Please start in order to use the radio"
+		\ "msg" : "SDRLibEConnector server is not running. Please start in order to use the radio"
 	}
+	"msg" rot m:!
 	"parent"  "win" t:@ m:!
 	"cb" ' __rm_msg_resp m:!
 	g:msgdlg	
 ;
 
+\ ========================================
+\ Response words
+
 \ ----------------------------------
-\ Helper to dispatch message
-: __rm_sender	SED: s w * -- 
-	a:new swap a:push null +sender msg!
+\ Decode response
+\ response-map -- true(good)|false(bad)
+: __rm_decode_response	SED: m -- T
+	"resp" m:@ "ACK" s:= nip if true else false then
+;
+
+\ ----------------------------------
+\ Response from stop radio
+: __rm_stop_radio_response	SED: * --
+	__rm_decode_response if
+		false rst_running!
+	else
+		\ Failed to stop radio
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to stop radio!" } g:do
+		true rst_running!
+	then	
+;
+
+\ ----------------------------------
+\ Response from start radio
+: __rm_start_radio_response	SED: * --
+	__rm_decode_response if
+		true rst_running!
+	else
+		\ Failed to start radio
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to start radio!" } g:do
+		false rst_running!
+	then	
+;
+
+\ ----------------------------------
+\ Response from start server
+: __rm_server_response	SED: * --
+	__rm_decode_response if
+		true rst_server!
+	else
+		\ Failed to start server, we can still run but can't really do very much
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		false rst_server!
+	then	
+;
+
+\ ----------------------------------
+\ Response from radio discover
+: __rm_discover_response	SED: * --
+	__rm_decode_response if
+		true rst_online!
+		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg! response@
+	else
+		\ No server, we can still run but can't really do very much
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
+		false rst_online!
+	then	
+;
+
+\ ----------------------------------
+\ Response from set default audio route
+: __rm_route_response	SED: * --
+	__rm_decode_response if
+		true rst_audio!
+		CONNECTOR_TASK ' t_conn_discover [null] ' __rm_discover_response +sender msg! response@
+	else
+		\ No server, we can still run but can't really do very much
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
+		false rst_audio!
+	then	
 ;
 
 \ ----------------------------------
 \ Response from default startup
 : __rm_poll_response	SED: * --
-	"resp" m:@ "NAK" s:= nip if
-		\ No server, we can still run but can't really do very much
-		' __rm_do_msg g:do
+	__rm_decode_response if
+		true rst_server!
+		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg! response@
 	else
-		\ Startup minimal system
-		CONNECTOR_TASK ' t_conn_set_default_route null __rm_sender "Set default route" log
-		CONNECTOR_TASK ' t_conn_discover null __rm_sender "Discover" log
-		CONNECTOR_TASK ' t_conn_start_server null __rm_sender "Start server" log
-		CONNECTOR_TASK ' t_conn_start_radio 0 __rm_sender "Start radio" log
+		\ No server, we can still run but can't really do very much
+		{ "cb" : ' __rm_do_msg, "msg" : "SDRLibEConnector server is not running!" } g:do
+		false rst_server!
 	then	
 ;
-
+		
 \ ===============================================================================
 \ PUBLIC
 
 \ ----------------------------------
-\ Start server and radio with default audio
-: rm_connect?	SED: --
+\ Run the radio start sequence
+: rm_start_sequence	SED: --
 	
 	\ See if we have a server or simulator running
 	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
 ;
 
 \ ----------------------------------
-\ Start server and radio with default audio
-: rm_default_startup	SED: --
+\ Start radio
+: rm_start_radio	SED: --
 	
 	\ See if we have a server or simulator running
-	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
+	CONNECTOR_TASK ' t_conn_start_radio [null] ' __rm_start_radio_response +sender msg! response@
+;
+
+\ ----------------------------------
+\ Stop radio
+: rm_stop_radio	SED: --
+	
+	\ See if we have a server or simulator running
+	CONNECTOR_TASK ' t_conn_stop_radio [null] ' __rm_stop_radio_response +sender msg! response@
 ;
 
 \ ========================================
 \ Reset namespace
 ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+runstate_test @ #if
+
+	with: sdr
+	with: fr.gs
+	with: fr.ps 
+	
+	rm_start_sequence
+	5 sleep
+	rm_start_radio
+	5 sleep
+	rm_stop_radio
+	1 sleep
+	bye
+	
+#then

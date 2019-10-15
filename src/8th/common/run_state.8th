@@ -29,7 +29,7 @@
 
 \ ========================================
 \ Testing only
-true var, runstate_test
+false var, runstate_test
 runstate_test @ #if
 	\ Includes
 	\ needs debug/sed
@@ -128,41 +128,51 @@ ns: sdr
 \ ===============================================================================
 runstate_test @ #if
 	
-	: run_test
-		rst_server@ . cr
-		true rst_server!
-		rst_server@ . cr
-		
-		rst_online@ . cr
-		true rst_online!
-		rst_online@ . cr
-		
-		rst_running@ . cr
-		true rst_running!
-		rst_running@ . cr
-		
-		rst_audio@ . cr
-		true rst_audio!
-		rst_audio@ . cr
-		
-		rst_sys@ . cr
-		true rst_sys!
-		rst_sys@ . cr
-		
-		rst_ui@ . cr
-		true rst_ui!
-		rst_ui@ . cr
+	: set_false
+		false rst_server!
+		false rst_online!
+		false rst_running!
+		false rst_audio!
+		false rst_sys!
+		false rst_ui!
 	;
 	
-	(*
+	: set_true
+		true rst_server!
+		true rst_online!
+		true rst_running!
+		true rst_audio!
+		true rst_sys!
+		true rst_ui!
+	;
+	
+	: read
+		rst_server@ drop
+		rst_online@ drop
+		rst_running@ drop
+		rst_audio@ drop
+		rst_sys@ drop
+		rst_ui@ drop
+	;
+	
+	: read_print
+			rst_server@ log
+			rst_online@ log
+			rst_running@ log
+			rst_audio@ log
+			rst_sys@ log
+			rst_ui@ log
+	;
+	
 	: run_tests
 		"***TEST***: " swap >s s:+ log
-		' run_test t:task
+		' set_false t:task
+		' set_true t:task
+		' read t:task
+		' read_print t:task
 	;
 	
-	' run_tests 1 50 loop
- 	10 sleep
- 	*)
- 	run_test
+	' run_tests 1 500 loop
+ 	1 sleep
 	bye
 #then
