@@ -83,7 +83,7 @@ with: fr.ps
 		"children" : []
 	} g:new dup "win" t:!
 	\ Create the vfo
-	"0,30,300,80" vfo_1_new
+	"VFO-1" "0,30,300,80" vfo_frag_new
 	\ Add to the window
 	"win" t:@ swap g:+child
 	\ Create main control

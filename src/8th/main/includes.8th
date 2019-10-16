@@ -56,8 +56,8 @@
 "../ui/components/vfo.8th" f:include
 "../ui/components/buttons.8th" f:include
 \ Fragments
-"../ui/fragments/main_control.8th" f:include
-"../ui/fragments/vfo_1.8th" f:include
+"../ui/fragments/main_frag.8th" f:include
+"../ui/fragments/vfo_frag.8th" f:include
 \ Main window
 "../ui/main_window/main_window.8th" f:include
 
