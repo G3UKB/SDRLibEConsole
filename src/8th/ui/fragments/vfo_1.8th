@@ -31,7 +31,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, vfo_1_test
+true var, vfo_1_test
 
 \ ----------------------------------
 vfo_1_test @ #if
@@ -91,18 +91,44 @@ with: fr.ps
 ;
 
 \ ----------------------------------
-\ Update radio 1 frequency
-\ {"cb" w, "data" [data, sender, w|null]} -- 
-: vfo_r1_freq	SED: m -- 
-	__data_get_freq
-	VFO-1 __vfo_gui_ref
+\ Update radio frequency
+\ freq name --
+: vfo_tail	SED: n s --
+	__vfo_gui_ref
 	__update_gui_map
 	__reset_all_digits
 	g:invalidate drop
 ;
 
+\ {"cb" w, "data" [data, sender, w|null]} -- 
+: vfo_r1_freq	SED: m -- 
+	__data_get_freq
+	VFO-1 vfo_tail
+;
+: vfo_r2_freq	SED: m -- 
+	__data_get_freq
+	VFO-2 vfo_tail
+;
+: vfo_r3_freq	SED: m -- 
+	__data_get_freq
+	VFO-3 vfo_tail
+;
+
 \ ========================================
-\ Helpers
+\ Subscriptions
+
+\ ----------------------------------
+\ Subscribe to VFO-n events
+\  --
+: vfo_1_subscribe	SED:  --
+	 t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
+;
+: vfo_2_subscribe	SED:  --
+	 t:name@ ' vfo_r2_freq UI_R2_FREQ subscribe
+;
+: vfo_3_subscribe	SED:  --
+	 t:name@ ' vfo_r3_freq UI_R3_FREQ subscribe
+;
 
 \ ========================================
 \ Callbacks
@@ -114,28 +140,34 @@ with: fr.ps
 	\ Set null callback word as no response required.
 	a:new swap a:push null +sender SYS_R1_FREQ publish drop
 ;
+: vfo_2_publish SED: n --
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R2_FREQ publish drop
+;
+: vfo_3_publish SED: n --
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R3_FREQ publish drop
+;
 
 \ ===============================================================================
 \ PUBLIC
 \ ===============================================================================
 
 \ ----------------------------------
-\ Subscribe to VFO-1 events
-\  --
-: vfo_1_subscribe	SED:  --
-	 t:name@ ' vfo_r1_freq UI_R1_FREQ subscribe
-;
-
-\ ----------------------------------
 \ Create VFO for radio-1
-\ bounds -- vfo-1-gui
-: vfo_1_new	SED: s -- g
+\ name bounds -- vfo-1-gui
+: vfo_frag_new	SED: s s -- g
 	\ Create
-	VFO-1 swap ' vfo_1_publish vfo_new
+	swap dup	>r \ bounds name name
+	{ VFO-1: ' vfo_1_publish , VFO-2: ' vfo_2_publish , VFO-3: ' vfo_3_publish } 
+	r@ m:@ nip 
+	rot swap 	\ name bounds callback
+	vfo_new
 	\ Initialise
 	vfo_init
 	\ Subscribe
-	vfo_1_subscribe
+	{ VFO-1: ' vfo_1_subscribe , VFO-2: ' vfo_2_subscribe , VFO-3: ' vfo_3_subscribe } 
+	r@ m:@ nip w:exec
 ;
 
 \ ===============================================================================
@@ -246,7 +278,7 @@ vfo_1_test @ #if
 				"children" : []
 			} g:new dup "win" t:!
 			\ Create the vfo
-			"0,0,300,50" vfo_1_new
+			VFO-1 "0,0,300,50" vfo_frag_new
 			\ Add to the window
 			"win" t:@ swap g:+child
 			\ VFO update task

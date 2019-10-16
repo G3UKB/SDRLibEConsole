@@ -435,7 +435,7 @@ with: fr.ps
 	\ in: 	0: s - sender (task name, w)
 	\				1: T - true if start WBS
 	\ out: 	q: * - "Timeout" or response data
-	rot __conn_radio_start_msg false swap __con_do_exchange 
+	rot __conn_radio_start_msg false swap .s __con_do_exchange 
 ;
 	
 \ ----------------------------------

@@ -188,10 +188,10 @@ with: fr.ps
 
 \ ----------------------------------
 \ Start radio
-: rm_start_radio	SED: --
+: rm_start_radio	SED: n --
 	
 	\ See if we have a server or simulator running
-	CONNECTOR_TASK ' t_conn_start_radio [0] ' __rm_start_radio_response +sender msg! response@
+	CONNECTOR_TASK ' t_conn_start_radio rot ' __rm_start_radio_response +sender msg! response@
 ;
 
 \ ----------------------------------
