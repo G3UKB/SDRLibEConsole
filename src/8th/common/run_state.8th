@@ -43,6 +43,7 @@ ns: sdr
 \ ========================================
 \ Main startup states
 {
+	"SERVER_ONLINE" : false ,
 	"SERVER_RUNNING" : false ,
 	"RADIO_ONLINE" : false ,
 	"RADIO_RUNNING" : false ,
@@ -60,6 +61,16 @@ ns: sdr
 
 \ ========================================
 \ Get/Set words
+
+\ ----------------------------------	
+: rst_poll@	SED: -- T
+	run_state_lock@ "SERVER_POLL" m:@ nip run_state_unlock 
+;
+
+\ ----------------------------------	
+: rst_poll!	SED: T  -- 
+	run_state_lock@ "SERVER_POLL" rot m:! drop run_state_unlock 
+; 
 
 \ ----------------------------------	
 : rst_server@	SED: -- T
@@ -114,6 +125,7 @@ ns: sdr
 \ ========================================
 \ Status
 : rst_status	SED: --
+	rst_poll@ if "Server: poll" log else "Server: poll" log then
 	rst_server@ if "Server: running" log else "Server: stopped" log then
 	rst_online@ if "Radio: discovered" log else "Radio: not found" log then
 	rst_audio@ if "Audio: set" log else "Audio: not set" log then

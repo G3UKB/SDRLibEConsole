@@ -162,18 +162,18 @@ with: fr.ps
 \ Response from default startup
 : __rm_poll_response	SED: * --
 	__rm_decode_response if
-		true rst_server!
+		true rst_poll!
 		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg! response@
 	else
 		\ No server, we can still run but can't really do very much
 		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector server is not running or cannot be contacted!" } g:do
-		false rst_server!
+		false rst_poll!
 	then	
 ;
 		
 \ ===============================================================================
 \ Message handlers for SEQUENCER task
-\ These words are called from the startup task or in real life the GUI as well
+\ These words are called from the startup task and GUI
 \ 
 \ ========================================
 \ Main control

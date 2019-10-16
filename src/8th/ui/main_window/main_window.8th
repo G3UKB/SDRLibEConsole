@@ -61,7 +61,6 @@ with: fr.ps
 \ Called after first draw
 : __ui_initialised
 	true rst_ui!
-	"Done" log
 ;
 
 \ ----------------------------------

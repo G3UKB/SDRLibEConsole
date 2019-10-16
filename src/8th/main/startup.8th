@@ -98,18 +98,19 @@ with: fr.sm
 	__startup_wait_server if
 		\ Send the system events
 		radio_model_sys_events
-		\ Wait for the UI to initialise
-		__wait_ui if
-			\ Send the UI events
-			radio_model_ui_events
-		then
 	else
-		"No server, startup terminating!" log
+		"No server, configuration only!" log
 	then
 	
-	\ ----------------------------------
-	\ Finished all we can do, the gen-server will just wait for termination.
-	"Startup complete ..." log 
+	\ Wait for the UI to initialise
+	__startup_wait_ui if
+		\ Send the UI events
+		radio_model_ui_events
+	else
+		"UI failed to initialise, cannot continue!" throw
+	then
+	
+	"Startup task exiting..." log
 ;
 
 \ ===============================================================================
