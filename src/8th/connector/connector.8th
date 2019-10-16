@@ -416,7 +416,7 @@ with: fr.ps
 	a:open rot drop
 	\ in: 	0: s - sender (task name, w)
 	\ out: 	q: * - "Timeout" or response data
-	__conn_discover_msg false swap __con_do_exchange dup . cr
+	__conn_discover_msg false swap __con_do_exchange
 ;
 
 \ ----------------------------------
