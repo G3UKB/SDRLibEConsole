@@ -31,7 +31,7 @@ needs gui/msgdlg
 
 \ ========================================
 \ Testing only
-true var, radio_manager_test
+false var, radio_manager_test
 radio_manager_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
@@ -139,7 +139,7 @@ with: fr.ps
 		true rst_online!
 		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg! response@
 	else
-		\ No server, we can still run but can't really do very much
+		\ No radio hardware, we can still run but can't really do very much
 		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
 		false rst_online!
 	then	
@@ -175,6 +175,9 @@ with: fr.ps
 \ Message handlers for SEQUENCER task
 \ These words are called from the startup task or in real life the GUI as well
 \ 
+\ ========================================
+\ Main control
+
 \ ----------------------------------
 \ Run the radio start sequence
 : rm_start_sequence	SED: --
@@ -197,6 +200,31 @@ with: fr.ps
 	
 	\ See if we have a server or simulator running
 	CONNECTOR_TASK ' t_conn_stop_radio [null] ' __rm_stop_radio_response +sender msg! response@
+;
+
+\ ========================================
+\ Initialisation and termination
+
+\ ----------------------------------
+\ Module initialisation
+: sequencer_init	SED: --
+	\ in: 	none
+	\ out:	none
+	
+	\ Create the sequencer gen-server
+	SEQUENCER_TASK gen_server_new
+	\ Ask the sequencer to run startup sequence
+	SEQUENCER_TASK ' rm_start_sequence null msg!
+;
+
+\ ----------------------------------
+\ Module close
+: sequencer_term	SED: --
+	\ in: 	none
+	\ out:	none
+	\ Tidy close the connector
+	SEQUENCER_TASK gen_server_term
+	0.1 sleep
 ;
 
 \ ========================================
@@ -228,12 +256,7 @@ radio_manager_test @ #if
 	
 		\ Create gen_servers
 		conn_init
-		SEQUENCER_TASK gen_server_new
-		RESPONDER_TASK gen_server_new
-		
-		\ Run the startup sequence in background
-		\ Flags wil be set in run_state
-		SEQUENCER_TASK ' rm_start_sequence null msg!
+		sequencer_init
 		1 sleep
 		SEQUENCER_TASK ' rm_start_radio null msg!
 		1 sleep
@@ -250,8 +273,7 @@ radio_manager_test @ #if
 		\ Else messages get lost
 		false log-async
 		\ Terminate gen_server
-		RESPONDER_TASK gen_server_term
-		SEQUENCER_TASK gen_server_term
+		sequencer_term
 		conn_term
 		0.1 sleep
 		\ Terminate startup task

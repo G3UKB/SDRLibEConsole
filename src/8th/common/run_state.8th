@@ -47,8 +47,7 @@ ns: sdr
 	"RADIO_ONLINE" : false ,
 	"RADIO_RUNNING" : false ,
 	"AUDIO_CONFIGURED" : false ,
-	"STARTUP_SYS_EVENTS" : false ,
-	"STARTUP_UI_EVENTS" : false
+	"UI_RUNNING" : false
 } var, run_state
 
 \ ========================================
@@ -103,23 +102,13 @@ ns: sdr
 ; 
 
 \ ----------------------------------	
-: rst_sys@	SED: -- T
-	run_state_lock@ "STARTUP_SYS_EVENTS" m:@ nip run_state_unlock 
-; 
-
-\ ----------------------------------	
-: rst_sys!	SED: T  -- 
-	run_state_lock@ "STARTUP_SYS_EVENTS" rot m:! drop run_state_unlock 
-; 
-
-\ ----------------------------------	
 : rst_ui@	SED: -- T
-	run_state_lock@ "STARTUP_UI_EVENTS" m:@ nip run_state_unlock 
+	run_state_lock@ "UI_RUNNING" m:@ nip run_state_unlock 
 ; 
 
 \ ----------------------------------	
 : rst_ui!	SED: T  -- 
-	run_state_lock@ "STARTUP_UI_EVENTS" rot m:! drop run_state_unlock 
+	run_state_lock@ "UI_RUNNING" rot m:! drop run_state_unlock 
 ; 
 
 \ ========================================
@@ -129,6 +118,7 @@ ns: sdr
 	rst_online@ if "Radio: discovered" log else "Radio: not found" log then
 	rst_audio@ if "Audio: set" log else "Audio: not set" log then
 	rst_running@ if "Radio: running" log else "Radio: stopped" log then
+	rst_ui@ if "UI: running" log else "UI: stopped" log then
 ;		
 
 \ ========================================

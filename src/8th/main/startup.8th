@@ -38,16 +38,45 @@ with: fr.sm
 \ ===============================================================================
 \ Message Handlers
 
+\ ========================================
+\ Helpers
+
 \ ----------------------------------
-\ Main startup initialisation.
-: startup_init	SED: * --
+\ Wait for server to be running with timeout
+: __startup_wait_server	SED: -- T
+	10 repeat
+		rst_server@ if 
+			true ;;
+		else
+			0.3 sleep n:1-
+		then
+	while drop
+	"Timeout waiting for server to start!" log
+	false
+;
+
+\ ----------------------------------
+\ Wait for ui to be running with timeout
+: __startup_wait_ui	SED: -- T
+	10 repeat
+		rst_ui@ if 
+			true ;;
+		else
+			0.3 sleep n:1-
+		then
+	while drop
+	"Timeout waiting for UI to initialise!" log
+	false
+;
+
+\ ========================================
+\ Startup sequence.
+: run_startup	SED: * --
 	\ in: 	none
 	\ out:	none
 	drop
 	
-	\ ----------------------------------
 	"Creating gen-server tasks..." log
-	
 	\ ----------------------------------
 	\ The connector task is our interface to the SDRLibE server.
 	\ Connector init and subscriptions
@@ -57,58 +86,41 @@ with: fr.sm
 	\ ----------------------------------
 	\ Models init only
 	radio_model_init
+	
 	\ ----------------------------------
-	\ Finished all we need to do, the gen-server will just wait for termination.
+	\ Run the startup sequence
+	\ This will check the server, start server, discover and configure
+	\ It will not run the radio as that is a UI responsibility.
+	sequencer_init
+	
+	"Running startup sequence..." log
+	\ Wait for server to be running
+	__startup_wait_server if
+		\ Send the system events
+		radio_model_sys_events
+		\ Wait for the UI to initialise
+		__wait_ui if
+			\ Send the UI events
+			radio_model_ui_events
+		then
+	else
+		"No server, startup terminating!" log
+	then
+	
+	\ ----------------------------------
+	\ Finished all we can do, the gen-server will just wait for termination.
 	"Startup complete ..." log 
-;
-
-\ ----------------------------------
-\ Send model SYS events
-: startup_sys_events	SED: * --
-	drop radio_model_sys_events
-;
-
-\ ----------------------------------
-\ Send model UI events
-: startup_ui_events	SED: * --
-	drop radio_model_ui_events
-;
-
-\ ----------------------------------
-\ Radio startup
-: startup_radio	SED: * --
-	drop
-	SEQUENCER_TASK gen_server_new
-	RESPONDER_TASK gen_server_new
-
-	\ Run the startup sequence in background
-	\ Flags wil be set in run_state
-	SEQUENCER_TASK ' rm_start_sequence null msg!
-	1 sleep
-	SEQUENCER_TASK ' rm_start_radio null msg!
-	1 sleep
-	rst_status
 ;
 
 \ ===============================================================================
 \ Transient task run from app_main.
 \ The proxy starts the STARTUP_TASK as gen-servers cannot be started from the main
-\ thread as a GUI app prevents events on the main thread. 
+\ thread as a GUI app blocks events on the main thread. 
 : startup_proxy	SED: --
 	\ Create the gen-server task
 	STARTUP_TASK gen_server_new
-	\ Now message it to perform the startup tasks
-	\ ToDo: Need better sync than sleeps here!
-	\ Main startup
-	STARTUP_TASK ' startup_init [null] msg!
-	\ Try to init and start radio before we send events
-	STARTUP_TASK ' startup_radio [null] msg!
-	\ SYS EVENTS
-	2 sleep
-	STARTUP_TASK ' startup_sys_events [null] msg!
-	2 sleep
-	\ UI EVENTS
-	STARTUP_TASK ' startup_ui_events [null] msg!
+	\ Now ask it to perform the startup sequence
+	STARTUP_TASK ' run_startup [null] msg!
 ;
 
 \ ========================================

@@ -48,6 +48,8 @@ ns: sdr
 	\ Close gen-server tasks
 	\ Connector
 	conn_term
+	\ Sequencer
+	sequencer_term
 	\ Models
 	radio_model_term
 	\ Startup

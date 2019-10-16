@@ -58,6 +58,12 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 
+\ Called after first draw
+: __ui_initialised
+	true rst_ui!
+	"Done" log
+;
+
 \ ----------------------------------
 \ Create main window and position fragments
 \ -- main-gui
@@ -74,6 +80,7 @@ with: fr.ps
 		"high" : 200,
 		"top" : 100,
 		"left" : 100,
+		"init" : ' __ui_initialised ,
 		"children" : []
 	} g:new dup "win" t:!
 	\ Create the vfo

@@ -31,8 +31,8 @@
 \ ===============================================================================
 \ Task names
 : MAIN_TASK "MainTask" ;
+: STARTUP_TASK "StartupTask" ;
 : SEQUENCER_TASK "SequencerTask" ;
-: RESPONDER_TASK "ResponderTask" ;
 : CLEANUP_TASK "CleanupTask" ;
 : CONNECTOR_TASK "ConnectorTask" ;
 : RADIO_MODEL_TASK "RadioModelTask" ;
