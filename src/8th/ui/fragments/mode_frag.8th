@@ -1,7 +1,7 @@
 (*
-	main_frag.8th
+	mode_frag.8th
  
-  Main buttons for radio control
+  Button pane for mode buttons.
  
  Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -31,13 +31,14 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, main_frag_test
+false var, mode_frag_test
 
 \ ----------------------------------
-main_frag_test @ #if
+mode_frag_test @ #if
 	\ Includes
 	"../common/g_cache.8th" f:include
 	"../components/buttons.8th" f:include
+	"../../common/radio_defs.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -63,26 +64,29 @@ with: fr.ps
 \ Events
 \ All buttons click in group
 \ gui -- gui
-: mc_button_click	SED: g -- g
-	"user-data" g:m@
-	"start" s:= if
-		SEQUENCER_TASK ' rm_start_radio [0] msg!
-	else
-		SEQUENCER_TASK ' rm_stop_radio null msg!
-	then
+: mode_button_click	SED: g -- g
+	"user-data" g:m@ log
 ;
 
 \ ========================================
 \ Helpers
-: mc_button_spec	SED: -- m
+: mode_button_spec	SED: -- m
 	{
-		"id" : "BB-MAIN",
-		"rows" : 1, 
-		"cols" : 2,
+		"id" : "BB-MODE",
+		"rows" : 4, 
+		"cols" : 3,
 		"spec" : [
-			["Start", "start", ' mc_button_click ],
-			["Stop", "stop", ' mc_button_click ]
-		] 
+			["LSB", ` CH_LSB ` , ' mode_button_click ],
+			["DSB", ` CH_DSB ` , ' mode_button_click ],
+			["CW-L", ` CH_CWL ` , ' mode_button_click ],
+			["CW-U", ` CH_CWU ` , ' mode_button_click ],
+			["FM", ` CH_FM ` , ' mode_button_click ],
+			["AM", ` CH_AM ` , ' mode_button_click ],
+			["DIGU", ` CH_DIGU ` , ' mode_button_click ],
+			["SPEC", ` CH_SPEC ` , ' mode_button_click ],
+			["DIGL", ` CH_DIGL ` , ' mode_button_click ],
+			["SAM", ` CH_SAM ` , ' mode_button_click ]
+		]
 	}
 ;
 
@@ -92,9 +96,9 @@ with: fr.ps
 
 \ New button box according to spec
 \ bounds -- main-control-gui
-: mc_new	SED: s -- g
+: mode_frag_new	SED: s -- g
 	\ Pop in the bounds
-	mc_button_spec "bounds" rot m:!
+	mode_button_spec "bounds" rot m:!
 	new_button_box
 ;
 
@@ -107,7 +111,7 @@ ns: user
 \ Testing
 \ ===============================================================================
 
-main_frag_test @ #if
+mode_frag_test @ #if
 	with: sdr
 	with: fr.gs
 	with: fr.ps
@@ -135,7 +139,7 @@ main_frag_test @ #if
 				"children" : []
 			} g:new dup "win" t:!
 			\ Create the test button box
-			"0,0,200,100" mc_new
+			"0,0,200,100" mode_frag_new
 			\ Add to the window
 			"win" t:@ swap g:+child	 
 	;

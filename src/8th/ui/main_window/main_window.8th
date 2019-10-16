@@ -88,6 +88,9 @@ with: fr.ps
 	"win" t:@ swap g:+child
 	\ Create main control
 	"0,0,100,30" mc_new
+	g:+child
+	\ Create main control
+	"0,80,200,200" mode_frag_new
 	\ Add to window
 	g:+child drop
 ;
