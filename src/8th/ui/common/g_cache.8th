@@ -49,6 +49,9 @@ ns: sdr
 : VFO-1 "VFO-1" ;
 : VFO-2 "VFO-2" ;
 : VFO-3 "VFO-3" ;
+: MODE-1 "MODE-1" ;
+: MODE-2 "MODE-2" ;
+: MODE-3 "MODE-3" ;
 
 \ ========================================
 \ Cache entries

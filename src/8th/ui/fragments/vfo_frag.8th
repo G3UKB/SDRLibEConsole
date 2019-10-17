@@ -258,30 +258,30 @@ vfo_1_test @ #if
 	\ Entry point 
 	\ Create a test window and add the button box
 	: app:main
-			\ Create startup task and keep reference
-			' startup_task t:task "startup_task" t:!
-			\ Set exit handler
-			' term_callback onexit
-		
-			\ A minimal window to hold our test component
-			{
-				"kind" : "win",
-				"title" : "ButtonBox",
-				"visible" : true,
-				"ontop" : false,
-				"bg" : "gray10",
-				"resize-corner" : 20,
-				"wide" : 400,
-				"high" : 200,
-				"top" : 100,
-				"left" : 100,
-				"children" : []
-			} g:new dup "win" t:!
-			\ Create the vfo
-			VFO-1 "0,0,300,50" vfo_frag_new
-			\ Add to the window
-			"win" t:@ swap g:+child
-			\ VFO update task
-			' update_task t:task "update_task" t:!
+		\ Create startup task and keep reference
+		' startup_task t:task "startup_task" t:!
+		\ Set exit handler
+		' term_callback onexit
+
+		\ A minimal window to hold our test component
+		{
+			"kind" : "win",
+			"title" : "ButtonBox",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new dup "win" t:!
+		\ Create the vfo
+		VFO-1 "0,0,300,50" vfo_frag_new
+		\ Add to the window
+		"win" t:@ swap g:+child
+		\ VFO update task
+		' update_task t:task "update_task" t:!
 	;
 #then

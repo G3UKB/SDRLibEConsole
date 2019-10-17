@@ -31,11 +31,14 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, mode_frag_test
+true var, mode_frag_test
 
 \ ----------------------------------
 mode_frag_test @ #if
 	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../../common/ps_events.8th" f:include
 	"../common/g_cache.8th" f:include
 	"../components/buttons.8th" f:include
 	"../../common/radio_defs.8th" f:include
@@ -59,13 +62,32 @@ with: fr.ps
 \ PRIVATE
 \	Convention: all private words start __
 \ ===============================================================================
+\ user-data --
+: mode_1_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R1_MODE publish drop
+;
+
+: mode_2_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R2_MODE publish drop
+;
+
+: mode_3_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R3_MODE publish drop
+;
 
 \ ========================================
 \ Events
 \ All buttons click in group
 \ gui -- gui
 : mode_button_click	SED: g -- g
-	"user-data" g:m@ log
+	"user-data" g:m@
+	swap g:parent "id" g:m@ .s nip
+	\ user-data id
+	{ MODE-1: ' mode_1_publish , MODE-2: ' mode_2_publish , MODE-3: ' mode_3_publish } 
+	swap m:@ nip w:exec
 ;
 
 \ ========================================
@@ -95,10 +117,12 @@ with: fr.ps
 \ ===============================================================================
 
 \ New button box according to spec
-\ bounds -- main-control-gui
-: mode_frag_new	SED: s -- g
+\ name bounds -- main-control-gui
+: mode_frag_new	SED: s s -- g
 	\ Pop in the bounds
-	mode_button_spec "bounds" rot m:!
+	mode_button_spec 
+	"bounds" rot m:!
+	"id" rot m:!
 	new_button_box
 ;
 
@@ -124,23 +148,23 @@ mode_frag_test @ #if
 	\ Create a test window and add the button box
 	: app:main
 
-			\ A minimal window to hold our test component
-			{
-				"kind" : "win",
-				"title" : "Main Control Test",
-				"visible" : true,
-				"ontop" : false,
-				"bg" : "gray10",
-				"resize-corner" : 20,
-				"wide" : 400,
-				"high" : 200,
-				"top" : 100,
-				"left" : 100,
-				"children" : []
-			} g:new dup "win" t:!
-			\ Create the test button box
-			"0,0,200,100" mode_frag_new
-			\ Add to the window
-			"win" t:@ swap g:+child	 
+		\ A minimal window to hold our test component
+		{
+			"kind" : "win",
+			"title" : "Main Control Test",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new dup "win" t:!
+		\ Create the test button box
+		MODE-1 "0,0,150,150" mode_frag_new
+		\ Add to the window
+		"win" t:@ swap g:+child	 
 	;
 #then
