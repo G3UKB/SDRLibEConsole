@@ -64,11 +64,13 @@ with: fr.ps
 \ All buttons click in group
 \ gui -- gui
 : mc_button_click	SED: g -- g
-	"user-data" g:m@
-	"start" s:= if
-		SEQUENCER_TASK ' rm_start_radio [0] msg!
-	else
-		SEQUENCER_TASK ' rm_stop_radio null msg!
+	g:on? if
+		"user-data" g:m@
+		"start" s:= if
+			SEQUENCER_TASK ' rm_start_radio [0] msg!
+		else
+			SEQUENCER_TASK ' rm_stop_radio null msg!
+		then
 	then
 ;
 

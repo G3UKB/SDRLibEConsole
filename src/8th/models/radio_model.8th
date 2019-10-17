@@ -203,9 +203,35 @@ with: fr.p
 
 \ ===============================================================================
 \ Model updates
+: __update_ref_1
+	0 a:@ nip >r __radio_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ]
+;
+: __update_ref_2
+	0 a:@ nip >r __radio_model@ ["radio-state", ` radio_2 ` , ` dyn_idx ` , ` data_idx` ]
+;
+: __update_ref_3
+	0 a:@ nip >r __radio_model@ ["radio-state", ` radio_3 ` , ` dyn_idx ` , ` data_idx` ]
+;
+
 \ freq --
 : t_radio_r1_freq	SED: n --
-	0 a:@ nip >r __radio_model@ ["radio-state", ` radio_1 ` , ` dyn_idx ` , ` data_idx` ] "freq" r> val!
+	__update_ref_1 "freq" r> val!
+;
+: t_radio_r2_freq	SED: n --
+	__update_ref_2 "freq" r> val!
+;
+: t_radio_r3_freq	SED: n --
+	__update_ref_3 "freq" r> val!
+;
+\ mode --
+: t_radio_r1_mode	SED: n --
+	__update_ref_1 "mode" r> val!
+;
+: t_radio_r2_mode	SED: n --
+	__update_ref_2 "mode" r> val!
+;
+: t_radio_r3_mode	SED: n --
+	__update_ref_3 "mode" r> val!
 ;
 
 \ ===============================================================================
@@ -222,7 +248,15 @@ with: fr.p
 	drop 
 	__radio_model_restore
 	
-	t:name@ ' t_radio_r1_freq SYS_R1_FREQ subscribe drop
+	\ Do subscriptions
+	t:name@ >r
+	r@ ' t_radio_r1_freq SYS_R1_FREQ subscribe
+	r@ ' t_radio_r2_freq SYS_R2_FREQ subscribe
+	r@ ' t_radio_r3_freq SYS_R3_FREQ subscribe
+	r@ ' t_radio_r1_mode SYS_R1_MODE subscribe
+	r@ ' t_radio_r2_mode SYS_R2_MODE subscribe
+	r> ' t_radio_r3_mode SYS_R3_MODE subscribe
+	
 	"Radio Model initialised" log
 ;
 

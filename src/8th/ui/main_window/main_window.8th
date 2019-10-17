@@ -39,13 +39,15 @@ main_window_test @ #if
 	"../../common/app_defs.8th" f:include
 	"../../common/radio_defs.8th" f:include
 	"../../common/ps_events.8th" f:include
+	"../../common/run_state.8th" f:include
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
 	"../components/buttons.8th" f:include
 	"../components/vfo.8th" f:include
-	"../fragments/main_control.8th" f:include
-	"../fragments/vfo_1.8th" f:include
+	"../fragments/main_frag.8th" f:include
+	"../fragments/vfo_frag.8th" f:include
+	"../fragments/mode_frag.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -90,7 +92,7 @@ with: fr.ps
 	"0,0,100,30" mc_new
 	g:+child
 	\ Create main control
-	"0,80,200,200" mode_frag_new
+	"MODE-1" "0,80,200,200" mode_frag_new
 	\ Add to window
 	g:+child drop
 ;

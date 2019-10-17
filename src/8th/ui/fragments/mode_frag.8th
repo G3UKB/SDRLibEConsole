@@ -31,7 +31,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, mode_frag_test
+false var, mode_frag_test
 
 \ ----------------------------------
 mode_frag_test @ #if
@@ -83,11 +83,13 @@ with: fr.ps
 \ All buttons click in group
 \ gui -- gui
 : mode_button_click	SED: g -- g
-	"user-data" g:m@
-	swap g:parent "id" g:m@ .s nip
-	\ user-data id
-	{ MODE-1: ' mode_1_publish , MODE-2: ' mode_2_publish , MODE-3: ' mode_3_publish } 
-	swap m:@ nip w:exec
+	g:on? if
+		"user-data" g:m@
+		swap g:parent "id" g:m@ nip
+		\ user-data id
+		{ MODE-1: ' mode_1_publish , MODE-2: ' mode_2_publish , MODE-3: ' mode_3_publish } 
+		swap m:@ nip w:exec
+	then
 ;
 
 \ ========================================
@@ -99,6 +101,7 @@ with: fr.ps
 		"cols" : 3,
 		"spec" : [
 			["LSB", ` CH_LSB ` , ' mode_button_click ],
+			["USB", ` CH_USB ` , ' mode_button_click ],
 			["DSB", ` CH_DSB ` , ' mode_button_click ],
 			["CW-L", ` CH_CWL ` , ' mode_button_click ],
 			["CW-U", ` CH_CWU ` , ' mode_button_click ],
@@ -107,10 +110,67 @@ with: fr.ps
 			["DIGU", ` CH_DIGU ` , ' mode_button_click ],
 			["SPEC", ` CH_SPEC ` , ' mode_button_click ],
 			["DIGL", ` CH_DIGL ` , ' mode_button_click ],
-			["SAM", ` CH_SAM ` , ' mode_button_click ]
+			["SAM", ` CH_SAM ` , ' mode_button_click ],
+			["DRM", ` CH_DRM ` , ' mode_button_click ]
 		]
 	}
 ;
+
+\ ========================================
+\ Events
+
+\ ----------------------------------
+\ Get mode from event data
+\ {"cb" w, "data" [data, sender, w|null] -- mode
+: __data_get_mode	SED: m -- n
+	"data" m:@ nip 0 a:@ nip
+;
+
+\ ----------------------------------
+\ Get gui ref for this frag
+\ gui-name -- gui
+: __mode_gui_ref	SED: s -- g
+	g_cache_get
+;
+
+\ ----------------------------------
+\ Toggle button
+\ mode name --
+: __mode_tail	SED: n s --
+	__mode_gui_ref	\ mode gui
+	swap g:child true g:on
+;
+
+\ {"cb" w, "data" [data, sender, w|null]} -- 
+: mode_r1	SED: m -- 
+	__data_get_mode
+	MODE-1 __mode_tail
+;
+: mode_r2	SED: m -- 
+	__data_get_mode
+	MODE-2 __mode_tail
+;
+: mode_r3	SED: m -- 
+	__data_get_mode
+	MODE-3 __mode_tail
+;
+
+\ ========================================
+\ Subscriptions
+
+\ ----------------------------------
+\ Subscribe to VFO-n events
+\  --
+: mode_1_subscribe	SED:  --
+	 t:name@ ' mode_r1 UI_R1_MODE subscribe
+;
+: mode_2_subscribe	SED:  --
+	 t:name@ ' mode_r2 UI_R2_MODE subscribe
+;
+: mode_3_subscribe	SED:  --
+	 t:name@ ' mode_r3 UI_R3_MODE subscribe
+;
+
 
 \ ===============================================================================
 \ PUBLIC
@@ -120,10 +180,13 @@ with: fr.ps
 \ name bounds -- main-control-gui
 : mode_frag_new	SED: s s -- g
 	\ Pop in the bounds
+	1 pick >r
 	mode_button_spec 
 	"bounds" rot m:!
 	"id" rot m:!
 	new_button_box
+	{ MODE-1: ' mode_1_subscribe , MODE-2: ' mode_2_subscribe , MODE-3: ' mode_3_subscribe } 
+	r> m:@ nip w:exec
 ;
 
 \ ===============================================================================

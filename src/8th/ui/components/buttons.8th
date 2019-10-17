@@ -73,10 +73,14 @@ with: fr.ps
 	"kind" "btn" m:!
 	"click" rot m:!
 	"user-data" rot m:!
+	"autotoggle" true m:!
+	"group" 1 m:!
 	"label" rot m:!
 	"font" 14 m:!
-	"bg" "lightcyan4" m:!
-	"fg" "blue" m:!
+	"bg" "gray0" m:!
+	"fg" "gold4" m:!
+	"bg0" "gray20" m:!
+	"fg0" "gold3" m:!
 	"alpha" 0.8 m:!
 	r> swap a:push
 ;
