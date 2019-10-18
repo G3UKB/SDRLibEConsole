@@ -1,0 +1,215 @@
+(* 
+	disp_events.8th
+ 
+  SDRLibEConnector server display event handler
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+*)
+
+(*
+	This is the server display system task[s]. It is a gen-server which starts and controls three
+	reader tasks, one for each radio display.
+	
+	Display dats for panadapter/waterfall and WBS is high volume with a frequency of no less
+	than 200ms, otherwise the display will be visibly jerky.
+	
+	We tell the server what data is required i.e r1/r2/r3/wbs and the required frequency of that data. The
+	server will then send that data on separate UDP channels for each display at the requested frequency. 
+	We start a reader thread for each display. These threads are enabled/disabled by the svr_evnt_set_disp_state
+	call. When a reader thread is active data received is shipped directly to the display instance data buffer 
+	[disp_common.8th]. Calls are then made to the builder to make the arrays for subsequent rendering. 
+	The builders are passed the display instance data id.
+	
+	The builders can operate on any thread as they do not render, that is handled by disp_renderer.8th which operates
+	off a GUI timer so the render can be at a different frequency to the data collection if required. Rendering
+	of course must be on the main thread.
+*)
+
+\ Set namespace
+ns: sdr
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__svr_evnt_
+\ ===============================================================================
+
+\ Initialisation
+: __svr_evnt_host	"127.0.0.1" ;
+\ : __svr_evnt_host	"192.168.1.14 ;
+: __svr_evnt_d1_port 10011 ;
+: __svr_evnt_d2_port 10012 ;
+: __svr_evnt_d3_port 10013 ;
+	
+\ Create UDP socket
+: __svr_evnt_create_d1_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d1_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d1_port net:getaddrinfo swap net:bind ;
+
+: __svr_evnt_create_d2_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d2_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d2_port net:getaddrinfo swap net:bind ;
+	
+: __svr_evnt_create_d3_sock
+	{ "domain" : ` net:INET4 ` , "type" : ` net:DGRAM ` , "proto" : ` net:PROTO_UDP ` } net:socket dup "udp_d3_evnt_sock" t:!
+	__svr_evnt_host __svr_evnt_d3_port net:getaddrinfo swap net:bind ;
+	
+\ ----------------------------------	
+\ Get command socket
+: __svr_evnt_d1_sock@	"udp_d1_evnt_sock" t:@ ;
+: __svr_evnt_d2_sock@	"udp_d2_evnt_sock" t:@ ;
+: __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
+
+\ ========================================
+\ Reader Task
+\ ========================================
+
+\ Read event data while enabled and not terminated
+\ Write event data to the data-buffer in instance data
+: __svr_evnt_reader	SED: net s --
+	\ in: 	0: s - reader instance
+	\				1: net - socket
+	\ out:	none
+	
+	\ ----------------------------------
+	\ Task initialisation
+	\ Save the task instance
+	dup "reader_inst" t:!
+	\ Register the task instance
+	"-TASK" s:+ dup t:name!
+	t:curtask swap fr:gs_reg!
+	\ Save socket
+	"reader_skt" t:!
+	\ Make sure the q does not throw
+	t:getq false q:throwing drop
+	\ Init param stack
+	param_st_alloc
+	
+	\ ----------------------------------
+	\ Wait for work
+	repeat
+		"reader_inst" t:@ "-waiting for work" s:+ log
+		-1 t:q-wait
+		\ "reader_inst" t:@ "-off wait" s:+ log
+		t:pop null? not if
+			break
+		else
+			drop
+		then
+	again
+	
+	"reader_inst" t:@ "-starting run section" s:+ log
+	\ ----------------------------------
+	\ Have we been told to run?
+	"run" s:= if
+		\ Yes, so enter the read loop
+		repeat
+			\ Check for termination at top of loop
+			t:qlen 0 n:> if 
+				t:pop null? not if
+					"term" s:= if break then
+				then
+			else
+				\ See if we have data
+				"reader_skt" t:@ true 500 net:wait if
+					\ Socket says yes
+					\ Lock the instance data and copy the ref to a task variable
+					"reader_inst" t:@ radio_ref "inst_data" t:!
+					\ SED in >= 19.02:  \ net buf flags -- net X buf #recv | net null
+					"inst_data" t:@ disp_buf_ref 0 net:recvfrom null? not if
+						\ Not interested in anything back from the receive
+						\ The data is stored in the instance data - data-buffer
+						\ 19.01
+						\ 3drop 2drop
+						\ 19.02
+						3drop drop
+						\ Read something
+						\ Save the locked reference for the builder to use
+						"inst_data" t:@ copy_to_raw
+						\ Call display builder to build the arrays
+						disp_builder
+					then
+					\ Release temporary reference
+					null "inst_data" t:!
+					\ Unlock the instance data
+					"reader_inst" t:@ radio_ref_unlock
+				else
+					\ drop socket
+					drop
+				then
+			then
+		again
+	then
+	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ ========================================
+\ General management
+
+\ Initialise the sockets
+: svr_evnt_init	SED:  --
+	\ in: 	none
+	\ out:	none
+	\ Create sockets
+	__svr_evnt_create_d1_sock
+	__svr_evnt_create_d2_sock
+	__svr_evnt_create_d3_sock
+	\ Start tasks
+	__svr_evnt_d1_sock@ "DISP-R1" 2 ' __svr_evnt_reader t:task-n
+	__svr_evnt_d2_sock@ "DISP-R2" 2 ' __svr_evnt_reader t:task-n
+	__svr_evnt_d3_sock@ "DISP-R3" 2 ' __svr_evnt_reader t:task-n  
+;
+	
+\ ----------------------------------	
+\ Set the display period in ms
+: svr_evnt_set_disp_period	SED: n -- T
+	\ in: 	0: n - update period in ms
+	\ out:	0: T - true if success
+	conn_set_disp_period ;
+
+\ ----------------------------------
+\ Enable/disable displays
+: svr_evnt_set_disp_state	SED: T T T -- T
+	\ in: 	0: T - true if enable R1 display
+	\				1: T - true if enable R2 display
+	\				2: T - true if enable R3 display
+	\ out:	0: T - true if success
+	2 pick 2 pick 2 pick conn_set_disp_state if
+		\ Enable the corresponding reader tasks
+		if "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		true 
+	else 
+		false 
+	then ;
+
+\ ----------------------------------
+\ Terminate displays
+: svr_evnt_term	SED:  -- 
+	"DISP-R1-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R2-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R3-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then ;
+
+\ ========================================
+\ Reset namespace
+ns: user
