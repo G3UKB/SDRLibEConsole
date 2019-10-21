@@ -36,3 +36,4 @@
 : CLEANUP_TASK "CleanupTask" ;
 : CONNECTOR_TASK "ConnectorTask" ;
 : RADIO_MODEL_TASK "RadioModelTask" ;
+: DISP_EVNT_TASK "DispEvntTask" ;

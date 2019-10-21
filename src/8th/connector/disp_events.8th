@@ -41,9 +41,11 @@
 	of course must be on the main thread.
 *)
 
+needs stack/3drop
+
 \ ========================================
 \ Testing only
-false var, disp_evnt_test
+true var, disp_evnt_test
 disp_evnt_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
@@ -98,7 +100,8 @@ with: fr.ps
 \ ========================================
 
 \ Read event data while enabled and not terminated
-\ Write event data to the data-buffer in instance data
+\ Write event data to the data-buffer, then dispatch
+\ to the appropriate builder task.
 : __svr_evnt_reader	SED: net s --
 	\ in: 	0: s - reader instance
 	\				1: net - socket
@@ -110,20 +113,19 @@ with: fr.ps
 	dup "reader_inst" t:!
 	\ Register the task instance
 	"-TASK" s:+ dup t:name!
-	t:curtask swap fr:gs_reg!
+	t:curtask swap reg!
 	\ Save socket
 	"reader_skt" t:!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
-	\ Init param stack
-	param_st_alloc
+	\ Create the data buffer
+	20000 b:new 0x0 b:fill "data-buf" t:!
 	
 	\ ----------------------------------
 	\ Wait for work
 	repeat
 		"reader_inst" t:@ "-waiting for work" s:+ log
 		-1 t:q-wait
-		\ "reader_inst" t:@ "-off wait" s:+ log
 		t:pop null? not if
 			break
 		else
@@ -146,26 +148,15 @@ with: fr.ps
 				\ See if we have data
 				"reader_skt" t:@ true 500 net:wait if
 					\ Socket says yes
-					\ Lock the instance data and copy the ref to a task variable
-					"reader_inst" t:@ radio_ref "inst_data" t:!
-					\ SED in >= 19.02:  \ net buf flags -- net X buf #recv | net null
-					"inst_data" t:@ disp_buf_ref 0 net:recvfrom null? not if
+					"Got data" log
+					"data-buf" t:@ 0 net:recvfrom null? not if
 						\ Not interested in anything back from the receive
-						\ The data is stored in the instance data - data-buffer
-						\ 19.01
-						\ 3drop 2drop
-						\ 19.02
+						\ The data is stored in the task variable - data-buf
 						3drop drop
 						\ Read something
-						\ Save the locked reference for the builder to use
-						\ "inst_data" t:@ copy_to_raw
-						\ Call display builder to build the arrays
+						\ Message the display builder to build the arrays
 						\ disp_builder
 					then
-					\ Release temporary reference
-					null "inst_data" t:!
-					\ Unlock the instance data
-					"reader_inst" t:@ radio_ref_unlock
 				else
 					\ drop socket
 					drop
@@ -180,7 +171,7 @@ with: fr.ps
 \ General management
 
 \ Initialise the sockets
-: disp_evnt_init	SED:  --
+: t_disp_evnt_init	SED:  --
 	\ in: 	none
 	\ out:	none
 	\ Create sockets
@@ -195,34 +186,38 @@ with: fr.ps
 	
 \ ----------------------------------	
 \ Set the display period in ms
-: disp_evnt_set_disp_period	SED: n -- T
+: t_disp_evnt_set_disp_period	SED: n -- T
 	\ in: 	0: n - update period in ms
 	\ out:	0: T - true if success
-	conn_set_disp_period ;
+	CONNECTOR_TASK ' t_conn_disp_period [null] null +sender msg!
+;
 
 \ ----------------------------------
 \ Enable/disable displays
-: disp_evnt_set_disp_state	SED: T T T -- T
+: t_disp_evnt_set_disp_state	SED: T T T -- T
 	\ in: 	0: T - true if enable R1 display
 	\				1: T - true if enable R2 display
 	\				2: T - true if enable R3 display
 	\ out:	0: T - true if success
-	2 pick 2 pick 2 pick conn_set_disp_state if
+	2 pick 2 pick 2 pick 3 a:close
+	CONNECTOR_TASK ' t_conn_disp_state rot a:new swap a:push null +sender drop rot msg! 
+	\ if
 		\ Enable the corresponding reader tasks
-		if "DISP-R3-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
-		if "DISP-R2-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
-		if "DISP-R1-TASK" fr:__gs_reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R3-TASK" reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R2-TASK" reg@ dup "run" t:push t:q-notify drop then
+		if "DISP-R1-TASK" reg@ dup "run" t:push t:q-notify drop then
 		true 
-	else 
-		false 
-	then ;
+	\ else 
+	\ 	false 
+	\ then 
+;
 
 \ ----------------------------------
 \ Terminate displays
-: disp_evnt_term	SED:  -- 
-	"DISP-R1-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
-	"DISP-R2-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then
-	"DISP-R3-TASK" fr:__gs_reg@ null? not if dup "term" t:push t:q-notify drop then ;
+: t_disp_evnt_term	SED:  -- 
+	"DISP-R1-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R2-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then
+	"DISP-R3-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then ;
 
 
 \ ===============================================================================
@@ -241,7 +236,7 @@ with: fr.ps
 	\ Create the sequencer gen-server
 	DISP_EVNT_TASK gen_server_new
 	\ Ask the disp-event to run init sequence
-	DISP_EVNT_TASK ' disp_evnt_init null msg!
+	DISP_EVNT_TASK ' t_disp_evnt_init null msg!
 ;
 
 \ ----------------------------------
@@ -250,7 +245,7 @@ with: fr.ps
 	\ in: 	none
 	\ out:	none
 	\ Tidy close the connector
-	DISP_EVNT_TASK ' disp_evnt_term null msg!
+	DISP_EVNT_TASK ' t_disp_evnt_term null msg!
 	1 sleep
 	DISP_EVNT_TASK gen_server_term
 	0.1 sleep
@@ -271,10 +266,51 @@ disp_evnt_test @ #if
 
 	4 json-pretty
 	
-	conn_init
+	: reg_task
+		\ Must register REPL in the task repos to be able to reply
+		t:curtask t:name@ reg!
+		\ Set q to null on empty
+		t:getq false q:throwing \ do not drop q else crashes
+	;
+
+	\ All responses here
+	: w
+		log
+	;
+
+	\ Send a message, get a rsponse
+	: sender
+		a:new swap a:push ' w  +sender msg! response@ 
+	;
+		
+	\ Basic start radio with default audio
+	: script
+		reg_task
+		conn_init
+		1 sleep
+		"POLL" log
+		CONNECTOR_TASK ' t_conn_poll null sender
+		1 sleep
+		"START RADIO" log
+		CONNECTOR_TASK ' t_conn_enum_audio_outputs null sender "Enum outputs" log
+		CONNECTOR_TASK ' t_conn_get_default_route null sender "Get default route" log
+		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
+		CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
+		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
+		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
+		"START DISPLAY" log
+		disp_evnt_init
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] msg!
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [false,false,true] msg!
+		
+		con:key
+		
+		conn_term
+		disp_evnt_term
+	;
 	
-	disp_evnt_init
-	DISP_EVNT_TASK ' disp_evnt_set_disp_period [100] msg!
-	DISP_EVNT_TASK ' disp_evnt_set_disp_state [false,false,true]
-	disp_evnt_term
+	script
+	"Test complete" log
+	1 sleep
+	bye
 #then

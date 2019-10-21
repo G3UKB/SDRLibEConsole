@@ -572,6 +572,38 @@ with: fr.ps
 ;
 
 \ ========================================
+\ Display functions
+
+\ ----------------------------------
+\ Set display width
+: t_conn_disp_width	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - width in pixels
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_disp_width_msg false swap __con_do_exchange ;
+	
+\ ----------------------------------
+\ Set display period
+: t_conn_disp_period	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: n - period in ms
+	\ out: 	q: * - "Timeout" or response data
+	rot __conn_disp_period_msg false swap __con_do_exchange ;
+
+\ ----------------------------------
+\ Set display state
+: t_conn_disp_state	SED: a --
+	a:open
+	\ in: 	0: n - sender (task name)
+	\				1: T - true if enable R1 display
+	\				2: T - true if enable R2 display
+	\				3: T - true if enable R3 display
+	\ out: 	q: * - "Timeout" or response data
+	3 pick 3 pick 3 pick __conn_disp_state_msg false swap __con_do_exchange 3drop ;
+
+\ ========================================
 \ Startup words
 
 \ ----------------------------------
