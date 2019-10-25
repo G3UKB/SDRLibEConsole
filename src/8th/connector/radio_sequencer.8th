@@ -90,16 +90,9 @@ with: fr.ps
 \ Response handlers for sequencer task
 
 \ ----------------------------------
-\ Decode response
-\ response-map -- true(good)|false(bad)
-: __rm_decode_response	SED: m -- T
-	"resp" m:@ "ACK" s:= nip if true else false then
-;
-
-\ ----------------------------------
 \ Response from stop radio
 : __rm_stop_radio_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		false rst_running!
 	else
 		\ Failed to stop radio
@@ -111,7 +104,7 @@ with: fr.ps
 \ ----------------------------------
 \ Response from start radio
 : __rm_start_radio_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		true rst_running!
 	else
 		\ Failed to start radio
@@ -123,7 +116,7 @@ with: fr.ps
 \ ----------------------------------
 \ Response from start server
 : __rm_server_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		true rst_server!
 	else
 		\ Failed to start server, we can still run but can't really do very much
@@ -135,9 +128,9 @@ with: fr.ps
 \ ----------------------------------
 \ Response from radio discover
 : __rm_discover_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		true rst_online!
-		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg! response@
+		CONNECTOR_TASK ' t_conn_start_server [null] ' __rm_server_response +sender msg!
 	else
 		\ No radio hardware, we can still run but can't really do very much
 		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to discover radio hardware!" } g:do
@@ -148,9 +141,9 @@ with: fr.ps
 \ ----------------------------------
 \ Response from set default audio route
 : __rm_route_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		true rst_audio!
-		CONNECTOR_TASK ' t_conn_discover [null] ' __rm_discover_response +sender msg! response@
+		CONNECTOR_TASK ' t_conn_discover [null] ' __rm_discover_response +sender msg!
 	else
 		\ No server, we can still run but can't really do very much
 		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector failed to set default audio route!" } g:do
@@ -161,9 +154,9 @@ with: fr.ps
 \ ----------------------------------
 \ Response from default startup
 : __rm_poll_response	SED: * --
-	__rm_decode_response if
+	conn_decode_response if
 		true rst_poll!
-		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg! response@
+		CONNECTOR_TASK ' t_conn_set_default_route [null] ' __rm_route_response +sender msg!
 	else
 		\ No server, we can still run but can't really do very much
 		{ "cb" : ' __rm_do_msg , "msg" : "SDRLibEConnector server is not running or cannot be contacted!" } g:do
@@ -180,26 +173,29 @@ with: fr.ps
 
 \ ----------------------------------
 \ Run the radio start sequence
-: rm_start_sequence	SED: --
+\ [data, sender, w|null] --
+: rm_start_sequence	SED: a --
 	
 	\ See if we have a server or simulator running
-	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg! response@
+	CONNECTOR_TASK ' t_conn_poll [null] ' __rm_poll_response +sender msg!
 ;
 
 \ ----------------------------------
 \ Start radio
-: rm_start_radio	SED: n --
+\ [data, sender, w|null] --
+: rm_start_radio	SED: a --
 	
 	\ See if we have a server or simulator running
-	CONNECTOR_TASK ' t_conn_start_radio rot ' __rm_start_radio_response +sender msg! response@
+	CONNECTOR_TASK ' t_conn_start_radio rot [0] a:@@ nip ' __rm_start_radio_response +sender msg!
 ;
 
 \ ----------------------------------
 \ Stop radio
-: rm_stop_radio	SED: --
+\ [data, sender, w|null] --
+: rm_stop_radio	SED: a --
 	
 	\ See if we have a server or simulator running
-	CONNECTOR_TASK ' t_conn_stop_radio [null] ' __rm_stop_radio_response +sender msg! response@
+	CONNECTOR_TASK ' t_conn_stop_radio [null] ' __rm_stop_radio_response +sender msg!
 ;
 
 \ ========================================
@@ -214,7 +210,7 @@ with: fr.ps
 	\ Create the sequencer gen-server
 	SEQUENCER_TASK gen_server_new
 	\ Ask the sequencer to run startup sequence
-	SEQUENCER_TASK ' rm_start_sequence null msg!
+	SEQUENCER_TASK ' rm_start_sequence [null] null +sender msg!
 ;
 
 \ ----------------------------------
@@ -258,7 +254,7 @@ radio_manager_test @ #if
 		conn_init
 		sequencer_init
 		1 sleep
-		SEQUENCER_TASK ' rm_start_radio null msg!
+		SEQUENCER_TASK ' rm_start_radio [0] null +sender msg!
 		1 sleep
 		rst_status
 		\ Wait until told to close at EOD so refs are maintained

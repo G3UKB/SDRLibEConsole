@@ -578,8 +578,9 @@ with: fr.ps
 \ Set display width
 : t_conn_disp_width	SED: a --
 	a:open
-	\ in: 	0: n - sender (task name)
-	\				1: n - width in pixels
+	\ in: 	0: w - response word
+	\				1: s - sender task name
+	\				2: n - width in pixels
 	\ out: 	q: * - "Timeout" or response data
 	rot __conn_disp_width_msg false swap __con_do_exchange ;
 	
@@ -587,21 +588,21 @@ with: fr.ps
 \ Set display period
 : t_conn_disp_period	SED: a --
 	a:open
-	\ in: 	0: n - sender (task name)
-	\				1: n - period in ms
+	\ in: 	0: w - response word
+	\				1: s - sender task name
+	\				: n - period in ms
 	\ out: 	q: * - "Timeout" or response data
 	rot __conn_disp_period_msg false swap __con_do_exchange ;
 
 \ ----------------------------------
 \ Set display state
 : t_conn_disp_state	SED: a --
-	a:open
-	\ in: 	0: n - sender (task name)
-	\				1: T - true if enable R1 display
-	\				2: T - true if enable R2 display
-	\				3: T - true if enable R3 display
+	a:open 
+	\ in: 	0: w - response word
+	\				1: s - sender task name
+	\				2: a - [T,T,T] enable flags
 	\ out: 	q: * - "Timeout" or response data
-	3 pick 3 pick 3 pick __conn_disp_state_msg false swap __con_do_exchange 3drop ;
+	rot a:open __conn_disp_state_msg false swap __con_do_exchange ;
 
 \ ========================================
 \ Startup words
@@ -695,7 +696,16 @@ with: fr.ps
 	CONNECTOR_TASK gen_server_term
 	0.1 sleep
 ;
-	
+
+\ ========================================
+\ Utils
+\ ----------------------------------
+\ Decode response
+\ response-map -- true(good)|false(bad)
+: conn_decode_response	SED: m -- T
+	"resp" m:@ "ACK" s:= nip if true else false then
+;
+
 \ ========================================
 \ Reset namespace
 ns: user
@@ -724,15 +734,16 @@ connector_test @ #if
 		log
 	;
 	
-	\ Send a message, get a rsponse
+	\ Send a message, get a response
 	: sender
-		a:new swap a:push ' w  +sender msg! response@ 
+		a:new swap a:push ' w  +sender .s msg! response@ 
 	;
 	
 	\ Basic start radio with default audio
 	: script
 		reg_task
 		conn_init
+		conn_subscribe
 		1 sleep
 		"POLL" log
 		
