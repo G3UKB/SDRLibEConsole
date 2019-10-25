@@ -20,25 +20,20 @@
  
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
-*)
 
-(*
 	This is the server display system task[s]. It is a gen-server which starts and controls three
 	reader tasks, one for each radio display.
 	
-	Display dats for panadapter/waterfall and WBS is high volume with a frequency of no less
+	Display data for panadapter/waterfall and WBS is high volume with a frequency of no less
 	than 200ms, otherwise the display will be visibly jerky.
 	
 	We tell the server what data is required i.e r1/r2/r3/wbs and the required frequency of that data. The
 	server will then send that data on separate UDP channels for each display at the requested frequency. 
 	We start a reader thread for each display. These threads are enabled/disabled by the svr_evnt_set_disp_state
-	call. When a reader thread is active data received is shipped directly to the display instance data buffer 
-	[disp_common.8th]. Calls are then made to the builder to make the arrays for subsequent rendering. 
-	The builders are passed the display instance data id.
-	
-	The builders can operate on any thread as they do not render, that is handled by disp_renderer.8th which operates
-	off a GUI timer so the render can be at a different frequency to the data collection if required. Rendering
-	of course must be on the main thread.
+	call. When a reader thread is active data received is encoded into a number of arrays directly within each reader
+	task for easy consumption by the renderer. There is adequate time within the 100-200ms frequency to encode in
+	the same task thus no data copy or locking is required as this would be costly with high volume data.
+
 *)
 
 needs stack/3drop
