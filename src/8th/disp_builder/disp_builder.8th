@@ -20,17 +20,17 @@
  
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
+     
+ 	The display builder is called by disp_event.8th when display data is available. Each display
+ 	is called on a separate thread and builds arrays such that the renderer has minimal work.
+ 	The arrays for the static and dynamic data are passed to the rendered using copy and g:do. This
+ 	may be more expensive than locking but the data is not huge and copy/dispatch is more deterministic.
+	
 *)
 
 \ Use SDR namespace
 ns: sdr
 
-(*
-	The display builder is called by event.8th when display data is available. Each display
-	is called on a separate thread and builds arrays such that the renderer has minimal work.
-	The instance data is locked for the duration as it is shared with the renderer.
-*)
-	
 \ ===============================================================================
 \ Add labels, lines and points
 
