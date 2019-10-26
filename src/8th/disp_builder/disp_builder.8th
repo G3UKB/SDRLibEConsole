@@ -31,6 +31,47 @@
 \ Use SDR namespace
 ns: sdr
 
+\ Temporary hopme for defs and helpers
+\ Defs
+: divs 6 ;
+
+\ Adjustments for label data to correctly align
+: x_h_label_adj -20 ;
+: y_h_label_adj -10 ;
+: y_v_label_adj -3 ;
+
+\ ----------------------------------
+\ Panadapter db scale to scale the Y axis display
+\ ToDo: configure low/high db
+: low_db -140 ;
+: high_db -20 ;
+
+\ Helpers
+\ ----------------------------------
+\ Total absolute dBm span 
+: span_db	SED: -- n
+	\ in: 	none	
+	\ out:	0: n - absolute dBm span
+	low_db n:abs high_db n:+ 
+;
+	
+\ ----------------------------------
+\ dBm increment per division in grid
+: step_db	SED: -- n 
+	\ in: 	none	
+	\ out:	0: n - dBm per grid division
+	span_db divs  n:/ 
+;
+
+\ ----------------------------------
+\ Given the grid number (e.g. 1-6)
+\ return a string dBm label at the given grid point
+: inter_db	SED: n -- s
+	\ in: 	0: n - grid number where 0 is topmost grid line
+	\ out:	0: s - signed db as a string
+	divs n:- n:abs step_db n:* low_db n:+ >s 
+;
+
 \ ===============================================================================
 \ Add labels, lines and points
 
@@ -44,7 +85,8 @@ ns: sdr
 	a:push													\ y_start ["idx"]
 	5 a:push												\ y_start ["idx",x]
 	1 pick y_v_label_adj n:+ a:push	\ y_start ["idx",x,y]
-	get_inst_data v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
+	\ get_inst_data v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
+	__get_v_label_data_ref a:push
 	drop														\ y_start 
 ;
 
@@ -171,11 +213,12 @@ ns: sdr
 	\ in: none
 	\ out: none
 	\ Get current widow size
-	get_inst_data get_disp_win_metrics a:open
+	\ get_inst_data get_disp_win_metrics a:open
+	__get_disp_width __get_disp_height
 	\ Make grid and label arrays
-	get_inst_data v_label_data_ref a:clear drop
-	get_inst_data h_label_data_ref a:clear drop
-	get_inst_data fixed_data_ref a:clear
+	__get_v_label_data_ref a:clear drop
+	__get_h_label_data_ref a:clear drop
+	__get_fixed_data_ref a:clear
 	' add_h_line 0 divs loop
 	' add_v_line 0 divs loop
 	3drop
@@ -256,8 +299,9 @@ ns: sdr
 	\ in: none
 	\ out: none
 	build_grid_array
-	build_pan_array 
-	build_wf_array ;
+	\ build_pan_array 
+	\ build_wf_array 
+;
 	
 \ ========================================
 \ Restore namespace	

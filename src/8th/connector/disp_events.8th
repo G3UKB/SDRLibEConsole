@@ -50,6 +50,7 @@ disp_evnt_test @ #if
 	"../common/ps_events.8th" f:include
 	"../common/run_state.8th" f:include
 	"connector.8th" f:include
+	"../disp_builder/disp_builder.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 #then
@@ -122,6 +123,15 @@ with: fr.ps
 ;
 : __push_raw	SED: n --
 	"disp-data" t:@ "raw_data" rot m:! drop
+;
+: __get_v_label_data_ref
+	"disp-data" t:@ "v-label-data" m:_@
+;
+: __get_h_label_data_ref
+	"disp-data" t:@ "h-label-data" m:_@
+;
+: __get_fixed_data_ref
+	"disp-data" t:@ "fixed-data" m:_@
 ;
 
 \ ========================================
@@ -199,7 +209,7 @@ with: fr.ps
 						3drop drop
 						\ Call the display builder to build the arrays
 						__copy_to_raw
-						\ disp_builder
+						disp_builder
 					then
 				else
 					\ drop socket
