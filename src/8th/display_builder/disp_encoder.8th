@@ -1,0 +1,267 @@
+(*
+	disp_builder.8th
+ 
+  Display builder for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+ 	The display encoder is called by disp_event.8th when display data is available. Each display
+ 	is called on a separate thread and builds arrays such that the renderer has minimal work.
+ 	The arrays for the static and dynamic data are passed to the rendered using copy and g:do. This
+ 	may be more expensive than locking but the data is not huge and copy/dispatch is more deterministic.
+	
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ===============================================================================
+\ Add labels, lines and points
+
+\ ----------------------------------
+\ Add one vertical label
+: add_v_label	SED: n n -- n
+	\ in: 	0: n - idx
+	\				1: n - y_start
+	\ out: 	0: n - y_start
+	inter_db a:new swap 						\ y_start [] "idx"
+	a:push													\ y_start ["idx"]
+	5 a:push												\ y_start ["idx",x]
+	1 pick y_v_label_adj n:+ a:push	\ y_start ["idx",x,y]
+	\ get_inst_data v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
+	__get_v_label_data_ref a:push
+	drop														\ y_start 
+;
+
+\ ----------------------------------
+\ Add one horizontal line
+: add_h_line	SED: n n a n -- n n a
+	\ in: 	0: n - idx
+	\				1: a - fixed_data
+	\				2: n - height
+	\				3: n - width
+	\ out: 	0: a - fixed_data
+	\				1: n - height
+	\				1: n - width
+	swap >r	>r r@							\ wide high idx r:fixed_data idx
+	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
+	a:new l_margin a:push			\ wide high wide high idx [x_start]
+	-rot											\ wide high wide [0] high idx 
+	\ (((high - 2*margin)/divs)*idx) + margin
+	swap t_margin b_margin n:+ n:- divs n:/ n:* t_margin n:+ \ wide high wide [x-start] y-start
+	r> add_v_label						\ wide high wide [x-start] y-start
+	a:push 										\ wide high wide [x-start, y-start] 
+	swap r_margin n:- a:push	\ wide high [x-start, y-start, x-stop] 
+	1 a:@ a:push							\ wide high [x-start, y-start, x-stop, y-stop] 
+	r> swap a:push 						\ wide high fixed_data
+;
+
+\ ----------------------------------
+\ Add one horizontal label
+: add_h_label	SED: n n n -- n n
+	\ in: 	0: n - idx
+	\				1: n - x_start
+	\				2: n - height
+	\ out: 	0: n - x_start
+	\				1: n - height
+	get_inst_data freq_str a:new swap \ high x_start [] "idx"
+	a:push													\ high x_start ["idx"]
+	1 pick x_h_label_adj n:+ a:push	\ high x_start ["idx",x]
+	2 pick y_h_label_adj n:+ a:push	\ high x_start ["idx",x,y]
+	get_inst_data h_label_data_ref swap a:push  	\ high x_start h_label_data
+	drop														\ high x_start
+;
+
+\ ----------------------------------
+\ Add one vertical line
+: add_v_line	SED: n n a n -- n n a
+	\ in: 	0: n - idx
+	\				1: a - fixed_data
+	\				2: n - height
+	\				3: n - width
+	\ out: 	0: a - fixed_data
+	\				1: n - height
+	\				2: n - width
+	swap >r	>r r@							\ wide high idx r:fixed_data idx
+	2 pick 2 pick rot					\ wide high wide high idx r:fixed_data idx
+	\ (((wide - 2*margin)/divs)*idx) + margin
+	2 pick l_margin r_margin n:+ n:- divs n:/ n:* l_margin n:+  \ wide high wide high x_start
+	r>	add_h_label						\ wide high wide high x_start
+	a:new swap a:push					\ wide high wide high [x_start]
+	t_margin a:push						\ wide high wide high [x-start, y-start]
+	0 a:@ a:push							\ wide high wide high [x-start, y-start, x-stop]
+	swap b_margin n:- a:push	\ wide high wide [x-start, y-start, x-stop, y-stop]
+	r> swap a:push nip 				\ wide high fixed_data
+;
+
+\ ----------------------------------
+\ Add one pan point
+\ Note that the data array is ordered high freq to low freq so indexing is reversed
+: add_pan_point	SED: a n n n -- a n n
+	\ in: 	0: n - x-coord
+	\				1: n - width
+	\				2: n - height
+	\				3: a - disp-data
+	\ out: 	0: n - width
+	\				1: n - height
+	\				2: a - disp-data
+	\ We want the corresponding dBm value for the x offset
+	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
+	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
+	3 pick swap n:- n:1-				\ disp-data height width  x-coord disp-data width-x-coord-l_margin
+	a:@ nip											\ disp-data height width  x-coord dBm 
+	3 pick											\ disp-data height width  x-coord dBm height
+	get_inst_data db_to_y				\ disp-data height width  x-coord y-coord
+	a:new 											\ disp-data height width  x-coord y-coord [] 
+	rot													\ disp-data height width  y-coord [] x-coord  
+	a:push											\ disp-data height width  y-coord [x-coord]
+	swap a:push									\ disp-data height width  [x-coord, y-coord]
+	get_inst_data pan_data_ref 	\ disp-data height width  [x-coord, y-coord] pan-data
+	swap 												\ disp-data height width  spec-data [x-coord, y-coord]
+	a:push drop  								\ disp-data height width
+;
+
+\ ----------------------------------
+\ Add one waterfall point
+\ Note that the data array is ordered high freq to low freq so indexing is reversed
+: add_wf_point	SED: a n n n -- a n n
+	\ in: 	0: n - x-coord
+	\				1: n - width
+	\				2: n - height
+	\				3: a - disp-data
+	\ out: 	0: n - width
+	\				1: n - height
+	\				2: a - disp-data
+	\ We want the corresponding dBm value for the x offset
+	3 pick 1 pick								\ disp-data height width x-coord disp-data x-coord 
+	l_margin n:- 								\ disp-data height width x-coord disp-data x-coord-l_margin
+	3 pick swap n:- n:1-				\ disp-data height width  x-coord disp-data width-x-coord-l_margin
+	a:@ nip											\ disp-data height width  x-coord dBm 
+	db_to_colour nip						\ disp-data height width  x-coord colour
+	a:new 											\ disp-data height width  x-coord colour [] 
+	2 pick 											\ disp-data height width  colour [] x-coord  							
+	a:push											\ disp-data height width  colour [x-coord]
+	swap a:push									\ disp-data height width  [x-coord, colour]
+	get_inst_data wf_data_ref		\ disp-data height width  [x-coord, colour] wf-data
+	swap 												\ disp-data height width  spec-data [x-coord, colour]
+	a:push drop 								\ disp-data height width
+;
+
+\ ===============================================================================
+\ Build arrays
+
+\ ----------------------------------
+\ Build grid array
+: build_grid_array	SED:  --
+	\ in: none
+	\ out: none
+	\ Get current widow size
+	\ get_inst_data get_disp_win_metrics a:open
+	__get_disp_width __get_disp_height
+	\ Make grid and label arrays
+	__get_v_label_data_ref a:clear drop
+	__get_h_label_data_ref a:clear drop
+	__get_fixed_data_ref a:clear
+	' add_h_line 0 divs loop
+	' add_v_line 0 divs loop
+	3drop
+;
+
+\ ----------------------------------
+\ Use to calibrate the display db range see build_pan_array
+: add_float
+	[-119.0, -109.0, -131.0, -50.0, -101.0, -141.0, -135.0, -111.0] a:shuffle
+	0 a:@ nip a:push
+;
+: make_float_array
+	a:new ' add_float 1024 times
+;
+
+\ ----------------------------------
+\ Build pan array
+: build_pan_array	SED:  --
+	\ in: none
+	\ out: none
+	\ Get current widow size
+	get_inst_data get_disp_win_metrics a:open			\ width height
+	\ Clear the data array
+	get_inst_data pan_data_ref a:clear drop				\ width height
+	\ Get display data for the instance
+	"inst_data" t:@	get_raw_data 	\ width height disp-data(float array)														
+	\ ... or calibrate
+	\ make_float_array
+	a:len 0 n:> if
+		\ We seem to have a good response
+		\ DSP data is a float array of db values which must be converted to y coordinates
+		\ The number of points is the width of the display area and is passed to the display proc
+		\ The array is therefore 1 y value per display area pixel in the x plane
+		\ We repeat on the x plane from the left-margin to the width - right-margin
+		-rot swap dup	l_margin n:- r_margin n:- swap	\ disp-data height width width-l_margin-r_margin
+		' add_pan_point swap													\ disp-data height width add_spec_points width
+		l_margin swap																	\ disp-data height width add_spec_points left-margin width
+		r_margin n:- n:1-															\ disp-data height width add_spec_points x-start x-end
+		loop 3drop
+	else
+		3drop
+	then
+;
+
+\ ----------------------------------
+\ Build wf array
+: build_wf_array	SED:  --
+	\ in: none
+	\ out: none
+	\ Get current widow size
+	get_inst_data get_disp_win_metrics a:open					\ width height
+	\ Clear the data array
+	get_inst_data wf_data_ref a:clear drop						\ width height
+	\ Get display data for the instance
+	"inst_data" t:@ get_raw_data	 	\ width height disp-data(float array)
+	\ ... or calibrate
+	\ make_float_array
+	a:len 0 n:> if
+		\ We seem to have a good response
+		\ DSP data is a float array of db values which must be converted to a colour
+		\ The number of points is the width of the display area and is passed to the display proc
+		\ The array is therefore 1 colour value per display area pixel in the x plane
+		\ We repeat on the x plane from the left-margin to the width - right-margin
+		-rot swap dup	l_margin n:- r_margin n:- swap	\ disp-data height width width-l_margin-r_margin
+		' add_wf_point swap														\ disp-data height width add_spec_points width
+		l_margin swap																	\ disp-data height width add_spec_points left-margin width
+		r_margin n:- n:1-															\ disp-data height width add_spec_points x-start x-end
+		loop 3drop
+	else
+		3drop
+	then
+;
+
+\ ===============================================================================
+\ Build the display arrays
+\ Called periodically from event.8th
+: disp_builder	SED:  --
+	\ in: none
+	\ out: none
+	build_grid_array
+	\ build_pan_array 
+	\ build_wf_array 
+;
+	
+\ ========================================
+\ Restore namespace	
+ns: user	

@@ -1,0 +1,57 @@
+(* 
+	disp_cacl.8th
+
+	Display calculations
+
+	Copyright C 2019 by G3UKB Bob Cowdery
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	at your option any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+	The author can be reached by email at:   
+		 bob@bobcowdery.plus.com
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ========================================
+\ Calculations
+\ ----------------------------------
+\ Total absolute dBm span 
+: span_db	SED: -- n
+	\ in: 	none	
+	\ out:	0: n - absolute dBm span
+	low_db n:abs high_db n:+ 
+;
+	
+\ ----------------------------------
+\ dBm increment per division in grid
+: step_db	SED: -- n 
+	\ in: 	none	
+	\ out:	0: n - dBm per grid division
+	span_db divs  n:/ 
+;
+
+\ ----------------------------------
+\ Given the grid number (e.g. 1-6)
+\ return a string dBm label at the given grid point
+: inter_db	SED: n -- s
+	\ in: 	0: n - grid number where 0 is topmost grid line
+	\ out:	0: s - signed db as a string
+	divs n:- n:abs step_db n:* low_db n:+ >s 
+;
+
+\ ========================================
+\ Restore namespace	
+ns: user	

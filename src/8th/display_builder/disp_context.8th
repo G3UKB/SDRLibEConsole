@@ -1,0 +1,46 @@
+(* 
+	disp_context.8th
+
+	Display context
+
+	Copyright C 2019 by G3UKB Bob Cowdery
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	at your option any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+	The author can be reached by email at:   
+		 bob@bobcowdery.plus.com
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ========================================
+\ Display data for capture and building
+: create_display_data	SED: --
+	{
+		"data-buffer" : ` 20000 b:new 0x0 b:fill ` ,	\ hw data buffer
+		"raw-data" : [],				\ raw float array formatted from data buffer
+		"rx-meter" : 0.0,				\ meter data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"disp_metrics" : [500,200]			\ Temporary until implemented
+	} "disp-data" t:!
+;
+
+\ ========================================
+\ Restore namespace	
+ns: user	
