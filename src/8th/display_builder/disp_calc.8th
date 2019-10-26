@@ -27,6 +27,10 @@ ns: sdr
 
 \ ========================================
 \ Calculations
+
+\ ========================================
+\ dBm Calculations
+
 \ ----------------------------------
 \ Total absolute dBm span 
 : span_db	SED: -- n
@@ -50,6 +54,35 @@ ns: sdr
 	\ in: 	0: n - grid number where 0 is topmost grid line
 	\ out:	0: s - signed db as a string
 	divs n:- n:abs step_db n:* low_db n:+ >s 
+;
+
+\ ========================================
+\ Frequency Calculations
+
+\ ----------------------------------	
+\ Start freq for display
+: start_freq	SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - start frequency as MHz float
+	\ get_disp_mid_freq span_freq 2 n:/ n:- 1000000 n:/ n:float ;
+	__get_mid_freq span_freq 2 n:/ n:- 1000000 n:/ n:float 
+;
+
+\ ----------------------------------	
+\ Step freq per div
+: step_freq	 SED: m -- n
+	\ in: 	0: m - display instance data	
+	\ out:	0: n - frequency increment per grid division as MHz float
+	span_freq divs n:/ 1000000 n:/ n:float 
+;
+	
+\ ----------------------------------	
+\ Return a string freq value for the grid division
+: freq_str SED: n -- s
+	\ in: 	0: n - grid number (e.g. 1-6) 
+	\ out:	0: s - frequency string in MHz (3 sig digits) for the grid number
+	start_freq step_freq rot n:* n:+
+	"%.3f" s:strfmt
 ;
 
 \ ========================================

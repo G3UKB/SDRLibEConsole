@@ -31,14 +31,24 @@
 \ Use SDR namespace
 ns: sdr
 
-\ Temporary hopme for defs and helpers
-\ Defs
-: divs 6 ;
+\ ===============================================================================
+\ Panadapter and waterfall definitions
 
+\ ----------------------------------
+\ Divisions and margins
+\ Paradapter grid divs
+: divs 6 ;
+\ Left, right, top, bottom margins (limits of grid and display)
+: l_margin 35 ;
+: r_margin 15 ;
+: t_margin 10 ;
+: b_margin 100 ;
 \ Adjustments for label data to correctly align
 : x_h_label_adj -20 ;
 : y_h_label_adj -10 ;
 : y_v_label_adj -3 ;
+\ Fixed height for waterfall display
+: wf_height 75 ;
 
 \ ----------------------------------
 \ Panadapter db scale to scale the Y axis display
@@ -46,6 +56,11 @@ ns: sdr
 : low_db -140 ;
 : high_db -20 ;
 
+\ ----------------------------------
+\ Frequency
+\ ToDo: - get from model
+\ Panadapter span i.e sample rate
+: span_freq 48000 ;
 
 \ ========================================
 \ Restore namespace	

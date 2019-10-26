@@ -27,7 +27,8 @@ ns: sdr
 
 \ ========================================
 \ Display data for capture and building
-: create_display_data	SED: --
+\ Each reader/builder task creates an instance and saves to "disp_data" task variable.
+: __create_display_data	SED: --
 	{
 		"data-buffer" : ` 20000 b:new 0x0 b:fill ` ,	\ hw data buffer
 		"raw-data" : [],				\ raw float array formatted from data buffer
@@ -37,8 +38,62 @@ ns: sdr
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
-		"disp_metrics" : [500,200]			\ Temporary until implemented
-	} "disp-data" t:!
+		\ Possibly temporary
+		"disp-metrics" : [500,200],
+		"mid-freq" : 7100000
+	}
+;
+
+\ ========================================
+\ Access words for display data
+: __get_instance_data
+	"disp-data" t:@
+;
+: __get_data_buffer
+	"disp-data" t:@ "data-buffer" m:_@
+;
+: __get_disp_width
+	"disp-data" t:@ "disp-metrics" m:_@ 0 a:_@
+;
+: __get_disp_height
+	"disp-data" t:@ "disp-metrics" m:_@ 1 a:_@
+;
+: __push_meter	SED: n --
+	"disp-data" t:@ "rx-meter" rot m:! drop
+;
+: __push_raw	SED: n --
+	"disp-data" t:@ "raw_data" rot m:! drop
+;
+: __get_v_label_data_ref
+	"disp-data" t:@ "v-label-data" m:_@
+;
+: __get_h_label_data_ref
+	"disp-data" t:@ "h-label-data" m:_@
+;
+: __get_fixed_data_ref
+	"disp-data" t:@ "fixed-data" m:_@
+;
+: __get_mid_freq
+	"disp-data" t:@ "mid-freq" m:_@
+;
+
+\ ========================================
+\ Conversions
+\ Convert and save raw data
+: __copy_to_raw	SED: m --
+	\ in: 	0: m - display instance data			
+	\ out:	none
+	
+	\ The buffer is display width +1 for the meter data
+	__get_data_buffer
+	\ Width of this radio display
+	__get_disp_width
+	\ unpacked array
+	n:1+ >s "f" s:+ unpack drop
+	\ Get/save the meter data which is 0th element of the array
+	a:shift swap __push_meter
+	\ Store remainder of the float array in raw
+	__push_raw
 ;
 
 \ ========================================

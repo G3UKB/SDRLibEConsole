@@ -45,7 +45,7 @@ ns: sdr
 	5 a:push												\ y_start ["idx",x]
 	1 pick y_v_label_adj n:+ a:push	\ y_start ["idx",x,y]
 	\ get_inst_data v_label_data_ref swap a:push		\ y_start [["idx",x,y]..]
-	__get_v_label_data_ref a:push
+	__get_v_label_data_ref swap a:push
 	drop														\ y_start 
 ;
 
@@ -80,11 +80,13 @@ ns: sdr
 	\				2: n - height
 	\ out: 	0: n - x_start
 	\				1: n - height
-	get_inst_data freq_str a:new swap \ high x_start [] "idx"
+	\ get_inst_data freq_str a:new swap \ high x_start [] "idx"
+	freq_str a:new swap 						\ high x_start [] "idx"
 	a:push													\ high x_start ["idx"]
 	1 pick x_h_label_adj n:+ a:push	\ high x_start ["idx",x]
 	2 pick y_h_label_adj n:+ a:push	\ high x_start ["idx",x,y]
-	get_inst_data h_label_data_ref swap a:push  	\ high x_start h_label_data
+	\ get_inst_data h_label_data_ref swap a:push  	\ high x_start h_label_data
+	__get_h_label_data_ref swap a:push
 	drop														\ high x_start
 ;
 
@@ -110,6 +112,7 @@ ns: sdr
 	r> swap a:push nip 				\ wide high fixed_data
 ;
 
+(*
 \ ----------------------------------
 \ Add one pan point
 \ Note that the data array is ordered high freq to low freq so indexing is reversed
@@ -162,6 +165,7 @@ ns: sdr
 	swap 												\ disp-data height width  spec-data [x-coord, colour]
 	a:push drop 								\ disp-data height width
 ;
+*)
 
 \ ===============================================================================
 \ Build arrays
@@ -178,11 +182,12 @@ ns: sdr
 	__get_v_label_data_ref a:clear drop
 	__get_h_label_data_ref a:clear drop
 	__get_fixed_data_ref a:clear
-	' add_h_line 0 divs loop
+	' add_h_line 0 divs loop 
 	' add_v_line 0 divs loop
 	3drop
 ;
 
+(*
 \ ----------------------------------
 \ Use to calibrate the display db range see build_pan_array
 : add_float
@@ -203,7 +208,7 @@ ns: sdr
 	\ Clear the data array
 	get_inst_data pan_data_ref a:clear drop				\ width height
 	\ Get display data for the instance
-	"inst_data" t:@	get_raw_data 	\ width height disp-data(float array)														
+	"inst_data" t:@	get_raw_data 	\ width height disp-data[float array]														
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -232,7 +237,7 @@ ns: sdr
 	\ Clear the data array
 	get_inst_data wf_data_ref a:clear drop						\ width height
 	\ Get display data for the instance
-	"inst_data" t:@ get_raw_data	 	\ width height disp-data(float array)
+	"inst_data" t:@ get_raw_data	 	\ width height disp-data[float array]
 	\ ... or calibrate
 	\ make_float_array
 	a:len 0 n:> if
@@ -250,6 +255,7 @@ ns: sdr
 		3drop
 	then
 ;
+*)
 
 \ ===============================================================================
 \ Build the display arrays
@@ -258,6 +264,9 @@ ns: sdr
 	\ in: none
 	\ out: none
 	build_grid_array
+	\ __get_v_label_data_ref . cr
+	\ __get_h_label_data_ref . cr
+	\ __get_fixed_data_ref . cr
 	\ build_pan_array 
 	\ build_wf_array 
 ;

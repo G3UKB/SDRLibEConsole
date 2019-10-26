@@ -50,9 +50,9 @@ disp_evnt_test @ #if
 	"../common/ps_events.8th" f:include
 	"../common/run_state.8th" f:include
 	"../connector/connector.8th" f:include
+	"disp_context.8th" f:include
 	"disp_defs.8th" f:include
 	"disp_calc.8th" f:include
-	"disp_context.8th" f:include
 	"disp_encoder.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
@@ -94,68 +94,6 @@ with: fr.ps
 : __svr_evnt_d2_sock@	"udp_d2_evnt_sock" t:@ ;
 : __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
 
-\ ========================================
-\ Display data for capture and building
-: __create_display_data	SED: --
-	{
-		"data-buffer" : ` 20000 b:new 0x0 b:fill ` ,
-		"raw-data" : [],				\ raw float array formatted from data buffer
-		"rx-meter" : 0.0,				\ meter data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
-		"disp_metrics" : [500,200]			\ Temporary until implemented
-	} "disp-data" t:!
-;
-
-\ ========================================
-\ Access words for display data
-: __get_data_buffer
-	"disp-data" t:@ "data-buffer" m:_@
-;
-: __get_disp_width
-	"disp-data" t:@ "disp_metrics" m:_@ 0 a:_@
-;
-: __get_disp_height
-	"disp-data" t:@ "disp_metrics" m:_@ 1 a:_@
-;
-: __push_meter	SED: n --
-	"disp-data" t:@ "rx-meter" rot m:! drop
-;
-: __push_raw	SED: n --
-	"disp-data" t:@ "raw_data" rot m:! drop
-;
-: __get_v_label_data_ref
-	"disp-data" t:@ "v-label-data" m:_@
-;
-: __get_h_label_data_ref
-	"disp-data" t:@ "h-label-data" m:_@
-;
-: __get_fixed_data_ref
-	"disp-data" t:@ "fixed-data" m:_@
-;
-
-\ ========================================
-\ Conversions
-\ Convert and save raw data
-: __copy_to_raw	SED: m --
-	\ in: 	0: m - display instance data			
-	\ out:	none
-	
-	\ The buffer is display width +1 for the meter data
-	__get_data_buffer
-	\ Width of this radio display
-	__get_disp_width
-	\ unpacked array
-	n:1+ >s "f" s:+ unpack drop
-	\ Get/save the meter data which is 0th element of the array
-	a:shift swap __push_meter
-	\ Store remainder of the float array in raw
-	__push_raw
-;
-
 \ ===============================================================================
 \ Reader/builder task
 \ Read event data while enabled and not terminated
@@ -178,7 +116,7 @@ with: fr.ps
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
 	\ Create display data and save as task variable
-	create_display_data "disp-data" t:!
+	__create_display_data "disp-data" t:!
 	
 	\ ----------------------------------
 	\ Wait for work
