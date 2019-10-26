@@ -39,30 +39,43 @@ ns: sdr
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
 		\ Possibly temporary
-		"disp-metrics" : [500,200],
+		"win-metrics" : [500,200],
+		"disp-metrics" : [480,180],
 		"mid-freq" : 7100000
 	}
 ;
 
 \ ========================================
 \ Access words for display data
+
+\ ========================================
+\ Readers
 : __get_instance_data
 	"disp-data" t:@
 ;
 : __get_data_buffer
 	"disp-data" t:@ "data-buffer" m:_@
 ;
+: __get_raw_data_ref
+	"disp-data" t:@ "raw-data" m:_@
+;
+: __get_pan_data_ref
+	"disp-data" t:@ "pan-data" m:_@
+;
+: __get_wf_data_ref
+	"disp-data" t:@ "wf-data" m:_@
+;
+: __get_win_width
+	"disp-data" t:@ "win-metrics" m:_@ 0 a:_@
+;
+: __get_win_height
+	"disp-data" t:@ "win-metrics" m:_@ 1 a:_@
+;
 : __get_disp_width
 	"disp-data" t:@ "disp-metrics" m:_@ 0 a:_@
 ;
 : __get_disp_height
 	"disp-data" t:@ "disp-metrics" m:_@ 1 a:_@
-;
-: __push_meter	SED: n --
-	"disp-data" t:@ "rx-meter" rot m:! drop
-;
-: __push_raw	SED: n --
-	"disp-data" t:@ "raw_data" rot m:! drop
 ;
 : __get_v_label_data_ref
 	"disp-data" t:@ "v-label-data" m:_@
@@ -75,6 +88,15 @@ ns: sdr
 ;
 : __get_mid_freq
 	"disp-data" t:@ "mid-freq" m:_@
+;
+
+\ ========================================
+\ Writers
+: __push_raw	SED: n --
+	"disp-data" t:@ "raw-data" rot m:! drop
+;
+: __push_meter	SED: n --
+	"disp-data" t:@ "rx-meter" rot m:! drop
 ;
 
 \ ========================================
@@ -91,7 +113,7 @@ ns: sdr
 	\ unpacked array
 	n:1+ >s "f" s:+ unpack drop
 	\ Get/save the meter data which is 0th element of the array
-	a:shift swap __push_meter
+	a:shift __push_meter
 	\ Store remainder of the float array in raw
 	__push_raw
 ;

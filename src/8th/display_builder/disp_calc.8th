@@ -56,6 +56,30 @@ ns: sdr
 	divs n:- n:abs step_db n:* low_db n:+ >s 
 ;
 
+\ ----------------------------------	
+\ dBm per pixel in the y plane
+: dBm_pp	SED: m -- n
+	\ in: 	
+	\ out:	0: n - dBm per pixel
+	__get_disp_height span_db n:/ 
+;
+
+\ ----------------------------------	
+\ Convert a dBm value to a y-coord
+: db_to_y	SED: n n m -- n
+	\ in: 	
+	\				1: n - display height
+	\				2: n - dBm value
+	\ out:	0: n - corresponding y coordinate
+	\ rel-dBm = abs(low-dBm) - abs(dBm)
+	swap n:int n:abs						\ height abs(dBm)
+	low_db n:int n:abs					\ height abs(dBm) abs(low-dBm)
+	swap n:-										\ height abs(rel-dBm)
+	swap b_margin n:- swap			\ height-margin abs(rel-dBm)
+	\ y-coord = height - (rel-dBm * dBm_pp)
+	dBm_pp n:* n:- n:int				\ y-coord
+;
+
 \ ========================================
 \ Frequency Calculations
 
@@ -85,6 +109,63 @@ ns: sdr
 	"%.3f" s:strfmt
 ;
 
+\ ========================================
+\ Waterfall colour calculation
+
+\ ----------------------------------
+: M160-M135	SED: n -- n T
+	\ in: 	0: n - dBm value
+	\ out:	0: n - dBm value
+	\				1: T - true if dBm fell between limits
+	dup -160 -135 n:between
+;
+: M135-M130 dup -135 -130  n:between ;
+: M130-M125 dup -130 -125  n:between ;
+: M125-M120 dup -125 -120  n:between ;
+: M120-M115 dup -120 -115  n:between ;
+: M115-M110 dup -115 -110  n:between ;
+: M110-M100 dup -110 -100  n:between ;
+: M100+ dup -100 0  n:between ;
+: M200-M+40 dup -200 40  n:between ;
+
+\ ----------------------------------
+\ RGBA colour values representing the colour spread
+: color-1 [ 0.0,0.0,0.2,1.0 ] ;
+: color-2 [ 0.1,0.0,0.3,1.0 ] ;
+: color-3 [ 0.2,0.0,0.4,1.0 ] ;
+: color-4 [ 0.3,0.0,0.5,1.0 ] ;
+: color-5 [ 0.5,0.0,0.4,1.0 ] ;
+: color-6 [ 0.7,0.0,0.2,1.0 ] ;
+: color-7 [ 0.9,0.0,0.1,1.0 ] ;
+: color-8 [ 1.0,0.0,0.0,1.0 ] ;
+
+\ ----------------------------------
+\ Lookup table [w, colour]
+\ If w returns true the corresponding colour is selected
+[
+	' M160-M135 , ' color-1 ,
+	' M135-M130 , ' color-2 , 
+	' M130-M125 , ' color-3 ,
+	' M125-M120 , ' color-4 ,
+	' M120-M115 , ' color-5 , 
+	' M115-M110 , ' color-6 ,
+	' M110-M100 , ' color-7 ,
+	' M100+ 		, ' color-8 ,
+	' M200-M+40 , ' color-1 ,
+	' color-1
+] var, clookup
+
+\ ----------------------------------
+\ Translate a dBm value to a colour
+: db_to_colour	SED: n -- a
+	\ in: 	0: n - dBm value
+	\ out:	0: a - RGBA colour array
+	\ Must lock read-only structures!
+	clookup lock @
+	a:when nip
+	clookup unlock drop 
+;
+	
 \ ========================================
 \ Restore namespace	
 ns: user	
