@@ -115,8 +115,8 @@ with: fr.ps
 	"reader_skt" t:!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
-	\ Create display data and save as task variable
-	__create_display_data "disp-data" t:!
+	\ Create builder data
+	__builder_data_new
 	
 	\ ----------------------------------
 	\ Wait for work

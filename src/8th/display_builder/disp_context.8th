@@ -27,9 +27,16 @@ ns: sdr
 
 \ ========================================
 \ Display data for capture and building
-\ Each reader/builder task creates an instance and saves to "disp_data" task variable.
-: __create_display_data	SED: --
+\ Each reader/builder task creates an instance
+: __builder_data	SED: --
 	{
+		\ ========================================
+		\ Window metrics
+		"win-metrics" : [500,200],	\ Window area for display
+		"disp-metrics" : [480,180],	\ Client area for graphs
+		
+		\ ========================================
+		\ Display data
 		"data-buffer" : ` 20000 b:new 0x0 b:fill ` ,	\ hw data buffer
 		"raw-data" : [],				\ raw float array formatted from data buffer
 		"rx-meter" : 0.0,				\ meter data
@@ -38,65 +45,71 @@ ns: sdr
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
 		"wf-data" : [],					\ [[x,color],[x,color],...]
-		\ Possibly temporary
-		"win-metrics" : [500,200],
-		"disp-metrics" : [480,180],
-		"mid-freq" : 7100000
+	
+		\ ========================================
+		\ Radio state
+		"mid-freq" : 7100000,
 	}
 ;
 
 \ ========================================
-\ Access words for display data
+\ Create instance for radio
+: __builder_data_new SED  --
+	__builder_data "builder-data" t:!
+;
 
+\ ========================================
+\ Access words for display data
+\ Change all these to eg __builder_raw_data@
 \ ========================================
 \ Readers
 : __get_instance_data
-	"disp-data" t:@
+	"builder-data" t:@
 ;
 : __get_data_buffer
-	"disp-data" t:@ "data-buffer" m:_@
+	"builder-data" t:@ "data-buffer" m:_@
 ;
 : __get_raw_data_ref
-	"disp-data" t:@ "raw-data" m:_@
+	"builder-data" t:@ "raw-data" m:_@
 ;
 : __get_pan_data_ref
-	"disp-data" t:@ "pan-data" m:_@
+	"builder-data" t:@ "pan-data" m:_@
 ;
 : __get_wf_data_ref
-	"disp-data" t:@ "wf-data" m:_@
+	"builder-data" t:@ "wf-data" m:_@
 ;
 : __get_win_width
-	"disp-data" t:@ "win-metrics" m:_@ 0 a:_@
+	"builder-data" t:@ "win-metrics" m:_@ 0 a:_@
 ;
 : __get_win_height
-	"disp-data" t:@ "win-metrics" m:_@ 1 a:_@
+	"builder-data" t:@ "win-metrics" m:_@ 1 a:_@
 ;
 : __get_disp_width
-	"disp-data" t:@ "disp-metrics" m:_@ 0 a:_@
+	"builder-data" t:@ "disp-metrics" m:_@ 0 a:_@
 ;
 : __get_disp_height
-	"disp-data" t:@ "disp-metrics" m:_@ 1 a:_@
+	"builder-data" t:@ "disp-metrics" m:_@ 1 a:_@
 ;
 : __get_v_label_data_ref
-	"disp-data" t:@ "v-label-data" m:_@
+	"builder-data" t:@ "v-label-data" m:_@
 ;
 : __get_h_label_data_ref
-	"disp-data" t:@ "h-label-data" m:_@
+	"builder-data" t:@ "h-label-data" m:_@
 ;
 : __get_fixed_data_ref
-	"disp-data" t:@ "fixed-data" m:_@
+	"builder-data" t:@ "fixed-data" m:_@
 ;
 : __get_mid_freq
-	"disp-data" t:@ "mid-freq" m:_@
+	"builder-data" t:@ "mid-freq" m:_@
 ;
 
 \ ========================================
 \ Writers
 : __push_raw	SED: n --
-	"disp-data" t:@ "raw-data" rot m:! drop
+	"builder-data" t:@ "raw-data" rot m:! drop
 ;
 : __push_meter	SED: n --
-	"disp-data" t:@ "rx-meter" rot m:! drop
+	"builder-data" t:@ "rx-meter" rot m:! drop
 ;
 
 \ ========================================
