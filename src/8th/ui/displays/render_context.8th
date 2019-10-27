@@ -1,0 +1,115 @@
+(* 
+	render_context.8th
+
+	Display render context
+
+	Copyright C 2019 by G3UKB Bob Cowdery
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	at your option any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+	The author can be reached by email at:   
+		 bob@bobcowdery.plus.com
+		 
+	This is partly a mirror image of the reader/builder context less those items
+	which are only required by the reader/builder and plus those items only required by
+	the renderer.
+	The main difference is that whilst the reader/builder has one task for each radio and 
+	thus the same task variable name is used to access the data the renderer has to be run
+	for all radios on the GUI thread and therefore we use a different task variable for each
+	radio instance and the radio id has to be passed in to the access words.
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ========================================
+\ Data for rendering displays
+: __render_data	SED: --
+	{
+		\ ========================================
+		\ Window metrics
+		"win-metrics" : [500,200],
+		"disp-metrics" : [480,180],
+		"mouse-pos" : [0,0],		\ Current mouse position
+		
+		\ ========================================
+		\ Display data
+		"rx-meter" : 0.0,				\ meter data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"wf-img" : ` 100 100 img:new ` ,
+	
+		\ ========================================
+		\ Radio state
+		"mid-freq" : 7100000,
+		"mode" : 0,
+		"filter" : 0
+	}
+;
+
+\ ========================================
+\ Create instance for radio
+: __render_data_new SED n --
+	__render_data "render-data-" rot >s s:+ t:!
+;
+
+\ ========================================
+\ Access words for render data
+
+\ ========================================
+\ Readers
+: __render_data_ref	SED: n -- m
+	"render-data-" swap >s s:+ t:@
+;
+: __render_pan_data@
+	__render_data_ref t:@ "pan-data" m:_@
+;
+: __render_wf_data@
+	__render_data_ref t:@ "wf-data" m:_@
+;
+: __render_win_width@
+	__render_data_ref t:@ "win-metrics" m:_@ 0 a:_@
+;
+: __render_win_height@
+	__render_data_ref t:@ "win-metrics" m:_@ 1 a:_@
+;
+: __render_disp_width@
+	__render_data_ref t:@ "disp-metrics" m:_@ 0 a:_@
+;
+: __render_disp_height@
+	__render_data_ref t:@ "disp-metrics" m:_@ 1 a:_@
+;
+: __render_v_label_data@
+	__render_data_ref t:@ "v-label-data" m:_@
+;
+: __get_h_label_data@
+	__render_data_ref t:@ "h-label-data" m:_@
+;
+: __render_fixed_data@
+	__render_data_ref t:@ "fixed-data" m:_@
+;
+: __render_mid_freq@
+	__render_data_ref t:@ "mid-freq" m:_@
+;
+
+\ ========================================
+\ Writers
+
+
+\ ========================================
+\ Restore namespace	
+ns: user	
