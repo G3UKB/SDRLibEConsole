@@ -1,0 +1,52 @@
+(*
+	global_state.8th
+ 
+  Current global state for the SDRLibEConsole application
+ 
+ Copyright C 2018 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  In general we try to avoid global state in the code modules. Most modules
+  are tasks, usually gen-servers and task state is kept in task variables. Tasks
+  only communicate via messaging directly or via pub/sub messaging.
+  
+  The models contain all persistent state and are there only to provide startup
+  state and to persist new state at EOD.
+  
+  However, state that is required at runtime but by potentially many different modules both
+  gen-server modules and GUI [main task] modules can be awkward to properly disseminate
+  to all requiring modules. Some will subscribe to topics and be informed directly. Others,
+  such as the display reader/builder tasks and renderers may find that inconvienient. This
+  module therefore provides a global repository for such state. It is a gen-server module and
+  consumes all state only via subscriptions. It writes the state to a global structure with 
+  appropriate locking. Any task may read the state via access methods only which provide appropriate
+  locking. Tasks must never write state.
+*)
+
+\ ========================================
+\ Testing only
+false var, runstate_test
+runstate_test @ #if
+	\ Includes
+	\ needs debug/sed
+	\ true SED-CHECK
+#then
+
+\ ========================================
+\ Set namespace
+ns: sdr

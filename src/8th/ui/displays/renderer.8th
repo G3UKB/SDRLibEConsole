@@ -1,0 +1,58 @@
+(*
+	renderer.8th
+ 
+  Display renderer component for the SDRLibEConsole application
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This component can be multi-instanced to provide a renderer for the pan
+  and waterfall displays.
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+false var, vfo_test
+
+\ ----------------------------------
+renderer_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../../common/app_defs.8th" f:include
+	"../../common/radio_defs.8th" f:include
+	"../common/layout.8th" f:include
+	"../common/font_cache.8th" f:include
+	"../common/g_cache.8th" f:include
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ============================================================================
+\ User draw components
+\
