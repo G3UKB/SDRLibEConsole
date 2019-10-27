@@ -50,6 +50,7 @@ disp_evnt_test @ #if
 	"../common/ps_events.8th" f:include
 	"../common/run_state.8th" f:include
 	"../connector/connector.8th" f:include
+	"../ui/common/displays/renderer.8th" f:include
 	"disp_context.8th" f:include
 	"disp_defs.8th" f:include
 	"disp_calc.8th" f:include

@@ -56,3 +56,8 @@ with: fr.ps
 \ ============================================================================
 \ User draw components
 \
+
+: renderer_render	SED n --
+	"Called: " . . cr
+	"data_r1" t:@ . cr
+;
