@@ -35,7 +35,7 @@ ns: sdr
 
 \ ========================================
 \ Data for rendering displays
-: __render_data	SED: --
+: __render_working	SED: --
 	{
 		\ ========================================
 		\ Window metrics
@@ -45,12 +45,6 @@ ns: sdr
 		
 		\ ========================================
 		\ Display data
-		"rx-meter" : 0.0,				\ meter data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
 		"wf-img" : ` 100 100 img:new ` ,
 	
 		\ ========================================
@@ -64,7 +58,7 @@ ns: sdr
 \ ========================================
 \ Create instance for radio
 : __render_data_new SED n --
-	__render_data "render-data-" rot >s s:+ t:!
+	__render_working "render-working-" rot >s s:+ t:!
 ;
 
 \ ========================================

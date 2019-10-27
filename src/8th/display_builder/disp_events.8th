@@ -149,8 +149,12 @@ with: fr.ps
 						\ The data is stored in the task variable - data-buf
 						3drop drop
 						\ Call the display builder to build the arrays
+						\ Convert byte data to floats and extract meter data
 						__copy_to_raw
+						\ Build the arrays for the renderer
 						disp_builder
+						\ Transfer data and invoke renderer
+						__builder_data_xfer
 					then
 				else
 					\ drop socket

@@ -26,9 +26,8 @@
 ns: sdr
 
 \ ========================================
-\ Display data for capture and building
-\ Each reader/builder task creates an instance
-: __builder_data	SED: --
+\ Builder variables for capture and building
+: __builder_working	SED: --
 	{
 		\ ========================================
 		\ Window metrics
@@ -39,77 +38,133 @@ ns: sdr
 		\ Display data
 		"data-buffer" : ` 20000 b:new 0x0 b:fill ` ,	\ hw data buffer
 		"raw-data" : [],				\ raw float array formatted from data buffer
-		"rx-meter" : 0.0,				\ meter data
-		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
-		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
-		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
-	
+		
 		\ ========================================
 		\ Radio state
 		"mid-freq" : 7100000,
 	}
 ;
 
+\ Builder data created during each build process
+\ This data has to be passed to the renderer
+: __builder_results	SED: --
+	{
+		"rx-meter" : 0.0,				\ meter data
+		"fixed-data" : [],			\ [[x-start, y-start, x-stop, y-stop],...]
+		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
+		"pan-data" : [],				\ [[x,y],[x,y],...]
+		"wf-data" : [],					\ [[x,color],[x,color],...]
+	}
+;
+
 \ ========================================
 \ Create instance for radio
 : __builder_data_new SED  --
-	__builder_data "builder-data" t:!
+	__builder_working "builder-working" t:!
+	__builder_results "builder-results" t:!
+;
+
+\ ========================================
+\ Data transfer to renderer
+\ Here we copy the data to a task variable in the GUI task
+\ We then tell the GUI task to render the data.
+
+\ Calls on GUI thread with cloned result data
+: __renderer_xfer_1	SED: m --
+	\ Save data to task variable
+	"data" m:@ "data_r1" t:!
+	\ Tell renderer to render
+	1 renderer_render
+;
+
+: __renderer_xfer_2	SED: m --
+	"data" m:@ "data_r2" t:!
+	2 renderer_render
+;
+
+: __renderer_xfer_3	SED: m --
+	"data" m:@ "data_r3" t:!
+	3 renderer_render
+;
+
+\ Second call on the thread of builder with id
+: __builder_xfer_1	SED: id --
+	m:new "cb" ' __renderer_xfer_1 m:!
+	"data" "builder-results" t:@ const m:!
+	g:do
+;
+
+: __builder_xfer_2	SED: id --
+	m:new "cb" ' __renderer_xfer_2 m:!
+	"data" "builder-results" t:@ const m:!
+	g:do
+;
+
+: __builder_xfer_3	SED: id --
+	m:new "cb" ' __renderer_xfer_3 m:!
+	"data" "builder-results" t:@ const m:!
+	g:do
+;
+
+\ Base call on the thread of builder with id
+: __builder_data_xfer	SED: id --
+	[ ' __builder_xfer_1 , ' __builder_xfer_2 , ' __builder_xfer_3 ]
+	swap caseof
 ;
 
 \ ========================================
 \ Access words for display data
 \ Change all these to eg __builder_raw_data@
 \ ========================================
-\ Readers
-: __get_instance_data
-	"builder-data" t:@
-;
+\ Readers for builder working data
 : __get_data_buffer
-	"builder-data" t:@ "data-buffer" m:_@
+	"builder-working" t:@ "data-buffer" m:_@
 ;
 : __get_raw_data_ref
-	"builder-data" t:@ "raw-data" m:_@
-;
-: __get_pan_data_ref
-	"builder-data" t:@ "pan-data" m:_@
-;
-: __get_wf_data_ref
-	"builder-data" t:@ "wf-data" m:_@
+	"builder-working" t:@ "raw-data" m:_@
 ;
 : __get_win_width
-	"builder-data" t:@ "win-metrics" m:_@ 0 a:_@
+	"builder-working" t:@ "win-metrics" m:_@ 0 a:_@
 ;
 : __get_win_height
-	"builder-data" t:@ "win-metrics" m:_@ 1 a:_@
+	"builder-working" t:@ "win-metrics" m:_@ 1 a:_@
 ;
 : __get_disp_width
-	"builder-data" t:@ "disp-metrics" m:_@ 0 a:_@
+	"builder-working" t:@ "disp-metrics" m:_@ 0 a:_@
 ;
 : __get_disp_height
-	"builder-data" t:@ "disp-metrics" m:_@ 1 a:_@
-;
-: __get_v_label_data_ref
-	"builder-data" t:@ "v-label-data" m:_@
-;
-: __get_h_label_data_ref
-	"builder-data" t:@ "h-label-data" m:_@
-;
-: __get_fixed_data_ref
-	"builder-data" t:@ "fixed-data" m:_@
+	"builder-working" t:@ "disp-metrics" m:_@ 1 a:_@
 ;
 : __get_mid_freq
-	"builder-data" t:@ "mid-freq" m:_@
+	"builder-working" t:@ "mid-freq" m:_@
+;
+\ ========================================
+\ Readers for builder results data
+: __get_pan_data_ref
+	"builder-results" t:@ "pan-data" m:_@
+;
+: __get_wf_data_ref
+	"builder-results" t:@ "wf-data" m:_@
+;
+: __get_v_label_data_ref
+	"builder-results" t:@ "v-label-data" m:_@
+;
+: __get_h_label_data_ref
+	"builder-results" t:@ "h-label-data" m:_@
+;
+: __get_fixed_data_ref
+	"builder-results" t:@ "fixed-data" m:_@
 ;
 
 \ ========================================
-\ Writers
+\ Writers for builder working data
 : __push_raw	SED: n --
-	"builder-data" t:@ "raw-data" rot m:! drop
+	"builder-working" t:@ "raw-data" rot m:! drop
 ;
+\ Writers for builder results data
 : __push_meter	SED: n --
-	"builder-data" t:@ "rx-meter" rot m:! drop
+	"builder-results" t:@ "rx-meter" rot m:! drop
 ;
 
 \ ========================================
