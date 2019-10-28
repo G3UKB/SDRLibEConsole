@@ -149,18 +149,6 @@ with: fr.ps
 ;
 
 \ ===============================================================================
-\ Message decoder
-: __svr_event_msg_decode
-	\ Check for a message
-	t:qlen 0 n:> if 
-		t:pop null? not if
-			\ We have work
-			"data" m:@ 0 a:@ nip swap "cb" m:@ nip w:exec
-		then
-	then
-;
-	
-\ ===============================================================================
 \ Reader/builder task
 \ Read event data while enabled and not terminated
 \ Write event data to the data-buffer, then dispatch
@@ -192,9 +180,12 @@ with: fr.ps
 	\ Wait for work
 	"idle" "state" t:!
 	repeat
-		__svr_event_msg_decode
-		\ Check for start message
+		msg@
+		\ Check for start/term message
 		"state" t:@ "run" s:= if break then
+		"state" t:@ "term" s:= if
+			t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log ;;
+		then
 		0.1 sleep
 	again
 	t:name@ "-starting run section" s:+ log
@@ -202,7 +193,7 @@ with: fr.ps
 	\ Repeat until termination
 	repeat
 		\ Check for messages at top of loop
-		__svr_event_msg_decode
+		msg@
 		\ Check for term message
 		"state" t:@ "term" s:= if 
 			break

@@ -58,8 +58,9 @@ with: fr.ps
 \
 
 : renderer_render	SED: n --
-	"Render: " . . cr
+	\ "Render: " . . cr
 	\ "data_r1" t:@ . cr
+	"data_r1" t:@ free
 ;
 
 \ ========================================
