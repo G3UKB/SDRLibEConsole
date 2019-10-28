@@ -162,6 +162,17 @@ ns: sdr
 : __push_raw	SED: n --
 	"builder-working" t:@ "raw-data" rot m:! drop
 ;
+: __push_win_metrics	SED: a --
+	"builder-working" t:@ "win-metrics" rot m:! drop
+;
+: __push_disp_metrics	SED: a --
+	"builder-working" t:@ "disp-metrics" rot m:! drop
+;
+: __push_mid_freq	SED: n --
+	"builder-working" t:@ "mid-freq" rot m:! drop
+;
+
+\ ========================================
 \ Writers for builder results data
 : __push_meter	SED: n --
 	"builder-results" t:@ "rx-meter" rot m:! drop

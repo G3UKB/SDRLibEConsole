@@ -96,33 +96,76 @@ with: fr.ps
 : __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
 
 \ ===============================================================================
+\ Event handlers
+: __svr_evnt_mid_freq	SED: n --
+	__push_mid_freq
+;
+
+: __svr_evnt_win_metrics	SED: a --
+	__push_win_metrics
+;
+
+: __svr_evnt_disp_metrics	SED: a --
+	__push_disp_metrics
+;
+	
+\ ===============================================================================
+\ Subscriptions
+: __ svr_event_subs_1	SED: --
+	t:name@ ' __svr_evnt_mid_freq SYS_R1_FREQ subscribe
+	t:name@ ' __svr_evnt_win_metrics SYS_R1_WIN_METRICS subscribe
+	t:name@ ' __svr_evnt_disp_metrics SYS_R1_DISP_METRICS subscribe
+;
+
+: __ svr_event_subs_2	SED: --
+	t:name@ ' __svr_evnt_mid_freq SYS_R2_FREQ subscribe
+	t:name@ ' __svr_evnt_win_metrics SYS_R2_WIN_METRICS subscribe
+	t:name@ ' __svr_evnt_disp_metrics SYS_R2_DISP_METRICS subscribe
+;
+
+: __ svr_event_subs_3	SED: --
+	t:name@ ' __svr_evnt_mid_freq SYS_R3_FREQ subscribe
+	t:name@ ' __svr_evnt_win_metrics SYS_R3_WIN_METRICS subscribe
+	t:name@ ' __svr_evnt_disp_metrics SYS_R3_DISP_METRICS subscribe
+;
+
+: __ svr_event_subs	SED: --
+	[ ' __ svr_event_subs_1 , ' __ svr_event_subs_2 , ' __ svr_event_subs_3 ]
+	"reader_inst" t:@ caseof
+;
+
+\ ===============================================================================
 \ Reader/builder task
 \ Read event data while enabled and not terminated
 \ Write event data to the data-buffer, then dispatch
 \ to the appropriate builder task.
-: __svr_evnt_reader	SED: net s --
-	\ in: 	0: s - reader instance
-	\				1: net - socket
+: __svr_evnt_reader	SED: net s n --
+	\ in:		0: n 		- instance 	
+	\				1: s 		- name
+	\				2: net 	- socket
 	\ out:	none
 	
 	\ ----------------------------------
 	\ Task initialisation
-	\ Save the task instance
-	dup "reader_inst" t:!
-	\ Register the task instance
-	"-TASK" s:+ dup t:name!
+	\ Set instance
+	"reader_inst" t:!
+	\ Set task name
+	dup t:name!
+	\ Register the task instance to allow communication
 	t:curtask swap reg!
-	\ Save socket
+	\ Save socket ref
 	"reader_skt" t:!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
 	\ Create builder data
 	__builder_data_new
+	\ Do subscriptions
+	__svr_event_subs
 	
 	\ ----------------------------------
 	\ Wait for work
 	repeat
-		"reader_inst" t:@ "-waiting for work" s:+ log
+		t:name@ "-waiting for work" s:+ log
 		-1 t:q-wait
 		t:pop null? not if
 			break
@@ -131,7 +174,7 @@ with: fr.ps
 		then
 	again
 	
-	"reader_inst" t:@ "-starting run section" s:+ log
+	t:name@ "-starting run section" s:+ log
 	\ ----------------------------------
 	\ Have we been told to run?
 	"run" s:= if
@@ -179,9 +222,9 @@ with: fr.ps
 	__svr_evnt_create_d2_sock
 	__svr_evnt_create_d3_sock
 	\ Start a reader task for each potential radio
-	__svr_evnt_d1_sock@ "DISP-R1" 2 ' __svr_evnt_reader t:task-n "DISP-R1" t:!
-	__svr_evnt_d2_sock@ "DISP-R2" 2 ' __svr_evnt_reader t:task-n "DISP-R2" t:!
-	__svr_evnt_d3_sock@ "DISP-R3" 2 ' __svr_evnt_reader t:task-n "DISP-R3" t:!
+	__svr_evnt_d1_sock@ "DISP-R1-TASK" 1 3 ' __svr_evnt_reader t:task-n "DISP-R1-TASK" t:!
+	__svr_evnt_d2_sock@ "DISP-R2-TASK" 2 3 ' __svr_evnt_reader t:task-n "DISP-R2-TASK" t:!
+	__svr_evnt_d3_sock@ "DISP-R3-TASK" 3 3 ' __svr_evnt_reader t:task-n "DISP-R3-TASK" t:!
 ;
 
 \ ----------------------------------	
@@ -300,6 +343,11 @@ disp_evnt_test @ #if
 		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 		"START DISPLAY" log
 		disp_evnt_init
+		"SENDING EVENTS" log
+		[14300000] null +sender SYS_R1_FREQ publish drop
+		[[500,200]] null +sender SYS_R1_WIN_METRICS publish drop
+		[[480,180]] null +sender SYS_R1_DISP_METRICS publish drop
+		"RUN DISP" log
 		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] null +sender msg!
 		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [[false,false,true]] null +sender msg!
 		
