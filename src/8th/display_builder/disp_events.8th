@@ -96,7 +96,15 @@ with: fr.ps
 : __svr_evnt_d3_sock@	"udp_d3_evnt_sock" t:@ ;
 
 \ ===============================================================================
-\ Event handlers
+\ Message handlers
+: __svr_evnt_run	SED: n --
+	"run" "state" t:! drop
+;
+
+: __svr_evnt_term	SED: n --
+	"term" "state" t:! drop
+;
+
 : __svr_evnt_mid_freq	SED: n --
 	__push_mid_freq
 ;
@@ -112,18 +120,24 @@ with: fr.ps
 \ ===============================================================================
 \ Subscriptions
 : __svr_event_subs_1	SED: --
+	t:name@ ' __svr_evnt_run SYS_EVNT_R1_RUN subscribe
+	t:name@ ' __svr_evnt_term SYS_EVNT_R1_TERM subscribe
 	t:name@ ' __svr_evnt_mid_freq SYS_R1_FREQ subscribe
 	t:name@ ' __svr_evnt_win_metrics SYS_R1_WIN_METRICS subscribe
 	t:name@ ' __svr_evnt_disp_metrics SYS_R1_DISP_METRICS subscribe
 ;
 
 : __svr_event_subs_2	SED: --
+	t:name@ ' __svr_evnt_run SYS_EVNT_R2_RUN subscribe
+	t:name@ ' __svr_evnt_term SYS_EVNT_R2_TERM subscribe
 	t:name@ ' __svr_evnt_mid_freq SYS_R2_FREQ subscribe
 	t:name@ ' __svr_evnt_win_metrics SYS_R2_WIN_METRICS subscribe
 	t:name@ ' __svr_evnt_disp_metrics SYS_R2_DISP_METRICS subscribe
 ;
 
-: __svr_event_subs_3	SED: --
+: __svr_event_subs_3	SED: --	
+	t:name@ ' __svr_evnt_run SYS_EVNT_R3_RUN subscribe
+	t:name@ ' __svr_evnt_term SYS_EVNT_R3_TERM subscribe
 	t:name@ ' __svr_evnt_mid_freq SYS_R3_FREQ subscribe
 	t:name@ ' __svr_evnt_win_metrics SYS_R3_WIN_METRICS subscribe
 	t:name@ ' __svr_evnt_disp_metrics SYS_R3_DISP_METRICS subscribe
@@ -134,6 +148,18 @@ with: fr.ps
 	"reader_inst" t:@ n:1- caseof
 ;
 
+\ ===============================================================================
+\ Message decoder
+: __svr_event_msg_decode
+	\ Check for a message
+	t:qlen 0 n:> if 
+		t:pop null? not if
+			\ We have work
+			"data" m:@ 0 a:@ nip swap "cb" m:@ nip w:exec
+		then
+	then
+;
+	
 \ ===============================================================================
 \ Reader/builder task
 \ Read event data while enabled and not terminated
@@ -164,48 +190,43 @@ with: fr.ps
 	
 	\ ----------------------------------
 	\ Wait for work
+	"idle" "state" t:!
 	repeat
-		t:name@ "-waiting for work" s:+ log
-		-1 t:q-wait
-		t:pop null? not if
-			break
-		else
-			drop
-		then
+		__svr_event_msg_decode
+		\ Check for start message
+		"state" t:@ "run" s:= if break then
+		0.1 sleep
 	again
 	t:name@ "-starting run section" s:+ log
 	\ ----------------------------------
-	\ Have we been told to run?
-	"run" s:= if
-		\ Yes, so enter the read loop
-		repeat
-			\ Check for termination at top of loop
-			t:qlen 0 n:> if 
-				t:pop null? not if
-					"term" s:= if break then
+	\ Repeat until termination
+	repeat
+		\ Check for messages at top of loop
+		__svr_event_msg_decode
+		\ Check for term message
+		"state" t:@ "term" s:= if 
+			break
+		else
+			\ See if we have read data on our socket
+			"reader_skt" t:@ true 500 net:wait if
+				\ Socket says yes
+				__get_data_buffer 0 net:recvfrom null? not if
+					\ The data is stored in the task variable - data-buf
+					3drop drop
+					\ Call the display builder to build the arrays
+					\ Convert byte data to floats and extract meter data
+					__copy_to_raw
+					\ Build the arrays for the renderer
+					disp_builder
+					\ Transfer data and invoke renderer
+					"reader_inst" t:@ __builder_data_xfer
 				then
 			else
-				\ See if we have data
-				"reader_skt" t:@ true 500 net:wait if
-					\ Socket says yes
-					__get_data_buffer 0 net:recvfrom null? not if
-						\ The data is stored in the task variable - data-buf
-						3drop drop
-						\ Call the display builder to build the arrays
-						\ Convert byte data to floats and extract meter data
-						__copy_to_raw
-						\ Build the arrays for the renderer
-						disp_builder
-						\ Transfer data and invoke renderer
-						__builder_data_xfer
-					then
-				else
-					\ drop socket
-					drop
-				then
+				\ drop socket
+				drop
 			then
-		again
-	then
+		then
+	again
 	t:name@ " exiting... [" s:+ depth >s s:+ "]" s:+ log
 ;
 
@@ -243,9 +264,9 @@ with: fr.ps
 	if 
 		\ Enable the corresponding reader tasks
 		"disp_enable" t:@ a:open
-		if "DISP-R1-TASK" reg@ dup "run" t:push t:q-notify drop then
-	 	if "DISP-R2-TASK" reg@ dup "run" t:push t:q-notify drop then
-	 	if "DISP-R3-TASK" reg@ dup "run" t:push t:q-notify drop then
+	 	if ["run"] null +sender SYS_EVNT_R1_RUN publish drop then
+	 	if ["run"] null +sender SYS_EVNT_R2_RUN publish drop then
+	 	if ["run"] null +sender SYS_EVNT_R3_RUN publish drop then
 	then 
 ;
 
@@ -259,10 +280,10 @@ with: fr.ps
 \ ----------------------------------
 \ Terminate displays
 : t_disp_evnt_term	SED:  -- 
-	"DISP-R1-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then
-	"DISP-R2-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then
-	"DISP-R3-TASK" reg@ null? not if dup "term" t:push t:q-notify drop then ;
-
+	["term"] null +sender SYS_EVNT_R1_TERM publish drop
+	["term"] null +sender SYS_EVNT_R2_TERM publish drop
+	["term"] null +sender SYS_EVNT_R3_TERM publish drop
+;
 
 \ ===============================================================================
 \ PUBLIC

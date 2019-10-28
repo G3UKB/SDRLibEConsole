@@ -110,7 +110,7 @@ ns: sdr
 \ Base call on the thread of builder with id
 : __builder_data_xfer	SED: id --
 	[ ' __builder_xfer_1 , ' __builder_xfer_2 , ' __builder_xfer_3 ]
-	swap caseof
+	swap n:1- caseof
 ;
 
 \ ========================================

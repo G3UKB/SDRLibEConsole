@@ -106,6 +106,12 @@ ns: sdr
 : SYS_R1_DISP_METRICS "SysR1DispMetrics" ;
 : SYS_R2_DISP_METRICS "SysR2DispMetrics" ;
 : SYS_R3_DISP_METRICS "SysR3DispMetrics" ;
+: SYS_EVNT_R1_RUN "SysEvntR1Run" ;
+: SYS_EVNT_R2_RUN "SysEvntR2Run" ;
+: SYS_EVNT_R3_RUN "SysEvntR3Run" ;
+: SYS_EVNT_R1_TERM "SysEvntR1Term" ;
+: SYS_EVNT_R2_TERM "SysEvntR2Term" ;
+: SYS_EVNT_R3_TERM "SysEvntR3Term" ;
 
 \ Radio TX events
 \ UI subscribers

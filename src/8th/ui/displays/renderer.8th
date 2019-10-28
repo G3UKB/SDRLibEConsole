@@ -58,8 +58,8 @@ with: fr.ps
 \
 
 : renderer_render	SED: n --
-	"Called: " . . cr
-	"data_r1" t:@ . cr
+	"Render: " . . cr
+	\ "data_r1" t:@ . cr
 ;
 
 \ ========================================
