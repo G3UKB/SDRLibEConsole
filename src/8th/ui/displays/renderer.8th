@@ -29,7 +29,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, vfo_test
+false var, renderer_test
 
 \ ----------------------------------
 renderer_test @ #if
@@ -57,7 +57,20 @@ with: fr.ps
 \ User draw components
 \
 
-: renderer_render	SED n --
+: renderer_render	SED: n --
 	"Called: " . . cr
 	"data_r1" t:@ . cr
 ;
+
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+renderer_test @ #if
+
+#then

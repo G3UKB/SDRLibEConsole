@@ -41,7 +41,7 @@ ns: sdr
 		
 		\ ========================================
 		\ Radio state
-		"mid-freq" : 7100000,
+		"mid-freq" : 7100000
 	}
 ;
 
@@ -54,13 +54,13 @@ ns: sdr
 		"v-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"h-label-data" : [],		\ [[label,x,y], [label,x,y],...]
 		"pan-data" : [],				\ [[x,y],[x,y],...]
-		"wf-data" : [],					\ [[x,color],[x,color],...]
+		"wf-data" : []					\ [[x,color],[x,color],...]
 	}
 ;
 
 \ ========================================
 \ Create instance for radio
-: __builder_data_new SED  --
+: __builder_data_new SED:  --
 	__builder_working "builder-working" t:!
 	__builder_results "builder-results" t:!
 ;

@@ -100,6 +100,12 @@ ns: sdr
 : SYS_R1_AFGAIN "SysR1AfGain" ;
 : SYS_R2_AFGAIN "SysR2AfGain" ;
 : SYS_R3_AFGAIN "SysR3AfGain" ;
+: SYS_R1_WIN_METRICS "SysR1WinMetrics" ;
+: SYS_R2_WIN_METRICS "SysR2WinMetrics" ;
+: SYS_R3_WIN_METRICS "SysR3WinMetrics" ;
+: SYS_R1_DISP_METRICS "SysR1DispMetrics" ;
+: SYS_R2_DISP_METRICS "SysR2DispMetrics" ;
+: SYS_R3_DISP_METRICS "SysR3DispMetrics" ;
 
 \ Radio TX events
 \ UI subscribers
