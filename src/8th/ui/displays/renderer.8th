@@ -61,6 +61,11 @@ with: fr.ps
 	\ "Render: " . . cr
 	\ "data_r1" t:@ . cr
 	"data_r1" t:@ free
+	ns:m pool-clear
+	ns:a pool-clear
+	ns:s pool-clear
+	ns:n pool-clear
+	\ .stats
 ;
 
 \ ========================================
