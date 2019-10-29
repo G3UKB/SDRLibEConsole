@@ -21,15 +21,16 @@
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
      
-  This component can be multi-instanced to provide a renderer for the pan
+  This display component can be multi-instanced to provide a renderer for the pan
   and waterfall displays.
+  
 *)
 
 needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, renderer_test
+true var, renderer_test
 
 \ ----------------------------------
 renderer_test @ #if
@@ -41,6 +42,7 @@ renderer_test @ #if
 	"../common/layout.8th" f:include
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
+	"render_context.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -58,9 +60,28 @@ with: fr.ps
 \ Convention: private words start: 		__svr_evnt_
 \ ===============================================================================
 
+\ ===============================================================================
+\ Display panel per radio fits inside its parent.
+\ The panadapter is the top variable size display with a fixed hight waterfall below.
+{
+	"kind" : "box",
+	"name" : "display-name",
+	"id" : "display-id",
+	"bounds" : "0,0,parent.width, parent.height",
+	"bg" : "gray10",
+	"draw" : "sdr:__renderer_draw_all"
+	\ "size" : "sdr:disp_size",
+	\ "mouse-moved" : "sdr:mouse_move",
+	\ "mouse-down" : "sdr:mouse_down",
+	\ "mouse-enter" : "sdr:mouse_enter",
+	\ "mouse-exit" : "sdr:mouse_exit",
+	\ "timer-period" : 100,
+	\ "timer" : "sdr:disp-timer"
+} var, __renderer_disp_panel
+
 \ ----------------------------------
 \ Draw horizontal/vertical label
-: draw_label	SED: g n a -- g
+: __renderer_draw_label	SED: g n a -- g
 	\ in: 	0: a - text descriptor [text,x,y]
 	\				1: n - idx
 	\				2: g - gui
@@ -75,7 +96,7 @@ with: fr.ps
 	
 \ ----------------------------------
 \ Add horizontal/vertical grid line to path
-: doline	SED: g n a -- g
+: __renderer_doline	SED: g n a -- g
 	\ in: 	0: a - fixed_data_itm [x-start, y-start, x-stop, y-stop]
 	\				1: n - idx
 	\				2: g - gui
@@ -92,32 +113,32 @@ with: fr.ps
 
 \ ----------------------------------
 \ Make the grid path
-: make_grid_path	SED: g -- g
+: __renderer_make_grid_path	SED: g -- g
 	\ in: 	0: g - gui
 	\ out:	0: g - gui	
-	"inst_data" t:@ fixed_data_ref ' doline a:each drop 
+	__render_fixed_data@ ' __renderer_doline a:each drop 
 ;
 
 \ ----------------------------------
 \ Draw the grid with dBm and freq labels
-: draw_grid	SED: g -- g
+: __renderer_draw_grid	SED: g -- g
 	\ in: 	0: g - gui
 	\ out:	0: g - gui	
 	"gray17" g:scolor
 	g:clearpath
 	g:path
-	make_grid_path
+	__renderer_make_grid_path
 	g:/path g:stroke
 	\ Labels
 	"yellow:50" g:scolor
-	"inst_data" t:@ h_label_data_ref ' draw_label a:each drop
-	"inst_data" t:@ v_label_data_ref ' draw_label a:each
+	__render_h_label_data@ ' __renderer_draw_label a:each drop
+	__render_v_label_data@ ' __renderer_draw_label a:each
 	drop 
 ;
 
 \ ========================================
 \ Render all display components
-: draw_all	SED: g --
+: __renderer_draw_all	SED: g --
 	\ in: 	0: g - gui
 	\ out:	none
 	
@@ -126,7 +147,7 @@ with: fr.ps
 	1 g:line-width
 	
 	\ Draw the display components
-	draw_grid
+	__renderer_draw_grid
 	\ draw_pan
 	\ draw_waterfall
 	\ draw_center_freq_line
@@ -139,18 +160,50 @@ with: fr.ps
 \ ===============================================================================
 
 : renderer_render	SED: n --
-	"Render: " . . cr
+	\ Get gui instance object
+	"DISP-" swap >s s:+ g_cache_get
+	\ Invalidate the display to force a repaint
+	g:invalidate
+	\ Does this fall through before or after the invalidate is actioned?
+	\ We must do the cleanup at the end of the rendering.
+	
+	\ "Render: " . . cr
 	\ drop
 	\ "data-r1" t:@ . cr
-	{} "data-r1" t:!
+	\ {} "data-r1" t:!
 	\ "data-r1" t:@ free
 	\ {} "data-r1" t:!
-	ns:m pool-clear
-	ns:a pool-clear
-	ns:s pool-clear
-	ns:n pool-clear
+	\ ns:m pool-clear
+	\ ns:a pool-clear
+	\ ns:s pool-clear
+	\ ns:n pool-clear
 	\ .stats
 	\ depth . cr
+;
+
+\ ============================================================================
+\ Initialisation
+
+\ ----------------------------------
+\ Create a display panel
+\ id bounds -- new-renderer-gui
+: renderer_new	SED: s s -- g										
+	__renderer_disp_panel @ G:clone nip 	\ id bounds callback vfo-clone
+	\ Populate panel with additional info
+	"id" 3 pick m:!
+	"name" 3 pick m:!
+	"bounds" 2 pick m:!
+	nip	\ id renderer-clone
+	g:new dup
+	\ Add to gui cache
+	rot swap g_cache_add
+;
+
+\ ----------------------------------
+\ Initialise a renderer instance
+\  gui -- gui
+: renderer_init	SED: g -- g
+  
 ;
 
 \ ========================================
@@ -164,4 +217,39 @@ ns: user
 
 renderer_test @ #if
 
+	\ Pull in the namespaces
+	with: sdr
+	
+	4 json-pretty
+	true app:isgui !
+	
+	\ ========================================
+	\ Test program entry point
+	: app:main
+		1 __renderer_data_new
+		1 __renderer_set_id
+		\ A minimal window to hold our test component
+		{
+			"kind" : "win",
+			"title" : "Renderer Component Test",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new
+		\ Create the test renderer
+		DISP-1 "0,0,500,200" renderer_new dup
+		\ Add to the window
+		rot swap g:+child
+		\ Initialise
+		1 pick renderer_init
+		\ Cleanup and save the window ref
+		drop "win" t:! drop
+		\ Enter event loop
+	;
 #then
