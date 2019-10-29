@@ -53,9 +53,90 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 
-\ ============================================================================
-\ User draw components
-\
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__svr_evnt_
+\ ===============================================================================
+
+\ ----------------------------------
+\ Draw horizontal/vertical label
+: draw_label	SED: g n a -- g
+	\ in: 	0: a - text descriptor [text,x,y]
+	\				1: n - idx
+	\				2: g - gui
+	\ out:	0: g - gui
+	nip
+	1 a:@ 
+	swap 2 a:@
+	swap 0 a:@
+	nip
+	g:draw-text-at 
+;
+	
+\ ----------------------------------
+\ Add horizontal/vertical grid line to path
+: doline	SED: g n a -- g
+	\ in: 	0: a - fixed_data_itm [x-start, y-start, x-stop, y-stop]
+	\				1: n - idx
+	\				2: g - gui
+	\ out:	0: g - gui
+	nip											\ gui fixed_data_itm
+	0 a:@ swap 1 a:@ 				\ gui x-start fixed_data_itm y-start
+	rot swap								\ gui fixed_data_itm x-start y-start
+	3 pick swap rot swap		\ gui fixed_data_itm gui x-start y-start
+	g:moveto								\ gui fixed_data_itm gui
+	swap 2 a:@ swap 3 a:@ 	\ gui gui x-stop fixed_data_itm y-stop
+	nip											\ gui gui x-stop y-stop
+	g:lineto drop	
+;	
+
+\ ----------------------------------
+\ Make the grid path
+: make_grid_path	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	"inst_data" t:@ fixed_data_ref ' doline a:each drop 
+;
+
+\ ----------------------------------
+\ Draw the grid with dBm and freq labels
+: draw_grid	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	"gray17" g:scolor
+	g:clearpath
+	g:path
+	make_grid_path
+	g:/path g:stroke
+	\ Labels
+	"yellow:50" g:scolor
+	"inst_data" t:@ h_label_data_ref ' draw_label a:each drop
+	"inst_data" t:@ v_label_data_ref ' draw_label a:each
+	drop 
+;
+
+\ ========================================
+\ Render all display components
+: draw_all	SED: g --
+	\ in: 	0: g - gui
+	\ out:	none
+	
+	\ Common settings
+	"gray11" g:fillall
+	1 g:line-width
+	
+	\ Draw the display components
+	draw_grid
+	\ draw_pan
+	\ draw_waterfall
+	\ draw_center_freq_line
+	\ draw_filter_overlay
+	\ draw_mouse_pos
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
 
 : renderer_render	SED: n --
 	"Render: " . . cr
