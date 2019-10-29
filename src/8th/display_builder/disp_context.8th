@@ -67,34 +67,8 @@ ns: sdr
 
 \ ========================================
 \ Data transfer to renderer
-\ Here we copy the data to a task variable in the GUI task
-\ We then tell the GUI task to render the data.
+\ Here we dispatch the data to the GUI task
 
-: renderer_render	SED: n --
-	"DISP-" swap >s s:+ g_cache_get
-	\ Invalidate the display to force a repaint
-	g:invalidate
-;
-
-\ Calls on GUI thread with cloned result data
-: __renderer_xfer_1	SED: m --
-	\ Save data to task variable
-	"data" m:@ "data-r1" t:! drop
-	\ Tell renderer to render
-	1 renderer_render
-;
-
-: __renderer_xfer_2	SED: m --
-	"data" m:@ "data-r2" t:!
-	2 renderer_render
-;
-
-: __renderer_xfer_3	SED: m --
-	"data" m:@ "data-r3" t:!
-	3 renderer_render
-;
-
-\ Second call on the thread of builder with id
 : __builder_xfer_1	SED: id --
 	m:new "cb" ' __renderer_xfer_1 m:!
 	"data" "builder-results" t:@ const m:!
@@ -113,7 +87,7 @@ ns: sdr
 	g:do
 ;
 
-\ Base call on the thread of builder with id
+
 : __builder_data_xfer	SED: id --
 	[ ' __builder_xfer_1 , ' __builder_xfer_2 , ' __builder_xfer_3 ]
 	swap n:1- caseof

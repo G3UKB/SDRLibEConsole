@@ -45,6 +45,7 @@ renderer_test @ #if
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
 	"../../connector/connector.8th" f:include
+	"render_if.8th" f:include
 	"../../display_builder/disp_context.8th" f:include
 	"../../display_builder/disp_defs.8th" f:include
 	"../../display_builder/disp_calc.8th" f:include
@@ -167,28 +168,6 @@ with: fr.ps
 \ ===============================================================================
 \ PUBLIC
 \ ===============================================================================
-
-\ : renderer_render	SED: n --
-	\ Get gui instance object
-\	"DISP-" swap >s s:+ g_cache_get
-	\ Invalidate the display to force a repaint
-\	g:invalidate
-	\ Does this fall through before or after the invalidate is actioned?
-	\ We must do the cleanup at the end of the rendering.
-	
-	\ "Render: " . . cr
-	\ drop
-	\ "data-r1" t:@ . cr
-	\ {} "data-r1" t:!
-	\ "data-r1" t:@ free
-	\ {} "data-r1" t:!
-	\ ns:m pool-clear
-	\ ns:a pool-clear
-	\ ns:s pool-clear
-	\ ns:n pool-clear
-	\ .stats
-	\ depth . cr
-\ ;
 
 \ ============================================================================
 \ Initialisation
