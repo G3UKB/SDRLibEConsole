@@ -58,14 +58,18 @@ with: fr.ps
 \
 
 : renderer_render	SED: n --
-	\ "Render: " . . cr
-	\ "data_r1" t:@ . cr
-	"data_r1" t:@ free
+	"Render: " . . cr
+	\ drop
+	\ "data-r1" t:@ . cr
+	{} "data-r1" t:!
+	\ "data-r1" t:@ free
+	\ {} "data-r1" t:!
 	ns:m pool-clear
 	ns:a pool-clear
 	ns:s pool-clear
 	ns:n pool-clear
 	\ .stats
+	\ depth . cr
 ;
 
 \ ========================================

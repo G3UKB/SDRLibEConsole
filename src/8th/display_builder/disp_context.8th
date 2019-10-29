@@ -73,18 +73,18 @@ ns: sdr
 \ Calls on GUI thread with cloned result data
 : __renderer_xfer_1	SED: m --
 	\ Save data to task variable
-	"data" m:@ "data_r1" t:!
+	"data" m:@ "data-r1" t:! drop
 	\ Tell renderer to render
 	1 renderer_render
 ;
 
 : __renderer_xfer_2	SED: m --
-	"data" m:@ "data_r2" t:!
+	"data" m:@ "data-r2" t:!
 	2 renderer_render
 ;
 
 : __renderer_xfer_3	SED: m --
-	"data" m:@ "data_r3" t:!
+	"data" m:@ "data-r3" t:!
 	3 renderer_render
 ;
 
