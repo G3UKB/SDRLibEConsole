@@ -40,7 +40,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, disp_evnt_test
+false var, disp_evnt_test
 disp_evnt_test @ #if
 	\ Includes
 	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include

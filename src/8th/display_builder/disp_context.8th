@@ -70,6 +70,12 @@ ns: sdr
 \ Here we copy the data to a task variable in the GUI task
 \ We then tell the GUI task to render the data.
 
+: renderer_render	SED: n --
+	"DISP-" swap >s s:+ g_cache_get
+	\ Invalidate the display to force a repaint
+	g:invalidate
+;
+
 \ Calls on GUI thread with cloned result data
 : __renderer_xfer_1	SED: m --
 	\ Save data to task variable
