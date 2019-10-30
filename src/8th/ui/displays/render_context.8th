@@ -33,6 +33,7 @@
 \ Use SDR namespace
 ns: sdr
 
+(*
 \ ========================================
 \ Data for rendering displays
 : __renderer_working	SED: --
@@ -54,7 +55,7 @@ ns: sdr
 		"filter" : 0
 	}
 ;
-
+*)
 \ The builder result data is passed to the renderer by a g:do at a
 \ period of 100-200 ms. The data is written to a task variable of the form
 \ "data-rn" where n is 1,2,3 for the radio id.
@@ -72,7 +73,7 @@ ns: sdr
 \ ========================================
 \ Create instance for radio
 : __renderer_data_new SED: n --
-	__renderer_working "render-working-" rot >s s:+ t:!
+	\ __renderer_working "render-working-" rot >s s:+ t:!
 	\ Create a default dataset
 	__default_builder_results "data-r1" t:!
 	__default_builder_results "data-r2" t:! 
@@ -90,6 +91,7 @@ ns: sdr
 
 \ ========================================
 \ Readers for renderer working data
+(*
 : __render_working_ref	SED: n -- m
 	"render-working-" "disp_id" t:@ >s s:+ t:@
 ;
@@ -108,7 +110,7 @@ ns: sdr
 : __render_mid_freq@
 	__render_working_ref "mid-freq" m:_@
 ;
-
+*)
 \ ========================================
 \ Readers for builder results data
 : __render_data_ref	SED: n -- m

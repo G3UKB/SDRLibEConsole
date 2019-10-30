@@ -74,19 +74,41 @@ with: fr.ps
 \ Display panel per radio fits inside its parent.
 \ The panadapter is the top variable size display with a fixed hight waterfall below.
 {
+	\ ----------------------------------
+	\ Panel def
 	"kind" : "box",
+	"bg" : "gray10",
+	
+	\ ----------------------------------
+	\ Parameters
+	\ name, id and bounds provided by renderer_new operation
 	"name" : "display-name",
 	"id" : "display-id",
 	"bounds" : "0,0,parent.width, parent.height",
-	"bg" : "gray10",
-	"draw" : "sdr:__renderer_draw_all"
-	\ "size" : "sdr:disp_size",
+	
+	\ ----------------------------------
+	\ Renderer events
+	"draw" : "sdr:__renderer_draw_all",
+	"size" : "sdr:disp_size",
 	\ "mouse-moved" : "sdr:mouse_move",
 	\ "mouse-down" : "sdr:mouse_down",
 	\ "mouse-enter" : "sdr:mouse_enter",
 	\ "mouse-exit" : "sdr:mouse_exit",
 	\ "timer-period" : 100,
 	\ "timer" : "sdr:disp-timer"
+	
+	\ ----------------------------------
+	\ User data
+	\ Metrics
+	"panel-metrics" : [500,200],			\ Panel into which all drawing is performed
+	"client-metrics" : [480,180],			\ Client area to draw dynamic content
+	"mouse-pos" : [0,0],							\ Current mouse position for click tune
+	\ Image
+	"wf-img" : ` 100 100 img:new ` ,	\ Image data for waterfall
+	\ Radio state											
+	"mid-freq" : 7100000,							\ This radio mid freq for freq scale
+	"mode" : 0,												\ This radio mode
+	"filter" : 0											\ This radio filter	
 } var, __renderer_disp_panel
 
 \ ----------------------------------

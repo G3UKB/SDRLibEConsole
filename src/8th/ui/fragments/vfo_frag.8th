@@ -154,8 +154,8 @@ with: fr.ps
 \ ===============================================================================
 
 \ ----------------------------------
-\ Create VFO for radio-1
-\ name bounds -- vfo-1-gui
+\ Create VFO for radio(s)
+\ name bounds -- vfo-n-gui
 : vfo_frag_new	SED: s s -- g
 	\ Create
 	swap dup	>r \ bounds name name
