@@ -30,7 +30,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-true var, renderer_test
+false var, renderer_test
 
 \ ----------------------------------
 renderer_test @ #if
