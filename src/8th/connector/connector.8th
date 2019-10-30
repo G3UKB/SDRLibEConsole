@@ -736,7 +736,7 @@ connector_test @ #if
 	
 	\ Send a message, get a response
 	: sender
-		a:new swap a:push ' w  +sender .s msg! response@ 
+		a:new swap a:push ' w  +sender msg! response@ 
 	;
 	
 	\ Basic start radio with default audio
