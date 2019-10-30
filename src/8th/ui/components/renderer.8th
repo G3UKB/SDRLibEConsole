@@ -45,13 +45,13 @@ renderer_test @ #if
 	"../common/font_cache.8th" f:include
 	"../common/g_cache.8th" f:include
 	"../../connector/connector.8th" f:include
-	"render_if.8th" f:include
+	"../common/render_if.8th" f:include
 	"../../display_builder/disp_context.8th" f:include
 	"../../display_builder/disp_defs.8th" f:include
 	"../../display_builder/disp_calc.8th" f:include
 	"../../display_builder/disp_encoder.8th" f:include
 	"../../display_builder/disp_events.8th" f:include
-	"render_context.8th" f:include
+	"../common/render_context.8th" f:include
 	
 	\ needs debug/sed
 	\ true SED-CHECK

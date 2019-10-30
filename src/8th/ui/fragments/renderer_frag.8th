@@ -1,0 +1,100 @@
+(*
+	renderer_frag.8th
+ 
+  Pan and waterfall display for radios
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Fragment - a UI fragment is a composable component that can be arranged into
+  a window for rendering. The fragment itself may use a generic component part
+  such as a display, vfo or button box. The fragment is responsible for interactions with 
+  the rest of the system by sending and receiving events.
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+false var, display_test
+
+\ ----------------------------------
+display_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../../common/app_defs.8th" f:include
+	"../../common/radio_defs.8th" f:include
+	"../../common/ps_events.8th" f:include
+	"../../common/run_state.8th" f:include
+	"../common/layout.8th" f:include
+	"../common/font_cache.8th" f:include
+	"../common/g_cache.8th" f:include
+	"../../connector/connector.8th" f:include
+	"../common/render_if.8th" f:include
+	"../../display_builder/disp_context.8th" f:include
+	"../../display_builder/disp_defs.8th" f:include
+	"../../display_builder/disp_calc.8th" f:include
+	"../../display_builder/disp_encoder.8th" f:include
+	"../../display_builder/disp_events.8th" f:include
+	"../common/render_context.8th" f:include
+	"../components/render.8th" f:include
+	
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+\ ============================================================================
+\ Initialisation
+
+\ ----------------------------------
+\ Create display for radio(s)
+\ name bounds -- disp-n-gui
+: display_frag_new	SED: s s -- g
+	\ Create
+	swap dup	>r \ bounds name name
+	{ DISP-1: ' disp_1_publish , DISP-2: ' disp_2_publish , DISP-3: ' disp_3_publish } 
+	r@ m:@ nip 
+	rot swap 	\ name bounds callback
+	renderer_new
+	\ Initialise
+	renderer_init
+	\ Subscribe
+	{ DISP-1: ' disp_1_subscribe , DISP-2: ' disp_2_subscribe , DISP-3: ' disp_3_subscribe } 
+	r@ m:@ nip w:exec
+;
+
+\ ========================================
+\ Reset namespace
+ns: user
