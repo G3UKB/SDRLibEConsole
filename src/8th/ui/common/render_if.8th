@@ -1,0 +1,83 @@
+(*
+	render_if.8th
+ 
+  Interface from builder to renderer
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This display component can be multi-instanced to provide a renderer for the pan
+  and waterfall displays.
+  
+*)
+
+\ Use SDR namespace
+ns: sdr
+
+\ ========================================
+\ Helpers
+
+\ ----------------------------------
+: renderer_invalidate	SED: n --
+	"DISP-" swap >s s:+ g_cache_get
+	\ Invalidate the display to force a repaint
+	g:invalidate
+;
+
+\ ----------------------------------
+: __renderer_clear	SED: --
+	\ Free last data and clear pools free list
+	{} "data-r1" t:!
+	ns:m pool-clear
+	ns:a pool-clear
+	ns:s pool-clear
+	ns:n pool-clear
+;
+
+\ ========================================
+\ Calls from builder (via g:do)
+
+\ ----------------------------------
+: __renderer_xfer_1	SED: m --
+	\ Clear down
+	__renderer_clear
+	\ Save new data to task variable
+	"data" m:@ "data-r1" t:! drop
+	\ Force repaint
+	1 renderer_invalidate
+;
+
+\ ----------------------------------
+: __renderer_xfer_2	SED: m --
+	\ Clear down
+	__renderer_clear
+	\ Save new data to task variable
+	"data" m:@ "data-r2" t:!
+	\ Force repaint
+	2 renderer_invalidate
+;
+
+\ ----------------------------------
+: __renderer_xfer_3	SED: m --
+	\ Clear down
+	__renderer_clear
+	\ Save new data to task variable
+	"data" m:@ "data-r3" t:!
+	\ Force repaint
+	3 renderer_invalidate
+;

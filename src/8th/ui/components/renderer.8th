@@ -1,0 +1,344 @@
+(*
+	renderer.8th
+ 
+  Display renderer component for the SDRLibEConsole application
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  This display component can be multi-instanced to provide a renderer for the pan
+  and waterfall displays.
+  
+*)
+
+needs stack/3drop
+
+\ ========================================
+\ Testing only
+true var, renderer_test
+
+\ ----------------------------------
+renderer_test @ #if
+	\ Includes
+	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+	"../../common/app_defs.8th" f:include
+	"../../common/radio_defs.8th" f:include
+	"../../common/ps_events.8th" f:include
+	"../../common/run_state.8th" f:include
+	"../common/layout.8th" f:include
+	"../common/font_cache.8th" f:include
+	"../common/g_cache.8th" f:include
+	"../../connector/connector.8th" f:include
+	"render_if.8th" f:include
+	"../../display_builder/disp_context.8th" f:include
+	"../../display_builder/disp_defs.8th" f:include
+	"../../display_builder/disp_calc.8th" f:include
+	"../../display_builder/disp_encoder.8th" f:include
+	"../../display_builder/disp_events.8th" f:include
+	"render_context.8th" f:include
+	
+	\ needs debug/sed
+	\ true SED-CHECK
+	\ needs debug/trace
+	\ dbg:line-info
+#then
+\ ========================================
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ===============================================================================
+\ PRIVATE
+\ Convention: private words start: 		__svr_evnt_
+\ ===============================================================================
+
+\ ===============================================================================
+\ Display panel per radio fits inside its parent.
+\ The panadapter is the top variable size display with a fixed hight waterfall below.
+{
+	\ ----------------------------------
+	\ Panel def
+	"kind" : "box",
+	"bg" : "gray10",
+	
+	\ ----------------------------------
+	\ Parameters
+	\ name, id and bounds provided by renderer_new operation
+	"name" : "display-name",
+	"id" : "display-id",
+	"bounds" : "0,0,parent.width, parent.height",
+	
+	\ ----------------------------------
+	\ Renderer events
+	"draw" : "sdr:__renderer_draw_all",
+	"size" : "sdr:disp_size",
+	\ "mouse-moved" : "sdr:mouse_move",
+	\ "mouse-down" : "sdr:mouse_down",
+	\ "mouse-enter" : "sdr:mouse_enter",
+	\ "mouse-exit" : "sdr:mouse_exit",
+	\ "timer-period" : 100,
+	\ "timer" : "sdr:disp-timer"
+	
+	\ ----------------------------------
+	\ User data
+	\ Metrics
+	"panel-metrics" : [500,200],			\ Panel into which all drawing is performed
+	"client-metrics" : [480,180],			\ Client area to draw dynamic content
+	"mouse-pos" : [0,0],							\ Current mouse position for click tune
+	\ Image
+	"wf-img" : ` 100 100 img:new ` ,	\ Image data for waterfall
+	\ Radio state											
+	"mid-freq" : 7100000,							\ This radio mid freq for freq scale
+	"mode" : 0,												\ This radio mode
+	"filter" : 0											\ This radio filter	
+} var, __renderer_disp_panel
+
+\ ----------------------------------
+\ Draw horizontal/vertical label
+: __renderer_draw_label	SED: g n a -- g
+	\ in: 	0: a - text descriptor [text,x,y]
+	\				1: n - idx
+	\				2: g - gui
+	\ out:	0: g - gui
+	nip
+	1 a:@ 
+	swap 2 a:@
+	swap 0 a:@
+	nip
+	g:draw-text-at 
+;
+	
+\ ----------------------------------
+\ Add horizontal/vertical grid line to path
+: __renderer_doline	SED: g n a -- g
+	\ in: 	0: a - fixed_data_itm [x-start, y-start, x-stop, y-stop]
+	\				1: n - idx
+	\				2: g - gui
+	\ out:	0: g - gui
+	nip											\ gui fixed_data_itm
+	0 a:@ swap 1 a:@ 				\ gui x-start fixed_data_itm y-start
+	rot swap								\ gui fixed_data_itm x-start y-start
+	3 pick swap rot swap		\ gui fixed_data_itm gui x-start y-start
+	g:moveto								\ gui fixed_data_itm gui
+	swap 2 a:@ swap 3 a:@ 	\ gui gui x-stop fixed_data_itm y-stop
+	nip											\ gui gui x-stop y-stop
+	g:lineto drop	
+;	
+
+\ ----------------------------------
+\ Make the grid path
+: __renderer_make_grid_path	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	__render_fixed_data@ ' __renderer_doline a:each drop 
+;
+
+\ ----------------------------------
+\ Draw the grid with dBm and freq labels
+: __renderer_draw_grid	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	"gray17" g:scolor
+	g:clearpath
+	g:path
+	__renderer_make_grid_path
+	g:/path g:stroke
+	\ Labels
+	"yellow:50" g:scolor
+	__render_h_label_data@ ' __renderer_draw_label a:each drop
+	__render_v_label_data@ ' __renderer_draw_label a:each
+	drop 
+;
+
+\ ========================================
+\ Render all display components
+: __renderer_draw_all	SED: g --
+	\ in: 	0: g - gui
+	\ out:	none
+	
+	\ Common settings
+	"gray11" g:fillall
+	1 g:line-width
+	
+	\ Draw the display components
+	__renderer_draw_grid
+	\ draw_pan
+	\ draw_waterfall
+	\ draw_center_freq_line
+	\ draw_filter_overlay
+	\ draw_mouse_pos
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ ============================================================================
+\ Initialisation
+
+\ ----------------------------------
+\ Create a display panel
+\ id bounds -- new-renderer-gui
+: renderer_new	SED: s s -- g										
+	__renderer_disp_panel @ G:clone nip 	\ id bounds callback vfo-clone
+	\ Populate panel with additional info
+	"id" 3 pick m:!
+	"name" 3 pick m:!
+	"bounds" 2 pick m:!
+	nip	\ id renderer-clone
+	g:new dup
+	\ Add to gui cache
+	rot swap g_cache_add
+;
+
+\ ----------------------------------
+\ Initialise a renderer instance
+\  gui -- gui
+: renderer_init	SED: g -- g
+  
+;
+
+\ ========================================
+\ Reset namespace
+ns: user
+
+\ ===============================================================================
+\ ===============================================================================
+\ Testing
+\ ===============================================================================
+
+renderer_test @ #if
+
+	\ Pull in the namespaces
+	with: sdr
+	with: fr.gs
+	with: fr.ps
+	
+	4 json-pretty
+	true app:isgui !
+	
+	: reg_task
+		\ Must register REPL in the task repos to be able to reply
+		t:curtask t:name@ reg!
+		\ Set q to null on empty
+		t:getq false q:throwing \ do not drop q else crashes
+	;
+	
+	\ All responses here
+	: w
+		log
+	;
+
+	\ Send a message, get a rsponse
+	: sender
+		a:new swap a:push ' w  +sender msg! response@ 
+	;
+	
+	\ ========================================
+	\ Startup
+
+	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
+	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
+	\ never seeing the notify.
+	\ We srart the gen_server here in a separate startup task.
+	: startup_task
+		\ Set up the receiver to get a data stream
+		reg_task
+		conn_init
+		1 sleep
+		"POLL" log
+		\ CONNECTOR_TASK ' t_conn_poll null sender
+		1 sleep
+		"START RADIO" log
+
+		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
+		CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
+		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
+		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
+		"START DISPLAY" log
+		disp_evnt_init
+		1 sleep
+		"SENDING EVENTS" log
+		[14300000] null +sender SYS_R1_FREQ publish drop
+		[[500,200]] null +sender SYS_R1_WIN_METRICS publish drop
+		[[480,180]] null +sender SYS_R1_DISP_METRICS publish drop
+		1 sleep
+		"RUN DISP" log
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] null +sender msg!
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [[false,false,true]] null +sender msg!
+
+		\ Wait until told to close at EOD so refs are maintained
+		-1 sleep
+		"Startup task exiting..." log
+		0.1 sleep
+	;
+	
+	\ ----------------------------------
+	\ onexit callback
+	: term_callback
+		\ Else messages get lost
+		false log-async
+		conn_term
+		disp_evnt_term
+		\ Terminate startup task
+		"startup_task" t:@ dup t:notify t:wait
+		wait_all
+		\ Messages flush
+		0.1 sleep
+	;
+	
+	\ ========================================
+	\ Test program entry point
+	: app:main
+		1 __renderer_data_new
+		1 __renderer_set_id
+		\ A minimal window to hold our test display component
+		{
+			"kind" : "win",
+			"title" : "Renderer Component Test",
+			"visible" : true,
+			"ontop" : false,
+			"bg" : "gray10",
+			"resize-corner" : 20,
+			"wide" : 400,
+			"high" : 200,
+			"top" : 100,
+			"left" : 100,
+			"children" : []
+		} g:new
+		\ Create the test renderer
+		DISP-1 "0,0,500,200" renderer_new dup
+		\ Add to the window
+		rot swap g:+child
+		\ Initialise
+		1 pick renderer_init
+		\ Cleanup and save the window ref
+		drop "win" t:! drop
+		
+		\ Create startup task and keep reference
+		' startup_task t:task "startup_task" t:!
+		
+		\ Set exit handler
+		' term_callback onexit
+		
+		\ Enter event loop
+	;
+#then
