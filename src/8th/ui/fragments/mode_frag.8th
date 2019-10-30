@@ -141,6 +141,7 @@ with: fr.ps
 	swap g:child true g:on
 ;
 
+\ Message handlers
 \ {"cb" w, "data" [data, sender, w|null]} -- 
 : mode_r1	SED: m -- 
 	__data_get_mode
@@ -159,7 +160,7 @@ with: fr.ps
 \ Subscriptions
 
 \ ----------------------------------
-\ Subscribe to VFO-n events
+\ Subscribe to mode-n events
 \  --
 : mode_1_subscribe	SED:  --
 	 t:name@ ' mode_r1 UI_R1_MODE subscribe
