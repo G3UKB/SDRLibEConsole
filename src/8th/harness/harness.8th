@@ -24,7 +24,12 @@
 *)
 
 ns: harness 
-\ A minimal window to hold our test component
+
+with: fr.gs
+with: fr.ps
+with: sdr
+
+\ A minimal window
 : harness_window
 	{
 		"kind" : "win",
@@ -56,4 +61,38 @@ ns: harness
 	]
 	} g:new dup "win" t:!
 ;
+
+\ Register a standard 8th or user task
+: harness_reg_task
+	\ Must register REPL in the task repos to be able to reply
+	t:curtask t:name@ reg!
+	\ Set q to null on empty
+	t:getq false q:throwing \ do not drop q else crashes
+;
+
+\ All responses here
+: harness_responses
+	log
+;
+
+\ Send a message, get a response
+: sender
+	a:new swap a:push ' w  +sender msg! response@ 
+;
+
+\ Basic start radio with default audio
+\ Note that this uses direct messaging with responses. Responses are output but
+\ are not checked in the harness as some cases require things to run on.
+: harness_start_radio
+	harness_reg_task
+	"POLL" log
+	CONNECTOR_TASK ' t_conn_poll null sender "Poll" log
+	1 sleep
+	"AUDIO" log
+	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
+	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
+	CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
+	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
+;
+
 ns: user

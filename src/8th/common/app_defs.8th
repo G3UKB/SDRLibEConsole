@@ -27,7 +27,6 @@
 : RADIO_MODEL_PATH "../models/radio-model.cfg" ;
 : OPTION_MODEL_PATH "../models/option-model.cfg" ;
 
-
 \ ===============================================================================
 \ Task names
 : MAIN_TASK "MainTask" ;

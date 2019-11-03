@@ -35,7 +35,7 @@ needs stack/3drop
 
 \ ========================================
 \ Testing only
-false var, connector_test
+true var, connector_test
 
 \ ----------------------------------
 connector_test @ #if
@@ -45,6 +45,7 @@ connector_test @ #if
 	"../common/app_defs.8th" f:include
 	"../common/radio_defs.8th" f:include
 	"../common/ps_events.8th" f:include
+	"../harness/harness.8th" f:include
 	\ needs debug/sed
 	\ true SED-CHECK
 	\ needs debug/trace
@@ -719,44 +720,19 @@ connector_test @ #if
 	with: sdr
 	with: fr.gs
 	with: fr.ps
+	with: harness
 	
 	4 json-pretty
 	
-	: reg_task
-		\ Must register REPL in the task repos to be able to reply
-		t:curtask t:name@ reg!
-		\ Set q to null on empty
-		t:getq false q:throwing \ do not drop q else crashes
-	;
-
-	\ All responses here
-	: w
-		log
-	;
-	
-	\ Send a message, get a response
-	: sender
-		a:new swap a:push ' w  +sender msg! response@ 
-	;
-	
 	\ Basic start radio with default audio
 	: script
-		reg_task
 		conn_init
 		conn_subscribe
 		1 sleep
-		"POLL" log
-		
-		CONNECTOR_TASK ' t_conn_poll null sender
-		1 sleep
-		"AUDIO" log
-		
-		CONNECTOR_TASK ' t_conn_enum_audio_outputs null sender "Enum outputs" log
-		CONNECTOR_TASK ' t_conn_get_default_route null sender "Get default route" log
-		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
-		CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
-		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
-		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
+		\ This uses direct sends
+		harness_start_radio
+		\ These use pub/sub
+		(*
 		"EVENTS" log
 		[7150000] ' w +sender SYS_R1_FREQ publish response@ "Event Set freq" log
 		0.1 sleep
@@ -771,6 +747,21 @@ connector_test @ #if
 		[ ` CH_2K4 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 2.4KHz" log
 		0.1 sleep
 		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
+		*)
+		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq" log
+		0.1 sleep
+		[ ` CH_LSB ` ] null +sender SYS_R1_MODE publish "Event Set mode LSB" log
+		0.1 sleep
+		[ ` CH_AM ` ] null +sender SYS_R1_MODE publish "Event Set mode AM" log
+		0.1 sleep
+		[ ` CH_6K0 ` ] null +sender SYS_R1_FILT publish "Event Set filter 6.0KHz" log
+		0.1 sleep
+		[ ` CH_FM ` ] null +sender SYS_R1_MODE publish "Event Set mode FM" log
+		0.1 sleep
+		[ ` CH_2K4 ` ] null +sender SYS_R1_FILT publish "Event Set filter 2.4KHz" log
+		0.1 sleep
+		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
+		
 		0.1 sleep
 		conn_term
 		0.1 sleep
