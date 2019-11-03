@@ -451,12 +451,22 @@ with: fr.ps
 \ ========================================
 \ Receiver functions
 
+\ Helpers
+: __decode_cmd	SED: a --
+	a:len 1 n:> if
+		a:open
+	else
+		a:open [null, null]
+	then
+;
+
 \ ========================================
 \ FREQUENCY
 
 \ Set R1 frequency
 : t_conn_r1_freq	SED: a --
-	a:open
+	\ a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R1 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
@@ -748,7 +758,7 @@ connector_test @ #if
 		0.1 sleep
 		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
 		*)
-		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq" log
+		[7150000] SYS_R1_FREQ publish "Event Set freq" log
 		0.1 sleep
 		[ ` CH_LSB ` ] null +sender SYS_R1_MODE publish "Event Set mode LSB" log
 		0.1 sleep
