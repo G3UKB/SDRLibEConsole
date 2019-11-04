@@ -30,7 +30,22 @@ with: sdr
 
 \ ========================================
 \ A minimal window
-: harness_window
+: harness_basic_window
+	{
+		"kind" : "win",
+		"title" : "Harness",
+		"visible" : true,
+		"ontop" : false,
+		"bg" : "gray10",
+		"resize-corner" : 20,
+		"wide" : 400,
+		"high" : 200,
+		"top" : 100,
+		"left" : 100,
+		"children" : []
+	} g:new dup "win" t:!
+;
+: harness_button_window
 	{
 		"kind" : "win",
 		"title" : "Harness",
@@ -58,7 +73,7 @@ with: sdr
 				"click" : "button_clicked",
 				"label" : "Test Events"
 			}
-	]
+		]
 	} g:new dup "win" t:!
 ;
 

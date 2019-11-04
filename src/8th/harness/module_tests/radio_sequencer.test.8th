@@ -63,7 +63,7 @@ true app:isgui !
 	harness_init_connector
 	sequencer_init
 	1 sleep
-	SEQUENCER_TASK ' rm_start_radio 0 null +sender msg!
+	SEQUENCER_TASK ' rm_start_radio [0] null +sender msg!
 	1 sleep
 	\ Print runstate status
 	rst_status
@@ -94,12 +94,13 @@ true app:isgui !
 \ Entry point 
 \ Create a test window and add the button box
 : app:main
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		\ Set exit handler
-		' term_callback onexit
-		\ Create window
-		harness_window
+	\ Create startup task and keep reference
+	' startup_task t:task "startup_task" t:!
+	\ Set exit handler
+	' term_callback onexit
+	\ Create window
+	harness_basic_window
+	"Exiting app:main" log
 ;
 
 \ ========================================
