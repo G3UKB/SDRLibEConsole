@@ -29,26 +29,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, mode_frag_test
-
-\ ----------------------------------
-mode_frag_test @ #if
-	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../../common/ps_events.8th" f:include
-	"../common/g_cache.8th" f:include
-	"../components/buttons.8th" f:include
-	"../../common/radio_defs.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -163,13 +143,13 @@ with: fr.ps
 \ Subscribe to mode-n events
 \  --
 : mode_1_subscribe	SED:  --
-	 t:name@ ' mode_r1 UI_R1_MODE subscribe
+	 t:name@ ' mode_r1 UI_R1_MODE subscribe drop
 ;
 : mode_2_subscribe	SED:  --
-	 t:name@ ' mode_r2 UI_R2_MODE subscribe
+	 t:name@ ' mode_r2 UI_R2_MODE subscribe drop
 ;
 : mode_3_subscribe	SED:  --
-	 t:name@ ' mode_r3 UI_R3_MODE subscribe
+	 t:name@ ' mode_r3 UI_R3_MODE subscribe drop
 ;
 
 
@@ -185,7 +165,7 @@ with: fr.ps
 	mode_button_spec 
 	"bounds" rot m:!
 	"id" rot m:!
-	new_button_box
+	new_button_box 
 	{ MODE-1: ' mode_1_subscribe , MODE-2: ' mode_2_subscribe , MODE-3: ' mode_3_subscribe } 
 	r> m:@ nip w:exec
 ;
@@ -193,42 +173,3 @@ with: fr.ps
 \ ===============================================================================
 \ Restore namespace	
 ns: user	
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-mode_frag_test @ #if
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-
-	true app:isgui !
-	4 json-pretty
-	
-	\ ----------------------------------
-	\ Entry point 
-	\ Create a test window and add the button box
-	: app:main
-
-		\ A minimal window to hold our test component
-		{
-			"kind" : "win",
-			"title" : "Main Control Test",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new dup "win" t:!
-		\ Create the test button box
-		MODE-1 "0,0,150,150" mode_frag_new
-		\ Add to the window
-		"win" t:@ swap g:+child	 
-	;
-#then
