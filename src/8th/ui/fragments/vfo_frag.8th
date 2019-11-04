@@ -29,29 +29,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, vfo_1_test
-
-\ ----------------------------------
-vfo_1_test @ #if
-	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../../common/app_defs.8th" f:include
-	"../../common/radio_defs.8th" f:include
-	"../../common/ps_events.8th" f:include
-	"../common/layout.8th" f:include
-	"../common/font_cache.8th" f:include
-	"../common/g_cache.8th" f:include
-	"../components/vfo.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -138,15 +115,15 @@ with: fr.ps
 \ freq-in-hz -- 
 : vfo_1_publish SED: n --
 	\ Set null callback word as no response required.
-	a:new swap a:push null +sender SYS_R1_FREQ publish drop
+	a:new swap a:push SYS_R1_FREQ publish drop
 ;
 : vfo_2_publish SED: n --
 	\ Set null callback word as no response required.
-	a:new swap a:push null +sender SYS_R2_FREQ publish drop
+	a:new swap a:push SYS_R2_FREQ publish drop
 ;
 : vfo_3_publish SED: n --
 	\ Set null callback word as no response required.
-	a:new swap a:push null +sender SYS_R3_FREQ publish drop
+	a:new swap a:push SYS_R3_FREQ publish drop
 ;
 
 \ ===============================================================================
@@ -173,115 +150,3 @@ with: fr.ps
 \ ===============================================================================
 \ Restore namespace	
 ns: user	
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-vfo_1_test @ #if
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-
-	true app:isgui !
-	4 json-pretty
-	
-	\ This is VFO fragment using the VFO component.
-	\ 1. It publishes frequency changes to SYS_R1_FREQ. We must have agen-server that
-	\			subscribes to SYS_R1_FREQ. to receive the events.
-	\ 2. It subscribes to frequency changes which may come from the model at initialisation
-	\			or a band change or click-frequency etc. We must have a task that publishes
-	\			some frequency changes to test the subscription. This does not have to be a gen-server
-	\			as it can just push publications.
-	
-	\ ========================================
-	\ These are gen_server words for the EVNT_TASK gen_server
-
-	\ ----------------------------------
-	\ Called by published frequency changes
-	: evnt_freq
-		0 a:@ nip log
-	;
-
-	\ ----------------------------------
-	\ Called from a gen_server message to subscribe to the frequency change
-	: evnt_subscribe
-		t:name@ ' evnt_freq SYS_R1_FREQ subscribe
-	;
-	
-	\ ========================================
-	\ Startup/terminate
-
-	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
-	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
-	\ never seeing the notify.
-	\ We srart the gen_server here in a separate startup task.
-	: startup_task
-		\ Create gen_server
-		"EVNT_TASK" gen_server_new
-		\ Tell it to do subscriptions
-		"EVNT_TASK" ' evnt_subscribe null msg!
-		\ Wait until told to close at EOD so refs are maintained
-		-1 sleep
-		"Startup task exiting..." log
-		0.1 sleep
-	;
-	
-	\ ----------------------------------
-	\ onexit callback
-	: term_callback
-		\ Else messages get lost
-		false log-async
-		\ Terminate gen_server
-		"EVNT_TASK" gen_server_term
-		0.1 sleep
-		\ Terminate startup task
-		"startup_task" t:@ dup t:notify t:wait
-		\ Wait for tasks to go
-		wait_all
-		\ Messages flush
-		0.1 sleep
-	;
-	
-	\ ========================================
-	\ Send periodic updates
-	: update_task
-		\ Send frequency updates
-		repeat
-			5 sleep
-			[10000000] t:name@ a:push null a:push UI_R1_FREQ publish drop
-		again
-	;
-	
-	\ ----------------------------------
-	\ Entry point 
-	\ Create a test window and add the button box
-	: app:main
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		\ Set exit handler
-		' term_callback onexit
-
-		\ A minimal window to hold our test component
-		{
-			"kind" : "win",
-			"title" : "ButtonBox",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new dup "win" t:!
-		\ Create the vfo
-		VFO-1 "0,0,300,50" vfo_frag_new
-		\ Add to the window
-		"win" t:@ swap g:+child
-		\ VFO update task
-		' update_task t:task "update_task" t:!
-	;
-#then

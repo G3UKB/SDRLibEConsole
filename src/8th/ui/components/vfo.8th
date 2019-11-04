@@ -27,27 +27,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, vfo_test
-
-\ ----------------------------------
-vfo_test @ #if
-	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../../common/app_defs.8th" f:include
-	"../../common/radio_defs.8th" f:include
-	"../common/layout.8th" f:include
-	"../common/font_cache.8th" f:include
-	"../common/g_cache.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -767,50 +746,3 @@ vfo_separator @ g:+kind
 \ ===============================================================================
 \ Restore namespace	
 ns: user	
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-vfo_test @ #if
-
-	\ Pull in the namespaces
-	with: sdr
-	
-	4 json-pretty
-	true app:isgui !
-	
-	\ Callback for publishing frequency
-	: callback
-		. cr
-	;
-	
-	\ ========================================
-	\ Test program entry point
-	: app:main
-		\ A minimal window to hold our test component
-		{
-			"kind" : "win",
-			"title" : "VFO Component Test",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new
-		\ Create the test VFO
-		VFO-1 "0,0,300,50" ' callback vfo_new dup
-		\ Add to the window
-		rot swap g:+child	
-		\ Initialise
-		1 pick vfo_init
-		\ Cleanup and save the window ref
-		drop "win" t:! drop
-		\ Enter event loop
-	;
-#then
