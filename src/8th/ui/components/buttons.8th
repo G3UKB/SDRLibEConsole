@@ -27,21 +27,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, buttons_test
-
-\ ----------------------------------
-buttons_test @ #if
-	\ Includes
-	"../common/g_cache.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -136,73 +121,3 @@ with: fr.ps
 \ ===============================================================================
 \ Restore namespace	
 ns: user	
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-buttons_test @ #if
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-	
-	true app:isgui !
-	4 json-pretty
-
-	\ ----------------------------------
-	\ Called as given by spec
-	\ Generally the user data will be required
-	\ g -- g
-	: button_click	SED: g -- g
-		"user-data" g:m@ . cr
-	;
-
-	\ ----------------------------------
-	\ This call would be made from the application to create a new button box from the spec.
-	\ --
-	: make_component	SED: -- g
-		{
-			"id" : "BB1",
-			"bounds" : "0,0,200,200",
-			"rows" : 3, 
-			"cols" : 3,
-			"spec" : [
-				["160", 1900000, ' button_click ],
-				["80", 3700000, ' button_click ],
-				["60", 5276000, ' button_click ],
-				["40", 7100000, ' button_click ],
-				["30", 10200000, ' button_click ],
-				["20", 14200000, ' button_click ],
-				["17", 18100000, ' button_click ],
-				["15", 21200000, ' button_click ],
-				["10", 29000000, ' button_click ]
-			] 
-		} new_button_box
-	;
-
-	\ ----------------------------------
-	\ Entry point 
-	\ Create a test window and add the button box
-	: app:main
-
-			\ A minimal window to hold our test component
-			{
-				"kind" : "win",
-				"title" : "ButtonBox Test",
-				"visible" : true,
-				"ontop" : false,
-				"bg" : "gray10",
-				"resize-corner" : 20,
-				"wide" : 400,
-				"high" : 200,
-				"top" : 100,
-				"left" : 100,
-				"children" : []
-			} g:new dup "win" t:!
-			\ Create the test button box
-			make_component
-			\ Add to the window
-			"win" t:@ swap g:+child	 
-	;
-#then

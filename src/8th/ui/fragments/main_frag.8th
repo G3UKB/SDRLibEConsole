@@ -29,22 +29,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, main_frag_test
-
-\ ----------------------------------
-main_frag_test @ #if
-	\ Includes
-	"../common/g_cache.8th" f:include
-	"../components/buttons.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -67,9 +51,11 @@ with: fr.ps
 	g:on? if
 		"user-data" g:m@
 		"start" s:= if
-			SEQUENCER_TASK ' rm_start_radio [0] msg!
+			\ SEQUENCER_TASK ' rm_start_radio [0] msg!
+			[0] SYS_START_RADIO publish
 		else
-			SEQUENCER_TASK ' rm_stop_radio null msg!
+			\ SEQUENCER_TASK ' rm_stop_radio null msg!
+			[null] SYS_STOP_RADIO publish
 		then
 	then
 ;
@@ -103,42 +89,3 @@ with: fr.ps
 \ ===============================================================================
 \ Restore namespace	
 ns: user	
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-main_frag_test @ #if
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-
-	true app:isgui !
-	4 json-pretty
-	
-	\ ----------------------------------
-	\ Entry point 
-	\ Create a test window and add the button box
-	: app:main
-
-			\ A minimal window to hold our test component
-			{
-				"kind" : "win",
-				"title" : "Main Control Test",
-				"visible" : true,
-				"ontop" : false,
-				"bg" : "gray10",
-				"resize-corner" : 20,
-				"wide" : 400,
-				"high" : 200,
-				"top" : 100,
-				"left" : 100,
-				"children" : []
-			} g:new dup "win" t:!
-			\ Create the test button box
-			"0,0,200,100" mc_new
-			\ Add to the window
-			"win" t:@ swap g:+child	 
-	;
-#then
