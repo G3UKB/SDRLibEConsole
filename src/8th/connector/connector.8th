@@ -452,11 +452,14 @@ with: fr.ps
 \ Receiver functions
 
 \ Helpers
+\ Check what we have in the command structure
 : __decode_cmd	SED: a --
 	a:len 1 n:> if
+		\ Have at least a task name so let it go
 		a:open
 	else
-		a:open [null, null]
+		\ No task name and no word so add dummies
+		a:open null null
 	then
 ;
 
@@ -465,7 +468,6 @@ with: fr.ps
 
 \ Set R1 frequency
 : t_conn_r1_freq	SED: a --
-	\ a:open
 	__decode_cmd
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R1 freq in Hz
@@ -476,7 +478,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R2 frequency
 : t_conn_r2_freq	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R2 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
@@ -486,7 +488,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R3 frequency
 : t_conn_r3_freq	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - R3 freq in Hz
 	\ out: 	q: * - "Timeout" or response data
@@ -496,7 +498,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set TX frequency
 : t_conn_tx_freq	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name, w)
 	\				1: s - TX freq in Hz
 	\ out: 	q: * - "Timeout" or response data
@@ -509,7 +511,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R1 mode
 : t_conn_r1_mode	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name)
 	\				1: s - R1 mode id
 	\ out: 	q: * - "Timeout" or response data
@@ -519,7 +521,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R2 mode
 : t_conn_r2_mode	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name)
 	\				1: s - R2 mode id
 	\ out: 	q: * - "Timeout" or response data
@@ -529,7 +531,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R3 mode
 : t_conn_r3_mode	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: n - sender (task name)
 	\				1: s - R3 mode id
 	\ out: 	q: * - "Timeout" or response data
@@ -541,7 +543,7 @@ with: fr.ps
 
 \ Set R1 filter
 : t_conn_r1_filter	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: s - sender task name, w
 	\				2: n - R1 filter id
 	\ out: 	q: * - "Timeout" or response data
@@ -552,7 +554,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R2 filter
 : t_conn_r2_filter	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: s - sender task name, w
 	\				2: n - R2 filter id
 	\ out: 	q: * - "Timeout" or response data
@@ -563,7 +565,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set R3 filter
 : t_conn_r3_filter	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: s - sender task name, w
 	\				2: n - R3 filter id
 	\ out: 	q: * - "Timeout" or response data
@@ -574,7 +576,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set TX filter
 : t_conn_tx_filter	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: s - sender task name, w
 	\				2: n - TX filter id
 	\ out: 	q: * - "Timeout" or response data
@@ -588,7 +590,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set display width
 : t_conn_disp_width	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: w - response word
 	\				1: s - sender task name
 	\				2: n - width in pixels
@@ -598,7 +600,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set display period
 : t_conn_disp_period	SED: a --
-	a:open
+	__decode_cmd
 	\ in: 	0: w - response word
 	\				1: s - sender task name
 	\				: n - period in ms
@@ -608,7 +610,7 @@ with: fr.ps
 \ ----------------------------------
 \ Set display state
 : t_conn_disp_state	SED: a --
-	a:open 
+	__decode_cmd 
 	\ in: 	0: w - response word
 	\				1: s - sender task name
 	\				2: a - [T,T,T] enable flags
@@ -736,43 +738,32 @@ connector_test @ #if
 	
 	\ Basic start radio with default audio
 	: script
+		\ Initialise connector
 		conn_init
 		conn_subscribe
 		1 sleep
+		\ Start the radio
 		\ This uses direct sends
 		harness_start_radio
-		\ These use pub/sub
-		(*
-		"EVENTS" log
-		[7150000] ' w +sender SYS_R1_FREQ publish response@ "Event Set freq" log
-		0.1 sleep
-		[ ` CH_LSB ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode LSB" log
-		0.1 sleep
-		[ ` CH_AM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode AM" log
-		0.1 sleep
-		[ ` CH_6K0 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 6.0KHz" log
-		0.1 sleep
-		[ ` CH_FM ` ] ' w +sender SYS_R1_MODE publish response@ "Event Set mode FM" log
-		0.1 sleep
-		[ ` CH_2K4 ` ] ' w +sender SYS_R1_FILT publish response@ "Event Set filter 2.4KHz" log
-		0.1 sleep
-		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
-		*)
+		
+		\ Published events which is normal send and forget mode. If responses are required then
+		\ use 'null +sender' after the data and may also require a response@ after the publish
+		\ depending on what is receiving the response.
 		[7150000] SYS_R1_FREQ publish "Event Set freq" log
 		0.1 sleep
-		[ ` CH_LSB ` ] null +sender SYS_R1_MODE publish "Event Set mode LSB" log
+		[ ` CH_LSB ` ] SYS_R1_MODE publish "Event Set mode LSB" log
 		0.1 sleep
-		[ ` CH_AM ` ] null +sender SYS_R1_MODE publish "Event Set mode AM" log
+		[ ` CH_AM ` ] SYS_R1_MODE publish "Event Set mode AM" log
 		0.1 sleep
-		[ ` CH_6K0 ` ] null +sender SYS_R1_FILT publish "Event Set filter 6.0KHz" log
+		[ ` CH_6K0 ` ] SYS_R1_FILT publish "Event Set filter 6.0KHz" log
 		0.1 sleep
-		[ ` CH_FM ` ] null +sender SYS_R1_MODE publish "Event Set mode FM" log
+		[ ` CH_FM ` ] SYS_R1_MODE publish "Event Set mode FM" log
 		0.1 sleep
-		[ ` CH_2K4 ` ] null +sender SYS_R1_FILT publish "Event Set filter 2.4KHz" log
+		[ ` CH_2K4 ` ] SYS_R1_FILT publish "Event Set filter 2.4KHz" log
 		0.1 sleep
-		[7150000] null +sender SYS_R1_FREQ publish "Event Set freq, no response" log
-		
+		[7150000] SYS_R1_FREQ publish "Event Set freq, no response" log
 		0.1 sleep
+		\ Close down
 		conn_term
 		0.1 sleep
 	;
