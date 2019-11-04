@@ -96,6 +96,10 @@ with: sdr
 	conn_init
 	conn_subscribe
 ;
+\ Close connector
+: harness_close_connector
+	conn_term
+;
 
 : harness_start_radio
 	harness_reg_task

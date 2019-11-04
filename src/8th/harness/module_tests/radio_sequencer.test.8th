@@ -1,7 +1,7 @@
 (* 
-	connector.test.8th
+	radio_sequencer.test.8th
  
-  Test harness for connector.8th
+  Test harness for radio_sequencer.8th
  
  Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,9 @@
 "../../common/app_defs.8th" f:include
 "../../common/radio_defs.8th" f:include
 "../../common/ps_events.8th" f:include
+"../../common/run_state.8th" f:include
 "../../connector/connector.8th" f:include
+"../../connector/radio_sequencer.8th" f:include
 "../harness.8th" f:include
 
 \ ========================================
@@ -47,38 +49,57 @@ with: fr.ps
 with: harness
 
 4 json-pretty
+true app:isgui !
 
 \ ========================================
-\ Note, as this is not a GUI app its ok to create gen-servers here
-: script
-	\ These use direct sends
-	\ Initialise connector
-	harness_init_connector
-	1 sleep
-	\ Start the radio
-	harness_start_radio
+\ Startup/terminate
 
-	\ Published events which is normal send and forget mode. If responses are required then
-	\ use 'null +sender' after the data and may also require a response@ after the publish
-	\ depending on what is receiving the response.
-	"Running some radio settings" log
-	7150000 harness_set_freq
-	0.1 sleep
-	harness_set_lsb
-	2 sleep
-	harness_set_am
-	2 sleep
-	harness_set_fm
-	2 sleep
-	\ Close down
-	harness_close_connector
+\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
+\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
+\ never seeing the notify.
+\ We srart the gen_server here in a separate startup task.
+: startup_task
+	\ Create gen_servers
+	harness_init_connector
+	sequencer_init
+	1 sleep
+	SEQUENCER_TASK ' rm_start_radio 0 null +sender msg!
+	1 sleep
+	\ Print runstate status
+	rst_status
+	\ Wait until told to close at EOD so refs are maintained
+	-1 sleep
+	"Startup task exiting..." log
 	0.1 sleep
 ;
 
-\ Run test and exit
-script
-1 sleep
-"Test complete" log
-bye
+\ ----------------------------------
+\ onexit callback
+: term_callback
+	\ Else messages get lost
+	false log-async
+	\ Terminate gen_server
+	sequencer_term
+	conn_term
+	0.1 sleep
+	\ Terminate startup task
+	"startup_task" t:@ dup t:notify t:wait
+	\ Wait for tasks to go
+	wait_all
+	\ Messages flush
+	0.1 sleep
+;
+
+\ ----------------------------------
+\ Entry point 
+\ Create a test window and add the button box
+: app:main
+		\ Create startup task and keep reference
+		' startup_task t:task "startup_task" t:!
+		\ Set exit handler
+		' term_callback onexit
+		\ Create window
+		harness_window
+;
 
 \ ========================================
