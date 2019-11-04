@@ -71,7 +71,7 @@ true app:isgui !
 \ ----------------------------------
 \ Called from a gen_server message to subscribe to the radio updates
 : evnt_subscribe
-	t:name@ ' evnt_mode UI_R1_MODE subscribe
+	t:name@ ' evnt_mode SYS_R1_MODE subscribe
 ;
 
 \ ========================================
