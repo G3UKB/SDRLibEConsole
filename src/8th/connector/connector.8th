@@ -33,26 +33,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-true var, connector_test
-
-\ ----------------------------------
-connector_test @ #if
-	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../common/app_defs.8th" f:include
-	"../common/radio_defs.8th" f:include
-	"../common/ps_events.8th" f:include
-	"../harness/harness.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Set namespace
 ns: sdr
 with: fr.gs
@@ -722,54 +702,3 @@ with: fr.ps
 \ ========================================
 \ Reset namespace
 ns: user
-
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-connector_test @ #if
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-	with: harness
-	
-	4 json-pretty
-	
-	\ Basic start radio with default audio
-	: script
-		\ Initialise connector
-		conn_init
-		conn_subscribe
-		1 sleep
-		\ Start the radio
-		\ This uses direct sends
-		harness_start_radio
-		
-		\ Published events which is normal send and forget mode. If responses are required then
-		\ use 'null +sender' after the data and may also require a response@ after the publish
-		\ depending on what is receiving the response.
-		[7150000] SYS_R1_FREQ publish "Event Set freq" log
-		0.1 sleep
-		[ ` CH_LSB ` ] SYS_R1_MODE publish "Event Set mode LSB" log
-		0.1 sleep
-		[ ` CH_AM ` ] SYS_R1_MODE publish "Event Set mode AM" log
-		0.1 sleep
-		[ ` CH_6K0 ` ] SYS_R1_FILT publish "Event Set filter 6.0KHz" log
-		0.1 sleep
-		[ ` CH_FM ` ] SYS_R1_MODE publish "Event Set mode FM" log
-		0.1 sleep
-		[ ` CH_2K4 ` ] SYS_R1_FILT publish "Event Set filter 2.4KHz" log
-		0.1 sleep
-		[7150000] SYS_R1_FREQ publish "Event Set freq, no response" log
-		0.1 sleep
-		\ Close down
-		conn_term
-		0.1 sleep
-	;
-
-	\ Run test and exit
-	script
-	1 sleep
-	bye
-#then

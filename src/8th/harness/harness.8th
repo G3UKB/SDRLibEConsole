@@ -1,7 +1,7 @@
 (* 
 	harness.8th
  
-  Some helpers for the various module tests as many have the same structure.
+  Some helpers for the various module tests as many have the same requirements
  
  Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
- 
 *)
 
 ns: harness 
@@ -29,6 +28,7 @@ with: fr.gs
 with: fr.ps
 with: sdr
 
+\ ========================================
 \ A minimal window
 : harness_window
 	{
@@ -62,6 +62,7 @@ with: sdr
 	} g:new dup "win" t:!
 ;
 
+\ ========================================
 \ Register a standard 8th or user task
 : harness_reg_task
 	\ Must register REPL in the task repos to be able to reply
@@ -70,19 +71,32 @@ with: sdr
 	t:getq false q:throwing \ do not drop q else crashes
 ;
 
+\ ========================================
 \ All responses here
 : harness_responses
-	log
+	conn_decode_response if
+		"Successful" log
+	else
+		"Failed!" log
+	then
 ;
 
+\ ========================================
 \ Send a message, get a response
 : sender
-	a:new swap a:push ' w  +sender msg! response@ 
+	a:new swap a:push ' harness_responses  +sender msg! response@ 
 ;
 
+\ ========================================
 \ Basic start radio with default audio
 \ Note that this uses direct messaging with responses. Responses are output but
 \ are not checked in the harness as some cases require things to run on.
+: harness_init_connector
+\ Initialise connector
+	conn_init
+	conn_subscribe
+;
+
 : harness_start_radio
 	harness_reg_task
 	"POLL" log
@@ -95,4 +109,25 @@ with: sdr
 	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 ;
 
+\ ========================================
+\ Publish some radio settings
+: harness_set_freq	\ freq --
+	a:new swap a:push SYS_R1_FREQ publish
+;
+
+: harness_set_lsb	\ --
+	[ ` CH_LSB ` ] SYS_R1_MODE publish
+	[ ` CH_2K4 ` ] SYS_R1_FILT publish
+;
+
+: harness_set_am	\ --
+	[ ` CH_AM ` ] SYS_R1_MODE publish
+	[ ` CH_6K0 ` ] SYS_R1_FILT publish
+;
+
+: harness_set_fm	\ --
+	[ ` CH_FM ` ] SYS_R1_MODE publish
+	[ ` CH_4K0 ` ] SYS_R1_FILT publish
+;
+	
 ns: user
