@@ -1,7 +1,7 @@
 (*
-	disp_builder.8th
+	disp_encoder.8th
  
-  Display builder for the SDRLibEConsole application
+  Display encoder for the SDRLibEConsole application
  
  Copyright C 2018 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,8 @@
  	The display encoder is called by disp_event.8th when display data is available. Each display
  	is called on a separate thread and builds arrays such that the renderer has minimal work.
  	The arrays for the static and dynamic data are passed to the rendered using copy and g:do. This
- 	may be more expensive than locking but the data is not huge and copy/dispatch is more deterministic.
+ 	may be more expensive than locking but the data is not huge and copy/dispatch is more deterministic
+ 	and avoids global data structures as all data is then in task variables.
 	
 *)
 
@@ -258,7 +259,7 @@ ns: sdr
 \ ===============================================================================
 \ Build the display arrays
 \ Called periodically from event.8th
-: disp_builder	SED:  --
+: disp_encoder	SED:  --
 	\ in: none
 	\ out: none
 	build_grid_array
