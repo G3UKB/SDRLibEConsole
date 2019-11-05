@@ -38,7 +38,7 @@ with: sdr
 		"ontop" : false,
 		"bg" : "gray10",
 		"resize-corner" : 20,
-		"wide" : 400,
+		"wide" : 500,
 		"high" : 200,
 		"top" : 100,
 		"left" : 100,

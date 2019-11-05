@@ -59,25 +59,7 @@ with: fr.ps
 with: harness
 
 4 json-pretty
-
 true app:isgui !
-	
-: reg_task
-	\ Must register REPL in the task repos to be able to reply
-	t:curtask t:name@ reg!
-	\ Set q to null on empty
-	t:getq false q:throwing \ do not drop q else crashes
-;
-
-\ All responses here
-: w
-	log
-;
-
-\ Send a message, get a rsponse
-: sender
-	a:new swap a:push ' w  +sender msg! response@ 
-;
 
 \ ========================================
 \ Startup
@@ -88,18 +70,14 @@ true app:isgui !
 \ We srart the gen_server here in a separate startup task.
 : startup_task
 	\ Set up the receiver to get a data stream
-	reg_task
-	conn_init
+	harness_reg_task
+	\ These use direct sends
+	\ Initialise connector
+	harness_init_connector
 	1 sleep
-	"POLL" log
-	\ CONNECTOR_TASK ' t_conn_poll null sender
-	1 sleep
-	"START RADIO" log
+	\ Start the radio
+	harness_start_radio
 
-	CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
-	CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
-	CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
-	CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
 	"START DISPLAY" log
 	disp_evnt_init
 	1 sleep
@@ -137,29 +115,15 @@ true app:isgui !
 : app:main
 	1 __renderer_data_new
 	1 __renderer_set_id
-	\ A minimal window to hold our test display component
-	{
-		"kind" : "win",
-		"title" : "Renderer Component Test",
-		"visible" : true,
-		"ontop" : false,
-		"bg" : "gray10",
-		"resize-corner" : 20,
-		"wide" : 400,
-		"high" : 200,
-		"top" : 100,
-		"left" : 100,
-		"children" : []
-	} g:new
+	\ Create an empty wondow
+	harness_basic_window
 	\ Create the test renderer
 	DISP-1 "0,0,500,200" render_frag_new dup
 	\ Add to the window
 	rot swap g:+child
 	\ Initialise
 	1 pick renderer_init
-	\ Cleanup and save the window ref
-	drop "win" t:! drop
-
+	
 	\ Create startup task and keep reference
 	' startup_task t:task "startup_task" t:!
 
