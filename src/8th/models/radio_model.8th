@@ -30,29 +30,6 @@
 			UI and to set the current values.
 *)
 
-\ ========================================
-\ Testing only
-false var, radio_model_test
-
-\ ----------------------------------
-radio_model_test @ #if
-	\ Includes
-	"../common/app_defs.8th" f:include
-	"../common/radio_defs.8th" f:include
-	"../common/ps_events.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/struct_manip.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
-	"../connector/connector.8th" f:include
-	"model_common.8th" f:include
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Set namespace
 ns: sdr
 with: fr.gs
@@ -342,31 +319,3 @@ with: fr.p
 \ Reset namespace
 ns: user
 
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-radio_model_test @ #if
-	with: sdr
-	
-	4 json-pretty
-	
-	\ Basic test
-	: script
-		\ Create connector
-		conn_init
-		\ Initialise model
-		radio_model_init
-		1 sleep
-		\ Terminate connector
-		conn_term
-		\ Terminate model
-		radio_model_term
-		1 sleep
-	;
-	
-	\ Run test and exit
-	script
-	bye
-#then

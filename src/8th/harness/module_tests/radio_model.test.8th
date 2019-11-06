@@ -1,0 +1,70 @@
+(* 
+	radio_model.test.8th
+ 
+  Test harness for radio_model.8th
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+ *)
+ 
+\ ========================================
+\ Includes
+"../../common/app_defs.8th" f:include
+"../../common/radio_defs.8th" f:include
+"../../common/ps_events.8th" f:include
+"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
+"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
+"E:/Projects/Framework/trunk/src/8th/struct_manip.8th" f:include
+"E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
+"../../connector/connector.8th" f:include
+"../../models/model_common.8th" f:include
+"../../models/radio_model.8th" f:include
+
+\ ========================================
+\ Debug Settings
+\ needs debug/sed
+\ true SED-CHECK
+\ needs debug/trace
+\ dbg:line-info
+
+\ ========================================
+\ Test code
+with: sdr
+	
+4 json-pretty
+
+\ Basic test
+: script
+	\ Create connector
+	conn_init
+	\ Initialise model
+	radio_model_init
+	1 sleep
+	radio_model_sys_events
+	radio_model_ui_events
+	1 sleep
+	\ Terminate connector
+	conn_term
+	\ Terminate model
+	radio_model_term
+	1 sleep
+;
+
+\ Run test and exit
+script
+bye

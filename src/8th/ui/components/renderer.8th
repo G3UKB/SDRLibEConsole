@@ -264,8 +264,8 @@ with: fr.ps
 	\ st_rad_running@ if
 		wf_update
 		"panel-metrics" g:m@ a:open nip	\ g disp-id height
-		b_margin n:-																					\ g disp-id start-y
-		swap "wf-img" g:m@																		\ g start-y img 
+		b_margin n:-										\ g disp-id start-y
+		swap "wf-img" g:m@							\ g start-y img 
 		rot l_margin swap g:image-at
 	\ then 
 ;
