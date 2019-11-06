@@ -28,38 +28,6 @@
 
 needs stack/3drop
 
-\ ========================================
-\ Testing only
-false var, renderer_test
-
-\ ----------------------------------
-renderer_test @ #if
-	\ Includes
-	"E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
-	"E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
-	"../../common/app_defs.8th" f:include
-	"../../common/radio_defs.8th" f:include
-	"../../common/ps_events.8th" f:include
-	"../../common/run_state.8th" f:include
-	"../common/layout.8th" f:include
-	"../common/font_cache.8th" f:include
-	"../common/g_cache.8th" f:include
-	"../../connector/connector.8th" f:include
-	"../common/render_if.8th" f:include
-	"../../display_builder/disp_context.8th" f:include
-	"../../display_builder/disp_defs.8th" f:include
-	"../../display_builder/disp_calc.8th" f:include
-	"../../display_builder/disp_encoder.8th" f:include
-	"../../display_builder/disp_events.8th" f:include
-	"../common/render_context.8th" f:include
-	
-	\ needs debug/sed
-	\ true SED-CHECK
-	\ needs debug/trace
-	\ dbg:line-info
-#then
-\ ========================================
-
 \ Use SDR namespace
 ns: sdr
 with: fr.gs
@@ -104,12 +72,17 @@ with: fr.ps
 	"client-metrics" : [480,180],			\ Client area to draw dynamic content
 	"mouse-pos" : [0,0],							\ Current mouse position for click tune
 	\ Image
-	"wf-img" : ` 100 100 img:new ` ,	\ Image data for waterfall
+	\ ToDo: must be resized correctly.
+	"wf-img" : ` 450 100 img:new ` ,	\ Image data for waterfall
 	\ Radio state											
 	"mid-freq" : 7100000,							\ This radio mid freq for freq scale
 	"mode" : 0,												\ This radio mode
 	"filter" : 0											\ This radio filter	
 } var, __renderer_disp_panel
+
+\ ===============================================================================
+\ Grid and Labels Drawing
+\ ===============================================================================
 
 \ ----------------------------------
 \ Draw horizontal/vertical label
@@ -168,7 +141,136 @@ with: fr.ps
 	drop 
 ;
 
-\ ========================================
+\ ===============================================================================
+\ Panadapter Drawing
+\ ===============================================================================
+
+\ ----------------------------------
+\ Close the pan path so it can be filled
+: __complete_pan_path	SED: g a --
+	\ in: 	0: a - pan_data (whole array)
+	\				1: g - gui
+	\ out:	none
+	\ Line from the current end point to the bottom right
+	\ swap "inst_data" t:@ get_disp_win_metrics 2dup a:open		\ pan-data gui [width,height] gui width height
+	swap "panel-metrics" g:m@ 2dup a:open											\ pan-data gui [width,height] gui width height
+	b_margin n:- swap r_margin n:- swap g:lineto							\ pan-data gui [width,height] gui
+	\ Line from bottom right to bottom left
+	drop 2dup a:open 1 0 poke																	\ pan-data gui [width,height] gui 0 height
+	b_margin n:- swap l_margin n:+ swap g:lineto							\ pan-data gui [width,height] gui
+	\ Line to the first point
+	\ "inst_data" t:@ pan_data_ref														\ pan-data gui [width,height] gui pan-data
+	__render_pan_data@																				\ pan-data gui [width,height] gui pan-data
+	0 a:@ nip 0 a:@ swap 1 a:@ nip														\ pan-data gui [width,height] gui x y
+	g:lineto																									\ pan-data gui [width,height] gui
+	4drop 
+;
+
+\ ----------------------------------
+\ Add next pan node to path
+: __do_node	SED: g n a -- g
+	\ in: 	0: a - pan_data_itm [x,dBm]
+	\				1: n - idx
+	\				2: g - gui
+	\ out:	0: g - gui
+	0 a:@ swap 1 a:@ nip 	\ gui idx x y
+	rot 0 n:= if					\ gui x y
+		\ First item so move to
+		g:moveto
+	else
+		\ Subsequent so add line to
+		g:lineto
+	then 
+;
+
+\ ----------------------------------
+\ Make the pan path
+: __make_pan_path	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	__render_pan_data@ ' __do_node a:each
+	a:len 0 n:> if
+		2dup __complete_pan_path
+	then
+	drop 
+;
+
+\ ----------------------------------
+\ Draw the panadapter display
+: __renderer_draw_pan	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui
+	\ Clear previous path
+	g:clearpath
+	\ Set palette
+	"green:50" g:scolor
+	"green:30" g:fcolor
+	\ Create a new path 
+	g:path
+	__make_pan_path
+	\ Render and fill path
+	g:/path g:stroke-fill 
+;
+
+\ ===============================================================================
+\ Waterfall Drawing
+\ ===============================================================================
+
+\ ----------------------------------
+\ Scroll the image up one line
+\ This creates the waterfall effect as the image moves up the screen
+: __scroll	SED: g img -- g
+	\ in: 	0: img - img
+	\				1: g - gui
+	\ out:	0: g - gui
+ 0 null 1 img:scroll drop 
+;
+
+\ ----------------------------------
+\ Write next pixel to image at idx
+: __dopix	SED: g img n a -- g img
+	\ in: 	0: a - pixel data item
+	\				1: n - idx
+	\ 			2: img - img
+	\ 			3: g - gui
+	\ out:	0: img - img
+	\				1: g - gui
+	1 a:@ nip 					\ g img col colour
+	wf_height n:1- -rot \ g img row col colour
+	img:pix!
+;
+
+\ ----------------------------------
+\ Write one line of the waterfall according to current data
+: wf_update	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	\ "inst_data" t:@ dup 
+	\ wf_data_ref 					\ g disp-id wf-data-ref
+	\ swap get_wf_img				\ g wf-data-ref img
+	__render_wf_data@
+	swap "wf-img" g:m@			\ wf-data-ref g img
+	rot	' __dopix						\ g img wf-data-ref 'dopix										
+	a:each drop
+	__scroll
+;
+
+\ ----------------------------------
+\ Draw the waterfall display
+: __renderer_draw_waterfall	SED: g -- g
+	\ in: 	0: g - gui
+	\ out:	0: g - gui	
+	\ ToDo: Check running state.
+	\ st_rad_running@ if
+		wf_update
+		"panel-metrics" g:m@ a:open nip	\ g disp-id height
+		b_margin n:-																					\ g disp-id start-y
+		swap "wf-img" g:m@																		\ g start-y img 
+		rot l_margin swap g:image-at
+	\ then 
+;
+	
+\ ===============================================================================
 \ Render all display components
 : __renderer_draw_all	SED: g --
 	\ in: 	0: g - gui
@@ -180,8 +282,8 @@ with: fr.ps
 	
 	\ Draw the display components
 	__renderer_draw_grid
-	\ draw_pan
-	\ draw_waterfall
+	__renderer_draw_pan
+	__renderer_draw_waterfall
 	\ draw_center_freq_line
 	\ draw_filter_overlay
 	\ draw_mouse_pos
@@ -220,125 +322,3 @@ with: fr.ps
 \ Reset namespace
 ns: user
 
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-
-renderer_test @ #if
-
-	\ Pull in the namespaces
-	with: sdr
-	with: fr.gs
-	with: fr.ps
-	
-	4 json-pretty
-	true app:isgui !
-	
-	: reg_task
-		\ Must register REPL in the task repos to be able to reply
-		t:curtask t:name@ reg!
-		\ Set q to null on empty
-		t:getq false q:throwing \ do not drop q else crashes
-	;
-	
-	\ All responses here
-	: w
-		log
-	;
-
-	\ Send a message, get a rsponse
-	: sender
-		a:new swap a:push ' w  +sender msg! response@ 
-	;
-	
-	\ ========================================
-	\ Startup
-
-	\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
-	\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
-	\ never seeing the notify.
-	\ We srart the gen_server here in a separate startup task.
-	: startup_task
-		\ Set up the receiver to get a data stream
-		reg_task
-		conn_init
-		1 sleep
-		"POLL" log
-		\ CONNECTOR_TASK ' t_conn_poll null sender
-		1 sleep
-		"START RADIO" log
-
-		CONNECTOR_TASK ' t_conn_set_default_route null sender "Set default route" log
-		CONNECTOR_TASK ' t_conn_discover null sender "Discover" log
-		CONNECTOR_TASK ' t_conn_start_server null sender "Start server" log
-		CONNECTOR_TASK ' t_conn_start_radio 0 sender "Start radio" log
-		"START DISPLAY" log
-		disp_evnt_init
-		1 sleep
-		"SENDING EVENTS" log
-		[14300000] null +sender SYS_R1_FREQ publish drop
-		[[500,200]] null +sender SYS_R1_WIN_METRICS publish drop
-		[[480,180]] null +sender SYS_R1_DISP_METRICS publish drop
-		1 sleep
-		"RUN DISP" log
-		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] null +sender msg!
-		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [[false,false,true]] null +sender msg!
-
-		\ Wait until told to close at EOD so refs are maintained
-		-1 sleep
-		"Startup task exiting..." log
-		0.1 sleep
-	;
-	
-	\ ----------------------------------
-	\ onexit callback
-	: term_callback
-		\ Else messages get lost
-		false log-async
-		conn_term
-		disp_evnt_term
-		\ Terminate startup task
-		"startup_task" t:@ dup t:notify t:wait
-		wait_all
-		\ Messages flush
-		0.1 sleep
-	;
-	
-	\ ========================================
-	\ Test program entry point
-	: app:main
-		1 __renderer_data_new
-		1 __renderer_set_id
-		\ A minimal window to hold our test display component
-		{
-			"kind" : "win",
-			"title" : "Renderer Component Test",
-			"visible" : true,
-			"ontop" : false,
-			"bg" : "gray10",
-			"resize-corner" : 20,
-			"wide" : 400,
-			"high" : 200,
-			"top" : 100,
-			"left" : 100,
-			"children" : []
-		} g:new
-		\ Create the test renderer
-		DISP-1 "0,0,500,200" renderer_new dup
-		\ Add to the window
-		rot swap g:+child
-		\ Initialise
-		1 pick renderer_init
-		\ Cleanup and save the window ref
-		drop "win" t:! drop
-		
-		\ Create startup task and keep reference
-		' startup_task t:task "startup_task" t:!
-		
-		\ Set exit handler
-		' term_callback onexit
-		
-		\ Enter event loop
-	;
-#then
