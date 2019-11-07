@@ -47,18 +47,29 @@
 "../connector/connector.8th" f:include
 "../connector/radio_sequencer.8th" f:include
 
+\ Display builder
+"../display_builder/disp_defs.8th" f:include
+"../display_builder/disp_calc.8th" f:include
+"../display_builder/disp_context.8th" f:include
+"../display_builder/disp_encoder.8th" f:include
+"../display_builder/disp_events.8th" f:include
+
 \ UI
 \ Common
 "../ui/common/layout.8th" f:include
 "../ui/common/font_cache.8th" f:include
 "../ui/common/g_cache.8th" f:include
+"../ui/common/render_context.8th" f:include
+"../ui/common/render_if.8th" f:include
 \ Components
 "../ui/components/vfo.8th" f:include
 "../ui/components/buttons.8th" f:include
+"../ui/components/renderer.8th" f:include
 \ Fragments
 "../ui/fragments/main_frag.8th" f:include
 "../ui/fragments/vfo_frag.8th" f:include
 "../ui/fragments/mode_frag.8th" f:include
+"../ui/fragments/renderer_frag.8th" f:include
 \ Main window
 "../ui/main_window/main_window.8th" f:include
 

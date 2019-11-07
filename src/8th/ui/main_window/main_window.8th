@@ -84,17 +84,25 @@ with: fr.ps
 		"init" : ' __ui_initialised ,
 		"children" : []
 	} g:new dup "win" t:!
-	\ Create the vfo
-	"VFO-1" "0,30,300,80" vfo_frag_new
-	\ Add to the window
-	"win" t:@ swap g:+child
-	\ Create main control
+	
+	\ Create/add main control
+	\ Tx,Ty,Bx,By
 	"0,0,100,30" mc_new
 	g:+child
-	\ Create main control
-	"MODE-1" "0,80,200,200" mode_frag_new
-	\ Add to window
-	g:+child drop
+	
+	\ Create/add vfo
+	VFO-1 "0,30,300,80" vfo_frag_new
+	"win" t:@ swap g:+child
+	
+	\ Create/add modes
+	MODE-1 "0,80,200,200" mode_frag_new
+	g:+child
+	
+	\ Create/add display
+	DISP-1 "0,200,400,400" render_frag_new
+	g:+child
+	
+	drop
 ;
 
 \ ===============================================================================

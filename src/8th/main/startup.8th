@@ -74,6 +74,7 @@ with: fr.sm
 : run_startup	SED: * --
 	\ in: 	none
 	\ out:	none
+	\ No parameters
 	drop
 	
 	"Creating gen-server tasks..." log
@@ -87,13 +88,13 @@ with: fr.sm
 	\ Models init only
 	radio_model_init
 	
+	"Running startup sequence..." log
 	\ ----------------------------------
 	\ Run the startup sequence
 	\ This will check the server, start server, discover and configure
 	\ It will not run the radio as that is a UI responsibility.
 	sequencer_init
 	
-	"Running startup sequence..." log
 	\ Wait for server to be running
 	__startup_wait_server if
 		\ Send the system events
