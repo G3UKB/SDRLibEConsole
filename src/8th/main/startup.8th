@@ -97,6 +97,11 @@ with: fr.sm
 	
 	\ Wait for server to be running
 	__startup_wait_server if
+	
+		"Starting display system" log
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] null +sender msg!
+		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [[false,false,true]] null +sender msg!
+	
 		\ Send the system events
 		radio_model_sys_events
 	else

@@ -194,6 +194,9 @@ with: fr.ps
 	SEQUENCER_TASK gen_server_new
 	\ Ask the sequencer to run startup sequence
 	SEQUENCER_TASK ' rm_start_sequence [null] null +sender msg!
+	\ Do subscriptions
+	SEQUENCER_TASK ' rm_start_radio SYS_START_RADIO subscribe
+	SEQUENCER_TASK ' rm_stop_radio SYS_STOP_RADIO subscribe
 ;
 
 \ ----------------------------------
