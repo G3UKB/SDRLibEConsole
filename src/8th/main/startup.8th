@@ -99,6 +99,8 @@ with: fr.sm
 	__startup_wait_server if
 	
 		"Starting display system" log
+		disp_evnt_init
+		0.1 sleep
 		DISP_EVNT_TASK ' t_disp_evnt_set_disp_period [100] null +sender msg!
 		DISP_EVNT_TASK ' t_disp_evnt_set_disp_state [[false,false,true]] null +sender msg!
 	

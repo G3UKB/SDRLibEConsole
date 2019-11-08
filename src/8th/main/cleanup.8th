@@ -50,6 +50,8 @@ ns: sdr
 	conn_term
 	\ Sequencer
 	sequencer_term
+	\ Display events
+	disp_evnt_term
 	\ Models
 	radio_model_term
 	\ Startup

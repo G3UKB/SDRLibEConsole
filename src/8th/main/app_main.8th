@@ -48,8 +48,8 @@ with: fr.sm
 	\ out:	none
 	
 	\ ----------------------------------
-	\ Set our task name
-	MAIN_TASK t:name!
+	\ Set our task name and add to the registry
+	MAIN_TASK dup t:name! t:curtask swap reg!
 	\ Make sure the q does not throw
 	t:getq false q:throwing drop
 	t:curtask log
@@ -63,6 +63,10 @@ with: fr.sm
 	
 	\ ----------------------------------
 	\ Start UI
+	\ Initialise renderer data
+	1 __renderer_data_new
+	1 __renderer_set_id
+	\ Create main window
 	main_window
 	
 	\ ----------------------------------

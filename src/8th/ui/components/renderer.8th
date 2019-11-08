@@ -275,7 +275,6 @@ with: fr.ps
 : __renderer_draw_all	SED: g --
 	\ in: 	0: g - gui
 	\ out:	none
-	
 	\ Common settings
 	"gray11" g:fillall
 	1 g:line-width
