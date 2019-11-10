@@ -36,7 +36,7 @@ ns: sdr
 : renderer_invalidate	SED: n --
 	"DISP-" swap >s s:+ g_cache_get
 	\ Invalidate the display to force a repaint
-	g:invalidate
+	g:invalidate drop
 ;
 
 \ ----------------------------------
@@ -58,7 +58,7 @@ ns: sdr
 	__renderer_clear
 	\ Save new data to task variable
 	"data" m:@ "data-r1" t:! drop
-	\ Force repaint
+	\ Force repaint 
 	1 renderer_invalidate
 ;
 

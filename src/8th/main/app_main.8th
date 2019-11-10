@@ -34,6 +34,8 @@
 true app:isgui !
 \ Log as separate task
 true log-async
+\ Trace words
+\ true dbg:line-info
 
 \ Set namespace
 ns: sdr
@@ -46,6 +48,8 @@ with: fr.sm
 : app:main	SED: --
 	\ in: 	none
 	\ out:	none
+	
+	"SDRLibEConsole startup at: " d:new >s s:+ log
 	
 	\ ----------------------------------
 	\ Set our task name and add to the registry
