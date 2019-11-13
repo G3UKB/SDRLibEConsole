@@ -54,31 +54,45 @@ with: fr.ps
 		"top" : 100,
 		"left" : 100,
 		"init" : ' __ui_initialised ,
-		"children" : []
+		"children" : [
+			{
+				"kind" : "tab",
+				"bounds" : "0,0,parent.width,parent.height",
+				"tabs" : [
+					` "10,30,parent.width-10,parent.height-10" mc_new g:obj ` ,
+					` VFO-1 "10,30,parent.width-10,parent.height-10" vfo_frag_new g:obj ` ,
+					\ ` DISP-1 "10,30,parent.width-10,parent.height-10" render_frag_new g:obj ` , 
+					` MODE-1 FILT-1 radio_settings_sub_new g:obj `
+				]
+			}
+		]
 	} g:new dup "win" t:!
 	
 	\ Create/add main control
 	\ Tx,Ty,Bx,By
-	"0,0,100,30" mc_new
-	g:+child
+	\ "0,0,100,30" mc_new
+	\ g:+child
 	
 	\ Create/add vfo
-	VFO-1 "0,30,300,80" vfo_frag_new
-	"win" t:@ swap g:+child
+	\ VFO-1 "0,30,300,80" vfo_frag_new
+	\ "win" t:@ swap g:+child
 	
 	\ Create/add modes
-	MODE-1 "0,80,200,200" mode_frag_new
-	g:+child
+	\ MODE-1 "0,80,200,200" mode_frag_new
+	\ g:+child
 	
 	\ Create/add filters
-	FILT-1 "0,200,300,300" filt_frag_new
-	g:+child
+	\ FILT-1 "0,200,300,300" filt_frag_new
+	\ g:+child
+	
+	\ MODE-1 FILT-1 radio_settings_sub_new
+	\ g:+child
 	
 	\ Create/add display
-	DISP-1 "0,300,500,500" render_frag_new
-	g:+child
+	\ DISP-1 "0,300,500,500" render_frag_new
+	\ g:+child
 	
-	drop
+	\ drop
 ;
 
 \ ===============================================================================

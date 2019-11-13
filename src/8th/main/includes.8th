@@ -73,6 +73,8 @@
 "../ui/fragments/mode_frag.8th" f:include
 "../ui/fragments/filt_frag.8th" f:include
 "../ui/fragments/renderer_frag.8th" f:include
+\ Sub-assemblies
+"../ui/sub_assemblies/radio_settings_sub.8th" f:include
 \ Main window
 "../ui/main_window/main_window.8th" f:include
 

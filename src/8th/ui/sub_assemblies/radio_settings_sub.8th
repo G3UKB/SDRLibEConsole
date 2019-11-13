@@ -21,10 +21,9 @@
   The author can be reached by email at:   
      bob@bobcowdery.plus.com
      
-  Fragment - a UI fragment is a composable component that can be arranged into
-	a window for rendering. The fragment itself may use a generic component part
-	such as a vfo or button box. The fragment is responsible for interactions with 
-  the rest of the system by sending and receiving events.
+  Sub-assembly - a UI sub-assembly is a composable component that can be arranged into
+	a window or be a page for display. The sub-assembly itself uses fragments which are
+	responsible for all interactions.
 *)
 
 needs stack/3drop
@@ -44,6 +43,7 @@ with: fr.ps
 	"alpha" : 1.0,
 	"bg" : "gray10",
 	"visible" : true,
+	"bounds" : "10,30,parent.width-10,parent.height-10",
 	"grid" : { "rows" : 2, "cols" : 1, "spans" : [] },
 	"children" : [
 		{
