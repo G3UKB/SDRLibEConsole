@@ -70,8 +70,12 @@ with: fr.ps
 	MODE-1 "0,80,200,200" mode_frag_new
 	g:+child
 	
+	\ Create/add filters
+	FILT-1 "0,200,300,300" filt_frag_new
+	g:+child
+	
 	\ Create/add display
-	DISP-1 "0,200,400,400" render_frag_new
+	DISP-1 "0,300,500,500" render_frag_new
 	g:+child
 	
 	drop

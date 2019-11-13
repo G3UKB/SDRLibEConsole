@@ -47,15 +47,15 @@ ns: sdr
 	
 	\ Close gen-server tasks
 	\ Connector
-	conn_term
+	conn_term "1" . cr
 	\ Sequencer
-	sequencer_term
+	sequencer_term "2" . cr
 	\ Display events
-	disp_evnt_term
+	disp_evnt_term "3" . cr
 	\ Models
-	radio_model_term
+	radio_model_term "14" . cr
 	\ Startup
-	STARTUP_TASK gen_server_term
+	STARTUP_TASK gen_server_term "5" . cr
 	
 	"Cleanup task - exiting..." log 
 	
