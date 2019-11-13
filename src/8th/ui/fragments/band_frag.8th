@@ -1,0 +1,130 @@
+(*
+	band_frag.8th
+ 
+  Button pane for band buttons.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Fragment - a UI fragment is a composable component that can be arranged into
+	a window for rendering. The fragment itself may use a generic component part
+	such as a vfo or button box. The fragment is responsible for interactions with 
+  the rest of the system by sending and receiving events.
+*)
+
+needs stack/3drop
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+\ user-data --
+: band_1_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R1_FREQ publish drop
+;
+
+: band_2_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R2_FREQ publish drop
+;
+
+: band_3_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R3_FREQ publish drop
+;
+
+\ ========================================
+\ Events
+\ All buttons click in group
+\ gui -- gui
+: band_button_click	SED: g -- g
+	g:on? if
+		"user-data" g:m@
+		swap g:parent "id" g:m@ nip
+		\ user-data id
+		{ BAND-1: ' band_1_publish , BAND-2: ' band_2_publish , BAND-3: ' band_3_publish } 
+		swap m:@ nip w:exec
+	then
+;
+
+\ ========================================
+\ Helpers
+: band_button_spec	SED: -- m
+	{
+		"id" : "BB-BAND",
+		"rows" : 4, 
+		"cols" : 3,
+		"spec" : [
+			["160", ` B_160 ` , ' band_button_click ],
+			["80", ` B_80 ` , ' band_button_click ],
+			["60", ` B_60 ` , ' band_button_click ],
+			["40", ` B_40 ` , ' band_button_click ],
+			["30", ` B_30 ` , ' band_button_click ],
+			["20", ` B_20 ` , ' band_button_click ],
+			["17", ` B_17 ` , ' band_button_click ],
+			["15", ` B_15 ` , ' band_button_click ],
+			["12", ` B_12 ` , ' band_button_click ],
+			["10", ` B_10 ` , ' band_button_click ]
+		]
+	}
+;
+
+\ ========================================
+\ Events
+
+\ ----------------------------------
+\ Get band from event data
+\ {"cb" w, "data" [data, sender, w|null] -- band
+: __data_get_band	SED: m -- n
+	"data" m:@ nip 0 a:@ nip
+;
+
+\ ----------------------------------
+\ Get gui ref for this frag
+\ gui-name -- gui
+: __band_gui_ref	SED: s -- g
+	g_cache_get
+;
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ New button box according to spec
+\ name bounds -- main-control-gui
+: band_frag_new	SED: s s -- g
+	\ Pop in the bounds
+	band_button_spec 
+	"bounds" rot m:!
+	"id" rot m:!
+	new_button_box 
+;
+
+\ ===============================================================================
+\ Restore namespace	
+ns: user	

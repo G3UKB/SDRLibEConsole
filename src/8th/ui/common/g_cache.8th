@@ -55,6 +55,9 @@ ns: sdr
 : FILT-1 "FILT-1" ;
 : FILT-2 "FILT-2" ;
 : FILT-3 "FILT-3" ;
+: BAND-1 "BAND-1" ;
+: BAND-2 "BAND-2" ;
+: BAND-3 "BAND-3" ;
 : DISP-1 "DISP-1" ;
 : DISP-2 "DISP-2" ;
 : DISP-3 "DISP-3" ;

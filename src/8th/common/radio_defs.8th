@@ -25,15 +25,6 @@
 needs utils/enums
 
 \ ========================================
-\ Testing only
-false var, radio_defs_test
-radio_defs_test @ #if
-	\ Includes
-	\ needs debug/sed
-	\ true SED-CHECK
-#then
-
-\ ========================================
 \ Define our SDR namespace
 ns: sdr
 
@@ -168,7 +159,23 @@ enum;
 	} swap m:@ nip null? if
 		"Invalid filter - filter_bounds_for_name:" r> >s s:+ throw
 	then rdrop ;
-	
+
+\ ========================================
+\ Bands
+\ Band id's used to index the lookup table
+0 enum:
+	B_160
+	B_80
+	B_60
+	B_40
+	B_30
+	B_20
+	B_17
+	B_15
+	B_12
+	B_10
+enum;
+
 \ ========================================
 \ AGC
 \ AGC id's as understood by the DSP
@@ -242,26 +249,3 @@ enum;
 \ Restore namespace	
 ns: user	
 
-\ ===============================================================================
-\ ===============================================================================
-\ Testing
-\ ===============================================================================
-radio_defs_test @ #if
-
-	sdr:CH_LSB sdr:name_for_mode . cr
-	\ 20 sdr:name_for_mode
-	"LSB" sdr:mode_for_name . cr
-	\ "LLSB" sdr:mode_for_name
-	
-	sdr:CH_2K4 sdr:filter_lookup . cr
-	\ 20 sdr:filter_lookup
-	"2.7KHz" sdr:filter_for_name . cr
-	\ "22.7KHz" sdr:filter_for_name
-
-	sdr:CH_AGC_LONG sdr:name_for_agc . cr
-	\ 20 sdr:name_for_agc
-	"Long" sdr:agc_for_name . cr
-	\ "Longish" sdr:agc_for_name
-	
-	bye
-#then
