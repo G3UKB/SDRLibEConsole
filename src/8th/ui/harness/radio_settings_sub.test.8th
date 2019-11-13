@@ -64,8 +64,8 @@ true app:isgui !
 : app:main
 	\ Create a basic window
 	harness_basic_window
-	\ Create the test button box
-	radio_settings_sub_new
+	\ Create the test sub-assembly
+	MODE-1 FILT-1 radio_settings_sub_new
 	\ Add to the window
 	"win" t:@ swap g:+child	
 	1 sleep

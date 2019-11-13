@@ -44,7 +44,21 @@ with: fr.ps
 	"alpha" : 1.0,
 	"bg" : "gray10",
 	"visible" : true,
-	"grid" : { "rows" : 2, "cols" : 1 }
+	"grid" : { "rows" : 2, "cols" : 1, "spans" : [] },
+	"children" : [
+		{
+			"kind" : "group",
+			"label" : "Mode",
+			"fg" : "antiquewhite4",
+			"children" : []
+		},
+		{
+			"kind" : "group",
+			"label" : "Filter",
+			"fg" : "antiquewhite4",
+			"children" : []
+		}
+	]
 } var, radio_settings_panel
 
 \ ===============================================================================
@@ -59,9 +73,12 @@ with: fr.ps
 \ ===============================================================================
 
 \ New button box according to spec
-\  -- radio-settings-gui
-: radio_settings_sub_new	SED: -- g
-	radio_settings_panel @ g:new
-	MODE-1 "0,0,300,40" mode_frag_new g:+child
-	FILT-1 "0,40,300,80" filt_frag_new g:+child
+\  mode-id filter-id -- radio-settings-gui
+: radio_settings_sub_new	SED: s s -- g
+	radio_settings_panel @ g:new dup >r
+	r@ 0 g:child
+	3 pick "10,20,parent.width-10,parent.height-10" mode_frag_new g:+child drop
+	r> 1 g:child
+	2 pick "10,20,parent.width-10,parent.height-10" filt_frag_new g:+child drop
+	nip nip
 ;
