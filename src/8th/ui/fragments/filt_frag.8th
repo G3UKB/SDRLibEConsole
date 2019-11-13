@@ -1,0 +1,172 @@
+(*
+	filt_frag.8th
+ 
+  Button pane for filter buttons.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Fragment - a UI fragment is a composable component that can be arranged into
+	a window for rendering. The fragment itself may use a generic component part
+	such as a vfo or button box. The fragment is responsible for interactions with 
+  the rest of the system by sending and receiving events.
+*)
+
+needs stack/3drop
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+\ user-data --
+: filt_1_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R1_FILT publish drop
+;
+
+: filt_2_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R2_FILT publish drop
+;
+
+: filt_3_publish	SED: s
+	\ Set null callback word as no response required.
+	a:new swap a:push null +sender SYS_R3_FILT publish drop
+;
+
+\ ========================================
+\ Events
+\ All buttons click in group
+\ gui -- gui
+: filt_button_click	SED: g -- g
+	g:on? if
+		"user-data" g:m@
+		swap g:parent "id" g:m@ nip
+		\ user-data id
+		{ FILT-1: ' filt_1_publish , FILT-2: ' filt_2_publish , FILT-3: ' filt_3_publish } 
+		swap m:@ nip w:exec
+	then
+;
+
+\ ========================================
+\ Helpers
+: filt_button_spec	SED: -- m
+	{
+		"id" : "BB-FILTER",
+		"rows" : 3, 
+		"cols" : 3,
+		"spec" : [
+			["6.0KHz", ` CH_6K0 ` , ' filt_button_click ],
+			["4.0KHz", ` CH_4K0 ` , ' filt_button_click ],
+			["2.7KHz", ` CH_2K7 ` , ' filt_button_click ],
+			["2.4KHz", ` CH_2K4 ` , ' filt_button_click ],
+			["2.1KHz", ` CH_2K1 ` , ' filt_button_click ],
+			["1.0KHz", ` CH_1K0 ` , ' filt_button_click ],
+			["500Hz", ` CH_500 ` , ' filt_button_click ],
+			["250Hz", ` CH_250 ` , ' filt_button_click ],
+			["100Hz", ` CH_100 ` , ' filt_button_click ]
+		]
+	}
+;
+
+\ ========================================
+\ Events
+
+\ ----------------------------------
+\ Get filter from event data
+\ {"cb" w, "data" [data, sender, w|null] -- filter
+: __data_get_filt	SED: m -- n
+	"data" m:@ nip 0 a:@ nip
+;
+
+\ ----------------------------------
+\ Get gui ref for this frag
+\ gui-name -- gui
+: __filt_gui_ref	SED: s -- g
+	g_cache_get
+;
+
+\ ----------------------------------
+\ Toggle button
+\ filt name --
+: __filt_tail	SED: n s --
+	__filt_gui_ref	\ filt gui
+	swap g:child true g:on
+;
+
+\ Message handlers
+\ {"cb" w, "data" [data, sender, w|null]} -- 
+: filt_r1	SED: m -- 
+	__data_get_filt
+	FILT-1 __filt_tail
+;
+: filt_r2	SED: m -- 
+	__data_get_filt
+	FILT-2 __filt_tail
+;
+: filt_r3	SED: m -- 
+	__data_get_filt
+	FILT-3 __filt_tail
+;
+
+\ ========================================
+\ Subscriptions
+
+\ ----------------------------------
+\ Subscribe to filt-n events
+\  --
+: filt_1_subscribe	SED:  --
+	 t:name@ ' filt_r1 UI_R1_FILT subscribe
+;
+: filt_2_subscribe	SED:  --
+	 t:name@ ' filt_r2 UI_R2_FILT subscribe
+;
+: filt_3_subscribe	SED:  --
+	 t:name@ ' filt_r3 UI_R3_FILT subscribe
+;
+
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ New button box according to spec
+\ name bounds -- filt-gui
+: filt_frag_new	SED: s s -- g
+	\ Pop in the bounds
+	1 pick >r
+	filt_button_spec 
+	"bounds" rot m:!
+	"id" rot m:!
+	new_button_box 
+	{ FILT-1: ' filt_1_subscribe , FILT-2: ' filt_2_subscribe , FILT-3: ' filt_3_subscribe } 
+	r> m:@ nip w:exec
+;
+
+\ ===============================================================================
+\ Restore namespace	
+ns: user	

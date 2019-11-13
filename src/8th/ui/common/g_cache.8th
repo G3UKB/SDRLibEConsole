@@ -52,6 +52,9 @@ ns: sdr
 : MODE-1 "MODE-1" ;
 : MODE-2 "MODE-2" ;
 : MODE-3 "MODE-3" ;
+: FILT-1 "FILT-1" ;
+: FILT-2 "FILT-2" ;
+: FILT-3 "FILT-3" ;
 : DISP-1 "DISP-1" ;
 : DISP-2 "DISP-2" ;
 : DISP-3 "DISP-3" ;
