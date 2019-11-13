@@ -1,0 +1,67 @@
+(*
+	radio_settings_sub.8th
+ 
+  Modes, filters etc in a pre-assempled panel.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Fragment - a UI fragment is a composable component that can be arranged into
+	a window for rendering. The fragment itself may use a generic component part
+	such as a vfo or button box. The fragment is responsible for interactions with 
+  the rest of the system by sending and receiving events.
+*)
+
+needs stack/3drop
+
+\ Use SDR namespace
+ns: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+\ ----------------------------------
+\ Semi-populated box to hold fragments
+{
+	"kind" : "box",
+	"alpha" : 1.0,
+	"bg" : "gray10",
+	"visible" : true,
+	"grid" : { "rows" : 2, "cols" : 1 }
+} var, radio_settings_panel
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+
+
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ New button box according to spec
+\  -- radio-settings-gui
+: radio_settings_sub_new	SED: -- g
+	radio_settings_panel @ g:new
+	MODE-1 "0,0,300,40" mode_frag_new g:+child
+	FILT-1 "0,40,300,80" filt_frag_new g:+child
+;

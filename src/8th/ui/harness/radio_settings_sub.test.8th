@@ -1,7 +1,7 @@
 (* 
-	mode_frag.test.8th
+	radio_settings_sub.test.8th
  
-  Test harness for mode_frag.8th
+  Test harness for radio_settings_sub.8th
  
  Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,8 @@
 "../common/g_cache.8th" f:include
 "../components/buttons.8th" f:include
 "../fragments/mode_frag.8th" f:include
+"../fragments/filt_frag.8th" f:include
+"../sub_assemblies/radio_settings_sub.8th" f:include
 
 \ ========================================
 \ Debug Settings
@@ -56,70 +58,14 @@ with: harness
 4 json-pretty
 true app:isgui !
 
-\ This is mode button fragment using the button component.
-\ 1. It publishes mode changes to SYS_Rn_MODE.
-\ 2. It receives mode updates on UI_Rn_MODE.
-
-\ ========================================
-\ These are gen_server words for the EVNT_TASK gen_server
-
-\ ----------------------------------
-\ Called by published state changes
-: evnt_mode
-	0 a:@ nip log
-;
-\ ----------------------------------
-\ Called from a gen_server message to subscribe to the radio updates
-: evnt_subscribe
-	t:name@ ' evnt_mode SYS_R1_MODE subscribe
-;
-
-\ ========================================
-\ Startup/terminate
-
-\ Once app:isgui is set true the main task will no longer respond to events such as t:notify
-\ If we create a gen_server on the main task of a GUI app it will hang on the -1 sleep
-\ never seeing the notify.
-\ We srart the gen_server here in a separate startup task.
-: startup_task
-	\ Create gen_server
-	"EVNT_TASK" gen_server_new
-	\ Tell it to do subscriptions
-	"EVNT_TASK" ' evnt_subscribe null msg!
-	\ Wait until told to close at EOD so refs are maintained
-	-1 sleep
-	"Startup task exiting..." log
-	0.1 sleep
-;
-
-\ ----------------------------------
-\ onexit callback
-: term_callback
-	\ Else messages get lost
-	false log-async
-	\ Terminate gen_server
-	"EVNT_TASK" gen_server_term
-	0.1 sleep
-	\ Terminate startup task
-	"startup_task" t:@ dup t:notify t:wait
-	\ Wait for tasks to go
-	wait_all
-	\ Messages flush
-	0.1 sleep
-;
-
 \ ----------------------------------
 \ Entry point 
 \ Create a test window and add the vfo
 : app:main
-	\ Create startup task and keep reference
-	' startup_task t:task "startup_task" t:!
-	\ Set exit handler
-	' term_callback onexit
 	\ Create a basic window
 	harness_basic_window
 	\ Create the test button box
-	MODE-1 "0,0,300,40" mode_frag_new
+	radio_settings_sub_new
 	\ Add to the window
 	"win" t:@ swap g:+child	
 	1 sleep

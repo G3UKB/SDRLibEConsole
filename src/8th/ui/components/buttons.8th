@@ -40,7 +40,8 @@ with: fr.ps
 {
 	"kind" : "box",
 	"alpha" : 1.0,
-	"bg" : "lightcyan4",
+	\ "bg" : "lightcyan4",
+	"bg" : "gray10",
 	"visible" : true
 } var, button_panel
 

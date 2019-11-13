@@ -77,8 +77,8 @@ with: fr.ps
 : filt_button_spec	SED: -- m
 	{
 		"id" : "BB-FILTER",
-		"rows" : 3, 
-		"cols" : 3,
+		"rows" : 2, 
+		"cols" : 6,
 		"spec" : [
 			["6.0KHz", ` CH_6K0 ` , ' filt_button_click ],
 			["4.0KHz", ` CH_4K0 ` , ' filt_button_click ],

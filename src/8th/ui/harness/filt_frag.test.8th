@@ -119,7 +119,7 @@ true app:isgui !
 	\ Create a basic window
 	harness_basic_window
 	\ Create the test button box
-	FILT-1 "0,0,150,150" filt_frag_new
+	FILT-1 "0,0,300,40" filt_frag_new
 	\ Add to the window
 	"win" t:@ swap g:+child	
 	1 sleep

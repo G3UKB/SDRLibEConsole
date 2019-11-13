@@ -77,8 +77,8 @@ with: fr.ps
 : mode_button_spec	SED: -- m
 	{
 		"id" : "BB-MODE",
-		"rows" : 4, 
-		"cols" : 3,
+		"rows" : 2, 
+		"cols" : 6,
 		"spec" : [
 			["LSB", ` CH_LSB ` , ' mode_button_click ],
 			["USB", ` CH_USB ` , ' mode_button_click ],
