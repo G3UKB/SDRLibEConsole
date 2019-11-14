@@ -79,9 +79,9 @@ with: fr.ps
 : radio_settings_sub_new	SED: s s -- g
 	radio_settings_panel @ g:new >r
 	r@ "mode-group" g:child
-	3 pick "10,20,parent.width-10,parent.height-10" mode_frag_new g:+child drop
+	2 pick "10,20,parent.width-10,parent.height-10" mode_frag_new g:+child drop
 	r@ "filt-group" g:child
-	2 pick "10,20,parent.width-10,parent.height-10" filt_frag_new g:+child drop
+	1 pick "10,20,parent.width-10,parent.height-10" filt_frag_new g:+child drop
 	2 pick r> g_cache_add
 	nip nip
 ;
