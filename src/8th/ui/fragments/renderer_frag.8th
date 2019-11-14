@@ -65,6 +65,7 @@ with: fr.ps
 	drop swap renderer_new
 	\ Initialise
 	renderer_init
+	rdrop
 	\ Subscribe
 	\ { DISP-1: ' render_1_subscribe , DISP-2: ' render_2_subscribe , DISP-3: ' render_3_subscribe } 
 	\ r@ m:@ nip w:exec

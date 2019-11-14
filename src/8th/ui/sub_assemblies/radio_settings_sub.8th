@@ -43,17 +43,19 @@ with: fr.ps
 	"alpha" : 1.0,
 	"bg" : "gray10",
 	"visible" : true,
-	"bounds" : "10,30,parent.width-10,parent.height-10",
+	\ "bounds" : "10,30,parent.width-10,parent.height-10",
 	"grid" : { "rows" : 2, "cols" : 1, "spans" : [] },
 	"children" : [
 		{
 			"kind" : "group",
+			"name" : "mode-group",
 			"label" : "Mode",
 			"fg" : "antiquewhite4",
 			"children" : []
 		},
 		{
 			"kind" : "group",
+			"name" : "filt-group",
 			"label" : "Filter",
 			"fg" : "antiquewhite4",
 			"children" : []
@@ -73,12 +75,13 @@ with: fr.ps
 \ ===============================================================================
 
 \ New button box according to spec
-\  mode-id filter-id -- radio-settings-gui
+\  name mode-id filter-id -- radio-settings-gui
 : radio_settings_sub_new	SED: s s -- g
-	radio_settings_panel @ g:new dup >r
-	r@ 0 g:child
+	radio_settings_panel @ g:new >r
+	r@ "mode-group" g:child
 	3 pick "10,20,parent.width-10,parent.height-10" mode_frag_new g:+child drop
-	r> 1 g:child
+	r@ "filt-group" g:child
 	2 pick "10,20,parent.width-10,parent.height-10" filt_frag_new g:+child drop
+	2 pick r> g_cache_add
 	nip nip
 ;

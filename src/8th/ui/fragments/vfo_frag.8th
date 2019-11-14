@@ -144,7 +144,7 @@ with: fr.ps
 	vfo_init
 	\ Subscribe
 	{ VFO-1: ' vfo_1_subscribe , VFO-2: ' vfo_2_subscribe , VFO-3: ' vfo_3_subscribe } 
-	r@ m:@ nip w:exec
+	r> m:@ nip w:exec
 ;
 
 \ ===============================================================================

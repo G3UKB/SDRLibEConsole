@@ -46,6 +46,7 @@ ns: sdr
 
 \ ========================================
 \ GUI component names
+: MAIN-CONTROL "MAIN-CONTROL" ;
 : VFO-1 "VFO-1" ;
 : VFO-2 "VFO-2" ;
 : VFO-3 "VFO-3" ;
@@ -61,6 +62,9 @@ ns: sdr
 : DISP-1 "DISP-1" ;
 : DISP-2 "DISP-2" ;
 : DISP-3 "DISP-3" ;
+: RADIO-PANEL-1 "RADIO-PANEL-1" ;
+: RADIO-PANEL-2 "RADIO-PANEL-2" ;
+: RADIO-PANEL-3 "RADIO-PANEL-3" ;
 
 \ ========================================
 \ Cache entries

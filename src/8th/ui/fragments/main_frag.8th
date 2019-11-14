@@ -64,7 +64,6 @@ with: fr.ps
 \ Helpers
 : mc_button_spec	SED: -- m
 	{
-		"id" : "BB-MAIN",
 		"rows" : 1, 
 		"cols" : 2,
 		"spec" : [
@@ -79,10 +78,13 @@ with: fr.ps
 \ ===============================================================================
 
 \ New button box according to spec
-\ bounds -- main-control-gui
-: mc_new	SED: s -- g
-	\ Pop in the bounds
-	mc_button_spec "bounds" rot m:!
+\ name bounds -- main-control-gui
+: mc_new	SED: s s -- g
+
+	1 pick >r
+	mc_button_spec 
+	"bounds" rot m:!
+	"id" rot m:!
 	new_button_box
 ;
 

@@ -37,9 +37,42 @@ with: fr.ps
 	true rst_ui!
 ;
 
-\ ----------------------------------
-\ Create main window and position fragments
-\ -- main-gui
+: getref
+	"win" t:@ "thebox" g:child
+;
+
+: dropchild
+	repeat
+		getref g:len 0 n:> if
+			0 g:-child
+		else
+			break
+		then
+	again drop
+;
+
+: refresh
+	\ Increment the size is the only thing that works.
+	getref g:size? n:1+ swap n:1+ swap g:size
+;
+
+: b1
+	dropchild getref MAIN-CONTROL g_cache_get g:+child drop
+	refresh
+;
+: b2
+	dropchild getref VFO-1 g_cache_get g:+child drop
+	refresh
+;
+: b3
+	dropchild getref DISP-1 g_cache_get g:+child drop
+	refresh
+;
+: b4
+	dropchild getref RADIO-PANEL-1 g_cache_get g:+child drop
+	refresh
+;
+
 : main_window	SED: -- g
 	\ A minimal window to hold our test component
 	{
@@ -49,50 +82,60 @@ with: fr.ps
 		"ontop" : false,
 		"bg" : "gray10",
 		"resize-corner" : 20,
-		"wide" : 400,
+		"wide" : 800,
 		"high" : 400,
 		"top" : 100,
 		"left" : 100,
 		"init" : ' __ui_initialised ,
 		"children" : [
-			{
-				"kind" : "tab",
-				"bounds" : "0,0,parent.width,parent.height",
-				"tabs" : [
-					` "10,30,parent.width-10,parent.height-10" mc_new g:obj ` ,
-					` VFO-1 "10,30,parent.width-10,parent.height-10" vfo_frag_new g:obj ` ,
-					\ ` DISP-1 "10,30,parent.width-10,parent.height-10" render_frag_new g:obj ` , 
-					` MODE-1 FILT-1 radio_settings_sub_new g:obj `
+			{ 
+				"kind" : "box",
+				"bounds" : "0,0,parent.width/3,parent.height",
+				"children" : [
+					{
+						"kind" : "box",
+						"grid" : {"rows" : 4, "cols" : 1},
+						"children" : [
+							{
+								"kind" : "btn",
+								"label" : "1",
+								"click" : ' b1
+							},
+							{
+								"kind" : "btn",
+								"label" : "2",
+								"click" : ' b2
+							},
+							{
+								"kind" : "btn",
+								"label" : "3",
+								"click" : ' b3
+							},
+							{
+								"kind" : "btn",
+								"label" : "4",
+								"click" : ' b4
+							}
+						]
+					}
 				]
+			},
+			{
+				"kind" : "box",
+				"name" : "thebox",
+				"bg" : "white",
+				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"children" : []
 			}
 		]
-	} g:new dup "win" t:!
+	} g:new "win" t:!
 	
-	\ Create/add main control
-	\ Tx,Ty,Bx,By
-	\ "0,0,100,30" mc_new
-	\ g:+child
-	
-	\ Create/add vfo
-	\ VFO-1 "0,30,300,80" vfo_frag_new
-	\ "win" t:@ swap g:+child
-	
-	\ Create/add modes
-	\ MODE-1 "0,80,200,200" mode_frag_new
-	\ g:+child
-	
-	\ Create/add filters
-	\ FILT-1 "0,200,300,300" filt_frag_new
-	\ g:+child
-	
-	\ MODE-1 FILT-1 radio_settings_sub_new
-	\ g:+child
-	
-	\ Create/add display
-	\ DISP-1 "0,300,500,500" render_frag_new
-	\ g:+child
-	
-	\ drop
+	\ Create the fragments and sub-assemblies we will be composing
+	\ These are then registered in the GUI cache
+	MAIN-CONTROL "0,0,parent.width, parent.height" mc_new
+	VFO-1 "0,0,parent.width, parent.height" vfo_frag_new
+	DISP-1  "0,0,parent.width, parent.height" render_frag_new
+	RADIO-PANEL-1 MODE-1 FILT-1 radio_settings_sub_new
 ;
 
 \ ===============================================================================
