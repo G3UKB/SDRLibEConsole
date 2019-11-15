@@ -1,7 +1,7 @@
 (* 
-	radio_settings_sub.test.8th
+	radio_panel_sub.test.8th
  
-  Test harness for radio_settings_sub.8th
+  Test harness for radio_panel_sub.8th
  
  Copyright C 2019 by G3UKB Bob Cowdery
  This program is free software; you can redistribute it and/or modify
@@ -33,13 +33,17 @@
 "../../connector/connector.8th" f:include
 "../../connector/radio_sequencer.8th" f:include
 "../../harness/harness.8th" f:include
+"../../display_builder/disp_defs.8th" f:include
 "../common/layout.8th" f:include
 "../common/font_cache.8th" f:include
 "../common/g_cache.8th" f:include
-"../components/buttons.8th" f:include
-"../fragments/mode_frag.8th" f:include
-"../fragments/filt_frag.8th" f:include
-"../sub_assemblies/radio_settings_sub.8th" f:include
+"../common/render_context.8th" f:include
+"../common/render_if.8th" f:include
+"../components/vfo.8th" f:include
+"../components/renderer.8th" f:include
+"../fragments/vfo_frag.8th" f:include
+"../fragments/renderer_frag.8th" f:include
+"../sub_assemblies/radio_panel_sub.8th" f:include
 
 \ ========================================
 \ Debug Settings
@@ -62,10 +66,13 @@ true app:isgui !
 \ Entry point 
 \ Create a test window and add the vfo
 : app:main
+	\ Initialise renderer data
+	1 __renderer_data_new
+	1 __renderer_set_id
 	\ Create a basic window
 	harness_basic_window
 	\ Create the test sub-assembly
-	RADIO-SETTINGS-1 MODE-1 FILT-1 radio_settings_sub_new
+	RADIO-PANEL-1 VFO-1 DISP-1 radio_panel_sub_new
 	\ Add to the window
-	"win" t:@ RADIO-SETTINGS-1 g_cache_get g:+child
+	"win" t:@ RADIO-PANEL-1 g_cache_get g:+child
 ;

@@ -61,15 +61,11 @@ with: fr.ps
 	refresh
 ;
 : b2
-	dropchild getref VFO-1 g_cache_get g:+child drop
+	dropchild getref RADIO-PANEL-1 g_cache_get g:+child drop
 	refresh
 ;
 : b3
-	dropchild getref DISP-1 g_cache_get g:+child drop
-	refresh
-;
-: b4
-	dropchild getref RADIO-PANEL-1 g_cache_get g:+child drop
+	dropchild getref RADIO-SETTINGS-1 g_cache_get g:+child drop
 	refresh
 ;
 
@@ -98,23 +94,18 @@ with: fr.ps
 						"children" : [
 							{
 								"kind" : "btn",
-								"label" : "1",
+								"label" : "CONTROL",
 								"click" : ' b1
 							},
 							{
 								"kind" : "btn",
-								"label" : "2",
+								"label" : "RADIO-MAIN",
 								"click" : ' b2
 							},
 							{
 								"kind" : "btn",
-								"label" : "3",
+								"label" : "RADIO-CONTROL",
 								"click" : ' b3
-							},
-							{
-								"kind" : "btn",
-								"label" : "4",
-								"click" : ' b4
 							}
 						]
 					}
@@ -133,9 +124,10 @@ with: fr.ps
 	\ Create the fragments and sub-assemblies we will be composing
 	\ These are then registered in the GUI cache
 	MAIN-CONTROL "0,0,parent.width, parent.height" mc_new
-	VFO-1 "0,0,parent.width, parent.height" vfo_frag_new
-	DISP-1  "0,0,parent.width, parent.height" render_frag_new
-	RADIO-PANEL-1 MODE-1 FILT-1 radio_settings_sub_new
+	\ VFO-1 "0,0,parent.width, parent.height" vfo_frag_new
+	\ DISP-1  "0,0,parent.width, parent.height" render_frag_new
+	RADIO-PANEL-1 VFO-1 DISP-1 radio_panel_sub_new
+	RADIO-SETTINGS-1 MODE-1 FILT-1 radio_settings_sub_new
 ;
 
 \ ===============================================================================

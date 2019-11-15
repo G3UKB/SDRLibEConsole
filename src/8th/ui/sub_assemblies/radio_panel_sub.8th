@@ -1,0 +1,87 @@
+(*
+	radio_panel_sub.8th
+ 
+  VFO + Display in a pre-assempled panel.
+ 
+ Copyright C 2019 by G3UKB Bob Cowdery
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ at your option any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+  The author can be reached by email at:   
+     bob@bobcowdery.plus.com
+     
+  Sub-assembly - a UI sub-assembly is a composable component that can be arranged into
+	a window or be a page for display. The sub-assembly itself uses fragments which are
+	responsible for all interactions.
+*)
+
+needs stack/3drop
+
+\ Use SDR namespace
+with: sdr
+with: fr.gs
+with: fr.ps
+
+\ ========================================
+\ Variables
+
+\ ----------------------------------
+\ Semi-populated box to hold fragments
+{
+	"kind" : "box",
+	"alpha" : 1.0,
+	"bg" : "gray10",
+	"visible" : true,
+	\ "bounds" : "10,30,parent.width-10,parent.height-10",
+	"grid" : { "rows" : 2, "cols" : 1, "spans" : [] },
+	"children" : [
+		{
+			"kind" : "group",
+			"name" : "vfo-group",
+			"label" : "VFO-A",
+			"fg" : "antiquewhite4",
+			"children" : []
+		},
+		{
+			"kind" : "group",
+			"name" : "disp-group",
+			"label" : "Displays",
+			"fg" : "antiquewhite4",
+			"children" : []
+		}
+	]
+} var, radio_main_panel
+
+\ ===============================================================================
+\ PRIVATE
+\	Convention: all private words start __
+\ ===============================================================================
+
+
+
+\ ===============================================================================
+\ PUBLIC
+\ ===============================================================================
+
+\ New button box according to spec
+\  name mode-id filter-id -- radio-settings-gui
+: radio_panel_sub_new	SED: s s s -- g
+	radio_main_panel @ g:new >r
+	r@ "vfo-group" g:child
+	2 pick "10,20,parent.width-10,parent.height-10" vfo_frag_new g:+child drop
+	r@ "disp-group" g:child
+	1 pick "10,20,parent.width-10,parent.height-10" render_frag_new g:+child drop
+	2 pick r> g_cache_add
+	nip nip
+;

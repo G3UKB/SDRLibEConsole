@@ -65,6 +65,9 @@ ns: sdr
 : RADIO-PANEL-1 "RADIO-PANEL-1" ;
 : RADIO-PANEL-2 "RADIO-PANEL-2" ;
 : RADIO-PANEL-3 "RADIO-PANEL-3" ;
+: RADIO-SETTINGS-1 "RADIO-SETTINGS-1" ;
+: RADIO-SETTINGS-2 "RADIO-SETTINGS-2" ;
+: RADIO-SETTINGS-3 "RADIO-SETTINGS-3" ;
 
 \ ========================================
 \ Cache entries
