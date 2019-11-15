@@ -168,7 +168,8 @@ ns: sdr
 	\ The buffer is display width +1 for the meter data
 	__get_data_buffer
 	\ Width of this radio display
-	__get_disp_width
+	\ __get_disp_width
+	__get_win_width
 	\ unpacked array
 	n:1+ >s "f" s:+ unpack drop
 	\ Get/save the meter data which is 0th element of the array
