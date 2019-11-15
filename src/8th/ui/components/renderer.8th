@@ -86,16 +86,25 @@ with: fr.ps
 \ gui width height --
 : __disp_size	SED: g n n --
 	\ swap "W:%d, H:%d " s:strfmt log
-	\ Tell server the width has changed
-	DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new 4 pick a:push null +sender msg!
+	\ Save g to r
+	rot >r
+	\ Get the display client area width
+	over l_margin n:- r_margin n:- >r	\ w h : r - g client-width  
+	\ Tell server the client width has changed
+	\ DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
 	\ Resize the img for the waterfall display
-	2dup img:new "wf-img" 4 pick swap rot g:m! drop
+	r@ wf_height img:new "wf-img" 1 rpick swap rot g:m! drop
 	\ Broadcast metrics
 	2dup 2 a:close a:new swap a:push null +sender SYS_R1_WIN_METRICS publish drop
 	\ 2dup swap l_margin n:- r_margin n:- swap  \ display area w h
-	\ 2 a:close a:new swap a:push null +sender SYS_R1_DISP_METRICS publish drop
+	dup r@ swap 2 a:close a:new swap a:push null +sender SYS_R1_DISP_METRICS publish drop
 	\ Reset the local metrics
-	2 a:close "panel-metrics" swap g:m! 
+	2 a:close 1 rpick swap "panel-metrics" swap g:m!
+	
+	\ Tell server the client width has changed
+	DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
+	
+	rdrop rdrop
 ;
 
 \ ===============================================================================
