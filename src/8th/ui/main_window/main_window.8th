@@ -124,8 +124,6 @@ with: fr.ps
 	\ Create the fragments and sub-assemblies we will be composing
 	\ These are then registered in the GUI cache
 	MAIN-CONTROL "0,0,parent.width, parent.height" mc_new
-	\ VFO-1 "0,0,parent.width, parent.height" vfo_frag_new
-	\ DISP-1  "0,0,parent.width, parent.height" render_frag_new
 	RADIO-PANEL-1 VFO-1 DISP-1 radio_panel_sub_new
 	RADIO-SETTINGS-1 MODE-1 FILT-1 radio_settings_sub_new
 ;

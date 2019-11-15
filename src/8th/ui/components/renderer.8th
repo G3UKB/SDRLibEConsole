@@ -57,7 +57,7 @@ with: fr.ps
 	\ ----------------------------------
 	\ Renderer events
 	"draw" : "sdr:__renderer_draw_all",
-	"size" : "sdr:disp_size",
+	"size" : "sdr:__disp_size",
 	\ "mouse-moved" : "sdr:mouse_move",
 	\ "mouse-down" : "sdr:mouse_down",
 	\ "mouse-enter" : "sdr:mouse_enter",
@@ -69,16 +69,32 @@ with: fr.ps
 	\ User data
 	\ Metrics
 	"panel-metrics" : [500,200],			\ Panel into which all drawing is performed
-	"client-metrics" : [480,180],			\ Client area to draw dynamic content
 	"mouse-pos" : [0,0],							\ Current mouse position for click tune
 	\ Image
-	\ ToDo: must be resized correctly.
 	"wf-img" : ` 450 100 img:new ` ,	\ Image data for waterfall
 	\ Radio state											
 	"mid-freq" : 7100000,							\ This radio mid freq for freq scale
 	"mode" : 0,												\ This radio mode
 	"filter" : 0											\ This radio filter	
 } var, __renderer_disp_panel
+
+\ ===============================================================================
+\ Window Management
+\ ===============================================================================
+
+\ Set the display size and tell the server new width
+\ gui width height --
+: __disp_size	SED: g n n --
+	\ swap "W:%d, H:%d " s:strfmt log
+	\ Tell server the width has changed
+	DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new 4 pick a:push null +sender msg!
+	\ Resize the img for the waterfall display
+	2dup img:new "wf-img" 4 pick swap rot g:m! drop
+	\ Broadcast metrics
+	2dup 2 a:close a:new swap a:push null +sender SYS_R1_WIN_METRICS publish drop
+	\ Reset the local metrics
+	2 a:close "panel-metrics" swap g:m! 
+;
 
 \ ===============================================================================
 \ Grid and Labels Drawing

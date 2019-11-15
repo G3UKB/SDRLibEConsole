@@ -226,6 +226,15 @@ with: fr.ps
 	CONNECTOR_TASK ' t_conn_disp_period rot [0] a:@@ nip null +sender msg!
 ;
 
+\ ----------------------------------	
+\ Set the display width
+\ [period, task, w|null] -- 
+: t_disp_evnt_set_disp_width	SED: a -- T
+	\ in: 	0: n - width in pixels
+	\ out:	0: T - true if success
+	CONNECTOR_TASK ' t_conn_disp_width rot [0] a:@@ nip null +sender msg!
+;
+
 \ ----------------------------------
 \ Enable/disable displays
 \ ACK/NAK --
