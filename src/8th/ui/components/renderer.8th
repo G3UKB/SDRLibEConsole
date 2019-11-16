@@ -84,10 +84,12 @@ with: fr.ps
 
 \ Set the display size and tell the server new width
 \ gui width height --
-: __disp-timer	SED: g n n --
+\ : __disp-timer	SED: g n n --
+: __disp_size	SED: g n n --
 	\ swap "W:%d, H:%d " s:strfmt log
 	\ Get current size
-	g:size? dup 0 n:> not if ;; then
+	\ g:size? dup 0 n:> not if ;; then
+	dup 0 n:> not if ;; then
 	\ Save g to r
 	rot >r
 	\ Get the display client area width
