@@ -58,6 +58,7 @@ with: fr.ps
 	\ Renderer events
 	"draw" : "sdr:__renderer_draw_all",
 	"size" : "sdr:__disp_size",
+	"init" : "sdr:__renderer_init",
 	\ "mouse-moved" : "sdr:mouse_move",
 	\ "mouse-down" : "sdr:mouse_down",
 	\ "mouse-enter" : "sdr:mouse_enter",
@@ -82,7 +83,8 @@ with: fr.ps
 \ Window Management
 \ ===============================================================================
 
-\ Set the display size and tell the server new width
+\ ----------------------------------
+\ Metrics changed, inform all interested parties
 \ gui width height --
 : __disp_size	SED: g n n --
 	\ Get current size
@@ -103,6 +105,13 @@ with: fr.ps
 	DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
 	\ Leavs r stack empty
 	rdrop rdrop
+;
+
+\ ----------------------------------
+\ Called on first draw
+\ Set the initial metrics
+: __renderer_init
+	g:size? __disp_size
 ;
 
 \ ===============================================================================
