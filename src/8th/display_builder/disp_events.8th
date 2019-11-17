@@ -172,7 +172,7 @@ with: fr.ps
 	\ Repeat until termination
 	repeat
 		\ Check for messages at top of loop
-		msg@
+		msgrpt@
 		\ Check for term message
 		"state" t:@ "term" s:= if 
 			break

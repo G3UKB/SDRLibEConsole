@@ -51,6 +51,8 @@ with: fr.sm
 	
 	"SDRLibEConsole startup at: " d:new >s s:+ log
 	
+	\ Set the queue size to something reasonable
+	100 t:def-queue
 	\ ----------------------------------
 	\ Set our task name and add to the registry
 	MAIN_TASK dup t:name! t:curtask swap reg!

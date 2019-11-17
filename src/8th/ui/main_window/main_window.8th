@@ -37,36 +37,36 @@ with: fr.ps
 	true rst_ui!
 ;
 
-: getref
-	"win" t:@ "thebox" g:child
+: get_win
+	"win" t:@
 ;
 
-: dropchild
-	repeat
-		getref g:len 0 n:> if
-			0 g:-child
-		else
-			break
-		then
-	again drop
+: get_main_box
+	get_win "main-box" g:child 
 ;
 
-: refresh
-	\ Increment the size is the only thing that works.
-	getref g:size? n:1+ swap n:1+ swap g:size
+: get_panel_box
+	get_win "panel-box" g:child 
+;
+
+: get_settings_box
+	get_win "settings-box" g:child 
 ;
 
 : b1
-	dropchild getref MAIN-CONTROL g_cache_get g:+child drop
-	refresh
+	get_main_box g:show drop
+	get_panel_box g:hide drop
+	get_settings_box g:hide drop
 ;
 : b2
-	dropchild getref RADIO-PANEL-1 g_cache_get g:+child drop
-	refresh
+	get_main_box g:hide drop
+	get_panel_box g:show drop
+	get_settings_box g:hide drop
 ;
 : b3
-	dropchild getref RADIO-SETTINGS-1 g_cache_get g:+child drop
-	refresh
+	get_main_box g:hide drop
+	get_panel_box g:hide drop
+	get_settings_box g:show drop
 ;
 
 : main_window	SED: -- g
@@ -113,8 +113,25 @@ with: fr.ps
 			},
 			{
 				"kind" : "box",
-				"name" : "thebox",
-				"bg" : "white",
+				"name" : "main-box",
+				"bg" : "gray10",
+				"visible" : true,
+				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"children" : []
+			},
+			{
+				"kind" : "box",
+				"name" : "panel-box",
+				"bg" : "gray10",
+				"visible" : false,
+				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"children" : []
+			},
+			{
+				"kind" : "box",
+				"name" : "settings-box",
+				"bg" : "gray10",
+				"visible" : false,
 				"bounds" : "parent.width/3,0,parent.width,parent.height",
 				"children" : []
 			}
@@ -126,6 +143,11 @@ with: fr.ps
 	MAIN-CONTROL "0,0,parent.width, parent.height" mc_new
 	RADIO-PANEL-1 VFO-1 DISP-1 radio_panel_sub_new
 	RADIO-SETTINGS-1 MODE-1 FILT-1 radio_settings_sub_new
+	
+	\ Add to the window
+	get_main_box MAIN-CONTROL g_cache_get g:+child drop
+	get_panel_box RADIO-PANEL-1 g_cache_get g:+child drop
+	get_settings_box RADIO-SETTINGS-1 g_cache_get g:+child drop
 ;
 
 \ ===============================================================================

@@ -57,7 +57,7 @@ with: fr.ps
 	\ ----------------------------------
 	\ Renderer events
 	"draw" : "sdr:__renderer_draw_all",
-	\ "size" : "sdr:__disp_size",
+	"size" : "sdr:__disp_size",
 	\ "mouse-moved" : "sdr:mouse_move",
 	\ "mouse-down" : "sdr:mouse_down",
 	\ "mouse-enter" : "sdr:mouse_enter",
@@ -84,18 +84,13 @@ with: fr.ps
 
 \ Set the display size and tell the server new width
 \ gui width height --
-\ : __disp-timer	SED: g n n --
 : __disp_size	SED: g n n --
-	\ swap "W:%d, H:%d " s:strfmt log
 	\ Get current size
-	\ g:size? dup 0 n:> not if ;; then
 	dup 0 n:> not if ;; then
 	\ Save g to r
 	rot >r
 	\ Get the display client area width
 	over l_margin n:- r_margin n:- >r	\ w h : r - g client-width  
-	\ Tell server the client width has changed
-	\ DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
 	\ Resize the img for the waterfall display
 	r@ wf_height img:new "wf-img" 1 rpick swap rot g:m! drop
 	\ Broadcast metrics
@@ -104,11 +99,9 @@ with: fr.ps
 	dup r@ swap 2 a:close a:new swap a:push null +sender SYS_R1_DISP_METRICS publish drop
 	\ Reset the local metrics
 	2 a:close 1 rpick swap "panel-metrics" swap g:m!
-	
 	\ Tell server the client width has changed
-	\ DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
-	CONNECTOR_TASK ' t_conn_disp_width a:new r@ a:push null +sender msg!
-	
+	DISP_EVNT_TASK ' t_disp_evnt_set_disp_width a:new r@ a:push null +sender msg!
+	\ Leavs r stack empty
 	rdrop rdrop
 ;
 
