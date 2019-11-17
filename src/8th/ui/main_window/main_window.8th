@@ -32,45 +32,52 @@ ns: sdr
 with: fr.gs
 with: fr.ps
 
+\ ----------------------------------
 \ Called after first draw
 : __ui_initialised
+	\ Set UI initialised
 	true rst_ui!
 ;
 
+\ ----------------------------------
+\ Main window ref
 : get_win
 	"win" t:@
 ;
 
+\ ----------------------------------
+\ Box references
 : get_main_box
 	get_win "main-box" g:child 
 ;
-
 : get_panel_box
 	get_win "panel-box" g:child 
 ;
-
 : get_settings_box
 	get_win "settings-box" g:child 
 ;
 
-: b1
+\ ----------------------------------
+\ Buttons swap visibility to bring selected gui to top
+: __main_button
 	get_main_box g:show drop
 	get_panel_box g:hide drop
 	get_settings_box g:hide drop
 ;
-: b2
+: __panel_button
 	get_main_box g:hide drop
 	get_panel_box g:show drop
 	get_settings_box g:hide drop
 ;
-: b3
+: __settings_button
 	get_main_box g:hide drop
 	get_panel_box g:hide drop
 	get_settings_box g:show drop
 ;
 
+\ ----------------------------------
+\ Window definition
 : main_window	SED: -- g
-	\ A minimal window to hold our test component
 	{
 		"kind" : "win",
 		"title" : "SDRLibEConsole",
@@ -86,7 +93,7 @@ with: fr.ps
 		"children" : [
 			{ 
 				"kind" : "box",
-				"bounds" : "0,0,parent.width/3,parent.height",
+				"bounds" : "0,0,parent.width/8,200",
 				"children" : [
 					{
 						"kind" : "box",
@@ -94,18 +101,18 @@ with: fr.ps
 						"children" : [
 							{
 								"kind" : "btn",
+								"label" : "MAIN",
+								"click" : ' __main_button
+							},
+							{
+								"kind" : "btn",
 								"label" : "CONTROL",
-								"click" : ' b1
+								"click" : ' __panel_button
 							},
 							{
 								"kind" : "btn",
-								"label" : "RADIO-MAIN",
-								"click" : ' b2
-							},
-							{
-								"kind" : "btn",
-								"label" : "RADIO-CONTROL",
-								"click" : ' b3
+								"label" : "SETTINGS",
+								"click" : ' __settings_button
 							}
 						]
 					}
@@ -116,7 +123,7 @@ with: fr.ps
 				"name" : "main-box",
 				"bg" : "gray10",
 				"visible" : true,
-				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"bounds" : "parent.width/8,0,parent.width,parent.height",
 				"children" : []
 			},
 			{
@@ -124,7 +131,7 @@ with: fr.ps
 				"name" : "panel-box",
 				"bg" : "gray10",
 				"visible" : false,
-				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"bounds" : "parent.width/8,0,parent.width,parent.height",
 				"children" : []
 			},
 			{
@@ -132,19 +139,20 @@ with: fr.ps
 				"name" : "settings-box",
 				"bg" : "gray10",
 				"visible" : false,
-				"bounds" : "parent.width/3,0,parent.width,parent.height",
+				"bounds" : "parent.width/8,0,parent.width,parent.height",
 				"children" : []
 			}
 		]
 	} g:new "win" t:!
 	
+	\ ----------------------------------
 	\ Create the fragments and sub-assemblies we will be composing
 	\ These are then registered in the GUI cache
-	MAIN-CONTROL "0,0,parent.width, parent.height" mc_new
+	MAIN-CONTROL "30,30,300,100" mc_new
 	RADIO-PANEL-1 VFO-1 DISP-1 radio_panel_sub_new
 	RADIO-SETTINGS-1 MODE-1 FILT-1 radio_settings_sub_new
 	
-	\ Add to the window
+	\ Add fragments and sub-assemblies to the window
 	get_main_box MAIN-CONTROL g_cache_get g:+child drop
 	get_panel_box RADIO-PANEL-1 g_cache_get g:+child drop
 	get_settings_box RADIO-SETTINGS-1 g_cache_get g:+child drop
