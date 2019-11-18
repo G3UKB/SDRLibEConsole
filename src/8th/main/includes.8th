@@ -26,18 +26,17 @@
 	loop is entered.
 	
 *)
+\ Common	
+"../common/app_defs.8th" f:include
+"../common/radio_defs.8th" f:include
+"../common/ps_events.8th" f:include
+"../common/run_state.8th" f:include
 
 \ Framework
 "E:/Projects/Framework/trunk/src/8th/gen_server.8th" f:include
 "E:/Projects/Framework/trunk/src/8th/pub_sub.8th" f:include
 "E:/Projects/Framework/trunk/src/8th/struct_manip.8th" f:include
 "E:/Projects/Framework/trunk/src/8th/persist.8th" f:include
-
-\ Common	
-"../common/app_defs.8th" f:include
-"../common/radio_defs.8th" f:include
-"../common/ps_events.8th" f:include
-"../common/run_state.8th" f:include
 
 \ Models
 "../models/model_common.8th" f:include
