@@ -31,6 +31,7 @@
 \ Task names
 : MAIN_TASK "MainTask" ;
 : STARTUP_TASK "StartupTask" ;
+: PUB-SUB-TASK "PubSubTask" ;
 : SEQUENCER_TASK "SequencerTask" ;
 : CLEANUP_TASK "CleanupTask" ;
 : CONNECTOR_TASK "ConnectorTask" ;
