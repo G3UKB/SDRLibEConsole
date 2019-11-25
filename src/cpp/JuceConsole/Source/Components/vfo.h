@@ -31,14 +31,38 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Defines
-#define MHZ_FONT 30
-#define KHZ_FONT 30
-#define HZ_FONT 20
+#define MHZ_FONT 30.0f
+#define KHZ_FONT 30.0f
+#define HZ_FONT 20.0f
 #define MHZ_COLOR Colours::white
 #define KHZ_COLOR Colours::white
 #define HZ_COLOR Colours::orange
 #define RX 0
 #define TX 1
+
+/*
+	A VFO Digit component
+*/
+class VFODigit : public Label
+{
+public:
+	//==============================================================================
+	VFODigit(String text, Colour colour, float size);
+	~VFODigit();
+
+	//==============================================================================
+	void paint(Graphics&) override;
+	void resized() override;
+
+private:
+	//==============================================================================
+	// State variables
+
+	//==============================================================================
+	// Method prototypes
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFODigit)
+};
 
 //==============================================================================
 /*
@@ -48,7 +72,7 @@ class VFOComponent : public Component
 {
 public:
 	//==============================================================================
-	VFOComponent(int p_vfo_type, int p_vfo_id);
+	VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, int h);
 	~VFOComponent();
 
 	//==============================================================================
@@ -76,9 +100,25 @@ private:
 		{String("1H"), 0.000001f},
 	};
 
+	// Grid to hold VFO digits
+	Grid *grid;
+
+	// Digits
+	VFODigit *d_100MHz;
+	VFODigit *d_10MHz;
+	VFODigit *d_1MHz;
+	VFODigit *d_100KHz;
+	VFODigit *d_10KHz;
+	VFODigit *d_1KHz;
+	VFODigit *d_100Hz;
+	VFODigit *d_10Hz;
+	VFODigit *d_1Hz;
+
+
 	//==============================================================================
 	// Method prototypes
-	
+	void add_digits(Grid *grid);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFOComponent)
 };
+
