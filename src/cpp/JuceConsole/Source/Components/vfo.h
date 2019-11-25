@@ -101,7 +101,7 @@ private:
 	};
 
 	// Grid to hold VFO digits
-	Grid *grid;
+	//Grid *grid;
 
 	// Digits
 	VFODigit *d_100MHz;
@@ -117,7 +117,7 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void add_digits(Grid *grid);
+	void add_digits(Grid grid);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFOComponent)
 };

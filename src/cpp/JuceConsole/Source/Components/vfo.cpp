@@ -43,9 +43,9 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, in
 	setBounds(x, y, w, h);
 
 	// Add digits to the grid
-	grid = new Grid();
-	add_digits(grid);
-	grid->performLayout(getLocalBounds());
+	//grid = new Grid();
+	//add_digits(grid);
+	//grid->performLayout(getLocalBounds());
 }
 
 VFOComponent::~VFOComponent()
@@ -65,29 +65,52 @@ void VFOComponent::resized()
 	// This is called when the VFOComponent is resized.
 	// If you add any child components, this is where you should
 	// update their positions.
+	Grid grid;
+	add_digits(grid);
+	grid.performLayout(getLocalBounds());
 }
 
 //==============================================================================
 // Private
-void VFOComponent::add_digits(Grid *thegrid) {
+void VFOComponent::add_digits(Grid thegrid) {
 
 	// Create digits
 	d_100MHz = new VFODigit( String("0"), MHZ_COLOR, MHZ_FONT );
+	//addAndMakeVisible(d_100MHz);
 	d_10MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	//addAndMakeVisible(d_10MHz);
 	d_1MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	//addAndMakeVisible(d_1MHz);
 	d_100KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	//addAndMakeVisible(d_100KHz);
 	d_10KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	//addAndMakeVisible(d_10KHz);
 	d_1KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	//addAndMakeVisible(d_1KHz);
 	d_100Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	//addAndMakeVisible(d_100Hz);
 	d_10Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	//addAndMakeVisible(d_10Hz);
 	d_1Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	//addAndMakeVisible(d_1Hz);
 
 	// Add digits in one horizontal row
 	using Track = Grid::TrackInfo;
-	thegrid->templateRows = { Track(1_fr) };
-	thegrid->templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
+	Grid::JustifyItems::stretch;
+	thegrid.templateRows = { Track(1_fr) };
+	thegrid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
 	
-	thegrid->items = { GridItem(d_100MHz), GridItem(d_10MHz), GridItem(d_1MHz), GridItem(d_100KHz), GridItem(d_10KHz), GridItem(d_1KHz), GridItem(d_100Hz), GridItem(d_10Hz), GridItem(d_1Hz) };
+	thegrid.items = { GridItem(d_100MHz), GridItem(d_10MHz), GridItem(d_1MHz), GridItem(d_100KHz), GridItem(d_10KHz), GridItem(d_1KHz), GridItem(d_100Hz), GridItem(d_10Hz), GridItem(d_1Hz) };
+	addAndMakeVisible(d_100MHz);
+	addAndMakeVisible(d_10MHz);
+	addAndMakeVisible(d_1MHz);
+	addAndMakeVisible(d_100KHz);
+	addAndMakeVisible(d_10KHz);
+	addAndMakeVisible(d_1KHz);
+	addAndMakeVisible(d_100Hz);
+	addAndMakeVisible(d_10Hz);
+	addAndMakeVisible(d_1Hz);
+	
 }
 
 //==============================================================================
