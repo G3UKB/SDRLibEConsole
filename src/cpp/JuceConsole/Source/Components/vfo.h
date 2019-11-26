@@ -34,6 +34,9 @@ The authors can be reached by email at:
 #define MHZ_FONT 35.0f
 #define KHZ_FONT 35.0f
 #define HZ_FONT 25.0f
+#define MHZ_FONT_OVER 40.0f
+#define KHZ_FONT_OVER 40.0f
+#define HZ_FONT_OVER 30.0f
 #define MHZ_COLOR Colours::white
 #define KHZ_COLOR Colours::white
 #define HZ_COLOR Colours::orange
@@ -53,6 +56,9 @@ public:
 	//==============================================================================
 	void paint(Graphics&) override;
 	void resized() override;
+	void mouseEnter(const MouseEvent& event) override;
+	void mouseExit(const MouseEvent& event) override;
+	void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override;
 
 private:
 	//==============================================================================
@@ -115,7 +121,6 @@ private:
 	// Method prototypes
 	void create_digits();
 	void layout_digits_in_grid();
-	void layout_digits_with_bounds();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFOComponent)
 };

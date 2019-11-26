@@ -70,22 +70,31 @@ void VFOComponent::create_digits() {
 
 	// Create digits
 	d_100MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	d_100MHz->setComponentID("0");
 	addAndMakeVisible(d_100MHz);
 	d_10MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	d_10MHz->setComponentID("1");
 	addAndMakeVisible(d_10MHz);
 	d_1MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	d_1MHz->setComponentID("2");
 	addAndMakeVisible(d_1MHz);
 	d_100KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	d_100KHz->setComponentID("3");
 	addAndMakeVisible(d_100KHz);
 	d_10KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	d_10KHz->setComponentID("4");
 	addAndMakeVisible(d_10KHz);
 	d_1KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
+	d_1KHz->setComponentID("5");
 	addAndMakeVisible(d_1KHz);
 	d_100Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	d_100Hz->setComponentID("6");
 	addAndMakeVisible(d_100Hz);
 	d_10Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	d_10Hz->setComponentID("7");
 	addAndMakeVisible(d_10Hz);
 	d_1Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
+	d_1Hz->setComponentID("8");
 	addAndMakeVisible(d_1Hz);
 }
 
@@ -144,3 +153,25 @@ void VFODigit::paint(Graphics& g) {
 void VFODigit::resized() {
 	
 };
+
+void VFODigit::mouseEnter(const MouseEvent& event) {
+	String id = event.eventComponent->getComponentID();
+	
+	// Grow font by 5 points
+	Font f = getFont();
+	int h = f.getHeight();
+	setFont(Font(h + 5, Font::plain));
+}
+
+void VFODigit::mouseExit(const MouseEvent& event) {
+	String id = event.eventComponent->getComponentID();
+
+	// Shrink font by 5 points
+	Font f = getFont();
+	int h = f.getHeight();
+	setFont(Font(h - 5, Font::plain));
+}
+
+void VFODigit::mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) {
+	printf("Wheel\n");
+}
