@@ -50,6 +50,32 @@ VFOComponent::~VFOComponent()
 {
 }
 
+void VFOComponent::set_freq_inc(String id) {
+	// Crashes on map access
+	//printf("%s, %f\n", id, freq_inc_map.at(id));
+	//freq_inc = freq_inc_map.at(id);
+	printf("1\n");
+}
+
+void VFOComponent::reset_freq_inc() {
+	//freq_inc = -1.0f;
+	printf("2\n");
+}
+
+void VFOComponent::freq_plus() {
+	//if (freq_inc > 0) {
+	//	current_freq = current_freq + freq_inc;
+	//}
+	printf("3\n");
+}
+
+void VFOComponent::freq_minus() {
+	//if (freq_inc > 0) {
+	//	current_freq = current_freq - freq_inc;
+	//}
+	printf("4\n");
+}
+
 //==============================================================================
 // GUI Events
 void VFOComponent::paint(Graphics& g)
@@ -69,32 +95,32 @@ void VFOComponent::resized()
 void VFOComponent::create_digits() {
 
 	// Create digits
-	d_100MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
-	d_100MHz->setComponentID("0");
+	d_100MHz = new VFODigit(this, String("0"), MHZ_COLOR, MHZ_FONT);
+	d_100MHz->setComponentID("100MHz");
 	addAndMakeVisible(d_100MHz);
-	d_10MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
-	d_10MHz->setComponentID("1");
+	d_10MHz = new VFODigit(this, String("0"), MHZ_COLOR, MHZ_FONT);
+	d_10MHz->setComponentID("10MHz");
 	addAndMakeVisible(d_10MHz);
-	d_1MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
-	d_1MHz->setComponentID("2");
+	d_1MHz = new VFODigit(this, String("0"), MHZ_COLOR, MHZ_FONT);
+	d_1MHz->setComponentID("1MHz");
 	addAndMakeVisible(d_1MHz);
-	d_100KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	d_100KHz->setComponentID("3");
+	d_100KHz = new VFODigit(this, String("0"), KHZ_COLOR, KHZ_FONT);
+	d_100KHz->setComponentID("100KHz");
 	addAndMakeVisible(d_100KHz);
-	d_10KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	d_10KHz->setComponentID("4");
+	d_10KHz = new VFODigit(this, String("0"), KHZ_COLOR, KHZ_FONT);
+	d_10KHz->setComponentID("10KHz");
 	addAndMakeVisible(d_10KHz);
-	d_1KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	d_1KHz->setComponentID("5");
+	d_1KHz = new VFODigit(this, String("0"), KHZ_COLOR, KHZ_FONT);
+	d_1KHz->setComponentID("1KHz");
 	addAndMakeVisible(d_1KHz);
-	d_100Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	d_100Hz->setComponentID("6");
+	d_100Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
+	d_100Hz->setComponentID("100Hz");
 	addAndMakeVisible(d_100Hz);
-	d_10Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	d_10Hz->setComponentID("7");
+	d_10Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
+	d_10Hz->setComponentID("10Hz");
 	addAndMakeVisible(d_10Hz);
-	d_1Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	d_1Hz->setComponentID("8");
+	d_1Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
+	d_1Hz->setComponentID("1Hz");
 	addAndMakeVisible(d_1Hz);
 }
 
@@ -131,9 +157,10 @@ void VFOComponent::layout_digits_in_grid() {
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(String text, Colour colour, float size) {
+VFODigit::VFODigit(VFOComponent *parent, String text, Colour colour, float size) {
 	
 	Label::Label();
+	my_parent = parent;
 	// Create a digit ready to add to the grid
 	setText(text, dontSendNotification);
 	setJustificationType(Justification::centred);
@@ -156,6 +183,7 @@ void VFODigit::resized() {
 
 void VFODigit::mouseEnter(const MouseEvent& event) {
 	String id = event.eventComponent->getComponentID();
+	my_parent->set_freq_inc(id);
 	
 	// Grow font by 5 points
 	Font f = getFont();
@@ -164,7 +192,7 @@ void VFODigit::mouseEnter(const MouseEvent& event) {
 }
 
 void VFODigit::mouseExit(const MouseEvent& event) {
-	String id = event.eventComponent->getComponentID();
+	my_parent->reset_freq_inc();
 
 	// Shrink font by 5 points
 	Font f = getFont();
@@ -173,5 +201,13 @@ void VFODigit::mouseExit(const MouseEvent& event) {
 }
 
 void VFODigit::mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) {
-	printf("Wheel\n");
+	float dir = wheel.deltaY;
+	if (dir < 0) {
+		// Freq going down
+		my_parent->freq_minus();
+	}
+	else {
+		// Freq going up
+		my_parent->freq_plus();
+	}
 }

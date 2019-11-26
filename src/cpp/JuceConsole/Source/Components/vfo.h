@@ -43,6 +43,8 @@ The authors can be reached by email at:
 #define RX 0
 #define TX 1
 
+class VFOComponent;
+
 /*
 	A VFO Digit component
 */
@@ -50,7 +52,7 @@ class VFODigit : public Label
 {
 public:
 	//==============================================================================
-	VFODigit(String text, Colour colour, float size);
+	VFODigit(VFOComponent *parent, String text, Colour colour, float size);
 	~VFODigit();
 
 	//==============================================================================
@@ -63,6 +65,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	VFOComponent *my_parent;
 
 	//==============================================================================
 	// Method prototypes
@@ -85,13 +88,18 @@ public:
 	void paint(Graphics&) override;
 	void resized() override;
 
+	void set_freq_inc(String);
+	void reset_freq_inc();
+	void freq_plus();
+	void freq_minus();
+
 private:
 	//==============================================================================
 	// State variables
-	int vfo_type = RX;		// RX|TX
-	int vfo_id = 0;			// Numerical id of VFO instance
-	int freq_int = 0;		// Last frequence increment in MHz
-	int current_freq = 0;	// Current frequency in MHz
+	int vfo_type = RX;			// RX|TX
+	int vfo_id = 0;				// Numerical id of VFO instance
+	float freq_inc = -1.0f;		// Last frequence increment in MHz
+	int current_freq = 0;		// Current frequency in MHz
 
 	// Map for lookup of increments
 	std::map<String, float> freq_inc_map {
