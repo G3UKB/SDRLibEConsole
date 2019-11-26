@@ -12,8 +12,10 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
-    setSize (600, 400);
-	addAndMakeVisible(new VFOComponent(0,0,0,0,getWidth(),getHeight()));
+	vfo_component = new VFOComponent(0, 0, 0, 0, getWidth(), getHeight());
+	addAndMakeVisible(vfo_component);
+	setSize(600, 400);
+	//printf("Main constructor\n");
 }
 
 MainComponent::~MainComponent()
@@ -36,5 +38,7 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
-
+	//printf("Main resized\n");
+	//setSize(600, 400);
+	vfo_component->setSize(getWidth(), getHeight());
 }

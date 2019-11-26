@@ -42,10 +42,8 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, in
 	// Bounds given by caller to position within callers container
 	setBounds(x, y, w, h);
 
-	// Add digits to the grid
-	//grid = new Grid();
-	//add_digits(grid);
-	//grid->performLayout(getLocalBounds());
+	create_digits();
+	//printf("Created digits\n");
 }
 
 VFOComponent::~VFOComponent()
@@ -63,54 +61,74 @@ void VFOComponent::paint(Graphics& g)
 void VFOComponent::resized()
 {
 	// This is called when the VFOComponent is resized.
-	// If you add any child components, this is where you should
-	// update their positions.
-	Grid grid;
-	add_digits(grid);
-	grid.performLayout(getLocalBounds());
+	//printf("Resized\n");
+	//layout_digits_in_grid();
+	layout_digits_with_bounds();
 }
 
 //==============================================================================
 // Private
-void VFOComponent::add_digits(Grid thegrid) {
+void VFOComponent::create_digits() {
 
 	// Create digits
-	d_100MHz = new VFODigit( String("0"), MHZ_COLOR, MHZ_FONT );
-	//addAndMakeVisible(d_100MHz);
+	d_100MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
+	addAndMakeVisible(d_100MHz);
 	d_10MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
-	//addAndMakeVisible(d_10MHz);
+	addAndMakeVisible(d_10MHz);
 	d_1MHz = new VFODigit(String("0"), MHZ_COLOR, MHZ_FONT);
-	//addAndMakeVisible(d_1MHz);
+	addAndMakeVisible(d_1MHz);
 	d_100KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	//addAndMakeVisible(d_100KHz);
+	addAndMakeVisible(d_100KHz);
 	d_10KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	//addAndMakeVisible(d_10KHz);
+	addAndMakeVisible(d_10KHz);
 	d_1KHz = new VFODigit(String("0"), KHZ_COLOR, KHZ_FONT);
-	//addAndMakeVisible(d_1KHz);
+	addAndMakeVisible(d_1KHz);
 	d_100Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	//addAndMakeVisible(d_100Hz);
+	addAndMakeVisible(d_100Hz);
 	d_10Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	//addAndMakeVisible(d_10Hz);
+	addAndMakeVisible(d_10Hz);
 	d_1Hz = new VFODigit(String("0"), HZ_COLOR, HZ_FONT);
-	//addAndMakeVisible(d_1Hz);
+	addAndMakeVisible(d_1Hz);
+}
+
+void VFOComponent::layout_digits_with_bounds() {
+	d_100MHz->setBounds(0, 0, 30, 30);
+	d_10MHz->setBounds(35, 0, 30, 30);
+	d_1MHz->setBounds(70, 0, 30, 30);
+	d_100KHz->setBounds(105, 0, 30, 30);
+	d_10KHz->setBounds(140, 0, 30, 30);
+	d_1KHz->setBounds(175, 0, 30, 30);
+	d_100Hz->setBounds(210, 0, 30, 30);
+	d_10Hz->setBounds(245, 0, 30, 30);
+	d_1Hz->setBounds(280, 0, 30, 30);
+}
+
+void VFOComponent::layout_digits_in_grid() {
+
+	Grid grid;
 
 	// Add digits in one horizontal row
 	using Track = Grid::TrackInfo;
-	Grid::JustifyItems::stretch;
-	thegrid.templateRows = { Track(1_fr) };
-	thegrid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
 	
-	thegrid.items = { GridItem(d_100MHz), GridItem(d_10MHz), GridItem(d_1MHz), GridItem(d_100KHz), GridItem(d_10KHz), GridItem(d_1KHz), GridItem(d_100Hz), GridItem(d_10Hz), GridItem(d_1Hz) };
-	addAndMakeVisible(d_100MHz);
-	addAndMakeVisible(d_10MHz);
-	addAndMakeVisible(d_1MHz);
-	addAndMakeVisible(d_100KHz);
-	addAndMakeVisible(d_10KHz);
-	addAndMakeVisible(d_1KHz);
-	addAndMakeVisible(d_100Hz);
-	addAndMakeVisible(d_10Hz);
-	addAndMakeVisible(d_1Hz);
+	grid.templateRows = { Track(1_fr) };
+	grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
 	
+	grid.items = {
+		GridItem(d_100MHz),
+		GridItem(d_10MHz), 
+		GridItem(d_1MHz), 
+		GridItem(d_100KHz), 
+		GridItem(d_10KHz), 
+		GridItem(d_1KHz), 
+		GridItem(d_100Hz), 
+		GridItem(d_10Hz), 
+		GridItem(d_1Hz) 
+	};
+
+	grid.justifyItems = Grid::JustifyItems::stretch;
+	grid.rowGap = Grid::Px::Px(10.0f);
+	grid.columnGap = Grid::Px::Px(10.0f);
+	grid.performLayout(getLocalBounds());
 }
 
 //==============================================================================
@@ -118,6 +136,8 @@ void VFOComponent::add_digits(Grid thegrid) {
 //==============================================================================
 
 VFODigit::VFODigit(String text, Colour colour, float size) {
+	
+	Label::Label();
 	// Create a digit ready to add to the grid
 	setText(text, dontSendNotification);
 	setJustificationType(Justification::centred);
@@ -129,10 +149,10 @@ VFODigit::~VFODigit() {
 
 }
 
-void VFODigit::paint(Graphics& g) {
-	g.fillAll(Colours::blue);
-};
+//void VFODigit::paint(Graphics& g) {
+//	//g.fillAll(Colours::blue);
+//};
 
 void VFODigit::resized() {
-
+	
 };

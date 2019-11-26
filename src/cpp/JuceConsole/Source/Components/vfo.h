@@ -51,7 +51,7 @@ public:
 	~VFODigit();
 
 	//==============================================================================
-	void paint(Graphics&) override;
+	//void paint(Graphics&) override;
 	void resized() override;
 
 private:
@@ -101,7 +101,8 @@ private:
 	};
 
 	// Grid to hold VFO digits
-	//Grid *grid;
+	//Grid grid;
+	//Grid& ref_grid = grid;
 
 	// Digits
 	VFODigit *d_100MHz;
@@ -117,7 +118,9 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void add_digits(Grid grid);
+	void create_digits();
+	void layout_digits_in_grid();
+	void layout_digits_with_bounds();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFOComponent)
 };
