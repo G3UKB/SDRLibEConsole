@@ -31,9 +31,9 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Defines
-#define MHZ_FONT 30.0f
-#define KHZ_FONT 30.0f
-#define HZ_FONT 20.0f
+#define MHZ_FONT 35.0f
+#define KHZ_FONT 35.0f
+#define HZ_FONT 25.0f
 #define MHZ_COLOR Colours::white
 #define KHZ_COLOR Colours::white
 #define HZ_COLOR Colours::orange
@@ -51,7 +51,7 @@ public:
 	~VFODigit();
 
 	//==============================================================================
-	//void paint(Graphics&) override;
+	void paint(Graphics&) override;
 	void resized() override;
 
 private:
@@ -100,10 +100,6 @@ private:
 		{String("1H"), 0.000001f},
 	};
 
-	// Grid to hold VFO digits
-	//Grid grid;
-	//Grid& ref_grid = grid;
-
 	// Digits
 	VFODigit *d_100MHz;
 	VFODigit *d_10MHz;
@@ -114,7 +110,6 @@ private:
 	VFODigit *d_100Hz;
 	VFODigit *d_10Hz;
 	VFODigit *d_1Hz;
-
 
 	//==============================================================================
 	// Method prototypes

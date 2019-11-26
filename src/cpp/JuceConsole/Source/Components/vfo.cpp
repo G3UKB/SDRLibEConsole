@@ -42,8 +42,8 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, in
 	// Bounds given by caller to position within callers container
 	setBounds(x, y, w, h);
 
+	// WE make content here but arrange it in resized
 	create_digits();
-	//printf("Created digits\n");
 }
 
 VFOComponent::~VFOComponent()
@@ -54,16 +54,14 @@ VFOComponent::~VFOComponent()
 // GUI Events
 void VFOComponent::paint(Graphics& g)
 {
-	// (Our component is opaque, so we must completely fill the background with a solid colour)
+	// Our component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::darkgrey);
 }
 
 void VFOComponent::resized()
 {
 	// This is called when the VFOComponent is resized.
-	//printf("Resized\n");
-	//layout_digits_in_grid();
-	layout_digits_with_bounds();
+	layout_digits_in_grid();
 }
 
 //==============================================================================
@@ -91,18 +89,6 @@ void VFOComponent::create_digits() {
 	addAndMakeVisible(d_1Hz);
 }
 
-void VFOComponent::layout_digits_with_bounds() {
-	d_100MHz->setBounds(0, 0, 30, 30);
-	d_10MHz->setBounds(35, 0, 30, 30);
-	d_1MHz->setBounds(70, 0, 30, 30);
-	d_100KHz->setBounds(105, 0, 30, 30);
-	d_10KHz->setBounds(140, 0, 30, 30);
-	d_1KHz->setBounds(175, 0, 30, 30);
-	d_100Hz->setBounds(210, 0, 30, 30);
-	d_10Hz->setBounds(245, 0, 30, 30);
-	d_1Hz->setBounds(280, 0, 30, 30);
-}
-
 void VFOComponent::layout_digits_in_grid() {
 
 	Grid grid;
@@ -126,8 +112,9 @@ void VFOComponent::layout_digits_in_grid() {
 	};
 
 	grid.justifyItems = Grid::JustifyItems::stretch;
-	grid.rowGap = Grid::Px::Px(10.0f);
-	grid.columnGap = Grid::Px::Px(10.0f);
+	// Add gaps if required
+	//grid.rowGap = Grid::Px::Px(10.0f);
+	//grid.columnGap = Grid::Px::Px(10.0f);
 	grid.performLayout(getLocalBounds());
 }
 
@@ -142,16 +129,17 @@ VFODigit::VFODigit(String text, Colour colour, float size) {
 	setText(text, dontSendNotification);
 	setJustificationType(Justification::centred);
 	setColour(Label::textColourId, colour);
-	setFont(Font(size, Font::bold));
+	setFont(Font(size, Font::plain));
 };
 
 VFODigit::~VFODigit() {
 
 }
 
-//void VFODigit::paint(Graphics& g) {
-//	//g.fillAll(Colours::blue);
-//};
+void VFODigit::paint(Graphics& g) {
+	// Add any additional painting here
+	Label::paint(g);
+};
 
 void VFODigit::resized() {
 	
