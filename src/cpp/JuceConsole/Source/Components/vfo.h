@@ -102,17 +102,7 @@ private:
 	int current_freq = 0;		// Current frequency in MHz
 
 	// Map for lookup of increments
-	std::map<String, float> freq_inc_map {
-		{String("100MHz"), 100.0f},
-		{String("10MHz"), 10.0f},
-		{String("1MHz"), 1.0f},
-		{String("100KHz"), 0.1f},
-		{String("10KHz"), 0.01f},
-		{String("1KH"), 0.001f},
-		{String("100Hz"), 0.0001f},
-		{String("10Hz"), 0.00001f},
-		{String("1H"), 0.000001f},
-	};
+	std::map<String, float> freq_inc_map;
 
 	// Digits
 	VFODigit *d_100MHz;

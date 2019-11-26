@@ -44,6 +44,17 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, in
 
 	// WE make content here but arrange it in resized
 	create_digits();
+
+	// Create freq_inc_map
+	freq_inc_map.insert(std::pair<String, float> ("100MHz", 100.0f));
+	freq_inc_map.insert(std::pair<String, float>("10MHz", 10.0f));
+	freq_inc_map.insert(std::pair<String, float>("1MHz", 1.0f));
+	freq_inc_map.insert(std::pair<String, float>("100KHz", 0.1f));
+	freq_inc_map.insert(std::pair<String, float>("10KHz", 0.01f));
+	freq_inc_map.insert(std::pair<String, float>("1KHz", 0.001f));
+	freq_inc_map.insert(std::pair<String, float>("100Hz", 0.0001f));
+	freq_inc_map.insert(std::pair<String, float>("10Hz", 0.00001f));
+	freq_inc_map.insert(std::pair<String, float>("1Hz", 0.000001f));
 }
 
 VFOComponent::~VFOComponent()
@@ -51,29 +62,23 @@ VFOComponent::~VFOComponent()
 }
 
 void VFOComponent::set_freq_inc(String id) {
-	// Crashes on map access
-	//printf("%s, %f\n", id, freq_inc_map.at(id));
-	//freq_inc = freq_inc_map.at(id);
-	printf("1\n");
+	freq_inc = freq_inc_map.at(id);
 }
 
 void VFOComponent::reset_freq_inc() {
-	//freq_inc = -1.0f;
-	printf("2\n");
+	freq_inc = -1.0f;
 }
 
 void VFOComponent::freq_plus() {
-	//if (freq_inc > 0) {
-	//	current_freq = current_freq + freq_inc;
-	//}
-	printf("3\n");
+	if (freq_inc > 0) {
+		current_freq = current_freq + freq_inc;
+	}
 }
 
 void VFOComponent::freq_minus() {
-	//if (freq_inc > 0) {
-	//	current_freq = current_freq - freq_inc;
-	//}
-	printf("4\n");
+	if (freq_inc > 0) {
+		current_freq = current_freq - freq_inc;
+	}
 }
 
 //==============================================================================
