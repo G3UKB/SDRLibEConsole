@@ -95,17 +95,17 @@ String VFOComponent::convertFreq(float freq) {
 }
 
 void VFOComponent::set_freq(String freq) {
-	const char* cstr = freq.toRawUTF8();
-	printf("%s, %c\n", cstr, cstr[0]);
-	d_100MHz->setText(String(cstr[0]), dontSendNotification);
-	d_10MHz->setText(String(cstr[1]), dontSendNotification);
-	d_1MHz->setText(String(cstr[2]), dontSendNotification);
-	d_100KHz->setText(String(cstr[3]), dontSendNotification);
-	d_10KHz->setText(String(cstr[4]), dontSendNotification);
-	d_1KHz->setText(String(cstr[5]), dontSendNotification);
-	d_100Hz->setText(String(cstr[6]), dontSendNotification);
-	d_10Hz->setText(String(cstr[7]), dontSendNotification);
-	d_1Hz->setText(String(cstr[8]), dontSendNotification);
+	const wchar_t * wcstr = freq.toWideCharPointer();
+	//printf("%s, %s\n", cstr, cstr[0]);
+	d_100MHz->setText(String::charToString(wcstr[0]), dontSendNotification);
+	d_10MHz->setText(String::charToString(wcstr[1]), dontSendNotification);
+	d_1MHz->setText(String::charToString(wcstr[2]), dontSendNotification);
+	d_100KHz->setText(String::charToString(wcstr[3]), dontSendNotification);
+	d_10KHz->setText(String::charToString(wcstr[4]), dontSendNotification);
+	d_1KHz->setText(String::charToString(wcstr[5]), dontSendNotification);
+	d_100Hz->setText(String::charToString(wcstr[6]), dontSendNotification);
+	d_10Hz->setText(String::charToString(wcstr[7]), dontSendNotification);
+	d_1Hz->setText(String::charToString(wcstr[8]), dontSendNotification);
 }
 
 //==============================================================================
