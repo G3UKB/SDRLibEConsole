@@ -92,6 +92,8 @@ public:
 	void reset_freq_inc();
 	void freq_plus();
 	void freq_minus();
+	String convertFreq(float freq);
+	void VFOComponent::set_freq(String freq);
 
 private:
 	//==============================================================================

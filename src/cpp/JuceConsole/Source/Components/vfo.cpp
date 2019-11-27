@@ -81,6 +81,33 @@ void VFOComponent::freq_minus() {
 	}
 }
 
+String VFOComponent::convertFreq(float freq) {
+	// Convert to a string representation of the frequency in Hz
+	String sfreq = String((int)(freq * 1000000));
+	// Add leading zeros to make it a 9 digit string
+	// Number of leading zeros to add
+	int l = 9 - sfreq.length();
+	String leading_zeros;
+	for ( int i = 0; i < l; i++) {
+		leading_zeros += "0";
+	}
+	return (leading_zeros += sfreq);
+}
+
+void VFOComponent::set_freq(String freq) {
+	const char* cstr = freq.toRawUTF8();
+	printf("%s, %c\n", cstr, cstr[0]);
+	d_100MHz->setText(String(cstr[0]), dontSendNotification);
+	d_10MHz->setText(String(cstr[1]), dontSendNotification);
+	d_1MHz->setText(String(cstr[2]), dontSendNotification);
+	d_100KHz->setText(String(cstr[3]), dontSendNotification);
+	d_10KHz->setText(String(cstr[4]), dontSendNotification);
+	d_1KHz->setText(String(cstr[5]), dontSendNotification);
+	d_100Hz->setText(String(cstr[6]), dontSendNotification);
+	d_10Hz->setText(String(cstr[7]), dontSendNotification);
+	d_1Hz->setText(String(cstr[8]), dontSendNotification);
+}
+
 //==============================================================================
 // GUI Events
 void VFOComponent::paint(Graphics& g)
@@ -127,6 +154,8 @@ void VFOComponent::create_digits() {
 	d_1Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
 	d_1Hz->setComponentID("1Hz");
 	addAndMakeVisible(d_1Hz);
+
+	set_freq(convertFreq(7.123f));
 }
 
 void VFOComponent::layout_digits_in_grid() {
