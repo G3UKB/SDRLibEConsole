@@ -29,7 +29,6 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
-
 //==============================================================================
 
 /*

@@ -1854,6 +1854,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Common\extern.h" />
     <ClInclude Include="..\..\Source\Components\radio_buttons.h" />
     <ClInclude Include="..\..\Source\Components\vfo.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />

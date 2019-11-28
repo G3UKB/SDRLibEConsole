@@ -26,11 +26,7 @@ The authors can be reached by email at:
 */
 
 #include "vfo.h"
-//extern "C" {
-//#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-//}
-
-extern "C" {void c_server_cc_out_set_rx_1_freq(int); }
+#include "../Common/extern.h"
 
 //==============================================================================
 // Main VFO Component Panel

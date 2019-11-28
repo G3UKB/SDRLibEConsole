@@ -10,11 +10,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
-//extern "C" {
-//	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-//}
-extern "C" {void c_server_make_wisdom(const char*); }
-extern "C" {int c_server_init(); }
+#include "Common/extern.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication

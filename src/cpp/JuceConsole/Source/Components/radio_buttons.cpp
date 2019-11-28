@@ -29,9 +29,7 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "radio_buttons.h"
-extern "C" {
-#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-}
+#include "../Common/extern.h"
 
 //==============================================================================
 

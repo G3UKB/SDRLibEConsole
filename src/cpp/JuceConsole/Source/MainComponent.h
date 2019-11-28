@@ -30,9 +30,6 @@ The authors can be reached by email at:
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Components/vfo.h"
 #include "Components/radio_buttons.h"
-//extern "C" {
-//	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-//}
 
 //==============================================================================
 /*
