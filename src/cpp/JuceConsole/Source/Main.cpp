@@ -14,6 +14,7 @@
 //	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
 //}
 extern "C" {void c_server_make_wisdom(const char*); }
+extern "C" {int c_server_init(); }
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -30,9 +31,16 @@ public:
     void initialise (const String& commandLine) override
     {
         // Application initialisation
-
+		
         mainWindow.reset (new MainWindow (getApplicationName()));
+		// Make wisdom file if not already made
 		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");
+
+		// Initialise server
+		if (!c_server_init()) {
+			printf("Failed to initialise server!");
+			return;
+		}
     }
 
     void shutdown() override

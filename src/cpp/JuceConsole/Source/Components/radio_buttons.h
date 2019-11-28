@@ -48,6 +48,9 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	bool audio_set = false;
+	bool discovered = false;
+	bool server_running = false;
 
 	//==============================================================================
 	// Method prototypes

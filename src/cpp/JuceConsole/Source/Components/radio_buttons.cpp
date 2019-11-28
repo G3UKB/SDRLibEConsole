@@ -36,7 +36,9 @@ extern "C" {
 //==============================================================================
 
 StartButton::StartButton() {
+
 	setButtonText("Start");
+	setClickingTogglesState(true);
 }
 
 StartButton::~StartButton() {}
@@ -47,40 +49,56 @@ void StartButton::clicked() {
 	char* host_api;
 	char* dev;
 
-	// Initialise server
-	if (!c_server_init()) {
-		printf("Failed to initialise server!");
-		return;
-	}
+	if (getToggleState()) {
+		// Switching everything on
 
-	// Set up a default route for RX1 to Speaker output
-	DeviceEnumList* l = c_server_enum_audio_outputs();
-	for (int i = 0; i < l->entries; i++) {
-		if (String(l->devices[i].name).startsWith("Speakers")) {
-			if (String(l->devices[i].host_api) == "MME") {
-				direction = l->devices[i].direction;
-				host_api = l->devices[i].host_api;
-				dev = l->devices[i].name;
-				break;
+		if (!audio_set) {
+			audio_set = true;
+			// Set up a default route for RX1 to Speaker output
+			DeviceEnumList* l = c_server_enum_audio_outputs();
+			for (int i = 0; i < l->entries; i++) {
+				if (String(l->devices[i].name).startsWith("Speakers")) {
+					if (String(l->devices[i].host_api) == "MME") {
+						direction = l->devices[i].direction;
+						host_api = l->devices[i].host_api;
+						dev = l->devices[i].name;
+						break;
+					}
+				}
 			}
+			c_server_set_audio_route(direction, LOCAL, 1, host_api, dev, BOTH);
+		}
+
+		if (!discovered) {
+			discovered = true;
+			// Discover radio
+			if (!c_radio_discover()) {
+				printf("Radio hardware not found!");
+				return;
+			}
+			Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
+		}
+
+		if (!server_running) {
+			server_running = true;
+			// Start server
+			if (!c_server_start()) {
+				printf("Failed to start server!");
+				return;
+			}
+			Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
+		}
+
+		// Start radio
+		if (!c_radio_start(0)) {
+			printf("Failed to start radio!");
 		}
 	}
-	c_server_set_audio_route(direction, LOCAL, 1, host_api, dev, BOTH);
-
-	// Discover radio
-	if (!c_radio_discover()) {
-		printf("Radio hardware not found!");
-		return;
-	}
-	Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
-	// Start server
-	if (!c_server_start()) {
-		printf("Failed to start server!");
-		return;
-	}
-	Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
-	// Start radio
-	if (!c_radio_start(0)) {
-		printf("Failed to start radio!");
+	else {
+		// Switching off
+		// Stop radio
+		if (!c_radio_stop()) {
+			printf("Failed to stop radio!");
+		}
 	}
 }
