@@ -30,9 +30,15 @@ The authors can be reached by email at:
 //==============================================================================
 MainComponent::MainComponent()
 {
-	vfo_component = new VFOComponent(0, 0, 0, 0, getWidth(), getHeight());
+	StartButton *button = new StartButton();
+	button->setBounds(10, 10, 60, 40);
+	addAndMakeVisible(button);
+
+	vfo_component = new VFOComponent(0, 0, 0, 0, getWidth(), 80);
+	vfo_component->setBounds(10, 50, getWidth(), 80);
 	addAndMakeVisible(vfo_component);
-	setSize(300, 90);
+	
+	setSize(300, 200);
 }
 
 MainComponent::~MainComponent()

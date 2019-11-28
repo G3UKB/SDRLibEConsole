@@ -10,9 +10,10 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
-extern "C" {
-	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-}
+//extern "C" {
+//	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
+//}
+extern "C" {void c_server_make_wisdom(const char*); }
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -23,14 +24,15 @@ public:
 
     const String getApplicationName() override       { return ProjectInfo::projectName; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed() override       { return true; }
+    bool moreThanOneInstanceAllowed() override       { return false; }
 
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        // This method is where you should put your application's initialisation code..
+        // Application initialisation
 
         mainWindow.reset (new MainWindow (getApplicationName()));
+		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");
     }
 
     void shutdown() override

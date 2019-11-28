@@ -1,7 +1,7 @@
 /*
-MainComponent.h
+buttons.h
 
-Header for Main Component for the Juce Console
+Header for buttons component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -27,32 +27,30 @@ The authors can be reached by email at:
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "Components/vfo.h"
-#include "Components/radio_buttons.h"
-//extern "C" {
-//	#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
-//}
+#include "../../JuceLibraryCode/JuceHeader.h"
+
 
 //==============================================================================
+
 /*
-    Top level component which contains all content
+	A button component
 */
-class MainComponent   : public Component
+class StartButton : public TextButton
 {
 public:
-    //==============================================================================
-    MainComponent();
-    ~MainComponent();
+	//==============================================================================
+	StartButton();
+	~StartButton();
 
-    //==============================================================================
-    void paint (Graphics&) override;
-    void resized() override;
+	//==============================================================================
+	void clicked();
 
 private:
-    //==============================================================================
-    // Test child
-	VFOComponent *vfo_component;
+	//==============================================================================
+	// State variables
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+	//==============================================================================
+	// Method prototypes
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StartButton)
 };

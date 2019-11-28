@@ -26,6 +26,11 @@ The authors can be reached by email at:
 */
 
 #include "vfo.h"
+//extern "C" {
+//#include "E:/Projects/SDRLibE/trunk/server/src/common/include.h"
+//}
+
+extern "C" {void c_server_cc_out_set_rx_1_freq(int); }
 
 //==============================================================================
 // Main VFO Component Panel
@@ -38,23 +43,27 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, in
 	// Local vars
 	vfo_type = p_vfo_type;
 	vfo_id = p_vfo_id;
+	x_pos = x;
+	y_pos = y;
+	c_width = w;
+	c_height = h;
 
 	// Bounds given by caller to position within callers container
-	setBounds(x, y, w, h);
+	//setBounds(x, y, w, h);
 
 	// WE make content here but arrange it in resized
 	create_digits();
 
 	// Create freq_inc_map
-	freq_inc_map.insert(std::pair<String, float> ("100MHz", 100.0f));
-	freq_inc_map.insert(std::pair<String, float>("10MHz", 10.0f));
-	freq_inc_map.insert(std::pair<String, float>("1MHz", 1.0f));
-	freq_inc_map.insert(std::pair<String, float>("100KHz", 0.1f));
-	freq_inc_map.insert(std::pair<String, float>("10KHz", 0.01f));
-	freq_inc_map.insert(std::pair<String, float>("1KHz", 0.001f));
-	freq_inc_map.insert(std::pair<String, float>("100Hz", 0.0001f));
-	freq_inc_map.insert(std::pair<String, float>("10Hz", 0.00001f));
-	freq_inc_map.insert(std::pair<String, float>("1Hz", 0.000001f));
+	freq_inc_map.insert(std::pair<String, int> ("100MHz", 100000000));
+	freq_inc_map.insert(std::pair<String, int>("10MHz", 10000000));
+	freq_inc_map.insert(std::pair<String, int>("1MHz", 1000000));
+	freq_inc_map.insert(std::pair<String, int>("100KHz", 100000));
+	freq_inc_map.insert(std::pair<String, int>("10KHz", 10000));
+	freq_inc_map.insert(std::pair<String, int>("1KHz", 1000));
+	freq_inc_map.insert(std::pair<String, int>("100Hz", 100));
+	freq_inc_map.insert(std::pair<String, int>("10Hz", 10));
+	freq_inc_map.insert(std::pair<String, int>("1Hz", 1));
 }
 
 VFOComponent::~VFOComponent()
@@ -66,32 +75,34 @@ void VFOComponent::set_freq_inc(String id) {
 }
 
 void VFOComponent::reset_freq_inc() {
-	freq_inc = -1.0f;
+	freq_inc = -1;
 }
 
 void VFOComponent::freq_plus() {
 	if (freq_inc > 0) {
-		float f = current_freq + freq_inc;
-		if (f <= MAX_FREQ) {
-			current_freq = f;
+		int ifreq = current_freq + freq_inc;
+		if (ifreq <= MAX_FREQ) {
+			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
+			c_server_cc_out_set_rx_1_freq(current_freq);
 		}
 	}
 }
 
 void VFOComponent::freq_minus() {
 	if (freq_inc > 0) {
-		float f = current_freq - freq_inc;
-		if (f >= MIN_FREQ) {
-			current_freq = f;
+		int ifreq = current_freq - freq_inc;
+		if (ifreq >= MIN_FREQ) {
+			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
+			c_server_cc_out_set_rx_1_freq(current_freq);
 		}
 	}
 }
 
-String VFOComponent::convertFreq(float freq) {
+String VFOComponent::convertFreq(int freq) {
 	// Convert to a string representation of the frequency in Hz
-	String sfreq = String((int)(freq * 1000000));
+	String sfreq = String(freq);
 	// Add leading zeros to make it a 9 digit string
 	// Number of leading zeros to add
 	int l = 9 - sfreq.length();
@@ -104,7 +115,6 @@ String VFOComponent::convertFreq(float freq) {
 
 void VFOComponent::set_freq(String freq) {
 	const wchar_t * wcstr = freq.toWideCharPointer();
-	//printf("%s, %s\n", cstr, cstr[0]);
 	d_100MHz->setText(String::charToString(wcstr[0]), dontSendNotification);
 	d_10MHz->setText(String::charToString(wcstr[1]), dontSendNotification);
 	d_1MHz->setText(String::charToString(wcstr[2]), dontSendNotification);
