@@ -71,15 +71,21 @@ void VFOComponent::reset_freq_inc() {
 
 void VFOComponent::freq_plus() {
 	if (freq_inc > 0) {
-		current_freq = current_freq + freq_inc;
-		set_freq(convertFreq(current_freq));
+		float f = current_freq + freq_inc;
+		if (f <= MAX_FREQ) {
+			current_freq = f;
+			set_freq(convertFreq(current_freq));
+		}
 	}
 }
 
 void VFOComponent::freq_minus() {
 	if (freq_inc > 0) {
-		current_freq = current_freq - freq_inc;
-		set_freq(convertFreq(current_freq));
+		float f = current_freq - freq_inc;
+		if (f >= MIN_FREQ) {
+			current_freq = f;
+			set_freq(convertFreq(current_freq));
+		}
 	}
 }
 
@@ -156,6 +162,8 @@ void VFOComponent::create_digits() {
 	d_1Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
 	d_1Hz->setComponentID("1Hz");
 	addAndMakeVisible(d_1Hz);
+
+	set_freq(convertFreq(current_freq));
 }
 
 void VFOComponent::layout_digits_in_grid() {

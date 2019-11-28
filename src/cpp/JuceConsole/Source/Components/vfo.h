@@ -42,6 +42,8 @@ The authors can be reached by email at:
 #define HZ_COLOR Colours::orange
 #define RX 0
 #define TX 1
+#define MIN_FREQ 0.1f
+#define MAX_FREQ 500.0f
 
 class VFOComponent;
 
@@ -101,7 +103,7 @@ private:
 	int vfo_type = RX;			// RX|TX
 	int vfo_id = 0;				// Numerical id of VFO instance
 	float freq_inc = -1.0f;		// Last frequence increment in MHz
-	int current_freq = 0;		// Current frequency in MHz
+	float current_freq = 7.1f;	// Current frequency in MHz
 
 	// Map for lookup of increments
 	std::map<String, float> freq_inc_map;
