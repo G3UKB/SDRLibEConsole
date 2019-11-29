@@ -1,7 +1,7 @@
 /*
 mode_panel.cpp
 
-Mode Bbuttons component for the Juce Console
+Mode buttons component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -43,8 +43,8 @@ ModeButton::~ModeButton() {}
 
 void ModeButton::clicked() {
 
-	int id = getComponentID().getIntValue();
 	if (getToggleState()) {
+		int id = getComponentID().getIntValue();
 		c_server_set_rx_mode(0, id);
 	}
 }
@@ -165,5 +165,4 @@ void ModePanel::layout_buttons_in_grid() {
 	//grid.rowGap = Grid::Px::Px(10.0f);
 	//grid.columnGap = Grid::Px::Px(10.0f);
 	grid.performLayout(getLocalBounds());
-	printf("Done layout\n");
 }

@@ -49,7 +49,7 @@ void StartButton::clicked() {
 
 	if (getToggleState()) {
 		// Switching everything on
-
+		setButtonText("Stop");
 		if (!audio_set) {
 			audio_set = true;
 			// Set up a default route for RX1 to Speaker output
@@ -95,6 +95,7 @@ void StartButton::clicked() {
 	else {
 		// Switching off
 		// Stop radio
+		setButtonText("Start");
 		if (!c_radio_stop()) {
 			printf("Failed to stop radio!");
 		}

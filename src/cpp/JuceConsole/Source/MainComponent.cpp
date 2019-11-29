@@ -39,7 +39,10 @@ MainComponent::MainComponent()
 	mode_panel = new ModePanel(0);
 	addAndMakeVisible(mode_panel);
 	
-	setSize(300, 300);
+	filter_panel = new FilterPanel(0);
+	addAndMakeVisible(filter_panel);
+
+	setSize(300, 375);
 }
 
 MainComponent::~MainComponent()
@@ -61,4 +64,5 @@ void MainComponent::resized()
 	start_button->setBounds(10, 10, 60, 40);
 	vfo_component->setBounds(10, 50, getWidth()-20, 80);
 	mode_panel->setBounds(10,140, getWidth()-20, 100);
+	filter_panel->setBounds(10, 250, getWidth() - 20, 100);
 }
