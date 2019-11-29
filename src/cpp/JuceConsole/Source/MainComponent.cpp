@@ -39,7 +39,7 @@ MainComponent::MainComponent()
 	mode_panel = new ModePanel(0);
 	addAndMakeVisible(mode_panel);
 	
-	setSize(300, 400);
+	setSize(300, 300);
 }
 
 MainComponent::~MainComponent()
@@ -59,6 +59,6 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // Resize children
 	start_button->setBounds(10, 10, 60, 40);
-	vfo_component->setBounds(10, 50, getWidth()-10, 80);
-	mode_panel->setBounds(10,140, getWidth()-10, 100);
+	vfo_component->setBounds(10, 50, getWidth()-20, 80);
+	mode_panel->setBounds(10,140, getWidth()-20, 100);
 }

@@ -43,11 +43,9 @@ ModeButton::~ModeButton() {}
 
 void ModeButton::clicked() {
 
+	int id = getComponentID().getIntValue();
 	if (getToggleState()) {
-		printf("ON: %s\n", getComponentID());
-	}
-	else {
-		printf("OFF: %s\n", getComponentID());
+		c_server_set_rx_mode(0, id);
 	}
 }
 
