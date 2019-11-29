@@ -64,34 +64,74 @@ ModePanel::ModePanel(int p_mode_id) {
 
 ModePanel::~ModePanel() {}
 
-void ModePanel::resized()
-{
+void ModePanel::resized() {
 	// This is called when the mode panel is resized.
 	layout_buttons_in_grid();
 }
 
 //==============================================================================
 // Private
-void ModePanel::make_mode_button(ModeButton *btn, String label, String id) {
-	btn = new ModeButton(label);
-	btn->setComponentID(id);
-	btn->setRadioGroupId(1);
-	addAndMakeVisible(btn);
-}
-
 void ModePanel::create_buttons() {
-	make_mode_button(LSBButton, "LSB", "0");
-	make_mode_button(USBButton, "USB", "1");
-	make_mode_button(DSBButton, "DSB", "2");
-	make_mode_button(CWLButton, "CW_L", "3");
-	make_mode_button(CWUButton, "CW_U", "4");
-	make_mode_button(FMButton, "FM", "5");
-	make_mode_button(AMButton, "AM", "6");
-	make_mode_button(DIGUButton, "DIG_U", "7");
-	make_mode_button(SPECButton, "SPEC", "8");
-	make_mode_button(DIGLButton, "DIG_L", "9");
-	make_mode_button(SAMButton, "SAM", "10");
-	make_mode_button(DRMButton, "DRM", "11");
+
+	LSBButton = new ModeButton("LSB");
+	LSBButton->setComponentID("0");
+	LSBButton->setRadioGroupId(1);
+	addAndMakeVisible(LSBButton);
+
+	USBButton = new ModeButton("USB");
+	USBButton->setComponentID("1");
+	USBButton->setRadioGroupId(1);
+	addAndMakeVisible(USBButton);
+
+	DSBButton = new ModeButton("DSB");
+	DSBButton->setComponentID("2");
+	DSBButton->setRadioGroupId(1);
+	addAndMakeVisible(DSBButton);
+
+	CWLButton = new ModeButton("CW-L");
+	CWLButton->setComponentID("3");
+	CWLButton->setRadioGroupId(1);
+	addAndMakeVisible(CWLButton);
+
+	CWUButton = new ModeButton("CW-U");
+	CWUButton->setComponentID("4");
+	CWUButton->setRadioGroupId(1);
+	addAndMakeVisible(CWUButton);
+
+	FMButton = new ModeButton("FM");
+	FMButton->setComponentID("5");
+	FMButton->setRadioGroupId(1);
+	addAndMakeVisible(FMButton);
+
+	AMButton = new ModeButton("AM");
+	AMButton->setComponentID("6");
+	AMButton->setRadioGroupId(1);
+	addAndMakeVisible(AMButton);
+
+	DIGUButton = new ModeButton("DIG-U");
+	DIGUButton->setComponentID("7");
+	DIGUButton->setRadioGroupId(1);
+	addAndMakeVisible(DIGUButton);
+
+	SPECButton = new ModeButton("SPEC");
+	SPECButton->setComponentID("8");
+	SPECButton->setRadioGroupId(1);
+	addAndMakeVisible(SPECButton);
+
+	DIGLButton = new ModeButton("DIG-L");
+	DIGLButton->setComponentID("9");
+	DIGLButton->setRadioGroupId(1);
+	addAndMakeVisible(DIGLButton);
+
+	SAMButton = new ModeButton("DIG-L");
+	SAMButton->setComponentID("10");
+	SAMButton->setRadioGroupId(1);
+	addAndMakeVisible(SAMButton);
+
+	DRMButton = new ModeButton("DRM");
+	DRMButton->setComponentID("11");
+	DRMButton->setRadioGroupId(1);
+	addAndMakeVisible(DRMButton);
 }
 
 void ModePanel::layout_buttons_in_grid() {
@@ -106,13 +146,14 @@ void ModePanel::layout_buttons_in_grid() {
 	grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
 	grid.templateRows = { Track(1_fr),  Track(1_fr),  Track(1_fr) };
 
-	// Ad items to the grid
+	// Add items to the grid
 	grid.items = {
 		GridItem(LSBButton),
 		GridItem(USBButton),
 		GridItem(DSBButton),
 		GridItem(CWLButton),
 		GridItem(CWUButton),
+		GridItem(FMButton),
 		GridItem(AMButton),
 		GridItem(DIGUButton),
 		GridItem(SPECButton),
@@ -126,4 +167,5 @@ void ModePanel::layout_buttons_in_grid() {
 	//grid.rowGap = Grid::Px::Px(10.0f);
 	//grid.columnGap = Grid::Px::Px(10.0f);
 	grid.performLayout(getLocalBounds());
+	printf("Done layout\n");
 }

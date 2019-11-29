@@ -31,7 +31,6 @@ The authors can be reached by email at:
 MainComponent::MainComponent()
 {
 	start_button = new StartButton();
-	start_button->setBounds(10, 10, 60, 40);
 	addAndMakeVisible(start_button);
 
 	vfo_component = new VFOComponent(0, 0);
@@ -59,6 +58,7 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	vfo_component->setBounds(10, 50, getWidth(), 80);
-	mode_panel->setBounds(10,140, 200, 100);
+	start_button->setBounds(10, 10, 60, 40);
+	vfo_component->setBounds(10, 50, getWidth()-10, 80);
+	mode_panel->setBounds(10,140, getWidth()-10, 100);
 }

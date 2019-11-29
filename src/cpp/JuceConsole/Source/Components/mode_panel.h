@@ -65,7 +65,7 @@ public:
 	ModePanel(int p_mode_id);
 	~ModePanel();
 
-	void ModePanel::resized();
+	void resized() override;
 
 	//==============================================================================
 
@@ -91,7 +91,6 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void make_mode_button(ModeButton *btn, String label, String id);
 	void create_buttons();
 	void layout_buttons_in_grid();
 
