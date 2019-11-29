@@ -34,18 +34,11 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, int h)
+VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id)
 {
 	// Local vars
 	vfo_type = p_vfo_type;
 	vfo_id = p_vfo_id;
-	x_pos = x;
-	y_pos = y;
-	c_width = w;
-	c_height = h;
-
-	// Bounds given by caller to position within callers container
-	//setBounds(x, y, w, h);
 
 	// WE make content here but arrange it in resized
 	create_digits();

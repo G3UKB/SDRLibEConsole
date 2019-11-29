@@ -34,8 +34,7 @@ MainComponent::MainComponent()
 	button->setBounds(10, 10, 60, 40);
 	addAndMakeVisible(button);
 
-	vfo_component = new VFOComponent(0, 0, 0, 0, getWidth(), 80);
-	vfo_component->setBounds(10, 50, getWidth(), 80);
+	vfo_component = new VFOComponent(0, 0);
 	addAndMakeVisible(vfo_component);
 	
 	setSize(300, 200);
@@ -57,5 +56,5 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	vfo_component->setSize(getWidth(), getHeight());
+	vfo_component->setBounds(10, 50, getWidth(), 80);
 }

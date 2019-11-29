@@ -83,7 +83,7 @@ class VFOComponent : public Component
 {
 public:
 	//==============================================================================
-	VFOComponent(int p_vfo_type, int p_vfo_id, int x, int y, int w, int h);
+	VFOComponent(int p_vfo_type, int p_vfo_id);
 	~VFOComponent();
 
 	//==============================================================================
@@ -100,10 +100,6 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	int x_pos;
-	int y_pos;
-	int c_width;
-	int c_height;
 	int vfo_type = RX;			// RX|TX
 	int vfo_id = 0;				// Numerical id of VFO instance
 	int freq_inc = -1;			// Last frequence increment in MHz
