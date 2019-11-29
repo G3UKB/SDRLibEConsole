@@ -30,6 +30,7 @@ The authors can be reached by email at:
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Components/vfo.h"
 #include "Components/radio_buttons.h"
+#include "Components/mode_panel.h"
 
 //==============================================================================
 /*
@@ -49,7 +50,9 @@ public:
 private:
     //==============================================================================
     // Test child
+	StartButton *start_button;
 	VFOComponent *vfo_component;
+	ModePanel *mode_panel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

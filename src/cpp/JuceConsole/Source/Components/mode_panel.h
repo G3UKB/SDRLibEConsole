@@ -1,7 +1,7 @@
 /*
-radio_buttons.h
+mode_panel.h
 
-Header for radio_buttons component for the Juce Console
+Header for mode buttons component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -32,14 +32,14 @@ The authors can be reached by email at:
 //==============================================================================
 
 /*
-	A start/stop button component
+	A mode button component
 */
-class StartButton : public TextButton
+class ModeButton : public TextButton
 {
 public:
 	//==============================================================================
-	StartButton();
-	~StartButton();
+	ModeButton(String label);
+	~ModeButton();
 
 	//==============================================================================
 	void clicked();
@@ -47,12 +47,53 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	bool audio_set = false;
-	bool discovered = false;
-	bool server_running = false;
+	
 
 	//==============================================================================
 	// Method prototypes
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StartButton)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModeButton)
+};
+
+/*
+	A mode panel component
+*/
+class ModePanel : public Component
+{
+public:
+	//==============================================================================
+	ModePanel(int p_mode_id);
+	~ModePanel();
+
+	void ModePanel::resized();
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	// Which radio
+	int mode_id;
+
+	// Button vars
+	ModeButton *LSBButton;
+	ModeButton *USBButton;
+	ModeButton *DSBButton;
+	ModeButton *CWLButton;
+	ModeButton *CWUButton;
+	ModeButton *FMButton;
+	ModeButton *AMButton;
+	ModeButton *DIGUButton;
+	ModeButton *SPECButton;
+	ModeButton *DIGLButton;
+	ModeButton *SAMButton;
+	ModeButton *DRMButton;
+
+	//==============================================================================
+	// Method prototypes
+	void make_mode_button(ModeButton *btn, String label, String id);
+	void create_buttons();
+	void layout_buttons_in_grid();
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModePanel)
 };

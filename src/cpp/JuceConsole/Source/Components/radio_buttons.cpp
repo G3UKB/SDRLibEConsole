@@ -1,7 +1,7 @@
 /*
-buttons.cpp
+radio_buttons.cpp
 
-Buttons component for the Juce Console
+Start/Stop buttons component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 

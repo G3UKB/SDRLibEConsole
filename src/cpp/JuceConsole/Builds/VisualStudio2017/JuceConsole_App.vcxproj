@@ -132,6 +132,7 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Components\mode_panel.cpp" />
     <ClCompile Include="..\..\Source\Components\radio_buttons.cpp" />
     <ClCompile Include="..\..\Source\Components\vfo.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
@@ -1855,6 +1856,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\extern.h" />
+    <ClInclude Include="..\..\Source\Components\mode_panel.h" />
     <ClInclude Include="..\..\Source\Components\radio_buttons.h" />
     <ClInclude Include="..\..\Source\Components\vfo.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
