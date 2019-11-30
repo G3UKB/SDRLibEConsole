@@ -60,7 +60,6 @@ void DisplayPanel::paint(Graphics& g)
 void DisplayPanel::resized()
 {
 	// This is called when the display is resized.
-	
 }
 
 //==============================================================================
@@ -69,17 +68,16 @@ void DisplayPanel::resized()
 void DisplayPanel::draw_grid(Graphics& g) {
 	// Draw grid with labels within our component bounds
 	int i;
-
 	g.setColour(Colours::green);
 	// One horizontal line per 20 db
-	int db_divs = (abs(HIGH_DB) - abs(LOW_DB))/20;
-	int db_pixels_per_div = (getWidth() / db_divs) - T_MARGIN - B_MARGIN;
+	int db_divs = (abs(LOW_DB) - abs(HIGH_DB))/20;
+	int db_pixels_per_div = ((getHeight() - T_MARGIN - B_MARGIN) / db_divs);
 	for (i = 0; i <= db_divs; i++) {
 		g.drawLine(
 			(float)(L_MARGIN),
-			(float)(T_MARGIN + i * db_pixels_per_div),
+			(float)(T_MARGIN + (i * db_pixels_per_div)),
 			(float(getWidth() - L_MARGIN - R_MARGIN)),
-			(float)(T_MARGIN + i * db_pixels_per_div)
+			(float)(T_MARGIN + (i * db_pixels_per_div))
 		);
 	}
 }
