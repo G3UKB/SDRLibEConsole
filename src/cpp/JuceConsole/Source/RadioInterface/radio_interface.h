@@ -81,9 +81,9 @@ private:
 	bool radio_discovered = false;
 	bool radio_running = false;
 	int current_rx_mode = -1;
-	int current_rx_filter_low = -1;
-	int current_rx_filter_high = -1;
-	int current_freq = -1;
+	int current_rx_filter_low = -2700;
+	int current_rx_filter_high = -300;
+	int current_freq = (int)MODES::CH_LSB;
 
 	//==============================================================================
 	// Method prototypes
