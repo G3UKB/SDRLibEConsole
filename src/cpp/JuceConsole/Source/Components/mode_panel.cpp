@@ -30,6 +30,7 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "mode_panel.h"
 #include "../Common/extern.h"
+#include "../RadioInterface/radio_interface.h"
 
 //==============================================================================
 
@@ -45,7 +46,7 @@ void ModeButton::clicked() {
 
 	if (getToggleState()) {
 		int id = getComponentID().getIntValue();
-		c_server_set_rx_mode(0, id);
+		RadioInterface::getInstance()->ri_server_set_rx_mode(0, id);
 	}
 }
 

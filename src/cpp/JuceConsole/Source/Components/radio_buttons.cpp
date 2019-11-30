@@ -30,6 +30,7 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "radio_buttons.h"
 #include "../Common/extern.h"
+#include "../RadioInterface/radio_interface.h"
 
 //==============================================================================
 
@@ -47,9 +48,12 @@ void StartButton::clicked() {
 	char* host_api;
 	char* dev;
 
+	//Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
+
 	if (getToggleState()) {
 		// Switching everything on
 		setButtonText("Stop");
+
 		if (!audio_set) {
 			audio_set = true;
 			// Set up a default route for RX1 to Speaker output
@@ -67,37 +71,14 @@ void StartButton::clicked() {
 			c_server_set_audio_route(direction, LOCAL, 1, host_api, dev, BOTH);
 		}
 
-		if (!discovered) {
-			discovered = true;
-			// Discover radio
-			if (!c_radio_discover()) {
-				printf("Radio hardware not found!");
-				return;
-			}
-			Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
-		}
-
-		if (!server_running) {
-			server_running = true;
-			// Start server
-			if (!c_server_start()) {
-				printf("Failed to start server!");
-				return;
-			}
-			Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
-		}
-
-		// Start radio
-		if (!c_radio_start(0)) {
-			printf("Failed to start radio!");
-		}
+		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
+		if (!RadioInterface::getInstance()->ri_server_start()) return;
+		if (!RadioInterface::getInstance()->ri_radio_start(0)) return;
 	}
 	else {
 		// Switching off
 		// Stop radio
 		setButtonText("Start");
-		if (!c_radio_stop()) {
-			printf("Failed to stop radio!");
-		}
+		RadioInterface::getInstance()->ri_radio_stop();
 	}
 }

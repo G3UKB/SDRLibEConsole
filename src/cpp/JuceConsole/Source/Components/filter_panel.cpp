@@ -30,6 +30,7 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "filter_panel.h"
 #include "../Common/extern.h"
+#include "../RadioInterface/radio_interface.h"
 
 //==============================================================================
 
@@ -42,23 +43,10 @@ FilterButton::FilterButton(String label) {
 FilterButton::~FilterButton() {}
 
 void FilterButton::clicked() {
-	int low;
-	int high;
-
+	
 	if (getToggleState()) {
 		int id = getComponentID().getIntValue();
-		switch (id) {
-			case 0: low = 100; high = 6100; break;
-			case 1: low = 100; high = 4100; break;
-			case 2: low = 300; high = 3000; break;
-			case 3: low = 300; high = 2700; break;
-			case 4: low = 300; high = 2400; break;
-			case 5: low = 300; high = 1300; break;
-			case 6: low = 500; high = 1000; break;
-			case 7: low = 600; high = 850; break;
-			case 8: low = 700; high = 800; break;
-		}
-		c_server_set_rx_filter_freq(0, low, high);
+		RadioInterface::getInstance()->ri_server_set_rx_filter_freq(0, id);
 	}
 }
 

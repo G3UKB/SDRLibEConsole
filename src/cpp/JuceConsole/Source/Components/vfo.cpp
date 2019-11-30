@@ -27,6 +27,7 @@ The authors can be reached by email at:
 
 #include "vfo.h"
 #include "../Common/extern.h"
+#include "../RadioInterface/radio_interface.h"
 
 //==============================================================================
 // Main VFO Component Panel
@@ -73,7 +74,7 @@ void VFOComponent::freq_plus() {
 		if (ifreq <= MAX_FREQ) {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
-			c_server_cc_out_set_rx_1_freq(current_freq);
+			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
 		}
 	}
 }
@@ -84,7 +85,7 @@ void VFOComponent::freq_minus() {
 		if (ifreq >= MIN_FREQ) {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
-			c_server_cc_out_set_rx_1_freq(current_freq);
+			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
 		}
 	}
 }
