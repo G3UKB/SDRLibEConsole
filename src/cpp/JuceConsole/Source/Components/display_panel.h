@@ -31,7 +31,33 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Defines
+// Panadapter and waterfall definitions
 
+// ----------------------------------
+// Divisions and margins
+// Panadapter grid divs
+#define	DIVS 6
+// Left, right, top, bottom margins(limits of grid and display)
+#define	L_MARGIN 35
+#define	R_MARGIN 15
+#define	T_MARGIN 10
+#define	B_MARGIN 100
+// Adjustments for label data to correctly align
+#define	X_H_LABEL_ADJ - 20
+#define	Y_H_LABEL_ADJ - 10
+#define	Y_V_LABEL_ADJ - 3
+// Fixed height for waterfall display
+#define	WF_HEIGHT 75
+
+// ----------------------------------
+// Panadapter db scale to scale the Y axis display
+#define	LOW_DB - 140
+#define	HIGH_DB - 20
+
+// ----------------------------------
+// Frequency
+// Panadapter span i.e sample rate
+#define	SPAN_FREQ 48000
 
 // ===========================================================
 /*

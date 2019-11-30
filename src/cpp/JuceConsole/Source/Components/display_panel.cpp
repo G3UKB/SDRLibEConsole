@@ -54,6 +54,7 @@ void DisplayPanel::paint(Graphics& g)
 {
 	// Our component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::black);
+	draw_grid(g);
 }
 
 void DisplayPanel::resized()
@@ -65,6 +66,20 @@ void DisplayPanel::resized()
 //==============================================================================
 // Private
 
-void draw_grid(Graphics& g) {
+void DisplayPanel::draw_grid(Graphics& g) {
+	// Draw grid with labels within our component bounds
+	int i;
 
+	g.setColour(Colours::green);
+	// One horizontal line per 20 db
+	int db_divs = (abs(HIGH_DB) - abs(LOW_DB))/20;
+	int db_pixels_per_div = (getWidth() / db_divs) - T_MARGIN - B_MARGIN;
+	for (i = 0; i <= db_divs; i++) {
+		g.drawLine(
+			(float)(L_MARGIN),
+			(float)(T_MARGIN + i * db_pixels_per_div),
+			(float(getWidth() - L_MARGIN - R_MARGIN)),
+			(float)(T_MARGIN + i * db_pixels_per_div)
+		);
+	}
 }

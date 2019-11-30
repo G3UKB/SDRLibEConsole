@@ -65,6 +65,7 @@ public:
 
 	//==============================================================================
 	// Method prototypes
+	// Call down to server
 	bool ri_server_start();
 	bool ri_server_terminate();
 	bool ri_radio_discover();
@@ -73,6 +74,10 @@ public:
 	void ri_server_set_rx_mode(int channel, int mode);
 	void ri_server_set_rx_filter_freq(int channel, int filter);
 	void ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz);
+
+	// Get methods
+	bool is_radio_running();
+	bool get_current_frequency();
 	
 private:
 	//==============================================================================
@@ -80,10 +85,10 @@ private:
 	bool server_running = false;
 	bool radio_discovered = false;
 	bool radio_running = false;
-	int current_rx_mode = -1;
+	int current_rx_mode = (int)MODES::CH_LSB;
 	int current_rx_filter_low = -2700;
 	int current_rx_filter_high = -300;
-	int current_freq = (int)MODES::CH_LSB;
+	int current_freq = 7100000;
 
 	//==============================================================================
 	// Method prototypes

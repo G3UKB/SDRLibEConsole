@@ -38,6 +38,8 @@ The authors can be reached by email at:
 //Macro for Singleton
 juce_ImplementSingleton(RadioInterface)
 
+//==============================================================================
+// Call down methods
 bool RadioInterface::ri_server_start() {
 
 	if (!server_running) {
@@ -121,6 +123,16 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 void RadioInterface::ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz) {
 	c_server_cc_out_set_rx_1_freq(freq_in_hz);
 	current_freq = freq_in_hz;
+}
+
+//==============================================================================
+// Get methods
+bool RadioInterface::is_radio_running() {
+	return radio_running;
+}
+
+bool RadioInterface::get_current_frequency() {
+	return current_freq;
 }
 
 //==============================================================================
