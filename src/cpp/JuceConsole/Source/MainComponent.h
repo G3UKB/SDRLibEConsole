@@ -32,6 +32,7 @@ The authors can be reached by email at:
 #include "Components/radio_buttons.h"
 #include "Components/mode_panel.h"
 #include "Components/filter_panel.h"
+#include "Components/display_panel.h"
 
 //==============================================================================
 /*
@@ -55,6 +56,7 @@ private:
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;
 	FilterPanel *filter_panel;
+	DisplayPanel *display_panel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

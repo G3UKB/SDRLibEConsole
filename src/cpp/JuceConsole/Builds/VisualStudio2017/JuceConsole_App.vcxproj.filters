@@ -2157,6 +2157,9 @@
     <ClCompile Include="..\..\Source\RadioInterface\radio_interface.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Components\display_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4200,6 +4203,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\RadioInterface\radio_interface.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Components\display_panel.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

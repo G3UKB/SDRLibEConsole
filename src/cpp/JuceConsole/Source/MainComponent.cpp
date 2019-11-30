@@ -42,7 +42,10 @@ MainComponent::MainComponent()
 	filter_panel = new FilterPanel(0);
 	addAndMakeVisible(filter_panel);
 
-	setSize(300, 375);
+	display_panel = new DisplayPanel(0);
+	addAndMakeVisible(display_panel);
+
+	setSize(600, 450);
 }
 
 MainComponent::~MainComponent()
@@ -62,7 +65,8 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // Resize children
 	start_button->setBounds(10, 10, 60, 40);
-	vfo_component->setBounds(10, 50, getWidth()-20, 80);
-	mode_panel->setBounds(10,140, getWidth()-20, 100);
-	filter_panel->setBounds(10, 250, getWidth() - 20, 100);
+	vfo_component->setBounds(10, 50, getWidth() - 20, 80);
+	mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
+	filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
+	display_panel->setBounds(10, 245, getWidth() - 20, 200);
 }
