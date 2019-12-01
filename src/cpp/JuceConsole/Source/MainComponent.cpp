@@ -68,5 +68,5 @@ void MainComponent::resized()
 	vfo_component->setBounds(10, 50, getWidth() - 20, 80);
 	mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
 	filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
-	display_panel->setBounds(10, 245, getWidth() - 20, 200);
+	display_panel->setBounds(10, 245, getWidth() - 20, getHeight() - 255);
 }

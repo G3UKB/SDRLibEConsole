@@ -38,7 +38,7 @@ The authors can be reached by email at:
 /*
     Top level component which contains all content
 */
-class MainComponent   : public Component
+class MainComponent : public Component
 {
 public:
     //==============================================================================

@@ -43,9 +43,10 @@ The authors can be reached by email at:
 #define	T_MARGIN 10
 #define	B_MARGIN 100
 // Adjustments for label data to correctly align
-#define	X_H_LABEL_ADJ - 20
+#define	X_H_LABEL_ADJ + 5
 #define	Y_H_LABEL_ADJ - 10
-#define	Y_V_LABEL_ADJ - 4
+#define	Y_V_LABEL_ADJ - 3
+
 // Fixed height for waterfall display
 #define	WF_HEIGHT 75
 
@@ -63,7 +64,7 @@ The authors can be reached by email at:
 /*
 	Multi-instance display component
 */
-class DisplayPanel : public Component
+class DisplayPanel : public Component, public Timer
 {
 public:
 	//==============================================================================
@@ -73,7 +74,7 @@ public:
 	//==============================================================================
 	void paint(Graphics&) override;
 	void resized() override;
-
+	void timerCallback();
 
 private:
 	//==============================================================================
@@ -88,4 +89,6 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DisplayPanel)
 };
+
+
 

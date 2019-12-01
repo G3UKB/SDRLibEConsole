@@ -42,6 +42,7 @@ DisplayPanel::DisplayPanel(int p_display_id)
 {
 	// Local vars
 	display_id = p_display_id;
+	startTimer(100);
 }
 
 DisplayPanel::~DisplayPanel()
@@ -60,6 +61,10 @@ void DisplayPanel::paint(Graphics& g)
 void DisplayPanel::resized()
 {
 	// This is called when the display is resized.
+}
+
+void DisplayPanel::timerCallback() {
+	repaint();
 }
 
 //==============================================================================
@@ -90,17 +95,18 @@ void DisplayPanel::draw_horiz(Graphics& g) {
 
 void DisplayPanel::draw_vert(Graphics& g) {
 	// DIVS number of vertical bars
-	int i, j;
+	int i;
+	float j;
 	String sfreq;
 	// Get current frequency
 	int freq = RadioInterface::getInstance()->get_current_frequency();
-	int start_freq = freq - (SPAN_FREQ / 2);
-	int freq_inc = SPAN_FREQ / 7;
+	float start_freq = (float)(freq - (SPAN_FREQ / 2));
+	float freq_inc = (float)SPAN_FREQ / (float)(DIVS + 1);
 
 	int pixels_per_div = ((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
 	for (i = 0, j = start_freq; i <= DIVS; i++, j += freq_inc) {
-		sfreq = String((float)(j / 1000000), 3);
-		g.drawText(sfreq, 30 + (i * pixels_per_div), getHeight() - B_MARGIN + 50, 40, 20, Justification(Justification::left));
+		sfreq = String(j / 1000000.0, 3);
+		g.drawText(sfreq, 17 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
 		g.drawLine(
 			(float)(L_MARGIN + (i * pixels_per_div)),
 			(float)(T_MARGIN),
