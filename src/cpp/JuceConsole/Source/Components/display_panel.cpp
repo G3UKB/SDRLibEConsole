@@ -150,5 +150,7 @@ void DisplayPanel::draw_pan(Graphics& g) {
 }
 
 float DisplayPanel::val_to_coord(float val) {
-	return 100.0f;
+	// y-coord = disp-height - ((abs(low-dBm) - abs(dBm)) * (disp-height/span_db))
+	int disp_height = getHeight() - T_MARGIN - B_MARGIN;
+	return (disp_height - ((abs(LOW_DB) - abs((int)val)) * (disp_height / (abs(LOW_DB) - abs(HIGH_DB)))));
 }
