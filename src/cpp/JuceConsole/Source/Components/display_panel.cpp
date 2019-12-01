@@ -128,7 +128,6 @@ void DisplayPanel::draw_pan(Graphics& g) {
 	float y;
 	if (RadioInterface::getInstance()->is_radio_running()) {
 		if (!display_set) {
-			printf("%d\n", getWidth());
 			c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
 			display_set = true;
 		}
