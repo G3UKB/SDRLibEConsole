@@ -43,6 +43,7 @@ DisplayPanel::DisplayPanel(int p_display_id)
 	// Local vars
 	display_id = p_display_id;
 	startTimer(100);
+	buf = (float*)malloc(MAX_SIZE_OF_DISPLAY * sizeof(float));
 }
 
 DisplayPanel::~DisplayPanel()
@@ -61,6 +62,9 @@ void DisplayPanel::paint(Graphics& g)
 void DisplayPanel::resized()
 {
 	// This is called when the display is resized.
+	if (RadioInterface::getInstance()->is_radio_running()) {
+		c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+	}
 }
 
 void DisplayPanel::timerCallback() {
@@ -75,6 +79,8 @@ void DisplayPanel::draw_grid(Graphics& g) {
 	g.setColour(Colours::green);
 	draw_horiz(g);
 	draw_vert(g);
+	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
+	draw_pan(g);
 }
 
 void DisplayPanel::draw_horiz(Graphics& g) {
@@ -105,7 +111,7 @@ void DisplayPanel::draw_vert(Graphics& g) {
 
 	int pixels_per_div = ((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
 	for (i = 0, j = start_freq; i <= DIVS; i++, j += freq_inc) {
-		sfreq = String(j / 1000000.0, 3);
+		sfreq = String(j / 1000000.0f, 3);
 		g.drawText(sfreq, 17 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
 		g.drawLine(
 			(float)(L_MARGIN + (i * pixels_per_div)),
@@ -114,4 +120,35 @@ void DisplayPanel::draw_vert(Graphics& g) {
 			(float)(getHeight() - B_MARGIN)
 		);
 	}
+}
+
+void DisplayPanel::draw_pan(Graphics& g) {
+	int x;
+	float y;
+	if (RadioInterface::getInstance()->is_radio_running()) {
+		if (c_server_get_display_data(display_id, (void*)buf) == 1) {
+			// We have some display data
+			// Data is a float for each pixel in the display width
+			// We need to convert the float value to a Y coordinate
+			path.clear();
+			// We start the path at the bottom left origin of the grid as we need
+			// a closed area in order to fill.
+			path.startNewSubPath((float)L_MARGIN, (float)(getHeight() - B_MARGIN));
+			for (x = 0; x < getWidth() - L_MARGIN - R_MARGIN; x++) {
+				y = val_to_coord(buf[x]);
+				path.lineTo(x + L_MARGIN, y);
+			}
+			// We end up at the right hand grid boundary
+			// We need to move to the bottom and then to the  bottom left 
+			// origin to complete the closed area to fill
+			path.lineTo(x + L_MARGIN, getHeight() - B_MARGIN);
+			path.closeSubPath();
+			//g.strokePath(path, PathStrokeType(1.0f));
+			g.fillPath(path);
+		}
+	}
+}
+
+float DisplayPanel::val_to_coord(float val) {
+	return 100.0f;
 }

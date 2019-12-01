@@ -59,6 +59,7 @@ The authors can be reached by email at:
 // Frequency
 // Panadapter span i.e sample rate
 #define	SPAN_FREQ 48000
+#define MAX_SIZE_OF_DISPLAY 1920
 
 // ===========================================================
 /*
@@ -80,12 +81,16 @@ private:
 	//==============================================================================
 	// State variables
 	int display_id;
+	float *buf;
+	Path path;
 
 	//==============================================================================
 	// Method prototypes
 	void draw_grid(Graphics& g);
 	void draw_horiz(Graphics& g);
 	void draw_vert(Graphics& g);
+	void draw_pan(Graphics& g);
+	float val_to_coord(float val);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DisplayPanel)
 };
