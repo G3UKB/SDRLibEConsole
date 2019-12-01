@@ -56,13 +56,14 @@ void DisplayPanel::paint(Graphics& g)
 {
 	// Our component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::black);
-	draw_grid(g);
+	draw_all(g);
 }
 
 void DisplayPanel::resized()
 {
 	// This is called when the display is resized.
 	if (RadioInterface::getInstance()->is_radio_running()) {
+		display_set = true;
 		c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
 	}
 }
@@ -74,7 +75,7 @@ void DisplayPanel::timerCallback() {
 //==============================================================================
 // Private
 
-void DisplayPanel::draw_grid(Graphics& g) {
+void DisplayPanel::draw_all(Graphics& g) {
 	// Draw grid with labels within our component bounds
 	g.setColour(Colours::green);
 	draw_horiz(g);
@@ -126,6 +127,11 @@ void DisplayPanel::draw_pan(Graphics& g) {
 	int x;
 	float y;
 	if (RadioInterface::getInstance()->is_radio_running()) {
+		if (!display_set) {
+			printf("%d\n", getWidth());
+			c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+			display_set = true;
+		}
 		if (c_server_get_display_data(display_id, (void*)buf) == 1) {
 			// We have some display data
 			// Data is a float for each pixel in the display width
@@ -150,6 +156,7 @@ void DisplayPanel::draw_pan(Graphics& g) {
 
 float DisplayPanel::val_to_coord(float val) {
 	// y-coord = disp-height - ((abs(low-dBm) - abs(dBm)) * (disp-height/span_db))
-	int disp_height = getHeight() - T_MARGIN - B_MARGIN;
-	return (disp_height - ((abs(LOW_DB) - abs((int)val)) * (disp_height / (abs(LOW_DB) - abs(HIGH_DB)))));
+	float disp_height = (float)(getHeight() - T_MARGIN - B_MARGIN);
+	float y = (disp_height - (((float)(abs(LOW_DB) - abs((int)val))) * (disp_height / (float)(abs(LOW_DB) - abs(HIGH_DB)))));
+	return y;
 }

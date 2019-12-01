@@ -83,10 +83,11 @@ private:
 	int display_id;
 	float *buf;
 	Path path;
+	bool display_set = false;
 
 	//==============================================================================
 	// Method prototypes
-	void draw_grid(Graphics& g);
+	void draw_all(Graphics& g);
 	void draw_horiz(Graphics& g);
 	void draw_vert(Graphics& g);
 	void draw_pan(Graphics& g);
