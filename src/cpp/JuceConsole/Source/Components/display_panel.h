@@ -45,7 +45,7 @@ The authors can be reached by email at:
 // Adjustments for label data to correctly align
 #define	X_H_LABEL_ADJ - 20
 #define	Y_H_LABEL_ADJ - 10
-#define	Y_V_LABEL_ADJ - 3
+#define	Y_V_LABEL_ADJ - 4
 // Fixed height for waterfall display
 #define	WF_HEIGHT 75
 
@@ -83,6 +83,8 @@ private:
 	//==============================================================================
 	// Method prototypes
 	void draw_grid(Graphics& g);
+	void draw_horiz(Graphics& g);
+	void draw_vert(Graphics& g);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DisplayPanel)
 };

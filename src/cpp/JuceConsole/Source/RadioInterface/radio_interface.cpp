@@ -131,7 +131,7 @@ bool RadioInterface::is_radio_running() {
 	return radio_running;
 }
 
-bool RadioInterface::get_current_frequency() {
+int RadioInterface::get_current_frequency() {
 	return current_freq;
 }
 

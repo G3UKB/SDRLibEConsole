@@ -77,7 +77,7 @@ public:
 
 	// Get methods
 	bool is_radio_running();
-	bool get_current_frequency();
+	int get_current_frequency();
 	
 private:
 	//==============================================================================
