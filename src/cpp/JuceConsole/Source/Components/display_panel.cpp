@@ -42,7 +42,7 @@ DisplayPanel::DisplayPanel(int p_display_id)
 {
 	// Local vars
 	display_id = p_display_id;
-	startTimer(100);
+	startTimer(200);
 	buf = (float*)malloc(MAX_SIZE_OF_DISPLAY * sizeof(float));
 }
 
@@ -143,7 +143,6 @@ void DisplayPanel::draw_pan(Graphics& g) {
 			// origin to complete the closed area to fill
 			path.lineTo(x + L_MARGIN, getHeight() - B_MARGIN);
 			path.closeSubPath();
-			//g.strokePath(path, PathStrokeType(1.0f));
 			g.fillPath(path);
 		}
 	}
