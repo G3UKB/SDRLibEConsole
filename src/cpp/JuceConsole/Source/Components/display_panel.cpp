@@ -183,7 +183,20 @@ void DisplayPanel::draw_filter(Graphics& g) {
 
 // Draw frequency at cursor
 void DisplayPanel::draw_cursor(Graphics& g) {
+	int freq = RadioInterface::getInstance()->get_current_frequency();
+	float pix_w, pix_centre, ppf;
+	// Display area width
+	pix_w = (float)(getWidth() - L_MARGIN - R_MARGIN);
+	// Display area centre relative to left edge
+	pix_centre = pix_w / 2.0f;
+	// Pixels per Hz in display area
+	ppf = pix_w / (float)SPAN_FREQ;
 
+	if (X != -1) {
+		float f = (X * ppf + freq);
+		String sf = String(f / 1000000.0f, 3);
+		printf("%s\n", sf);
+	}
 }
 
 //----------------------------------------------------------------------------
