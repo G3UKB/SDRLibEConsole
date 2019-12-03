@@ -80,6 +80,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 	g.setColour(Colours::green);
 	draw_horiz(g);
 	draw_vert(g);
+	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)75));
 	draw_filter(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
 	draw_pan(g);
@@ -132,7 +133,33 @@ void DisplayPanel::draw_vert(Graphics& g) {
 // Shade area for filter bandwidth
 void DisplayPanel::draw_filter(Graphics& g) {
 	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc();
-	printf("%d,%d\n", d.position, d.width);
+	int freq = RadioInterface::getInstance()->get_current_frequency();
+	int low = d.f_lower;
+	int high = d.f_upper;
+	int diff;
+	float ppf, x_left, x_right;
+
+	// Pixels per Hz
+	ppf = (float)((getWidth() - L_MARGIN - R_MARGIN) / (float)SPAN_FREQ);
+	// Overlay a semi-transparent rectangle over the filter area
+	// We have to map low and high frequency to an x position
+	if (low < freq) {
+		diff = freq - low;
+		x_left = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) - (diff * ppf));
+	} else {
+		diff = freq + low;
+		x_left = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) + (diff * ppf));
+	}
+	if (high < freq) {
+		diff = freq - high;
+		x_right = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) - (diff * ppf));
+	}
+	else {
+		diff = freq + low;
+		x_right = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) + (diff * ppf));
+	}
+	printf("%f,%f\n", x_left, x_right);
+	g.fillRect(x_left, (float)T_MARGIN, x_right - x_left, (float)getHeight() - (float)T_MARGIN - (float)B_MARGIN);
 }
 
 //----------------------------------------------------------------------------

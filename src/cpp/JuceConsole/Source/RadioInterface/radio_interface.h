@@ -44,16 +44,10 @@ enum class MODES {
 	CH_DRM
 };
 
-enum class FILT_POS {
-	CENTRE,
-	LOWER,
-	UPPER
-};
-
 // Descriptor of filter width and position
 struct filter_desc {
-	int width;
-	FILT_POS position;
+	int f_lower;
+	int f_upper;
 };
 
 //==============================================================================
@@ -102,8 +96,8 @@ private:
 	int current_rx_filter_low = -2700;
 	int current_rx_filter_high = -300;
 	int current_freq = 7100000;
-	FILT_POS pos = FILT_POS::LOWER;
-	int filter_width = 2400;
+	int filt_freq_lower = -1;
+	int filt_freq_upper = -1;
 
 	//==============================================================================
 	// Method prototypes

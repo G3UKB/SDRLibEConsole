@@ -145,8 +145,8 @@ int RadioInterface::get_current_rx_mode() {
 
 filter_desc RadioInterface::get_current_rx_filter_desc() {
 	filter_desc filter_desc;
-	filter_desc.width = filter_width;
-	filter_desc.position = pos;
+	filter_desc.f_lower = filt_freq_lower;
+	filter_desc.f_upper = filt_freq_upper;
 	return filter_desc;
 }
 
@@ -160,20 +160,20 @@ void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) 
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
 		low = -filter_high;
 		high = -filter_low;
-		pos = FILT_POS::LOWER;
-		filter_width = abs(low) + high;
+		filt_freq_lower = current_freq - abs(filter_high);
+		filt_freq_upper = current_freq - abs(filter_low);
 	}
 	else if ((MODES)mode == MODES::CH_USB || (MODES)mode == MODES::CH_CWU || (MODES)mode == MODES::CH_DIGU) {
 		low = filter_low;
 		high = filter_high;
-		pos = FILT_POS::UPPER;
-		filter_width = high - low;
+		filt_freq_lower = current_freq + filter_low;
+		filt_freq_upper = current_freq + filter_high;
 	}
 	else {
 		low = -filter_high;
 		high = filter_high;
-		pos = FILT_POS::CENTRE;
-		filter_width = abs(low) + high;
+		filt_freq_lower = current_freq - abs(filter_high);
+		filt_freq_upper = current_freq + filter_high;
 	}
 
 	// Set new filter and/or mode
