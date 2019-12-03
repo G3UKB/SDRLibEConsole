@@ -80,7 +80,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 	g.setColour(Colours::green);
 	draw_horiz(g);
 	draw_vert(g);
-	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)75));
+	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)70));
 	draw_filter(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
 	draw_pan(g);
@@ -136,30 +136,34 @@ void DisplayPanel::draw_filter(Graphics& g) {
 	int freq = RadioInterface::getInstance()->get_current_frequency();
 	int low = d.f_lower;
 	int high = d.f_upper;
+	//printf("%d,%d\n", low, high);
 	int diff;
-	float ppf, x_left, x_right;
-
-	// Pixels per Hz
-	ppf = (float)((getWidth() - L_MARGIN - R_MARGIN) / (float)SPAN_FREQ);
+	float pix_w, pix_centre, ppf, x_left, x_right;
+	// Display area width
+	pix_w = (float)(getWidth() - L_MARGIN - R_MARGIN);
+	// Display area centre relative to left edge
+	pix_centre = pix_w / 2.0f;
+	// Pixels per Hz in display area
+	ppf = pix_w / (float)SPAN_FREQ;
 	// Overlay a semi-transparent rectangle over the filter area
 	// We have to map low and high frequency to an x position
 	if (low < freq) {
 		diff = freq - low;
-		x_left = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) - (diff * ppf));
+		x_left = pix_centre - (float)(diff * ppf);
 	} else {
-		diff = freq + low;
-		x_left = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) + (diff * ppf));
+		diff = low - freq;
+		x_left = pix_centre + (float)(diff * ppf);
 	}
 	if (high < freq) {
 		diff = freq - high;
-		x_right = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) - (diff * ppf));
+		x_right = pix_centre - (float)(diff * ppf);
 	}
 	else {
-		diff = freq + low;
-		x_right = (float)(((getWidth() - L_MARGIN - R_MARGIN) / 2) + (diff * ppf));
+		diff = high - freq;
+		x_right = pix_centre + (float)(diff * ppf);
 	}
-	printf("%f,%f\n", x_left, x_right);
-	g.fillRect(x_left, (float)T_MARGIN, x_right - x_left, (float)getHeight() - (float)T_MARGIN - (float)B_MARGIN);
+	//printf("%f,%f\n", x_left, x_right);
+	g.fillRect(x_left + (float)L_MARGIN, (float)T_MARGIN, x_right - x_left, (float)getHeight() - (float)T_MARGIN - (float)B_MARGIN);
 }
 
 //----------------------------------------------------------------------------

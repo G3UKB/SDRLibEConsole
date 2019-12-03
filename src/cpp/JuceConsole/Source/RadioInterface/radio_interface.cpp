@@ -145,6 +145,9 @@ int RadioInterface::get_current_rx_mode() {
 
 filter_desc RadioInterface::get_current_rx_filter_desc() {
 	filter_desc filter_desc;
+	if (radio_running) {
+		set_mode_filter(current_rx_mode, current_rx_filter_low, current_rx_filter_high);
+	}
 	filter_desc.f_lower = filt_freq_lower;
 	filter_desc.f_upper = filt_freq_upper;
 	return filter_desc;
@@ -152,16 +155,15 @@ filter_desc RadioInterface::get_current_rx_filter_desc() {
 
 //==============================================================================
 // Private
-
+// ToDo: Split this to just set for the display struct.
 void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) {
 	int low;
 	int high;
-
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
 		low = -filter_high;
 		high = -filter_low;
-		filt_freq_lower = current_freq - abs(filter_high);
-		filt_freq_upper = current_freq - abs(filter_low);
+		filt_freq_lower = current_freq - filter_high;
+		filt_freq_upper = current_freq - filter_low;
 	}
 	else if ((MODES)mode == MODES::CH_USB || (MODES)mode == MODES::CH_CWU || (MODES)mode == MODES::CH_DIGU) {
 		low = filter_low;
@@ -172,7 +174,7 @@ void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) 
 	else {
 		low = -filter_high;
 		high = filter_high;
-		filt_freq_lower = current_freq - abs(filter_high);
+		filt_freq_lower = current_freq - filter_high;
 		filt_freq_upper = current_freq + filter_high;
 	}
 
