@@ -75,6 +75,7 @@ public:
 	//==============================================================================
 	void paint(Graphics&) override;
 	void resized() override;
+	void mouseMove(const MouseEvent & event) override;
 	void timerCallback();
 
 private:
@@ -84,6 +85,7 @@ private:
 	float *buf;
 	Path path;
 	bool display_set = false;
+	int X;
 
 	//==============================================================================
 	// Method prototypes
@@ -91,6 +93,7 @@ private:
 	void draw_horiz(Graphics& g);
 	void draw_vert(Graphics& g);
 	void draw_filter(Graphics& g);
+	void draw_cursor(Graphics& g);
 	void draw_pan(Graphics& g);
 	float val_to_coord(float val);
 

@@ -72,6 +72,20 @@ void DisplayPanel::timerCallback() {
 	repaint();
 }
 
+void DisplayPanel::mouseMove(const MouseEvent & event) {
+	// Remember pos if within display client area
+	Point<int> p = event.getPosition();
+	if (p.x > L_MARGIN && 
+		p.x < getWidth() - R_MARGIN &&
+		p.y > T_MARGIN &&
+		p.y < getHeight() - B_MARGIN) {
+		X = p.x - L_MARGIN;
+	}
+	else {
+		X = -1;
+	}
+}
+
 //==============================================================================
 // Private
 
@@ -82,6 +96,8 @@ void DisplayPanel::draw_all(Graphics& g) {
 	draw_vert(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)70));
 	draw_filter(g);
+	g.setColour(Colour((uint8)0, (uint8)255, (uint8)255, (uint8)100));
+	draw_cursor(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
 	draw_pan(g);
 }
@@ -136,7 +152,6 @@ void DisplayPanel::draw_filter(Graphics& g) {
 	int freq = RadioInterface::getInstance()->get_current_frequency();
 	int low = d.f_lower;
 	int high = d.f_upper;
-	//printf("%d,%d\n", low, high);
 	int diff;
 	float pix_w, pix_centre, ppf, x_left, x_right;
 	// Display area width
@@ -162,8 +177,13 @@ void DisplayPanel::draw_filter(Graphics& g) {
 		diff = high - freq;
 		x_right = pix_centre + (float)(diff * ppf);
 	}
-	//printf("%f,%f\n", x_left, x_right);
+	
 	g.fillRect(x_left + (float)L_MARGIN, (float)T_MARGIN, x_right - x_left, (float)getHeight() - (float)T_MARGIN - (float)B_MARGIN);
+}
+
+// Draw frequency at cursor
+void DisplayPanel::draw_cursor(Graphics& g) {
+
 }
 
 //----------------------------------------------------------------------------
