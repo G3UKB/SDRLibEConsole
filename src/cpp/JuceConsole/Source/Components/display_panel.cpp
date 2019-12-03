@@ -80,10 +80,13 @@ void DisplayPanel::draw_all(Graphics& g) {
 	g.setColour(Colours::green);
 	draw_horiz(g);
 	draw_vert(g);
+	draw_filter(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
 	draw_pan(g);
 }
 
+//----------------------------------------------------------------------------
+// Draw horizontal grid lines and dbM scale
 void DisplayPanel::draw_horiz(Graphics& g) {
 	// One horizontal line per 20 db
 	int i, j;
@@ -100,6 +103,8 @@ void DisplayPanel::draw_horiz(Graphics& g) {
 	}
 }
 
+//----------------------------------------------------------------------------
+// Draw vertical grid lines and frequency scale
 void DisplayPanel::draw_vert(Graphics& g) {
 	// DIVS number of vertical bars
 	int i;
@@ -108,11 +113,12 @@ void DisplayPanel::draw_vert(Graphics& g) {
 	// Get current frequency
 	int freq = RadioInterface::getInstance()->get_current_frequency();
 	float start_freq = (float)(freq - (SPAN_FREQ / 2));
-	float freq_inc = (float)SPAN_FREQ / (float)(DIVS + 1);
-
-	int pixels_per_div = ((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
+	float freq_inc = (float)SPAN_FREQ / (float)(DIVS);
+	float pixels_per_div = (float)((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
 	for (i = 0, j = start_freq; i <= DIVS; i++, j += freq_inc) {
-		sfreq = String(j / 1000000.0f, 3);
+		// Centre line in red
+		if (i == DIVS / 2) g.setColour(Colours::red); else g.setColour(Colours::green);
+		sfreq = String(j / 1000000.0f , 3);
 		g.drawText(sfreq, 17 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
 		g.drawLine(
 			(float)(L_MARGIN + (i * pixels_per_div)),
@@ -123,6 +129,14 @@ void DisplayPanel::draw_vert(Graphics& g) {
 	}
 }
 
+// Shade area for filter bandwidth
+void DisplayPanel::draw_filter(Graphics& g) {
+	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc();
+	printf("%d,%d\n", d.position, d.width);
+}
+
+//----------------------------------------------------------------------------
+// Draw panadapter
 void DisplayPanel::draw_pan(Graphics& g) {
 	int x;
 	float y;
@@ -135,24 +149,27 @@ void DisplayPanel::draw_pan(Graphics& g) {
 			// We have some display data
 			// Data is a float for each pixel in the display width
 			// We need to convert the float value to a Y coordinate
+			// Note that the data is reversed as in data[0] is last x position.
 			path.clear();
-			// We start the path at the bottom left origin of the grid as we need
+			// We start the path at the bottom right origin of the grid as we need
 			// a closed area in order to fill.
 			path.startNewSubPath((float)L_MARGIN, (float)(getHeight() - B_MARGIN));
 			for (x = 0; x < getWidth() - L_MARGIN - R_MARGIN; x++) {
-				y = val_to_coord(buf[x]);
-				path.lineTo(x + L_MARGIN, y);
+				y = val_to_coord(buf[getWidth() - L_MARGIN - R_MARGIN - x]);
+				path.lineTo((float)(x + L_MARGIN), y);
 			}
-			// We end up at the right hand grid boundary
-			// We need to move to the bottom and then to the  bottom left 
+			// We end up at the left hand grid boundary
+			// We need to move to the bottom and then to the  bottom right 
 			// origin to complete the closed area to fill
-			path.lineTo(x + L_MARGIN, getHeight() - B_MARGIN);
+			path.lineTo((float)(x + L_MARGIN), (float)(getHeight() - B_MARGIN));
 			path.closeSubPath();
 			g.fillPath(path);
 		}
 	}
 }
 
+//----------------------------------------------------------------------------
+// Convert a dBM value to a Y coordinate
 float DisplayPanel::val_to_coord(float val) {
 	// y-coord = disp-height - ((abs(low-dBm) - abs(dBm)) * (disp-height/span_db))
 	float disp_height = (float)(getHeight() - T_MARGIN - B_MARGIN);

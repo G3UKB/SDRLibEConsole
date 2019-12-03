@@ -94,8 +94,10 @@ bool RadioInterface::ri_radio_stop() {
 }
 
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
-	current_rx_mode = mode;
-	set_mode_filter(mode, current_rx_filter_low, current_rx_filter_high);
+	if (radio_running) {
+		current_rx_mode = mode;
+		set_mode_filter(mode, current_rx_filter_low, current_rx_filter_high);
+	}
 }
 
 void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
@@ -103,7 +105,8 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 	int low;
 	int high;
 
-	switch (filter) {
+	if (radio_running) {
+		switch (filter) {
 		case 0: low = 100; high = 6100; break;
 		case 1: low = 100; high = 4100; break;
 		case 2: low = 300; high = 3000; break;
@@ -114,10 +117,11 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 		case 7: low = 600; high = 850; break;
 		case 8: low = 700; high = 800; break;
 		default: low = 300; high = 2400;
+		}
+		current_rx_filter_low = low;
+		current_rx_filter_high = high;
+		set_mode_filter(current_rx_mode, low, high);
 	}
-	current_rx_filter_low = low;
-	current_rx_filter_high = high;
-	set_mode_filter(current_rx_mode, low, high);
 }
 
 void RadioInterface::ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz) {
@@ -135,6 +139,17 @@ int RadioInterface::get_current_frequency() {
 	return current_freq;
 }
 
+int RadioInterface::get_current_rx_mode() {
+	return current_rx_mode;
+}
+
+filter_desc RadioInterface::get_current_rx_filter_desc() {
+	filter_desc filter_desc;
+	filter_desc.width = filter_width;
+	filter_desc.position = pos;
+	return filter_desc;
+}
+
 //==============================================================================
 // Private
 
@@ -145,14 +160,20 @@ void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) 
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
 		low = -filter_high;
 		high = -filter_low;
+		pos = FILT_POS::LOWER;
+		filter_width = abs(low) + high;
 	}
 	else if ((MODES)mode == MODES::CH_USB || (MODES)mode == MODES::CH_CWU || (MODES)mode == MODES::CH_DIGU) {
 		low = filter_low;
 		high = filter_high;
+		pos = FILT_POS::UPPER;
+		filter_width = high - low;
 	}
 	else {
 		low = -filter_high;
 		high = filter_high;
+		pos = FILT_POS::CENTRE;
+		filter_width = abs(low) + high;
 	}
 
 	// Set new filter and/or mode

@@ -90,6 +90,7 @@ private:
 	void draw_all(Graphics& g);
 	void draw_horiz(Graphics& g);
 	void draw_vert(Graphics& g);
+	void draw_filter(Graphics& g);
 	void draw_pan(Graphics& g);
 	float val_to_coord(float val);
 
