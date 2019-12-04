@@ -2160,6 +2160,9 @@
     <ClCompile Include="..\..\Source\Components\display_panel.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Common\gui_cache.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4206,6 +4209,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\display_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Common\gui_cache.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

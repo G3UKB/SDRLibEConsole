@@ -51,12 +51,12 @@ public:
 
 private:
     //==============================================================================
-    // Test child
+    // Children
 	StartButton *start_button;
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;
 	FilterPanel *filter_panel;
 	DisplayPanel *display_panel;
-
+	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

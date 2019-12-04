@@ -95,7 +95,8 @@ public:
 	void freq_plus();
 	void freq_minus();
 	String convertFreq(int freq);
-	void VFOComponent::set_freq(String freq);
+	void set_freq(String freq);
+	void set_freq_from_hz(int freq);
 
 private:
 	//==============================================================================

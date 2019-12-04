@@ -26,6 +26,7 @@ The authors can be reached by email at:
 */
 
 #include "MainComponent.h"
+#include "Common/gui_cache.h"
 
 //==============================================================================
 MainComponent::MainComponent()
@@ -35,6 +36,7 @@ MainComponent::MainComponent()
 
 	vfo_component = new VFOComponent(0, 0);
 	addAndMakeVisible(vfo_component);
+	GUICache::getInstance()->setVFOInst(vfo_component);
 
 	mode_panel = new ModePanel(0);
 	addAndMakeVisible(mode_panel);
@@ -56,7 +58,6 @@ MainComponent::~MainComponent()
 void MainComponent::paint (Graphics& g)
 {
     // The component is opaque, so we must completely fill the background with a solid colour
-    //g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 	g.fillAll(Colours::darkgrey);
 }
 

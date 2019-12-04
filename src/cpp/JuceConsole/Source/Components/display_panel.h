@@ -76,6 +76,7 @@ public:
 	void paint(Graphics&) override;
 	void resized() override;
 	void mouseMove(const MouseEvent & event) override;
+	void mouseDown(const MouseEvent & event) override;
 	void timerCallback();
 
 private:
@@ -87,6 +88,7 @@ private:
 	bool display_set = false;
 	int X;
 	int Y;
+	bool clicked = false;
 
 	//==============================================================================
 	// Method prototypes

@@ -132,6 +132,7 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Common\gui_cache.cpp" />
     <ClCompile Include="..\..\Source\Components\display_panel.cpp" />
     <ClCompile Include="..\..\Source\Components\filter_panel.cpp" />
     <ClCompile Include="..\..\Source\Components\mode_panel.cpp" />
@@ -1859,6 +1860,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\extern.h" />
+    <ClInclude Include="..\..\Source\Common\gui_cache.h" />
     <ClInclude Include="..\..\Source\Components\display_panel.h" />
     <ClInclude Include="..\..\Source\Components\filter_panel.h" />
     <ClInclude Include="..\..\Source\Components\mode_panel.h" />

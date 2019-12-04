@@ -116,6 +116,10 @@ void VFOComponent::set_freq(String freq) {
 	d_1Hz->setText(String::charToString(wcstr[8]), dontSendNotification);
 }
 
+void VFOComponent::set_freq_from_hz(int freq) {
+	set_freq(convertFreq(freq));
+}
+
 //==============================================================================
 // GUI Events
 void VFOComponent::paint(Graphics& g)

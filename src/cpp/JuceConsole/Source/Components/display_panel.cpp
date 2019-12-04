@@ -28,6 +28,8 @@ The authors can be reached by email at:
 #include "display_panel.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../Components/vfo.h"
+#include "../Common/gui_cache.h"
 
 //==============================================================================
 // Display Panel
@@ -52,6 +54,8 @@ DisplayPanel::~DisplayPanel()
 
 //==============================================================================
 // GUI Events
+
+//----------------------------------------------------------------------------
 void DisplayPanel::paint(Graphics& g)
 {
 	// Our component is opaque, so we must completely fill the background with a solid colour
@@ -59,6 +63,7 @@ void DisplayPanel::paint(Graphics& g)
 	draw_all(g);
 }
 
+//----------------------------------------------------------------------------
 void DisplayPanel::resized()
 {
 	// This is called when the display is resized.
@@ -68,10 +73,12 @@ void DisplayPanel::resized()
 	}
 }
 
+//----------------------------------------------------------------------------
 void DisplayPanel::timerCallback() {
 	repaint();
 }
 
+//----------------------------------------------------------------------------
 void DisplayPanel::mouseMove(const MouseEvent & event) {
 	// Remember pos if within display client area
 	Point<int> p = event.getPosition();
@@ -85,6 +92,12 @@ void DisplayPanel::mouseMove(const MouseEvent & event) {
 		X = -1;
 	}
 	Y = p.y;
+}
+
+void DisplayPanel::mouseDown(const MouseEvent & event) {
+	if (event.mouseWasClicked()) {
+		clicked = true;
+	}
 }
 
 //==============================================================================
@@ -147,6 +160,7 @@ void DisplayPanel::draw_vert(Graphics& g) {
 	}
 }
 
+//----------------------------------------------------------------------------
 // Shade area for filter bandwidth
 void DisplayPanel::draw_filter(Graphics& g) {
 	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc();
@@ -182,10 +196,11 @@ void DisplayPanel::draw_filter(Graphics& g) {
 	g.fillRect(x_left + (float)L_MARGIN, (float)T_MARGIN, x_right - x_left, (float)getHeight() - (float)T_MARGIN - (float)B_MARGIN);
 }
 
-// Draw frequency at cursor
+//----------------------------------------------------------------------------
+// Draw frequency at mouse pointer
 void DisplayPanel::draw_cursor(Graphics& g) {
 	int freq = RadioInterface::getInstance()->get_current_frequency();
-	float pix_w, pix_centre, ppf;
+	float pix_w, pix_centre, ppf, f;
 	// Display area width
 	pix_w = (float)(getWidth() - L_MARGIN - R_MARGIN);
 	// Hz per pixel in display area
@@ -194,11 +209,19 @@ void DisplayPanel::draw_cursor(Graphics& g) {
 	String sf;
 	// Get frequency at mouse X location
 	if (X != -1) {
-		float f = (((float)X * ppf) + (float)(freq - (SPAN_FREQ/2)));
+		f = (((float)X * ppf) + (float)(freq - (SPAN_FREQ/2)));
 		sf = String(f / 1000000.0f, 3);
 	}
 	// Track frequency at mouse pointer
 	g.drawText(sf, X, Y, 50, 20, Justification::centredLeft);
+
+	// See if we need to change frequency
+	if (clicked) {
+		clicked = false;
+		RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq((int)f);
+		VFOComponent* vfo = (VFOComponent*)(GUICache::getInstance()->getVFOInst());
+		vfo->set_freq_from_hz((int)f);
+	}
 }
 
 //----------------------------------------------------------------------------
