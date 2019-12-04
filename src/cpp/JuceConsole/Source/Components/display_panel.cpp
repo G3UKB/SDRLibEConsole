@@ -84,6 +84,7 @@ void DisplayPanel::mouseMove(const MouseEvent & event) {
 	else {
 		X = -1;
 	}
+	Y = p.y;
 }
 
 //==============================================================================
@@ -96,7 +97,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 	draw_vert(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)70));
 	draw_filter(g);
-	g.setColour(Colour((uint8)0, (uint8)255, (uint8)255, (uint8)100));
+	g.setColour(Colour((uint8)255, (uint8)255, (uint8)0, (uint8)125));
 	draw_cursor(g);
 	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
 	draw_pan(g);
@@ -187,16 +188,17 @@ void DisplayPanel::draw_cursor(Graphics& g) {
 	float pix_w, pix_centre, ppf;
 	// Display area width
 	pix_w = (float)(getWidth() - L_MARGIN - R_MARGIN);
-	// Display area centre relative to left edge
-	pix_centre = pix_w / 2.0f;
-	// Pixels per Hz in display area
-	ppf = pix_w / (float)SPAN_FREQ;
-
+	// Hz per pixel in display area
+	ppf =  (float)SPAN_FREQ / pix_w;
+	// Current frequency at mouse position
+	String sf;
+	// Get frequency at mouse X location
 	if (X != -1) {
-		float f = (X * ppf + freq);
-		String sf = String(f / 1000000.0f, 3);
-		printf("%s\n", sf);
+		float f = (((float)X * ppf) + (float)(freq - (SPAN_FREQ/2)));
+		sf = String(f / 1000000.0f, 3);
 	}
+	// Track frequency at mouse pointer
+	g.drawText(sf, X, Y, 50, 20, Justification::centredLeft);
 }
 
 //----------------------------------------------------------------------------

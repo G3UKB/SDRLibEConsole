@@ -86,6 +86,7 @@ private:
 	Path path;
 	bool display_set = false;
 	int X;
+	int Y;
 
 	//==============================================================================
 	// Method prototypes
