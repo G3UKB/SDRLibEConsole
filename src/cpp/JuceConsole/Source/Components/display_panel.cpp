@@ -262,10 +262,31 @@ void DisplayPanel::draw_pan(Graphics& g) {
 }
 
 //----------------------------------------------------------------------------
+// Draw waterfall
+
+void DisplayPanel::draw_waterfall(Graphics& g) {
+
+}
+
+//----------------------------------------------------------------------------
 // Convert a dBM value to a Y coordinate
 float DisplayPanel::val_to_coord(float val) {
 	// y-coord = disp-height - ((abs(low-dBm) - abs(dBm)) * (disp-height/span_db))
 	float disp_height = (float)(getHeight() - T_MARGIN - B_MARGIN);
 	float y = (disp_height - (((float)(abs(LOW_DB) - abs((int)val))) * (disp_height / (float)(abs(LOW_DB) - abs(HIGH_DB)))));
 	return y;
+}
+
+//----------------------------------------------------------------------------
+// Convert a dBM value to a colour
+Colour DisplayPanel::db_to_colour(int dbM) {
+	if (dbM >= -160 && dbM < -135) return colour_1;
+	if (dbM >= -135 && dbM < -130) return colour_2;
+	if (dbM >= -130 && dbM < -125) return colour_3;
+	if (dbM >= -125 && dbM < -120) return colour_4;
+	if (dbM >= -120 && dbM < -115) return colour_5;
+	if (dbM >= -115 && dbM < -110) return colour_6;
+	if (dbM >= -110 && dbM < -100) return colour_7;
+	if (dbM >= -100 && dbM < 0) return colour_8;
+	return colour_1;
 }

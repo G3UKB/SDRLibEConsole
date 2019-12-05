@@ -98,14 +98,14 @@ private:
 	Colour pan_colour = Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125);
 
 	// Colours gradients for the waterfall display
-	Colour w_1 = Colour((uint8)0, (uint8)0, (uint8)51, (uint8)255);
-	Colour w_2 = Colour((uint8)25, (uint8)0, (uint8)76, (uint8)255);
-	Colour w_3 = Colour((uint8)51, (uint8)0, (uint8)102, (uint8)255);
-	Colour w_4 = Colour((uint8)76, (uint8)0, (uint8)127, (uint8)255);
-	Colour w_5 = Colour((uint8)127, (uint8)0, (uint8)102, (uint8)255);
-	Colour w_6 = Colour((uint8)178, (uint8)0, (uint8)127, (uint8)255);
-	Colour w_7 = Colour((uint8)220, (uint8)0, (uint8)25, (uint8)255);
-	Colour w_8 = Colour((uint8)255, (uint8)0, (uint8)0, (uint8)255);
+	Colour colour_1 = Colour((uint8)0, (uint8)0, (uint8)51, (uint8)255);
+	Colour colour_2 = Colour((uint8)25, (uint8)0, (uint8)76, (uint8)255);
+	Colour colour_3 = Colour((uint8)51, (uint8)0, (uint8)102, (uint8)255);
+	Colour colour_4 = Colour((uint8)76, (uint8)0, (uint8)127, (uint8)255);
+	Colour colour_5 = Colour((uint8)127, (uint8)0, (uint8)102, (uint8)255);
+	Colour colour_6 = Colour((uint8)178, (uint8)0, (uint8)127, (uint8)255);
+	Colour colour_7 = Colour((uint8)220, (uint8)0, (uint8)25, (uint8)255);
+	Colour colour_8 = Colour((uint8)255, (uint8)0, (uint8)0, (uint8)255);
 
 	//==============================================================================
 	// Method prototypes
@@ -116,10 +116,11 @@ private:
 	void draw_filter(Graphics& g);
 	void draw_cursor(Graphics& g);
 	void draw_pan(Graphics& g);
-	float val_to_coord(float val);
+	void draw_waterfall(Graphics& g);
 
-	// Waterfall colours
-	
+	// Helpers
+	float val_to_coord(float val);
+	Colour db_to_colour(int dbM);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DisplayPanel)
 };
