@@ -28,5 +28,30 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "properties.h"
+
 
 //==============================================================================
+// Display Panel
+//==============================================================================
+
+//==============================================================================
+// Public
+
+//==============================================================================
+// Constructor/Destructor
+Properties::Properties()
+{
+	// Local vars
+	fprop = new File("props.cfg");
+	PropertiesFile::Options options = PropertiesFile::Options::Options();
+	options.applicationName = "JuceConsole";
+	//options.filenameSuffix = "cfg";
+	//options.folderName = ".";
+	
+	properties_file = new PropertiesFile(*fprop, options);
+}
+
+Properties::~Properties()
+{
+}

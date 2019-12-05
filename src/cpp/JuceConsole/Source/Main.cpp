@@ -11,6 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "Common/extern.h"
+#include "Properties/properties.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -28,6 +29,9 @@ public:
     {
         // Application initialisation
 		
+		// Create properties file
+		Properties *p = new Properties();
+
         mainWindow.reset (new MainWindow (getApplicationName()));
 		// Make wisdom file if not already made
 		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");

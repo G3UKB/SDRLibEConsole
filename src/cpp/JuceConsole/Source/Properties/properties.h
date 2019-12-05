@@ -30,3 +30,29 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 
 //==============================================================================
+
+// ===========================================================
+/*
+	Multi-instance display component
+*/
+class Properties
+{
+public:
+	//==============================================================================
+	Properties();
+	~Properties();
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	PropertiesFile *properties_file;
+	File *fprop;
+	
+	//==============================================================================
+	// Method prototypes
+	
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Properties)
+};
