@@ -70,6 +70,8 @@ void DisplayPanel::resized()
 	if (RadioInterface::getInstance()->is_radio_running()) {
 		display_set = true;
 		c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+		if (image != (Image*)NULL) free(image);
+		image = new Image(Image::RGB, getWidth() - L_MARGIN - R_MARGIN, WF_HEIGHT, true);
 	}
 }
 
@@ -104,16 +106,34 @@ void DisplayPanel::mouseDown(const MouseEvent & event) {
 // Private
 
 void DisplayPanel::draw_all(Graphics& g) {
+
+	
 	// Draw grid with labels within our component bounds
 	g.setColour(grid_colour);
 	draw_horiz(g);
 	draw_vert(g);
-	g.setColour(filter_overlay_colour);
-	draw_filter(g);
-	g.setColour(freq_cursor_colour);
-	draw_cursor(g);
-	g.setColour(pan_colour);
-	draw_pan(g);
+
+	// Draw dynamic parts of the display
+	if (RadioInterface::getInstance()->is_radio_running()) {
+		// Set display width if not set
+		if (!display_set) {
+			c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+			display_set = true;
+		}
+		// Create a new image if first time in
+		if (image == (Image*)NULL)
+			image = new Image(Image::RGB, getWidth() - L_MARGIN - R_MARGIN, WF_HEIGHT, true);
+		// Do drawing
+		g.setColour(filter_overlay_colour);
+		draw_filter(g);
+		g.setColour(freq_cursor_colour);
+		draw_cursor(g);
+		if (c_server_get_display_data(display_id, (void*)buf) == 1) {
+			g.setColour(pan_colour);
+			draw_pan(g);
+			draw_waterfall(g);
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -233,39 +253,44 @@ void DisplayPanel::draw_cursor(Graphics& g) {
 void DisplayPanel::draw_pan(Graphics& g) {
 	int x;
 	float y;
-	if (RadioInterface::getInstance()->is_radio_running()) {
-		if (!display_set) {
-			c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
-			display_set = true;
-		}
-		if (c_server_get_display_data(display_id, (void*)buf) == 1) {
-			// We have some display data
-			// Data is a float for each pixel in the display width
-			// We need to convert the float value to a Y coordinate
-			// Note that the data is reversed as in data[0] is last x position.
-			path.clear();
-			// We start the path at the bottom right origin of the grid as we need
-			// a closed area in order to fill.
-			path.startNewSubPath((float)L_MARGIN, (float)(getHeight() - B_MARGIN));
-			for (x = 0; x < getWidth() - L_MARGIN - R_MARGIN; x++) {
-				y = val_to_coord(buf[getWidth() - L_MARGIN - R_MARGIN - x]);
-				path.lineTo((float)(x + L_MARGIN), y);
-			}
-			// We end up at the left hand grid boundary
-			// We need to move to the bottom and then to the  bottom right 
-			// origin to complete the closed area to fill
-			path.lineTo((float)(x + L_MARGIN), (float)(getHeight() - B_MARGIN));
-			path.closeSubPath();
-			g.fillPath(path);
-		}
+	
+	// Data is a float for each pixel in the display width
+	// We need to convert the float value to a Y coordinate
+	// Note that the data is reversed as in data[0] is last x position.
+	path.clear();
+	// We start the path at the bottom right origin of the grid as we need
+	// a closed area in order to fill.
+	path.startNewSubPath((float)L_MARGIN, (float)(getHeight() - B_MARGIN));
+	for (x = 0; x < getWidth() - L_MARGIN - R_MARGIN; x++) {
+		y = val_to_coord(buf[getWidth() - L_MARGIN - R_MARGIN - x]);
+		path.lineTo((float)(x + L_MARGIN), y);
 	}
+	// We end up at the left hand grid boundary
+	// We need to move to the bottom and then to the  bottom right 
+	// origin to complete the closed area to fill
+	path.lineTo((float)(x + L_MARGIN), (float)(getHeight() - B_MARGIN));
+	path.closeSubPath();
+	g.fillPath(path);
 }
 
 //----------------------------------------------------------------------------
 // Draw waterfall
 
 void DisplayPanel::draw_waterfall(Graphics& g) {
+	int x, disp_width;
 
+	// Data is a float for each pixel in the display width
+	// We need to convert the float value to a colour and set the 
+	// corresponding pixel in the image (X coordinate) then scroll
+	// the image and render underneath the panadapter.
+	// Note that the data is reversed as in data[0] is last x position.
+	disp_width = getWidth() - L_MARGIN - R_MARGIN;
+	for (x = 0; x < disp_width; x++) {
+		Colour c = db_to_colour(buf[getWidth() - L_MARGIN - R_MARGIN - x]);
+		image->setPixelAt(x, WF_HEIGHT - 1, c);
+	}
+	image->moveImageSection(0, 0, 0, 1, disp_width, WF_HEIGHT - 1);
+	g.drawImageAt(*image, L_MARGIN, getHeight() - WF_HEIGHT);
 }
 
 //----------------------------------------------------------------------------

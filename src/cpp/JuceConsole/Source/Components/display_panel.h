@@ -85,6 +85,7 @@ private:
 	int display_id;
 	float *buf;
 	Path path;
+	Image *image = (Image*)NULL;
 	bool display_set = false;
 	int X;
 	int Y;
