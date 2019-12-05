@@ -90,8 +90,26 @@ private:
 	int Y;
 	bool clicked = false;
 
+	// Colours for the various elements of the panadapter
+	Colour grid_colour = Colour((uint8)0, (uint8)255, (uint8)0, (uint8)80);
+	Colour legend_colour = Colour((uint8)255, (uint8)255, (uint8)0, (uint8)125);
+	Colour filter_overlay_colour = Colour((uint8)0, (uint8)255, (uint8)0, (uint8)70);
+	Colour freq_cursor_colour = Colour((uint8)255, (uint8)255, (uint8)0, (uint8)125);
+	Colour pan_colour = Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125);
+
+	// Colours gradients for the waterfall display
+	Colour w_1 = Colour((uint8)0, (uint8)0, (uint8)51, (uint8)255);
+	Colour w_2 = Colour((uint8)25, (uint8)0, (uint8)76, (uint8)255);
+	Colour w_3 = Colour((uint8)51, (uint8)0, (uint8)102, (uint8)255);
+	Colour w_4 = Colour((uint8)76, (uint8)0, (uint8)127, (uint8)255);
+	Colour w_5 = Colour((uint8)127, (uint8)0, (uint8)102, (uint8)255);
+	Colour w_6 = Colour((uint8)178, (uint8)0, (uint8)127, (uint8)255);
+	Colour w_7 = Colour((uint8)220, (uint8)0, (uint8)25, (uint8)255);
+	Colour w_8 = Colour((uint8)255, (uint8)0, (uint8)0, (uint8)255);
+
 	//==============================================================================
 	// Method prototypes
+	// Drawing
 	void draw_all(Graphics& g);
 	void draw_horiz(Graphics& g);
 	void draw_vert(Graphics& g);
@@ -99,6 +117,9 @@ private:
 	void draw_cursor(Graphics& g);
 	void draw_pan(Graphics& g);
 	float val_to_coord(float val);
+
+	// Waterfall colours
+	
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DisplayPanel)
 };

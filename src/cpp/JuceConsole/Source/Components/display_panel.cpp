@@ -105,14 +105,14 @@ void DisplayPanel::mouseDown(const MouseEvent & event) {
 
 void DisplayPanel::draw_all(Graphics& g) {
 	// Draw grid with labels within our component bounds
-	g.setColour(Colours::green);
+	g.setColour(grid_colour);
 	draw_horiz(g);
 	draw_vert(g);
-	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)70));
+	g.setColour(filter_overlay_colour);
 	draw_filter(g);
-	g.setColour(Colour((uint8)255, (uint8)255, (uint8)0, (uint8)125));
+	g.setColour(freq_cursor_colour);
 	draw_cursor(g);
-	g.setColour(Colour((uint8)0, (uint8)255, (uint8)0, (uint8)125));
+	g.setColour(pan_colour);
 	draw_pan(g);
 }
 
@@ -124,7 +124,9 @@ void DisplayPanel::draw_horiz(Graphics& g) {
 	int db_divs = (abs(LOW_DB) - abs(HIGH_DB)) / 20;
 	int db_pixels_per_div = ((getHeight() - T_MARGIN - B_MARGIN) / db_divs);
 	for (i = 0, j = HIGH_DB; i <= db_divs; i++, j -= 20) {
+		g.setColour(legend_colour);
 		g.drawText(String(j), 5, Y_V_LABEL_ADJ + (i * db_pixels_per_div), 40, 20, Justification(Justification::left));
+		g.setColour(grid_colour);
 		g.drawLine(
 			(float)(L_MARGIN),
 			(float)(T_MARGIN + (i * db_pixels_per_div)),
@@ -150,7 +152,9 @@ void DisplayPanel::draw_vert(Graphics& g) {
 		// Centre line in red
 		if (i == DIVS / 2) g.setColour(Colours::red); else g.setColour(Colours::green);
 		sfreq = String(j / 1000000.0f , 3);
+		g.setColour(legend_colour);
 		g.drawText(sfreq, 17 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
+		g.setColour(grid_colour);
 		g.drawLine(
 			(float)(L_MARGIN + (i * pixels_per_div)),
 			(float)(T_MARGIN),
