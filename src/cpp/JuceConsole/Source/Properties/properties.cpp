@@ -42,6 +42,7 @@ The authors can be reached by email at:
 // Constructor/Destructor
 Properties::Properties()
 {
+	printf("Here\n");
 	// Local vars
 	fprop = new File("props.cfg");
 	PropertiesFile::Options options = PropertiesFile::Options::Options();
@@ -50,6 +51,17 @@ Properties::Properties()
 	//options.folderName = ".";
 	
 	properties_file = new PropertiesFile(*fprop, options);
+	//std::unique_ptr<XmlElement> el = properties_file->createXml("RX-1");
+	//XmlElement* e = el.get();
+	//e->
+	//properties_file->setValue("a property", &el);
+	properties_file->setValue("Property 1", var(100));
+	properties_file->setValue("Property 2", var(100));
+	properties_file->save();
+	printf("Saved\n");
+	properties_file->reload();
+	StringPairArray & p = properties_file->getAllProperties();
+	printf("%s\n", p.getValue("Property 1", "Default"));
 }
 
 Properties::~Properties()
