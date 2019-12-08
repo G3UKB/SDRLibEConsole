@@ -12,6 +12,7 @@
 #include "MainComponent.h"
 #include "Common/extern.h"
 #include "Properties/properties.h"
+#include "Properties/prop_cache.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -23,14 +24,15 @@ public:
     const String getApplicationName() override       { return ProjectInfo::projectName; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return false; }
+	PropCache *p;
 
     //==============================================================================
     void initialise (const String& commandLine) override
     {
         // Application initialisation
 		
-		// Create properties file
-		Properties *p = new Properties("radio-1", "r1_config.cfg");
+		// Create properties cache
+		p = new PropCache();
 
         mainWindow.reset (new MainWindow (getApplicationName()));
 		// Make wisdom file if not already made
