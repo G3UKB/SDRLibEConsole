@@ -40,30 +40,53 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-Properties::Properties()
+Properties::Properties(String p_common_name, String p_filename)
 {
-	printf("Here\n");
 	// Local vars
-	fprop = new File("props.cfg");
+	common_name = p_common_name;
+	fprop = new File(p_filename);
 	PropertiesFile::Options options = PropertiesFile::Options::Options();
 	options.applicationName = "JuceConsole";
 	//options.filenameSuffix = "cfg";
 	//options.folderName = ".";
 	
 	properties_file = new PropertiesFile(*fprop, options);
-	//std::unique_ptr<XmlElement> el = properties_file->createXml("RX-1");
-	//XmlElement* e = el.get();
-	//e->
-	//properties_file->setValue("a property", &el);
-	properties_file->setValue("Property 1", var(100));
-	properties_file->setValue("Property 2", var(100));
-	properties_file->save();
-	printf("Saved\n");
-	properties_file->reload();
-	StringPairArray & p = properties_file->getAllProperties();
-	printf("%s\n", p.getValue("Property 1", "Default"));
 }
 
 Properties::~Properties()
 {
+}
+
+//==============================================================================
+// Get/Set
+void Properties::set_value(String key, var value) {
+	properties_file->setValue(key, value);
+}
+
+void Properties::save_if_needed() {
+	properties_file->saveIfNeeded();
+}
+
+void Properties::save() {
+	properties_file->save();
+}
+
+void Properties::load() {
+	properties_file->reload();
+}
+
+String Properties::getValue(StringRef keyName, const String &defaultReturnValue) {
+	return properties_file->getValue(keyName, defaultReturnValue);
+}
+
+int Properties::getIntValue(StringRef keyName, int defaultReturnValue) {
+	return properties_file->getIntValue(keyName, defaultReturnValue);
+}
+
+double Properties::getDoubleValue(StringRef keyName, double defaultReturnValue) {
+	return properties_file->getDoubleValue(keyName, defaultReturnValue);
+}
+
+bool Properties::getBoolValue(StringRef keyName, bool defaultReturnValue) {
+	return properties_file->getBoolValue(keyName, defaultReturnValue);
 }

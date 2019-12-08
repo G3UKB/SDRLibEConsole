@@ -30,7 +30,7 @@ public:
         // Application initialisation
 		
 		// Create properties file
-		Properties *p = new Properties();
+		Properties *p = new Properties("radio-1", "r1_config.cfg");
 
         mainWindow.reset (new MainWindow (getApplicationName()));
 		// Make wisdom file if not already made

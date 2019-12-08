@@ -1,7 +1,7 @@
 /*
-properties.h
+prop_cache.h
 
-Header for properties save/restore
+Header for the properties cache
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -28,39 +28,36 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "properties.h"
 
 //==============================================================================
-
-// ===========================================================
-/*
-	Multi-instance display component
-*/
-class Properties
+// Singleton instance for access methods to the gui components.
+class PropCache
 {
 public:
+	// JUCEy Singleton
 	//==============================================================================
-	Properties(String p_common_name, String p_filename);
-	~Properties();
+	PropCache();
+	~PropCache()
+	{
+		clearSingletonInstance();
+	}
+
+	// Macro to create boilerplate methods for singleton
+	juce_DeclareSingleton(PropCache, true);
 
 	//==============================================================================
+	// Method prototypes
+	Properties* get_prop_inst(String name);
 
 private:
 	//==============================================================================
 	// State variables
-	PropertiesFile *properties_file;
-	File *fprop;
-	String common_name;
-	
+	Properties* radio_1;
+	Properties* radio_2;
+	Properties* radio_3;
+
 	//==============================================================================
 	// Method prototypes
-	void set_value(String key, var value);
-	void save();
-	void save_if_needed();
-	void load();
-	String getValue(StringRef keyName, const String &defaultReturnValue = String());
-	int getIntValue(StringRef keyName, int defaultReturnValue = 0);
-	double getDoubleValue(StringRef keyName, double defaultReturnValue = 0.0);
-	bool getBoolValue(StringRef keyName, bool defaultReturnValue = false);
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Properties)
+	
 };
