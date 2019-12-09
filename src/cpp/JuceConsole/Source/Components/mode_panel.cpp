@@ -31,14 +31,16 @@ The authors can be reached by email at:
 #include "mode_panel.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../Properties/prop_cache.h"
 
 //==============================================================================
 
-ModeButton::ModeButton(int p_radio_id, String label) {
+ModeButton::ModeButton(int p_i_radio_id, String p_s_radio_id, String label) {
 
 	setButtonText(label);
 	setClickingTogglesState(true);
-	radio_id = p_radio_id;
+	i_radio_id = p_i_radio_id;
+	s_radio_id = p_s_radio_id;
 }
 
 ModeButton::~ModeButton() {}
@@ -47,7 +49,8 @@ void ModeButton::clicked() {
 
 	if (getToggleState()) {
 		int mode_id = getComponentID().getIntValue();
-		RadioInterface::getInstance()->ri_server_set_rx_mode(radio_id, mode_id);
+		RadioInterface::getInstance()->ri_server_set_rx_mode(i_radio_id, mode_id);
+		PropCache::getInstance()->get_prop_inst(s_radio_id)->set_value("MODE", var(mode_id));
 	}
 }
 
@@ -58,8 +61,29 @@ ModePanel::ModePanel(String p_radio_id) {
 	// Local vars
 	radio_id = p_radio_id;
 
+	if (radio_id == "radio-1") i_radio = 0;
+	else if (radio_id == "radio-2") i_radio = 1;
+	else i_radio = 2;
+
 	// Create all mode buttons
 	create_buttons();
+	int mode = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("MODE", var(0));
+	switch (mode) {
+	case 0: LSBButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 1: USBButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 2: DSBButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 3: CWLButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 4: CWUButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 5: FMButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 6: AMButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 7: DIGUButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 8: SPECButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 9: DIGLButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 10: SAMButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 11: DRMButton->setToggleState(true, NotificationType::dontSendNotification); break;
+	default: LSBButton->setToggleState(true, NotificationType::dontSendNotification);
+	}
+
 }
 
 ModePanel::~ModePanel() {}
@@ -73,68 +97,62 @@ void ModePanel::resized() {
 // Private
 void ModePanel::create_buttons() {
 
-	int radio;
-
-	if (radio_id == "radio-1") radio = 0;
-	else if (radio_id == "radio-2") radio = 1;
-	else radio = 2;
-
-	LSBButton = new ModeButton(radio, "LSB");
+	LSBButton = new ModeButton(i_radio, radio_id, "LSB");
 	LSBButton->setComponentID("0");
 	LSBButton->setRadioGroupId(1);
 	addAndMakeVisible(LSBButton);
 
-	USBButton = new ModeButton(radio, "USB");
+	USBButton = new ModeButton(i_radio, radio_id, "USB");
 	USBButton->setComponentID("1");
 	USBButton->setRadioGroupId(1);
 	addAndMakeVisible(USBButton);
 
-	DSBButton = new ModeButton(radio, "DSB");
+	DSBButton = new ModeButton(i_radio, radio_id, "DSB");
 	DSBButton->setComponentID("2");
 	DSBButton->setRadioGroupId(1);
 	addAndMakeVisible(DSBButton);
 
-	CWLButton = new ModeButton(radio, "CW-L");
+	CWLButton = new ModeButton(i_radio, radio_id, "CW-L");
 	CWLButton->setComponentID("3");
 	CWLButton->setRadioGroupId(1);
 	addAndMakeVisible(CWLButton);
 
-	CWUButton = new ModeButton(radio, "CW-U");
+	CWUButton = new ModeButton(i_radio, radio_id, "CW-U");
 	CWUButton->setComponentID("4");
 	CWUButton->setRadioGroupId(1);
 	addAndMakeVisible(CWUButton);
 
-	FMButton = new ModeButton(radio, "FM");
+	FMButton = new ModeButton(i_radio, radio_id, "FM");
 	FMButton->setComponentID("5");
 	FMButton->setRadioGroupId(1);
 	addAndMakeVisible(FMButton);
 
-	AMButton = new ModeButton(radio, "AM");
+	AMButton = new ModeButton(i_radio, radio_id, "AM");
 	AMButton->setComponentID("6");
 	AMButton->setRadioGroupId(1);
 	addAndMakeVisible(AMButton);
 
-	DIGUButton = new ModeButton(radio, "DIG-U");
+	DIGUButton = new ModeButton(i_radio, radio_id, "DIG-U");
 	DIGUButton->setComponentID("7");
 	DIGUButton->setRadioGroupId(1);
 	addAndMakeVisible(DIGUButton);
 
-	SPECButton = new ModeButton(radio, "SPEC");
+	SPECButton = new ModeButton(i_radio, radio_id, "SPEC");
 	SPECButton->setComponentID("8");
 	SPECButton->setRadioGroupId(1);
 	addAndMakeVisible(SPECButton);
 
-	DIGLButton = new ModeButton(radio, "DIG-L");
+	DIGLButton = new ModeButton(i_radio, radio_id, "DIG-L");
 	DIGLButton->setComponentID("9");
 	DIGLButton->setRadioGroupId(1);
 	addAndMakeVisible(DIGLButton);
 
-	SAMButton = new ModeButton(radio, "DIG-L");
+	SAMButton = new ModeButton(i_radio, radio_id, "DIG-L");
 	SAMButton->setComponentID("10");
 	SAMButton->setRadioGroupId(1);
 	addAndMakeVisible(SAMButton);
 
-	DRMButton = new ModeButton(radio, "DRM");
+	DRMButton = new ModeButton(i_radio, radio_id, "DRM");
 	DRMButton->setComponentID("11");
 	DRMButton->setRadioGroupId(1);
 	addAndMakeVisible(DRMButton);

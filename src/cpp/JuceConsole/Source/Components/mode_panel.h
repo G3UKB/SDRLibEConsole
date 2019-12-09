@@ -38,7 +38,7 @@ class ModeButton : public TextButton
 {
 public:
 	//==============================================================================
-	ModeButton(int p_radio_id, String label);
+	ModeButton(int p_i_radio_id, String p_s_radio_id, String label);
 	~ModeButton();
 
 	//==============================================================================
@@ -47,7 +47,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	int radio_id;
+	int i_radio_id;
+	String s_radio_id;
 
 	//==============================================================================
 	// Method prototypes
@@ -74,6 +75,7 @@ private:
 	// State variables
 	// Which radio
 	String radio_id;
+	int i_radio;
 
 	// Button vars
 	ModeButton *LSBButton;
