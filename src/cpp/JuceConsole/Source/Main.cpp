@@ -24,16 +24,16 @@ public:
     const String getApplicationName() override       { return ProjectInfo::projectName; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return false; }
-	PropCache *p;
 
     //==============================================================================
     void initialise (const String& commandLine) override
     {
         // Application initialisation
 		
-		// Create properties cache
-		p = new PropCache();
+		// Restore all properties
+		PropCache::getInstance()->restore_all();
 
+		// Create main window
         mainWindow.reset (new MainWindow (getApplicationName()));
 		// Make wisdom file if not already made
 		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");

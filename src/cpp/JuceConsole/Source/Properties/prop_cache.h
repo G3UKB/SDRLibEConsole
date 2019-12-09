@@ -38,10 +38,7 @@ public:
 	// JUCEy Singleton
 	//==============================================================================
 	PropCache();
-	~PropCache()
-	{
-		clearSingletonInstance();
-	}
+	~PropCache();
 
 	// Macro to create boilerplate methods for singleton
 	juce_DeclareSingleton(PropCache, true);
@@ -49,6 +46,8 @@ public:
 	//==============================================================================
 	// Method prototypes
 	Properties* get_prop_inst(String name);
+	void restore_all();
+	void save_all();
 
 private:
 	//==============================================================================

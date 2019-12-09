@@ -43,6 +43,15 @@ public:
 	~Properties();
 
 	//==============================================================================
+	// Method prototypes
+	void set_value(String key, var value);
+	void save();
+	void save_if_needed();
+	void load();
+	String getValue(StringRef keyName, const String &defaultReturnValue = String());
+	int getIntValue(StringRef keyName, int defaultReturnValue = 0);
+	double getDoubleValue(StringRef keyName, double defaultReturnValue = 0.0);
+	bool getBoolValue(StringRef keyName, bool defaultReturnValue = false);
 
 private:
 	//==============================================================================
@@ -53,14 +62,6 @@ private:
 	
 	//==============================================================================
 	// Method prototypes
-	void set_value(String key, var value);
-	void save();
-	void save_if_needed();
-	void load();
-	String getValue(StringRef keyName, const String &defaultReturnValue = String());
-	int getIntValue(StringRef keyName, int defaultReturnValue = 0);
-	double getDoubleValue(StringRef keyName, double defaultReturnValue = 0.0);
-	bool getBoolValue(StringRef keyName, bool defaultReturnValue = false);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Properties)
 };

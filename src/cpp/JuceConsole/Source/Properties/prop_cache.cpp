@@ -35,13 +35,36 @@ The authors can be reached by email at:
 // Public
 PropCache::PropCache() {
 	radio_1 = new Properties("radio-1", "r1_config.cfg");
+	radio_2 = new Properties("radio-2", "r2_config.cfg");
+	radio_3 = new Properties("radio-3", "r3_config.cfg");
+}
+
+PropCache::~PropCache() {
+	save_all();
+	clearSingletonInstance();
 }
 
 //Macro for Singleton
 juce_ImplementSingleton(PropCache)
 
 //==============================================================================
+// Save/Restore methods
+
+void PropCache::restore_all() {
+	radio_1->load();
+	radio_2->load();
+	radio_3->load();
+}
+
+void PropCache::save_all() {
+	radio_1->save();
+	radio_2->save();
+	radio_3->save();
+}
+
+//==============================================================================
 // Get/Set methods
+// Access via the Properties instance
 
 Properties* PropCache::get_prop_inst(String name) {
 	if (name == "radio-1") return radio_1;
