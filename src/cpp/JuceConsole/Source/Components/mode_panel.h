@@ -38,7 +38,7 @@ class ModeButton : public TextButton
 {
 public:
 	//==============================================================================
-	ModeButton(String label);
+	ModeButton(int p_radio_id, String label);
 	~ModeButton();
 
 	//==============================================================================
@@ -47,7 +47,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	
+	int radio_id;
 
 	//==============================================================================
 	// Method prototypes
@@ -62,7 +62,7 @@ class ModePanel : public Component
 {
 public:
 	//==============================================================================
-	ModePanel(int p_mode_id);
+	ModePanel(String p_radio_id);
 	~ModePanel();
 
 	void resized() override;
@@ -73,7 +73,7 @@ private:
 	//==============================================================================
 	// State variables
 	// Which radio
-	int mode_id;
+	String radio_id;
 
 	// Button vars
 	ModeButton *LSBButton;

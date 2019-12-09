@@ -36,11 +36,11 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id)
+VFOComponent::VFOComponent(String p_radio_id, int p_vfo_type)
 {
 	// Local vars
 	vfo_type = p_vfo_type;
-	vfo_id = p_vfo_id;
+	radio_id = p_radio_id;
 
 	// WE make content here but arrange it in resized
 	create_digits();
@@ -57,7 +57,7 @@ VFOComponent::VFOComponent(int p_vfo_type, int p_vfo_id)
 	freq_inc_map.insert(std::pair<String, int>("1Hz", 1));
 
 	// Update frequency
-	int freq = PropCache::getInstance()->get_prop_inst("radio-1")->getIntValue("RADIO-1-FREQ", 7100000);
+	int freq = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("FREQ", 7100000);
 	set_freq(convertFreq(freq));
 }
 
@@ -80,7 +80,7 @@ void VFOComponent::freq_plus() {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
 			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
-			PropCache::getInstance()->get_prop_inst("radio-1")->set_value("RADIO-1-FREQ", var(current_freq));
+			PropCache::getInstance()->get_prop_inst(radio_id)->set_value("FREQ", var(current_freq));
 		}
 	}
 }
@@ -92,7 +92,7 @@ void VFOComponent::freq_minus() {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
 			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
-			PropCache::getInstance()->get_prop_inst("radio-1")->set_value("RADIO-1-FREQ", var(current_freq));
+			PropCache::getInstance()->get_prop_inst(radio_id)->set_value("FREQ", var(current_freq));
 		}
 	}
 }

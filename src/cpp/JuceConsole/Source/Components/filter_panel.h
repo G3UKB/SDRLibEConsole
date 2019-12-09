@@ -38,7 +38,7 @@ class FilterButton : public TextButton
 {
 public:
 	//==============================================================================
-	FilterButton(String label);
+	FilterButton(int p_radio_id, String label);
 	~FilterButton();
 
 	//==============================================================================
@@ -47,7 +47,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	
+	int radio_id;
 
 	//==============================================================================
 	// Method prototypes
@@ -62,7 +62,7 @@ class FilterPanel : public Component
 {
 public:
 	//==============================================================================
-	FilterPanel(int p_mode_id);
+	FilterPanel(String p_radio_id);
 	~FilterPanel();
 
 	void resized() override;
@@ -73,7 +73,7 @@ private:
 	//==============================================================================
 	// State variables
 	// Which radio
-	int filter_id;
+	String radio_id;
 
 	// Button vars
 	FilterButton *Filt6K0Button;

@@ -40,12 +40,16 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-DisplayPanel::DisplayPanel(int p_display_id)
+DisplayPanel::DisplayPanel(String p_radio_id)
 {
 	// Local vars
-	display_id = p_display_id;
+	radio_id = p_radio_id;
 	startTimer(200);
 	buf = (float*)malloc(MAX_SIZE_OF_DISPLAY * sizeof(float));
+
+	if (radio_id == "radio-1") i_radio = 0;
+	else if (radio_id == "radio-2") i_radio = 1;
+	else i_radio = 2;
 }
 
 DisplayPanel::~DisplayPanel()
@@ -69,7 +73,7 @@ void DisplayPanel::resized()
 	// This is called when the display is resized.
 	if (RadioInterface::getInstance()->is_radio_running()) {
 		display_set = true;
-		c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+		c_server_set_display(i_radio, getWidth() - L_MARGIN - R_MARGIN);
 		if (image != (Image*)NULL) free(image);
 		image = new Image(Image::RGB, getWidth() - L_MARGIN - R_MARGIN, WF_HEIGHT, true);
 	}
@@ -117,7 +121,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 	if (RadioInterface::getInstance()->is_radio_running()) {
 		// Set display width if not set
 		if (!display_set) {
-			c_server_set_display(display_id, getWidth() - L_MARGIN - R_MARGIN);
+			c_server_set_display(i_radio, getWidth() - L_MARGIN - R_MARGIN);
 			display_set = true;
 		}
 		// Create a new image if first time in
@@ -128,7 +132,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 		draw_filter(g);
 		g.setColour(freq_cursor_colour);
 		draw_cursor(g);
-		if (c_server_get_display_data(display_id, (void*)buf) == 1) {
+		if (c_server_get_display_data(i_radio, (void*)buf) == 1) {
 			g.setColour(pan_colour);
 			draw_pan(g);
 			draw_waterfall(g);

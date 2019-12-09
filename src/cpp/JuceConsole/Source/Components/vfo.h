@@ -83,7 +83,7 @@ class VFOComponent : public Component
 {
 public:
 	//==============================================================================
-	VFOComponent(int p_vfo_type, int p_vfo_id);
+	VFOComponent(String p_vfo_id, int p_vfo_type);
 	~VFOComponent();
 
 	//==============================================================================
@@ -102,7 +102,7 @@ private:
 	//==============================================================================
 	// State variables
 	int vfo_type = RX;			// RX|TX
-	int vfo_id = 0;				// Numerical id of VFO instance
+	String radio_id = "";		// Radio id of VFO instance
 	int freq_inc = -1;			// Last frequence increment in MHz
 	int current_freq = 7100000;	// Current frequency in MHz
 

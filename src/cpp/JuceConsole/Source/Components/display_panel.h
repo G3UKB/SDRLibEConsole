@@ -69,7 +69,7 @@ class DisplayPanel : public Component, public Timer
 {
 public:
 	//==============================================================================
-	DisplayPanel(int p_display_id);
+	DisplayPanel(String p_radio_id);
 	~DisplayPanel();
 
 	//==============================================================================
@@ -82,7 +82,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	int display_id;
+	String radio_id;
+	int i_radio;
 	float *buf;
 	Path path;
 	Image *image = (Image*)NULL;

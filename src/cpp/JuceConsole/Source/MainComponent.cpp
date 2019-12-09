@@ -34,17 +34,17 @@ MainComponent::MainComponent()
 	start_button = new StartButton();
 	addAndMakeVisible(start_button);
 
-	vfo_component = new VFOComponent(0, 0);
+	vfo_component = new VFOComponent("radio-1", RX);
 	addAndMakeVisible(vfo_component);
 	GUICache::getInstance()->setVFOInst(vfo_component);
 
-	mode_panel = new ModePanel(0);
+	mode_panel = new ModePanel("radio-1");
 	addAndMakeVisible(mode_panel);
 	
-	filter_panel = new FilterPanel(0);
+	filter_panel = new FilterPanel("radio-1");
 	addAndMakeVisible(filter_panel);
 
-	display_panel = new DisplayPanel(0);
+	display_panel = new DisplayPanel("radio-1");
 	addAndMakeVisible(display_panel);
 
 	setSize(600, 450);

@@ -29,6 +29,9 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
+#define RX 0
+#define TX 1
+
 enum class MODES {
 	CH_LSB,
 	CH_USB,
