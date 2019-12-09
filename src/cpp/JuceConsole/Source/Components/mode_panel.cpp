@@ -83,6 +83,7 @@ ModePanel::ModePanel(String p_radio_id) {
 	case 11: DRMButton->setToggleState(true, NotificationType::dontSendNotification); break;
 	default: LSBButton->setToggleState(true, NotificationType::dontSendNotification);
 	}
+	RadioInterface::getInstance()->ri_server_set_rx_mode(i_radio, mode);
 
 }
 

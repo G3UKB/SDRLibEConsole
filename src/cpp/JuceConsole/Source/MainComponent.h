@@ -45,6 +45,8 @@ public:
     MainComponent();
     ~MainComponent();
 
+	void start_ui();
+
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;

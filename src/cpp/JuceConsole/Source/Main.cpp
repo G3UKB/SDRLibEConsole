@@ -32,9 +32,10 @@ public:
 		
 		// Restore all properties
 		PropCache::getInstance()->restore_all();
-
+		
 		// Create main window
         mainWindow.reset (new MainWindow (getApplicationName()));
+	
 		// Make wisdom file if not already made
 		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");
 

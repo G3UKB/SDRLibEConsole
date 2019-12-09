@@ -59,6 +59,8 @@ VFOComponent::VFOComponent(String p_radio_id, int p_vfo_type)
 	// Update frequency
 	int freq = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("FREQ", 7100000);
 	set_freq(convertFreq(freq));
+	current_freq = freq;
+	RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
 }
 
 VFOComponent::~VFOComponent()
