@@ -60,7 +60,7 @@ VFOComponent::VFOComponent(String p_radio_id, int p_vfo_type)
 	int freq = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("FREQ", 7100000);
 	set_freq(convertFreq(freq));
 	current_freq = freq;
-	RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
+	set_radio_freq();
 }
 
 VFOComponent::~VFOComponent()
@@ -81,7 +81,7 @@ void VFOComponent::freq_plus() {
 		if (ifreq <= MAX_FREQ) {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
-			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
+			set_radio_freq();
 			PropCache::getInstance()->get_prop_inst(radio_id)->set_value("FREQ", var(current_freq));
 		}
 	}
@@ -93,7 +93,7 @@ void VFOComponent::freq_minus() {
 		if (ifreq >= MIN_FREQ) {
 			current_freq = ifreq;
 			set_freq(convertFreq(current_freq));
-			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
+			set_radio_freq();
 			PropCache::getInstance()->get_prop_inst(radio_id)->set_value("FREQ", var(current_freq));
 		}
 	}
@@ -206,6 +206,15 @@ void VFOComponent::layout_digits_in_grid() {
 	//grid.rowGap = Grid::Px::Px(10.0f);
 	//grid.columnGap = Grid::Px::Px(10.0f);
 	grid.performLayout(getLocalBounds());
+}
+
+void VFOComponent::set_radio_freq() {
+	if (radio_id == "radio-1")
+		RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
+	else if (radio_id == "radio-2")
+		RadioInterface::getInstance()->ri_server_cc_out_set_rx_2_freq(current_freq);
+	else if (radio_id == "radio-3")
+		RadioInterface::getInstance()->ri_server_cc_out_set_rx_3_freq(current_freq);
 }
 
 //==============================================================================

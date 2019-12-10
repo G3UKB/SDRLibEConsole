@@ -83,6 +83,8 @@ public:
 	void ri_server_set_rx_mode(int channel, int mode);
 	void ri_server_set_rx_filter_freq(int channel, int filter);
 	void ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz);
+	void ri_server_cc_out_set_rx_2_freq(unsigned int freq_in_hz);
+	void ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz);
 
 	// Get methods
 	bool is_radio_running();

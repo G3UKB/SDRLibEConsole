@@ -124,6 +124,7 @@ private:
 	// Method prototypes
 	void create_digits();
 	void layout_digits_in_grid();
+	void set_radio_freq();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VFOComponent)
 };
