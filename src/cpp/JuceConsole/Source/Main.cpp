@@ -11,6 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "Common/extern.h"
+#include "Common/gui_cache.h"
 #include "Properties/properties.h"
 #include "Properties/prop_cache.h"
 
@@ -32,7 +33,7 @@ public:
 		
 		// Restore all properties
 		PropCache::getInstance()->restore_all();
-		
+
 		// Create main window
         mainWindow.reset (new MainWindow (getApplicationName()));
 	
@@ -44,6 +45,9 @@ public:
 			printf("Failed to initialise server!");
 			return;
 		}
+
+		MainComponent* c = (MainComponent*)GUICache::getInstance()->getMainInst();
+		c->start_ui();
     }
 
     void shutdown() override

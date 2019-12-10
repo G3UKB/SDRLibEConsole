@@ -50,12 +50,15 @@ public:
 	void setVFOInst(Component* vfo);
 	Component* getVFOInst();
 
-	Component* vfo;
+	void setMainInst(Component* main);
+	Component* getMainInst();
+	
 
 private:
 	//==============================================================================
 	// State variables
-	
+	Component* vfo;
+	Component* main;
 
 	//==============================================================================
 	// Method prototypes

@@ -31,6 +31,9 @@ The authors can be reached by email at:
 //==============================================================================
 MainComponent::MainComponent()
 {
+	GUICache::getInstance()->setMainInst(this);
+
+	/*
 	start_button = new StartButton();
 	addAndMakeVisible(start_button);
 
@@ -46,8 +49,9 @@ MainComponent::MainComponent()
 
 	display_panel = new DisplayPanel("radio-1");
 	addAndMakeVisible(display_panel);
-	
-	setSize(600, 450);
+	*/
+
+	//setSize(600, 450);
 }
 
 MainComponent::~MainComponent()
