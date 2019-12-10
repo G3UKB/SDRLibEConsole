@@ -44,35 +44,7 @@ StartButton::~StartButton() {}
 
 void StartButton::clicked() {
 
-	int direction;
-	char* host_api;
-	char* dev;
-
-	//Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
-
 	if (getToggleState()) {
-		// Switching everything on
-		setButtonText("Stop");
-
-		if (!audio_set) {
-			audio_set = true;
-			// Set up a default route for RX1 to Speaker output
-			DeviceEnumList* l = c_server_enum_audio_outputs();
-			for (int i = 0; i < l->entries; i++) {
-				if (String(l->devices[i].name).startsWith("Speakers")) {
-					if (String(l->devices[i].host_api) == "MME") {
-						direction = l->devices[i].direction;
-						host_api = l->devices[i].host_api;
-						dev = l->devices[i].name;
-						break;
-					}
-				}
-			}
-			c_server_set_audio_route(direction, LOCAL, 1, host_api, dev, BOTH);
-		}
-
-		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
-		if (!RadioInterface::getInstance()->ri_server_start()) return;
 		if (!RadioInterface::getInstance()->ri_radio_start(0)) return;
 	}
 	else {

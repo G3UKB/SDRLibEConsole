@@ -14,6 +14,7 @@
 #include "Common/gui_cache.h"
 #include "Properties/properties.h"
 #include "Properties/prop_cache.h"
+#include "RadioInterface/radio_interface.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -45,6 +46,9 @@ public:
 			printf("Failed to initialise server!");
 			return;
 		}
+		if (!RadioInterface::getInstance()->ri_set_default_audio()) return;
+		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
+		if (!RadioInterface::getInstance()->ri_server_start()) return;
 
 		MainComponent* c = (MainComponent*)GUICache::getInstance()->getMainInst();
 		c->start_ui();

@@ -74,6 +74,7 @@ public:
 	//==============================================================================
 	// Method prototypes
 	// Call down to server
+	bool ri_set_default_audio();
 	bool ri_server_start();
 	bool ri_server_terminate();
 	bool ri_radio_discover();
@@ -92,6 +93,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	bool audio_set = false;
 	bool server_running = false;
 	bool radio_discovered = false;
 	bool radio_running = false;

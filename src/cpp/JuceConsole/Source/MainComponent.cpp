@@ -31,27 +31,8 @@ The authors can be reached by email at:
 //==============================================================================
 MainComponent::MainComponent()
 {
+	// Register component
 	GUICache::getInstance()->setMainInst(this);
-
-	/*
-	start_button = new StartButton();
-	addAndMakeVisible(start_button);
-
-	vfo_component = new VFOComponent("radio-1", RX);
-	addAndMakeVisible(vfo_component);
-	GUICache::getInstance()->setVFOInst(vfo_component);
-
-	mode_panel = new ModePanel("radio-1");
-	addAndMakeVisible(mode_panel);
-	
-	filter_panel = new FilterPanel("radio-1");
-	addAndMakeVisible(filter_panel);
-
-	display_panel = new DisplayPanel("radio-1");
-	addAndMakeVisible(display_panel);
-	*/
-
-	//setSize(600, 450);
 }
 
 MainComponent::~MainComponent()

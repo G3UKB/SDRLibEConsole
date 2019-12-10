@@ -40,6 +40,31 @@ juce_ImplementSingleton(RadioInterface)
 
 //==============================================================================
 // Call down methods
+
+bool RadioInterface::ri_set_default_audio() {
+	int direction;
+	char* host_api;
+	char* dev;
+
+	if (!audio_set) {
+		audio_set = true;
+		// Set up a default route for RX1 to Speaker output
+		DeviceEnumList* l = c_server_enum_audio_outputs();
+		for (int i = 0; i < l->entries; i++) {
+			if (String(l->devices[i].name).startsWith("Speakers")) {
+				if (String(l->devices[i].host_api) == "MME") {
+					direction = l->devices[i].direction;
+					host_api = l->devices[i].host_api;
+					dev = l->devices[i].name;
+					break;
+				}
+			}
+		}
+		c_server_set_audio_route(direction, LOCAL, 1, host_api, dev, BOTH);
+	}
+	return true;
+}
+
 bool RadioInterface::ri_server_start() {
 
 	if (!server_running) {
@@ -94,7 +119,7 @@ bool RadioInterface::ri_radio_stop() {
 }
 
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
-	if (radio_running) {
+	if (server_running) {
 		current_rx_mode = mode;
 		set_mode_filter(mode, current_rx_filter_low, current_rx_filter_high);
 	}
@@ -105,7 +130,7 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 	int low;
 	int high;
 
-	if (radio_running) {
+	if (server_running) {
 		switch (filter) {
 		case 0: low = 100; high = 6100; break;
 		case 1: low = 100; high = 4100; break;
