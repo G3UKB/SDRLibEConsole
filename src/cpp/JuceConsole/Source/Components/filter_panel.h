@@ -74,6 +74,7 @@ private:
 	// State variables
 	// Which radio
 	String radio_id;
+	int i_radio;
 
 	// Button vars
 	FilterButton *Filt6K0Button;

@@ -61,13 +61,16 @@ ModePanel::ModePanel(String p_radio_id) {
 	// Local vars
 	radio_id = p_radio_id;
 
+	// Radio interface requires a numeric id
 	if (radio_id == "radio-1") i_radio = 0;
 	else if (radio_id == "radio-2") i_radio = 1;
 	else i_radio = 2;
 
 	// Create all mode buttons
 	create_buttons();
+	// Retrieve last mode
 	int mode = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("MODE", var(0));
+	// Toggle appropriate button
 	switch (mode) {
 	case 0: LSBButton->setToggleState(true, NotificationType::dontSendNotification); break;
 	case 1: USBButton->setToggleState(true, NotificationType::dontSendNotification); break;
@@ -83,8 +86,8 @@ ModePanel::ModePanel(String p_radio_id) {
 	case 11: DRMButton->setToggleState(true, NotificationType::dontSendNotification); break;
 	default: LSBButton->setToggleState(true, NotificationType::dontSendNotification);
 	}
+	// Set radio mode
 	RadioInterface::getInstance()->ri_server_set_rx_mode(i_radio, mode);
-
 }
 
 ModePanel::~ModePanel() {}

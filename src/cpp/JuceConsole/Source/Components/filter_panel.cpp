@@ -31,6 +31,7 @@ The authors can be reached by email at:
 #include "filter_panel.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../Properties/prop_cache.h"
 
 //==============================================================================
 
@@ -58,8 +59,30 @@ FilterPanel::FilterPanel(String p_radio_id) {
 	// Local vars
 	radio_id = p_radio_id;
 
-	// Create all mode buttons
+	// Radio interface requires a numeric id
+	if (radio_id == "radio-1") i_radio = 0;
+	else if (radio_id == "radio-2") i_radio = 1;
+	else i_radio = 2;
+
+	// Create all filter buttons
 	create_buttons();
+	// Retrieve last filter
+	int filter = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("FILTER", var(0));
+	// Toggle appropriate button
+	switch (filter) {
+	case 0: Filt6K0Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 1: Filt4K0Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 2: Filt2K7Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 3: Filt2K4Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 4: Filt2K1Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 5: Filt1K0Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 6: Filt500Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 7: Filt250Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	case 8: Filt100Button->setToggleState(true, NotificationType::dontSendNotification); break;
+	default: Filt2K4Button->setToggleState(true, NotificationType::dontSendNotification);
+	}
+	// Set radio filter
+	RadioInterface::getInstance()->ri_server_set_rx_filter_freq(i_radio, filter);
 }
 
 FilterPanel::~FilterPanel() {}

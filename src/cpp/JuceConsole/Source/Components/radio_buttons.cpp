@@ -38,6 +38,8 @@ StartButton::StartButton() {
 
 	setButtonText("Start");
 	setClickingTogglesState(true);
+	setColour(textColourOffId, Colours::red);
+	setColour(textColourOnId, Colours::green);
 }
 
 StartButton::~StartButton() {}
@@ -45,6 +47,7 @@ StartButton::~StartButton() {}
 void StartButton::clicked() {
 
 	if (getToggleState()) {
+		setButtonText("Stop");
 		if (!RadioInterface::getInstance()->ri_radio_start(0)) return;
 	}
 	else {
