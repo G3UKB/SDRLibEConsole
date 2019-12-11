@@ -2169,6 +2169,12 @@
     <ClCompile Include="..\..\Source\Properties\prop_cache.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\radio_component.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\radio_window.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4224,6 +4230,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Properties\prop_cache.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\radio_component.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>
