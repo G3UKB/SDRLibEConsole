@@ -62,7 +62,7 @@ class RadioInterface
 public:
 	// JUCEy Singleton
 	//==============================================================================
-	RadioInterface() {}
+	RadioInterface();
 	~RadioInterface()
 	{
 		clearSingletonInstance();
@@ -88,9 +88,9 @@ public:
 
 	// Get methods
 	bool is_radio_running();
-	int get_current_frequency();
-	int get_current_rx_mode();
-	struct filter_desc get_current_rx_filter_desc(int p_radio_id);
+	int get_current_frequency(int channel);
+	int get_current_rx_mode(int channel);
+	struct filter_desc get_current_rx_filter_desc(int channel);
 	
 private:
 	//==============================================================================
@@ -105,19 +105,30 @@ private:
 	int current_freq = 7100000;
 	int filt_freq_lower = 7100000;
 	int filt_freq_upper = 7100000;
-	struct rx_state {
+	typedef struct RxState {
 		int freq = 7100000;
 		int mode = (int)MODES::CH_LSB;
 		int filt_lower = 300;
 		int filt_upper = 2400;
-	};
-	struct all_state {
-		rx_state rx_1;
-		rx_state rx_2;
-		rx_state rx_3;
-	};
+	}RxState;
+	
+	typedef struct AllState {
+		RxState rx_1;
+		RxState rx_2;
+		RxState rx_3;
+	}AllState;
+	AllState *all_state;
 
 	//==============================================================================
 	// Method prototypes
 	void set_mode_filter(int channel, int mode, int filter_low, int filter_high);
+
+	void set_current_freq(int channel, int freq);
+	void set_current_mode(int channel, int mode);
+	void set_current_filt_low (int channel, int filt_low);
+	void set_current_filt_high(int channel, int filt_high);
+	int get_current_freq(int channel);
+	int get_current_mode(int channel);
+	int get_current_filt_low(int channel);
+	int get_current_filt_high(int channel);
 };

@@ -168,7 +168,7 @@ void DisplayPanel::draw_vert(Graphics& g) {
 	float j;
 	String sfreq;
 	// Get current frequency
-	int freq = RadioInterface::getInstance()->get_current_frequency();
+	int freq = RadioInterface::getInstance()->get_current_frequency(i_radio);
 	float start_freq = (float)(freq - (SPAN_FREQ / 2));
 	float freq_inc = (float)SPAN_FREQ / (float)(DIVS);
 	float pixels_per_div = (float)((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
@@ -192,7 +192,7 @@ void DisplayPanel::draw_vert(Graphics& g) {
 // Shade area for filter bandwidth
 void DisplayPanel::draw_filter(Graphics& g) {
 	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc(i_radio);
-	int freq = RadioInterface::getInstance()->get_current_frequency();
+	int freq = RadioInterface::getInstance()->get_current_frequency(i_radio);
 	int low = d.f_lower;
 	int high = d.f_upper;
 	int diff;
@@ -227,7 +227,7 @@ void DisplayPanel::draw_filter(Graphics& g) {
 //----------------------------------------------------------------------------
 // Draw frequency at mouse pointer
 void DisplayPanel::draw_cursor(Graphics& g) {
-	int freq = RadioInterface::getInstance()->get_current_frequency();
+	int freq = RadioInterface::getInstance()->get_current_frequency(i_radio);
 	float pix_w, pix_centre, ppf, f;
 	// Display area width
 	pix_w = (float)(getWidth() - L_MARGIN - R_MARGIN);
