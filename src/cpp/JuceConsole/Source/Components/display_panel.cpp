@@ -191,7 +191,7 @@ void DisplayPanel::draw_vert(Graphics& g) {
 //----------------------------------------------------------------------------
 // Shade area for filter bandwidth
 void DisplayPanel::draw_filter(Graphics& g) {
-	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc();
+	struct filter_desc d = RadioInterface::getInstance()->get_current_rx_filter_desc(i_radio);
 	int freq = RadioInterface::getInstance()->get_current_frequency();
 	int low = d.f_lower;
 	int high = d.f_upper;

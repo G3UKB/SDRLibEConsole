@@ -58,7 +58,7 @@ void MainComponent::start_ui()
 	display_panel = new DisplayPanel("radio-1");
 	addAndMakeVisible(display_panel);
 	*/
-	setSize(600, 450);
+	setSize(300, 200);
 }
 
 //==============================================================================

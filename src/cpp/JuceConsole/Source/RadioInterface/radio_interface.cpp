@@ -178,11 +178,11 @@ int RadioInterface::get_current_rx_mode() {
 	return current_rx_mode;
 }
 
-filter_desc RadioInterface::get_current_rx_filter_desc() {
+filter_desc RadioInterface::get_current_rx_filter_desc(int p_radio_id) {
 	filter_desc filter_desc;
-	if (radio_running) {
-		set_mode_filter(current_rx_mode, current_rx_filter_low, current_rx_filter_high);
-	}
+	//if (radio_running) {
+	//	set_mode_filter(p_radio_id, current_rx_mode, current_rx_filter_low, current_rx_filter_high);
+	//}
 	filter_desc.f_lower = filt_freq_lower;
 	filter_desc.f_upper = filt_freq_upper;
 	return filter_desc;

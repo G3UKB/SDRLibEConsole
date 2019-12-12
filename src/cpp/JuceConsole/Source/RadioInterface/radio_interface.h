@@ -90,7 +90,7 @@ public:
 	bool is_radio_running();
 	int get_current_frequency();
 	int get_current_rx_mode();
-	struct filter_desc get_current_rx_filter_desc();
+	struct filter_desc get_current_rx_filter_desc(int p_radio_id);
 	
 private:
 	//==============================================================================
@@ -105,6 +105,17 @@ private:
 	int current_freq = 7100000;
 	int filt_freq_lower = 7100000;
 	int filt_freq_upper = 7100000;
+	struct rx_state {
+		int freq = 7100000;
+		int mode = (int)MODES::CH_LSB;
+		int filt_lower = 300;
+		int filt_upper = 2400;
+	};
+	struct all_state {
+		rx_state rx_1;
+		rx_state rx_2;
+		rx_state rx_3;
+	};
 
 	//==============================================================================
 	// Method prototypes
