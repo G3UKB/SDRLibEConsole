@@ -29,14 +29,10 @@ The authors can be reached by email at:
 #include "Common/gui_cache.h"
 
 //==============================================================================
-MainComponent::MainComponent()
-{
-	// Register component
-	GUICache::getInstance()->setMainInst(this);
+MainComponent::MainComponent() {
 }
 
-MainComponent::~MainComponent()
-{
+MainComponent::~MainComponent() {
 }
 
 void MainComponent::start_ui()

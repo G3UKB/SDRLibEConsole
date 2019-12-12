@@ -48,11 +48,3 @@ void GUICache::setVFOInst(Component* pvfo) {
 Component* GUICache::getVFOInst() {
 	return vfo;
 }
-
-void GUICache::setMainInst(Component* pmain) {
-	main = pmain;
-}
-
-Component* GUICache::getMainInst() {
-	return main;
-}

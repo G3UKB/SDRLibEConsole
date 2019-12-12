@@ -124,9 +124,7 @@ bool RadioInterface::ri_radio_stop() {
 
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
 	if (server_running) {
-		//current_rx_mode = mode;
 		set_current_mode(channel, mode);
-		//set_mode_filter(channel, mode, current_rx_filter_low, current_rx_filter_high);
 		set_mode_filter(channel, mode, get_current_filt_low(channel), get_current_filt_high(channel));
 	}
 }
@@ -149,9 +147,6 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 		case 8: low = 700; high = 800; break;
 		default: low = 300; high = 2400;
 		}
-		//current_rx_filter_low = low;
-		//current_rx_filter_high = high;
-		//set_mode_filter(channel, current_rx_mode, low, high);
 		set_current_filt_low(channel, low);
 		set_current_filt_high(channel, high);
 		set_mode_filter(channel, get_current_mode(channel), low, high);
@@ -160,19 +155,16 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 
 void RadioInterface::ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz) {
 	c_server_cc_out_set_rx_1_freq(freq_in_hz);
-	//current_freq = freq_in_hz;
 	set_current_freq(0, freq_in_hz);
 }
 
 void RadioInterface::ri_server_cc_out_set_rx_2_freq(unsigned int freq_in_hz) {
 	c_server_cc_out_set_rx_2_freq(freq_in_hz);
-	//current_freq = freq_in_hz;
 	set_current_freq(1, freq_in_hz);
 }
 
 void RadioInterface::ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz) {
 	c_server_cc_out_set_rx_3_freq(freq_in_hz);
-	//current_freq = freq_in_hz;
 	set_current_freq(2, freq_in_hz);
 }
 
@@ -183,22 +175,15 @@ bool RadioInterface::is_radio_running() {
 }
 
 int RadioInterface::get_current_frequency(int channel) {
-	//return current_freq;
 	return get_current_freq(channel);
 }
 
 int RadioInterface::get_current_rx_mode(int channel) {
-	//return current_rx_mode;
 	return get_current_mode(channel);
 }
 
 filter_desc RadioInterface::get_current_rx_filter_desc(int channel) {
 	filter_desc filter_desc;
-	//if (radio_running) {
-	//	set_mode_filter(p_radio_id, current_rx_mode, current_rx_filter_low, current_rx_filter_high);
-	//}
-	//filter_desc.f_lower = filt_freq_lower;
-	//filter_desc.f_upper = filt_freq_upper;
 	if (radio_running) {
 		set_mode_filter(channel , get_current_mode(channel), get_current_filt_low(channel), get_current_filt_high(channel), false);
 	}
@@ -215,24 +200,18 @@ void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int 
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
 		low = -filter_high;
 		high = -filter_low;
-		//filt_freq_lower = current_freq - filter_high;
-		//filt_freq_upper = current_freq - filter_low;
 		set_current_filt_freq_low (channel, get_current_freq(channel) - filter_high);
 		set_current_filt_freq_high (channel, get_current_freq(channel) - filter_low);
 	}
 	else if ((MODES)mode == MODES::CH_USB || (MODES)mode == MODES::CH_CWU || (MODES)mode == MODES::CH_DIGU) {
 		low = filter_low;
 		high = filter_high;
-		//filt_freq_lower = current_freq + filter_low;
-		//filt_freq_upper = current_freq + filter_high;
 		set_current_filt_freq_low (channel, get_current_freq(channel) + filter_low);
 		set_current_filt_freq_high (channel, get_current_freq(channel) + filter_high);
 	}
 	else {
 		low = -filter_high;
 		high = filter_high;
-		//filt_freq_lower = current_freq - filter_high;
-		//filt_freq_upper = current_freq + filter_high;
 		set_current_filt_freq_low (channel, get_current_freq(channel) - filter_high);
 		set_current_filt_freq_high (channel, get_current_freq(channel) + filter_high);
 	}

@@ -99,12 +99,7 @@ private:
 	bool server_running = false;
 	bool radio_discovered = false;
 	bool radio_running = false;
-	int current_rx_mode = (int)MODES::CH_LSB;
-	int current_rx_filter_low = 300;
-	int current_rx_filter_high = 2400;
-	int current_freq = 7100000;
-	int filt_freq_lower = 7100000;
-	int filt_freq_upper = 7100000;
+	
 	typedef struct RxState {
 		int freq = 7100000;
 		int mode = (int)MODES::CH_LSB;

@@ -53,12 +53,12 @@ public:
 		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
 		if (!RadioInterface::getInstance()->ri_server_start()) return;
 
-		MainComponent* c = (MainComponent*)GUICache::getInstance()->getMainInst();
-		c->start_ui();
-		//MainComponent* c = mainWindow->get_component();
-		//mainWindow->get_component()->start_ui();
+		// Start the main UI
+		MainComponent* c = mainWindow->get_component();
+		mainWindow->get_component()->start_ui();
 
-		// Start radio-1 instance
+		// Start radio instance(s)
+		// Temp until we do this dynamically from the UI
 		RadioWindow *w1 = new RadioWindow("radio-1");
 		w1->get_component()->start_ui();
 		RadioWindow *w2 = new RadioWindow("radio-2");
@@ -104,7 +104,7 @@ public:
         {
             setUsingNativeTitleBar (true);
 			c = new MainComponent();
-            setContentOwned (new MainComponent(), true);
+            setContentOwned (c, true);
 
            #if JUCE_IOS || JUCE_ANDROID
             setFullScreen (true);
