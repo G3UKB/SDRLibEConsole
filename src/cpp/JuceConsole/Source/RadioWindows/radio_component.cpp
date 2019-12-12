@@ -29,10 +29,11 @@ The authors can be reached by email at:
 #include "../Common/gui_cache.h"
 
 //==============================================================================
-RadioComponent::RadioComponent(String radio_id)
+RadioComponent::RadioComponent(String p_radio_id)
 {
 	// Register component
-	GUICache::getInstance()->setMainInst(this);
+	//GUICache::getInstance()->setMainInst(this);
+	radio_id = p_radio_id;
 }
 
 RadioComponent::~RadioComponent()
@@ -41,17 +42,17 @@ RadioComponent::~RadioComponent()
 
 void RadioComponent::start_ui()
 {
-	vfo_component = new VFOComponent("radio-1", RX);
+	vfo_component = new VFOComponent(radio_id, RX);
 	addAndMakeVisible(vfo_component);
 	GUICache::getInstance()->setVFOInst(vfo_component);
 
-	mode_panel = new ModePanel("radio-1");
+	mode_panel = new ModePanel(radio_id);
 	addAndMakeVisible(mode_panel);
 
-	filter_panel = new FilterPanel("radio-1");
+	filter_panel = new FilterPanel(radio_id);
 	addAndMakeVisible(filter_panel);
 
-	display_panel = new DisplayPanel("radio-1");
+	display_panel = new DisplayPanel(radio_id);
 	addAndMakeVisible(display_panel);
 
 	setSize(600, 450);

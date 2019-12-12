@@ -108,5 +108,5 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void set_mode_filter(int mode, int filter_low, int filter_high);
+	void set_mode_filter(int channel, int mode, int filter_low, int filter_high);
 };

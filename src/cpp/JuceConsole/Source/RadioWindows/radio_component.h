@@ -53,7 +53,9 @@ public:
 
 private:
     //==============================================================================
-    // Children
+	// ID for this radio
+	String radio_id;
+	// Children
 	StartButton *start_button;
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;

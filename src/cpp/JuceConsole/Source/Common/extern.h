@@ -46,6 +46,7 @@ extern "C" {
 
 	// Function Prototypes
 	int c_server_init();
+	void c_server_set_num_rx(int num_rx);
 	void c_server_set_in_rate(int rate);
 	void c_server_set_out_rate(int rate);
 	void c_server_set_iq_blk_sz(int blk_sz);

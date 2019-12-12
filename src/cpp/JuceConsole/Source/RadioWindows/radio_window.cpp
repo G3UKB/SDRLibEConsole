@@ -39,7 +39,9 @@ public:
 		DocumentWindow::allButtons)
 	{
 		setUsingNativeTitleBar(true);
-		setContentOwned(new RadioComponent(radio_id), true);
+
+		c = new RadioComponent(radio_id);
+		setContentOwned(c, true);
 
 	#if JUCE_IOS || JUCE_ANDROID
 		setFullScreen(true);
@@ -50,4 +52,10 @@ public:
 
 		setVisible(true);
 	}
+
+	RadioComponent *get_component() {
+		return c;
+	}
+
+	RadioComponent *c;
 };

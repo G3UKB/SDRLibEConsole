@@ -121,7 +121,7 @@ bool RadioInterface::ri_radio_stop() {
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
 	if (server_running) {
 		current_rx_mode = mode;
-		set_mode_filter(mode, current_rx_filter_low, current_rx_filter_high);
+		set_mode_filter(channel, mode, current_rx_filter_low, current_rx_filter_high);
 	}
 }
 
@@ -145,7 +145,7 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 		}
 		current_rx_filter_low = low;
 		current_rx_filter_high = high;
-		set_mode_filter(current_rx_mode, low, high);
+		set_mode_filter(channel, current_rx_mode, low, high);
 	}
 }
 
@@ -191,7 +191,7 @@ filter_desc RadioInterface::get_current_rx_filter_desc() {
 //==============================================================================
 // Private
 // ToDo: Split this to just set for the display struct.
-void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) {
+void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int filter_high) {
 	int low;
 	int high;
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
@@ -214,6 +214,6 @@ void RadioInterface::set_mode_filter(int mode, int filter_low, int filter_high) 
 	}
 
 	// Set new filter and/or mode
-	c_server_set_rx_mode(0, mode);
-	c_server_set_rx_filter_freq(0, low, high);
+	c_server_set_rx_mode(channel, mode);
+	c_server_set_rx_filter_freq(channel, low, high);
 }

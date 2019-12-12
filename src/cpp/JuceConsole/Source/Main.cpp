@@ -15,6 +15,8 @@
 #include "Properties/properties.h"
 #include "Properties/prop_cache.h"
 #include "RadioInterface/radio_interface.h"
+#include "RadioWindows/radio_component.h"
+#include "RadioWindows/radio_window.cpp"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -40,18 +42,29 @@ public:
 	
 		// Make wisdom file if not already made
 		c_server_make_wisdom("E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom");
-
+		
 		// Initialise server
 		if (!c_server_init()) {
 			printf("Failed to initialise server!");
 			return;
 		}
+		c_server_set_num_rx(3);
 		if (!RadioInterface::getInstance()->ri_set_default_audio()) return;
 		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
 		if (!RadioInterface::getInstance()->ri_server_start()) return;
 
 		MainComponent* c = (MainComponent*)GUICache::getInstance()->getMainInst();
 		c->start_ui();
+		//MainComponent* c = mainWindow->get_component();
+		//mainWindow->get_component()->start_ui();
+
+		// Start radio-1 instance
+		RadioWindow *w1 = new RadioWindow("radio-1");
+		w1->get_component()->start_ui();
+		RadioWindow *w2 = new RadioWindow("radio-2");
+		w2->get_component()->start_ui();
+		RadioWindow *w3 = new RadioWindow("radio-3");
+		w3->get_component()->start_ui();
     }
 
     void shutdown() override
@@ -90,6 +103,7 @@ public:
                                                     DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
+			c = new MainComponent();
             setContentOwned (new MainComponent(), true);
 
            #if JUCE_IOS || JUCE_ANDROID
@@ -116,8 +130,12 @@ public:
            you really have to override any DocumentWindow methods, make sure your
            subclass also calls the superclass's method.
         */
+		MainComponent *get_component() {
+			return c;
+		}
 
     private:
+		MainComponent *c;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
