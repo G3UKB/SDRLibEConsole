@@ -27,6 +27,8 @@ The authors can be reached by email at:
 
 #include "radio_component.h"
 #include "../Common/gui_cache.h"
+#include "../Common/extern.h"
+#include "../RadioInterface/radio_interface.h"
 
 //==============================================================================
 RadioComponent::RadioComponent(String p_radio_id)
@@ -42,6 +44,9 @@ RadioComponent::~RadioComponent()
 
 void RadioComponent::start_ui()
 {
+	audio_button = new AudioButton(radio_id);
+	addAndMakeVisible(audio_button);
+
 	vfo_component = new VFOComponent(radio_id, RX);
 	addAndMakeVisible(vfo_component);
 	GUICache::getInstance()->setVFOInst(vfo_component);
@@ -69,8 +74,22 @@ void RadioComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
+	audio_button->setBounds(10, 10, 60, 40);
 	vfo_component->setBounds(10, 50, getWidth() - 20, 80);
 	mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
 	filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
 	display_panel->setBounds(10, 245, getWidth() - 20, getHeight() - 255);
+}
+
+// Audio button
+AudioButton::AudioButton(String p_radio_id) {
+
+	setButtonText("Audio>");
+	if (p_radio_id == "radio-1") channel = 0;
+	else if (p_radio_id == "radio-2") channel = 1;
+	else channel = 2;
+}
+
+void AudioButton::clicked() {
+	c_server_change_audio_outputs(channel, "BOTH");
 }

@@ -38,6 +38,21 @@ The authors can be reached by email at:
 /*
     Radio component which contains all content for one radio instance
 */
+class AudioButton : public TextButton {
+
+public:
+	AudioButton::AudioButton(String p_channel);
+	AudioButton::~AudioButton() {}
+
+	// Prototypes
+	void clicked();
+
+	// State
+	int channel;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioButton)
+};
+
 class RadioComponent : public Component
 {
 public:
@@ -56,6 +71,7 @@ private:
 	// ID for this radio
 	String radio_id;
 	// Children
+	AudioButton *audio_button;
 	StartButton *start_button;
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;
@@ -64,3 +80,4 @@ private:
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RadioComponent)
 };
+
