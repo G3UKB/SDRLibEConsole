@@ -35,11 +35,13 @@ The authors can be reached by email at:
 
 //==============================================================================
 
-FilterButton::FilterButton(int p_radio_id, String label) {
+FilterButton::FilterButton(int p_i_radio_id, String p_s_radio_id, String label) {
 
 	setButtonText(label);
 	setClickingTogglesState(true);
-	radio_id = p_radio_id;
+
+	i_radio_id = p_i_radio_id;
+	s_radio_id = p_s_radio_id;
 }
 
 FilterButton::~FilterButton() {}
@@ -48,7 +50,8 @@ void FilterButton::clicked() {
 	
 	if (getToggleState()) {
 		int filter_id = getComponentID().getIntValue();
-		RadioInterface::getInstance()->ri_server_set_rx_filter_freq(radio_id, filter_id);
+		RadioInterface::getInstance()->ri_server_set_rx_filter_freq(i_radio_id, filter_id);
+		PropCache::getInstance()->get_prop_inst(s_radio_id)->set_value("FILTER", var(filter_id));
 	}
 }
 
@@ -96,53 +99,47 @@ void FilterPanel::resized() {
 // Private
 void FilterPanel::create_buttons() {
 
-	int radio;
-
-	if (radio_id == "radio-1") radio = 0;
-	else if (radio_id == "radio-2") radio = 1;
-	else radio = 2;
-
-	Filt6K0Button = new FilterButton(radio, "6.0 KHz");
+	Filt6K0Button = new FilterButton(i_radio, radio_id, "6.0 KHz");
 	Filt6K0Button->setComponentID("0");
 	Filt6K0Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt6K0Button);
 
-	Filt4K0Button = new FilterButton(radio, "4.0 KHz");
+	Filt4K0Button = new FilterButton(i_radio, radio_id, "4.0 KHz");
 	Filt4K0Button->setComponentID("1");
 	Filt4K0Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt4K0Button);
 
-	Filt2K7Button = new FilterButton(radio, "2.7 KHz");
+	Filt2K7Button = new FilterButton(i_radio, radio_id, "2.7 KHz");
 	Filt2K7Button->setComponentID("2");
 	Filt2K7Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt2K7Button);
 
-	Filt2K4Button = new FilterButton(radio, "2.4KHz");
+	Filt2K4Button = new FilterButton(i_radio, radio_id, "2.4KHz");
 	Filt2K4Button->setComponentID("3");
 	Filt2K4Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt2K4Button);
 
-	Filt2K1Button = new FilterButton(radio, "2.1KHz");
+	Filt2K1Button = new FilterButton(i_radio, radio_id, "2.1KHz");
 	Filt2K1Button->setComponentID("4");
 	Filt2K1Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt2K1Button);
 
-	Filt1K0Button = new FilterButton(radio, "1.0KHz");
+	Filt1K0Button = new FilterButton(i_radio, radio_id, "1.0KHz");
 	Filt1K0Button->setComponentID("5");
 	Filt1K0Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt1K0Button);
 
-	Filt500Button = new FilterButton(radio, "500 Hz");
+	Filt500Button = new FilterButton(i_radio, radio_id, "500 Hz");
 	Filt500Button->setComponentID("6");
 	Filt500Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt500Button);
 
-	Filt250Button = new FilterButton(radio, "250 Hz");
+	Filt250Button = new FilterButton(i_radio, radio_id, "250 Hz");
 	Filt250Button->setComponentID("7");
 	Filt250Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt250Button);
 
-	Filt100Button = new FilterButton(radio, "100 Hz");
+	Filt100Button = new FilterButton(i_radio, radio_id, "100 Hz");
 	Filt100Button->setComponentID("8");
 	Filt100Button->setRadioGroupId(1);
 	addAndMakeVisible(Filt100Button);

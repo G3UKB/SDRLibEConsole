@@ -38,7 +38,7 @@ class FilterButton : public TextButton
 {
 public:
 	//==============================================================================
-	FilterButton(int p_radio_id, String label);
+	FilterButton(int p_i_radio_id, String p_s_radio_id, String label);
 	~FilterButton();
 
 	//==============================================================================
@@ -47,7 +47,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	int radio_id;
+	int i_radio_id;
+	String s_radio_id;
 
 	//==============================================================================
 	// Method prototypes

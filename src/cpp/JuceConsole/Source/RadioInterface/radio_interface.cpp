@@ -199,14 +199,17 @@ filter_desc RadioInterface::get_current_rx_filter_desc(int channel) {
 	//}
 	//filter_desc.f_lower = filt_freq_lower;
 	//filter_desc.f_upper = filt_freq_upper;
-	filter_desc.f_lower = get_current_filt_low(channel);
-	filter_desc.f_upper = get_current_filt_high(channel);
+	if (radio_running) {
+		set_mode_filter(channel , get_current_mode(channel), get_current_filt_low(channel), get_current_filt_high(channel), false);
+	}
+	filter_desc.f_lower = get_current_filt_freq_low(channel);
+	filter_desc.f_upper = get_current_filt_freq_high(channel);
 	return filter_desc;
 }
 
 //==============================================================================
 // Private
-void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int filter_high) {
+void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int filter_high, bool set_radio) {
 	int low;
 	int high;
 	if ((MODES)mode == MODES::CH_LSB || (MODES)mode == MODES::CH_CWL || (MODES)mode == MODES::CH_DIGL) {
@@ -214,29 +217,31 @@ void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int 
 		high = -filter_low;
 		//filt_freq_lower = current_freq - filter_high;
 		//filt_freq_upper = current_freq - filter_low;
-		set_current_filt_low (channel, get_current_freq(channel) - filter_high);
-		set_current_filt_high (channel, get_current_freq(channel) - filter_low);
+		set_current_filt_freq_low (channel, get_current_freq(channel) - filter_high);
+		set_current_filt_freq_high (channel, get_current_freq(channel) - filter_low);
 	}
 	else if ((MODES)mode == MODES::CH_USB || (MODES)mode == MODES::CH_CWU || (MODES)mode == MODES::CH_DIGU) {
 		low = filter_low;
 		high = filter_high;
 		//filt_freq_lower = current_freq + filter_low;
 		//filt_freq_upper = current_freq + filter_high;
-		set_current_filt_low (channel, get_current_freq(channel) + filter_low);
-		set_current_filt_high (channel, get_current_freq(channel) + filter_high);
+		set_current_filt_freq_low (channel, get_current_freq(channel) + filter_low);
+		set_current_filt_freq_high (channel, get_current_freq(channel) + filter_high);
 	}
 	else {
 		low = -filter_high;
 		high = filter_high;
 		//filt_freq_lower = current_freq - filter_high;
 		//filt_freq_upper = current_freq + filter_high;
-		set_current_filt_low (channel, get_current_freq(channel) - filter_high);
-		set_current_filt_high (channel, get_current_freq(channel) + filter_high);
+		set_current_filt_freq_low (channel, get_current_freq(channel) - filter_high);
+		set_current_filt_freq_high (channel, get_current_freq(channel) + filter_high);
 	}
 
 	// Set new filter and/or mode
-	c_server_set_rx_mode(channel, mode);
-	c_server_set_rx_filter_freq(channel, low, high);
+	if (set_radio) {
+		c_server_set_rx_mode(channel, mode);
+		c_server_set_rx_filter_freq(channel, low, high);
+	}
 }
 
 // Get/Set methods
@@ -268,6 +273,20 @@ void RadioInterface::set_current_filt_high(int channel, int filt_high) {
 	case 2: all_state->rx_3.filt_upper = filt_high; break;
 	}
 }
+void RadioInterface::set_current_filt_freq_low(int channel, int filt_freq_low) {
+	switch (channel) {
+	case 0: all_state->rx_1.filt_freq_lower = filt_freq_low; break;
+	case 1: all_state->rx_2.filt_freq_lower = filt_freq_low; break;
+	case 2: all_state->rx_3.filt_freq_lower = filt_freq_low; break;
+	}
+}
+void RadioInterface::set_current_filt_freq_high(int channel, int filt_freq_high) {
+	switch (channel) {
+	case 0: all_state->rx_1.filt_freq_upper = filt_freq_high; break;
+	case 1: all_state->rx_2.filt_freq_upper = filt_freq_high; break;
+	case 2: all_state->rx_3.filt_freq_upper = filt_freq_high; break;
+	}
+}
 int RadioInterface::get_current_freq(int channel) {
 	switch (channel) {
 	case 0: return all_state->rx_1.freq;
@@ -294,5 +313,19 @@ int RadioInterface::get_current_filt_high(int channel) {
 	case 0: return all_state->rx_1.filt_upper;
 	case 1: return all_state->rx_2.filt_upper;
 	case 2: return all_state->rx_3.filt_upper;
+	}
+}
+int RadioInterface::get_current_filt_freq_low(int channel) {
+	switch (channel) {
+	case 0: return all_state->rx_1.filt_freq_lower;
+	case 1: return all_state->rx_2.filt_freq_lower;
+	case 2: return all_state->rx_3.filt_freq_lower;
+	}
+}
+int RadioInterface::get_current_filt_freq_high(int channel) {
+	switch (channel) {
+	case 0: return all_state->rx_1.filt_freq_upper;
+	case 1: return all_state->rx_2.filt_freq_upper;
+	case 2: return all_state->rx_3.filt_freq_upper;
 	}
 }

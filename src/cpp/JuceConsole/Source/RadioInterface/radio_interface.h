@@ -110,6 +110,8 @@ private:
 		int mode = (int)MODES::CH_LSB;
 		int filt_lower = 300;
 		int filt_upper = 2400;
+		int filt_freq_lower = 7100000;
+		int filt_freq_upper = 7100000;
 	}RxState;
 	
 	typedef struct AllState {
@@ -121,14 +123,19 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void set_mode_filter(int channel, int mode, int filter_low, int filter_high);
+	void set_mode_filter(int channel, int mode, int filter_low, int filter_high, bool set_radio = true);
 
 	void set_current_freq(int channel, int freq);
 	void set_current_mode(int channel, int mode);
 	void set_current_filt_low (int channel, int filt_low);
 	void set_current_filt_high(int channel, int filt_high);
+	void set_current_filt_freq_low(int channel, int filt_freq_low);
+	void set_current_filt_freq_high(int channel, int filt_freq_high);
 	int get_current_freq(int channel);
 	int get_current_mode(int channel);
 	int get_current_filt_low(int channel);
 	int get_current_filt_high(int channel);
+	int get_current_filt_freq_low(int channel);
+	int get_current_filt_freq_high(int channel);
+
 };
