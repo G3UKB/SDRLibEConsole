@@ -38,6 +38,9 @@ RadioWindow::RadioWindow(String p_radio_id) : DocumentWindow("RadioWindow",
 	DocumentWindow::allButtons)
 {
 	radio_id = p_radio_id;
+	if (radio_id == "radio-1") setName("Receiver-1");
+	else if (radio_id == "radio-2") setName("Receiver-2");
+	else setName("Receiver-3");
 
 	setUsingNativeTitleBar(true);
 
