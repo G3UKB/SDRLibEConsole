@@ -16,7 +16,7 @@
 #include "Properties/prop_cache.h"
 #include "RadioInterface/radio_interface.h"
 #include "RadioWindows/radio_component.h"
-#include "RadioWindows/radio_window.cpp"
+#include "RadioWindows/radio_window.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication

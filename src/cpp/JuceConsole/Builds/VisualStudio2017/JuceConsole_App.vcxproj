@@ -2549,6 +2549,7 @@
     <ClInclude Include="..\..\Source\Properties\prop_cache.h" />
     <ClInclude Include="..\..\Source\RadioInterface\radio_interface.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_component.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\radio_window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt" />

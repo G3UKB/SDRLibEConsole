@@ -29,33 +29,28 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "radio_component.h"
+#include "radio_window.h"
 
-class RadioWindow : public DocumentWindow
+RadioWindow::RadioWindow(String radio_id) : DocumentWindow("RadioWindow",
+	Desktop::getInstance().getDefaultLookAndFeel()
+	.findColour(ResizableWindow::backgroundColourId),
+	DocumentWindow::allButtons)
 {
-public:
-	RadioWindow(String radio_id) : DocumentWindow("RadioWindow",
-		Desktop::getInstance().getDefaultLookAndFeel()
-		.findColour(ResizableWindow::backgroundColourId),
-		DocumentWindow::allButtons)
-	{
-		setUsingNativeTitleBar(true);
+	setUsingNativeTitleBar(true);
 
-		c = new RadioComponent(radio_id);
-		setContentOwned(c, true);
+	c = new RadioComponent(radio_id);
+	setContentOwned(c, true);
 
-	#if JUCE_IOS || JUCE_ANDROID
-		setFullScreen(true);
-	#else
-		setResizable(true, true);
-		centreWithSize(getWidth(), getHeight());
-	#endif
+#if JUCE_IOS || JUCE_ANDROID
+	setFullScreen(true);
+#else
+	setResizable(true, true);
+	centreWithSize(getWidth(), getHeight());
+#endif
 
-		setVisible(true);
-	}
+	setVisible(true);
+}
 
-	RadioComponent *get_component() {
-		return c;
-	}
-
-	RadioComponent *c;
-};
+RadioComponent *RadioWindow::get_component() {
+	return c;
+}

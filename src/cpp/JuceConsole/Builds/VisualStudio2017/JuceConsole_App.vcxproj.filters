@@ -4235,6 +4235,9 @@
     <ClInclude Include="..\..\Source\RadioWindows\radio_component.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\radio_window.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt">
