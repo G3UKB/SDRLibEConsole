@@ -29,12 +29,11 @@ The authors can be reached by email at:
 #include "../Common/gui_cache.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../Properties/prop_cache.h"
 
 //==============================================================================
 RadioComponent::RadioComponent(String p_radio_id)
 {
-	// Register component
-	//GUICache::getInstance()->setMainInst(this);
 	radio_id = p_radio_id;
 }
 
@@ -60,7 +59,10 @@ void RadioComponent::start_ui()
 	display_panel = new DisplayPanel(radio_id);
 	addAndMakeVisible(display_panel);
 
-	setSize(600, 450);
+	// Restore metics
+	int W = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Width", var(600));
+	int H = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Height", var(450));
+	setSize(W, H);
 }
 
 //==============================================================================
@@ -79,6 +81,12 @@ void RadioComponent::resized()
 	mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
 	filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
 	display_panel->setBounds(10, 245, getWidth() - 20, getHeight() - 255);
+
+	// Save metrics
+	if (getWidth() > 0 && getHeight() > 0) {
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Width", var(getWidth()));
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Height", var(getHeight()));
+	}
 }
 
 // Audio button

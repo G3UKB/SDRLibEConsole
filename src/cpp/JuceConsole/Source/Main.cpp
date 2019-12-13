@@ -110,10 +110,16 @@ public:
             setFullScreen (true);
            #else
             setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
+            //centreWithSize (getWidth(), getHeight());
            #endif
 
+			// Restore position
+			int X = PropCache::getInstance()->get_prop_inst("main")->getIntValue("X", var(100));
+			int Y = PropCache::getInstance()->get_prop_inst("main")->getIntValue("Y", var(100));
+			setTopLeftPosition(X, Y);
+
             setVisible (true);
+
         }
 
         void closeButtonPressed() override
@@ -130,6 +136,15 @@ public:
            you really have to override any DocumentWindow methods, make sure your
            subclass also calls the superclass's method.
         */
+		void moved() {
+			DocumentWindow::moved();
+			if (getX() > 0 && getY() > 0) {
+				// Set new position
+				PropCache::getInstance()->get_prop_inst("main")->set_value("X", var(getX()));
+				PropCache::getInstance()->get_prop_inst("main")->set_value("Y", var(getY()));
+			}
+		}
+
 		MainComponent *get_component() {
 			return c;
 		}

@@ -52,6 +52,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	Properties* main;
 	Properties* radio_1;
 	Properties* radio_2;
 	Properties* radio_3;

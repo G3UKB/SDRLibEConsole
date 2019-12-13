@@ -30,12 +30,15 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "radio_component.h"
 #include "radio_window.h"
+#include "../Properties/prop_cache.h"
 
-RadioWindow::RadioWindow(String radio_id) : DocumentWindow("RadioWindow",
+RadioWindow::RadioWindow(String p_radio_id) : DocumentWindow("RadioWindow",
 	Desktop::getInstance().getDefaultLookAndFeel()
 	.findColour(ResizableWindow::backgroundColourId),
 	DocumentWindow::allButtons)
 {
+	radio_id = p_radio_id;
+
 	setUsingNativeTitleBar(true);
 
 	c = new RadioComponent(radio_id);
@@ -45,10 +48,23 @@ RadioWindow::RadioWindow(String radio_id) : DocumentWindow("RadioWindow",
 	setFullScreen(true);
 #else
 	setResizable(true, true);
-	centreWithSize(getWidth(), getHeight());
 #endif
 
+	// Restore position
+	int X = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("X", var(100));
+	int Y = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Y", var(100));
+	setTopLeftPosition(X, Y);
+
 	setVisible(true);
+}
+
+void RadioWindow::moved() {
+	DocumentWindow::moved();
+	if (getX() > 0 && getY() > 0) {
+		// Set new position
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("X", var(getX()));
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Y", var(getY()));
+	}
 }
 
 RadioComponent *RadioWindow::get_component() {

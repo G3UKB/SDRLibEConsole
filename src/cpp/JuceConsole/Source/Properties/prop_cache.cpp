@@ -34,6 +34,7 @@ The authors can be reached by email at:
 //==============================================================================
 // Public
 PropCache::PropCache() {
+	main = new Properties("main", "main_config.cfg");
 	radio_1 = new Properties("radio-1", "r1_config.cfg");
 	radio_2 = new Properties("radio-2", "r2_config.cfg");
 	radio_3 = new Properties("radio-3", "r3_config.cfg");
@@ -51,12 +52,14 @@ juce_ImplementSingleton(PropCache)
 // Save/Restore methods
 
 void PropCache::restore_all() {
+	main->load();
 	radio_1->load();
 	radio_2->load();
 	radio_3->load();
 }
 
 void PropCache::save_all() {
+	main->save();
 	radio_1->save();
 	radio_2->save();
 	radio_3->save();
@@ -67,7 +70,8 @@ void PropCache::save_all() {
 // Access via the Properties instance
 
 Properties* PropCache::get_prop_inst(String name) {
-	if (name == "radio-1") return radio_1;
+	if (name == "main") return main;
+	else if (name == "radio-1") return radio_1;
 	else if (name == "radio-2") return radio_2;
 	else return radio_3;
 }

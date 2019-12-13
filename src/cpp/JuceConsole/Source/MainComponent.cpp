@@ -27,6 +27,7 @@ The authors can be reached by email at:
 
 #include "MainComponent.h"
 #include "Common/gui_cache.h"
+#include "Properties/prop_cache.h"
 
 //==============================================================================
 MainComponent::MainComponent() {
@@ -40,21 +41,10 @@ void MainComponent::start_ui()
 	start_button = new StartButton();
 	addAndMakeVisible(start_button);
 
-	/*
-	vfo_component = new VFOComponent("radio-1", RX);
-	addAndMakeVisible(vfo_component);
-	GUICache::getInstance()->setVFOInst(vfo_component);
-
-	mode_panel = new ModePanel("radio-1");
-	addAndMakeVisible(mode_panel);
-
-	filter_panel = new FilterPanel("radio-1");
-	addAndMakeVisible(filter_panel);
-
-	display_panel = new DisplayPanel("radio-1");
-	addAndMakeVisible(display_panel);
-	*/
-	setSize(300, 200);
+	// Restore metics
+	int W = PropCache::getInstance()->get_prop_inst("main")->getIntValue("Width", var(300));
+	int H = PropCache::getInstance()->get_prop_inst("main")->getIntValue("Height", var(200));
+	setSize(W, H);
 }
 
 //==============================================================================
@@ -69,8 +59,10 @@ void MainComponent::resized()
     // This is called when the MainComponent is resized.
     // Resize children
 	start_button->setBounds(10, 10, 60, 40);
-	//vfo_component->setBounds(10, 50, getWidth() - 20, 80);
-	//mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
-	//filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
-	//display_panel->setBounds(10, 245, getWidth() - 20, getHeight() - 255);
+
+	// Save metrics
+	if (getWidth() > 0 && getHeight() > 0) {
+		PropCache::getInstance()->get_prop_inst("main")->set_value("Width", var(getWidth()));
+		PropCache::getInstance()->get_prop_inst("main")->set_value("Height", var(getHeight()));
+	}
 }
