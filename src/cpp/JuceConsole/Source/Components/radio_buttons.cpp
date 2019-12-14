@@ -30,6 +30,7 @@ The authors can be reached by email at:
 #include "radio_buttons.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../RadioWindows/radio_window.h"
 
 //==============================================================================
 
@@ -89,12 +90,12 @@ void RadioButton::clicked() {
 				p->get_start_button()->setEnabled(true);
 				std::cout << "Starting radios" << std::endl;
 				// Temp until we do this dynamically from the UI
-				//RadioWindow *w1 = new RadioWindow("radio-1");
-				//w1->get_component()->start_ui();
-				//RadioWindow *w2 = new RadioWindow("radio-2");
-				//w2->get_component()->start_ui();
-				//RadioWindow *w3 = new RadioWindow("radio-3");
-				//w3->get_component()->start_ui();
+				RadioWindow *w1 = new RadioWindow("radio-1");
+				w1->get_component()->start_ui();
+				RadioWindow *w2 = new RadioWindow("radio-2");
+				w2->get_component()->start_ui();
+				RadioWindow *w3 = new RadioWindow("radio-3");
+				w3->get_component()->start_ui();
 			}
 		}
 	}
