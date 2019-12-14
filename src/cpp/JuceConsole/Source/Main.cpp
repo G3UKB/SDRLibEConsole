@@ -49,28 +49,42 @@ public:
 			return;
 		}
 		c_server_set_num_rx(3);
-		if (!RadioInterface::getInstance()->ri_set_default_audio()) return;
-		if (!RadioInterface::getInstance()->ri_radio_discover()) return;
-		if (!RadioInterface::getInstance()->ri_server_start()) return;
+		if (!RadioInterface::getInstance()->ri_set_default_audio()) {
+			// Something is kinda wrong here, cant continue
+			std::cout << std::endl << "Failed to configure audio, unable to continue!" << std::endl;
+			quit();
+		}
+		if (!RadioInterface::getInstance()->ri_radio_discover()) {
+			// Radio hardware not running or comms problem
+			std::cout << "Failed to discover radio, please check hardware." << std::endl;
+			// Start the main UI only
+			MainComponent* c = mainWindow->get_component();
+			mainWindow->get_component()->start_ui();
+		} else {
+			if (!RadioInterface::getInstance()->ri_server_start()) {
+				// Something also kinda wrong here, cant continue
+				std::cout << std::endl << "Failed to start server processes, unable to continue!" << std::endl;
+				quit();
+			} else {
+				// Start the main UI
+				MainComponent* c = mainWindow->get_component();
+				mainWindow->get_component()->start_ui();
 
-		// Start the main UI
-		MainComponent* c = mainWindow->get_component();
-		mainWindow->get_component()->start_ui();
-
-		// Start radio instance(s)
-		// Temp until we do this dynamically from the UI
-		RadioWindow *w1 = new RadioWindow("radio-1");
-		w1->get_component()->start_ui();
-		RadioWindow *w2 = new RadioWindow("radio-2");
-		w2->get_component()->start_ui();
-		RadioWindow *w3 = new RadioWindow("radio-3");
-		w3->get_component()->start_ui();
+				// Start radio instance(s)
+				// Temp until we do this dynamically from the UI
+				RadioWindow *w1 = new RadioWindow("radio-1");
+				w1->get_component()->start_ui();
+				RadioWindow *w2 = new RadioWindow("radio-2");
+				w2->get_component()->start_ui();
+				RadioWindow *w3 = new RadioWindow("radio-3");
+				w3->get_component()->start_ui();
+			}
+		}
     }
 
     void shutdown() override
     {
-        // Add your application's shutdown code here..
-
+        // Shutdown
         mainWindow = nullptr; // (deletes our window)
     }
 

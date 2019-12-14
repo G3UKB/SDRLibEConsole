@@ -72,10 +72,11 @@ bool RadioInterface::ri_set_default_audio() {
 bool RadioInterface::ri_server_start() {
 
 	if (!server_running) {
-		server_running = true;
 		// Start server
-		if (!c_server_start()) {
-			printf("Failed to start server!");
+		if (c_server_start()) {
+			server_running = true;
+		} else {
+			std::cout << "Interface: Failed to start server!" << std::endl;
 			return false;
 		}
 	}
@@ -88,10 +89,11 @@ bool RadioInterface::ri_server_terminate() {
 
 bool RadioInterface::ri_radio_discover() {
 	if (!radio_discovered) {
-		radio_discovered = true;
 		// Discover radio
-		if (!c_radio_discover()) {
-			printf("Radio hardware not found!");
+		if (c_radio_discover()) {
+			radio_discovered = true;
+		} else {
+			std::cout << "Interface: Radio hardware not found!" << std::endl;
 			return false;
 		}
 	}
@@ -100,10 +102,11 @@ bool RadioInterface::ri_radio_discover() {
 
 bool RadioInterface::ri_radio_start(int wbs) {
 	if (!radio_running) {
-		radio_running = true;
 		// Start radio
-		if (!c_radio_start(wbs)) {
-			printf("Failed to start radio!");
+		if (c_radio_start(wbs)) {
+			radio_running = true;
+		} else {
+			std::cout << "Interface: Failed to start radio!" << std::endl;
 			return false;
 		}
 	}
@@ -115,7 +118,7 @@ bool RadioInterface::ri_radio_stop() {
 		radio_running = false;
 		// Stop radio
 		if (!c_radio_stop()) {
-			printf("Failed to stop radio!");
+			printf("Interface: Failed to stop radio!");
 			return false;
 		}
 	}
@@ -170,6 +173,10 @@ void RadioInterface::ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz) {
 
 //==============================================================================
 // Get methods
+bool RadioInterface::is_radio_discovered() {
+	return radio_discovered;
+}
+
 bool RadioInterface::is_radio_running() {
 	return radio_running;
 }

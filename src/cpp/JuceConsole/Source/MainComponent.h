@@ -54,11 +54,7 @@ public:
 private:
     //==============================================================================
     // Children
-	StartButton *start_button;
-	VFOComponent *vfo_component;
-	ModePanel *mode_panel;
-	FilterPanel *filter_panel;
-	DisplayPanel *display_panel;
+	RadioPanel *radio_panel;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

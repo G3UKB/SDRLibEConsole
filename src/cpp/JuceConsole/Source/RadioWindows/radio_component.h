@@ -72,7 +72,6 @@ private:
 	String radio_id;
 	// Children
 	AudioButton *audio_button;
-	StartButton *start_button;
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;
 	FilterPanel *filter_panel;

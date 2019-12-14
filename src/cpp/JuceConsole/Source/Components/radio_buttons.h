@@ -31,15 +31,20 @@ The authors can be reached by email at:
 
 //==============================================================================
 
+enum class BUTTON_TYPE {
+	START_STOP,
+	DISCOVER
+};
+
 /*
 	A start/stop button component
 */
-class StartButton : public TextButton
+class RadioButton : public TextButton
 {
 public:
 	//==============================================================================
-	StartButton();
-	~StartButton();
+	RadioButton(BUTTON_TYPE type, String label, String label_down, Colour normal, Colour down);
+	~RadioButton();
 
 	//==============================================================================
 	void clicked();
@@ -47,12 +52,44 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	bool audio_set = false;
-	bool discovered = false;
-	bool server_running = false;
+	BUTTON_TYPE type;
+	String label;
+	String label_down;
 
 	//==============================================================================
 	// Method prototypes
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StartButton)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioButton)
+};
+
+/*
+	A radio panel component
+*/
+class RadioPanel : public Component
+{
+public:
+	//==============================================================================
+	RadioPanel();
+	~RadioPanel();
+
+	void resized() override;
+
+	RadioButton *get_start_button();
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+
+	// Button vars
+	RadioButton *StartButton;
+	RadioButton *DiscoverButton;
+
+	//==============================================================================
+	// Method prototypes
+	void create_buttons();
+	void layout_buttons_in_grid();
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioPanel)
 };

@@ -88,6 +88,7 @@ public:
 
 	// Get methods
 	bool is_radio_running();
+	bool is_radio_discovered();
 	int get_current_frequency(int channel);
 	int get_current_rx_mode(int channel);
 	struct filter_desc get_current_rx_filter_desc(int channel);

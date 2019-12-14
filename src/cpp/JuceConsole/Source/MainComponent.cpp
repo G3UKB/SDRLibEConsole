@@ -38,8 +38,8 @@ MainComponent::~MainComponent() {
 
 void MainComponent::start_ui()
 {
-	start_button = new StartButton();
-	addAndMakeVisible(start_button);
+	radio_panel = new RadioPanel();
+	addAndMakeVisible(radio_panel);
 
 	// Restore metics
 	int W = PropCache::getInstance()->get_prop_inst("main")->getIntValue("Width", var(300));
@@ -58,7 +58,7 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	start_button->setBounds(10, 10, 60, 40);
+	radio_panel->setBounds(10, 10, 120, 40);
 
 	// Save metrics
 	if (getWidth() > 0 && getHeight() > 0) {
