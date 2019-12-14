@@ -246,8 +246,13 @@ void DisplayPanel::draw_cursor(Graphics& g) {
 	// See if we need to change frequency
 	if (clicked) {
 		clicked = false;
-		RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq((int)f);
-		VFOComponent* vfo = (VFOComponent*)(GUICache::getInstance()->getVFOInst());
+		if (radio_id == "radio-1")
+			RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq((int)f);
+		else if (radio_id == "radio-2")
+			RadioInterface::getInstance()->ri_server_cc_out_set_rx_2_freq((int)f);
+		else
+			RadioInterface::getInstance()->ri_server_cc_out_set_rx_3_freq((int)f);
+		VFOComponent* vfo = (VFOComponent*)(GUICache::getInstance()->getVFOInst(radio_id));
 		vfo->set_freq_from_hz((int)f);
 	}
 }

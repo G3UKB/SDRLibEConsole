@@ -47,13 +47,15 @@ public:
 
 	//==============================================================================
 	// Method prototypes
-	void setVFOInst(Component* vfo);
-	Component* getVFOInst();
+	void setVFOInst(String radio_id, Component* vfo);
+	Component* getVFOInst(String radio_id);
 
 private:
 	//==============================================================================
 	// State variables
-	Component* vfo;
+	Component* vfo_1;
+	Component* vfo_2;
+	Component* vfo_3;
 
 	//==============================================================================
 	// Method prototypes

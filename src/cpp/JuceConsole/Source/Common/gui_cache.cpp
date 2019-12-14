@@ -41,10 +41,20 @@ juce_ImplementSingleton(GUICache)
 //==============================================================================
 // Get/Set methods
 
-void GUICache::setVFOInst(Component* pvfo) {
-	vfo = pvfo;
+void GUICache::setVFOInst(String radio_id, Component* pvfo) {
+	if (radio_id == "radio_1")
+		vfo_1 = pvfo;
+	else if (radio_id == "radio_2")
+		vfo_2 = pvfo;
+	else
+		vfo_3 = pvfo;
 }
 
-Component* GUICache::getVFOInst() {
-	return vfo;
+Component* GUICache::getVFOInst(String radio_id) {
+	if (radio_id == "radio_1")
+		return vfo_1;
+	else if (radio_id == "radio_2")
+		return vfo_2;
+	else
+		return vfo_3;
 }

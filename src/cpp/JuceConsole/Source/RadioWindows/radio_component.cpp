@@ -48,7 +48,7 @@ void RadioComponent::start_ui()
 
 	vfo_component = new VFOComponent(radio_id, RX);
 	addAndMakeVisible(vfo_component);
-	GUICache::getInstance()->setVFOInst(vfo_component);
+	GUICache::getInstance()->setVFOInst(radio_id, vfo_component);
 
 	mode_panel = new ModePanel(radio_id);
 	addAndMakeVisible(mode_panel);
