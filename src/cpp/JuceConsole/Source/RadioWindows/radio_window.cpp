@@ -46,6 +46,7 @@ RadioWindow::RadioWindow(String p_radio_id) : DocumentWindow("RadioWindow",
 
 	c = new RadioComponent(radio_id);
 	setContentOwned(c, true);
+	
 
 #if JUCE_IOS || JUCE_ANDROID
 	setFullScreen(true);

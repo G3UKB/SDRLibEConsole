@@ -32,6 +32,8 @@ The authors can be reached by email at:
 #include "../Properties/prop_cache.h"
 
 //==============================================================================
+//==============================================================================
+// The document component
 RadioComponent::RadioComponent(String p_radio_id)
 {
 	radio_id = p_radio_id;
@@ -42,6 +44,57 @@ RadioComponent::~RadioComponent()
 }
 
 void RadioComponent::start_ui()
+{
+	// Create the inner container
+	radio_box = new RadioBox(radio_id);
+	addAndMakeVisible(radio_box);
+
+	// Instantiate all the inner contained components
+	radio_box->start_ui();
+
+	// Restore metics
+	int W = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Width", var(600));
+	int H = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Height", var(450));
+
+	// Set size
+	// NOTE: This calls resized() down the hierarchy so do not call this before components are instantiated.
+	setSize(W, H);
+}
+
+//==============================================================================
+// Events
+void RadioComponent::paint(Graphics& g)
+{
+	// The component is opaque, so we must completely fill the background with a solid colour
+	g.fillAll(Colours::darkgrey);
+}
+
+void RadioComponent::resized()
+{
+	// Resize children
+	// Allow a small border around inner component
+	radio_box->setBounds(5, 5, getWidth() - 10, getHeight() - 10);
+
+	// Save metrics
+	if (getWidth() > 0 && getHeight() > 0) {
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Width", var(getWidth()));
+		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Height", var(getHeight()));
+	}
+}
+
+//==============================================================================
+//==============================================================================
+// The inner box component for layout
+RadioBox::RadioBox(String p_radio_id)
+{
+	radio_id = p_radio_id;
+}
+
+RadioBox::~RadioBox()
+{
+}
+
+void RadioBox::start_ui()
 {
 	audio_button = new AudioButton(radio_id);
 	addAndMakeVisible(audio_button);
@@ -58,38 +111,54 @@ void RadioComponent::start_ui()
 
 	display_panel = new DisplayPanel(radio_id);
 	addAndMakeVisible(display_panel);
-
-	// Restore metics
-	int W = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Width", var(600));
-	int H = PropCache::getInstance()->get_prop_inst(radio_id)->getIntValue("Height", var(450));
-	setSize(W, H);
 }
 
 //==============================================================================
-void RadioComponent::paint (Graphics& g)
+// Events
+void RadioBox::paint (Graphics& g)
 {
     // The component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::darkgrey);
 }
 
-void RadioComponent::resized()
+void RadioBox::resized()
 {
-    // This is called when the MainComponent is resized.
-    // Resize children
-	audio_button->setBounds(10, 10, 60, 40);
-	vfo_component->setBounds(10, 50, getWidth() - 20, 80);
-	mode_panel->setBounds(10,140, (getWidth()/2) + 20, 100);
-	filter_panel->setBounds((getWidth()/2) + 40, 140, (getWidth()/2) - 50, 100);
-	display_panel->setBounds(10, 245, getWidth() - 20, getHeight() - 255);
+    // Layout children in a grid layout
+	Grid grid;
+	grid.rowGap = 10_px;
+	grid.columnGap = 10_px;
+	
+	// Set grid parameters
+	using Track = Grid::TrackInfo;
+	// Just need to right number of rows
+	grid.templateRows = { Track(25_px), Track(50_px), Track(1_fr), Track(3_fr) };
+	// Allow 16 colums so we can give each component the right amount of space
+	grid.templateColumns = { 
+		Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), 
+		Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr),
+		Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr),
+		Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
+	grid.autoColumns = Track(1_fr);
+	grid.autoRows = Track(1_fr);
+	grid.autoFlow = Grid::AutoFlow::row;
+	grid.justifyContent = Grid::JustifyContent::spaceAround;
+	grid.alignContent = Grid::AlignContent::center;
 
-	// Save metrics
-	if (getWidth() > 0 && getHeight() > 0) {
-		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Width", var(getWidth()));
-		PropCache::getInstance()->get_prop_inst(radio_id)->set_value("Height", var(getHeight()));
-	}
+	// Add items to grid
+	grid.items.addArray({ 
+		GridItem(audio_button).withArea(1,GridItem::Span(3)),
+		GridItem(vfo_component).withArea(2,GridItem::Span(8)),
+		GridItem(mode_panel).withArea(3,GridItem::Span(6)),
+		GridItem(filter_panel).withArea(3,GridItem::Span(5)),
+		GridItem(display_panel).withArea(4,GridItem::Span(16))
+	});
+	// Finally apply layout
+	grid.performLayout(getLocalBounds());
 }
 
-// Audio button
+//==============================================================================
+//==============================================================================
+// The audio button component
 AudioButton::AudioButton(String p_radio_id) {
 
 	setButtonText("Audio>");

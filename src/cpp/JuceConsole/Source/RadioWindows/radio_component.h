@@ -53,30 +53,57 @@ public:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioButton)
 };
 
-class RadioComponent : public Component
+class RadioBox : public Component
 {
 public:
-    //==============================================================================
-	RadioComponent(String radio_id);
-    ~RadioComponent();
+	//==============================================================================
+	RadioBox(String radio_id);
+	~RadioBox();
 
 	void start_ui();
 
-    //==============================================================================
-    void paint (Graphics&) override;
-    void resized() override;
+	//==============================================================================
+	void paint(Graphics&) override;
+	void resized() override;
 
 private:
-    //==============================================================================
+	//==============================================================================
 	// ID for this radio
 	String radio_id;
+
 	// Children
 	AudioButton *audio_button;
 	VFOComponent *vfo_component;
 	ModePanel *mode_panel;
 	FilterPanel *filter_panel;
 	DisplayPanel *display_panel;
-	
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RadioComponent)
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioBox)
 };
+
+class RadioComponent : public Component
+{
+public:
+	//==============================================================================
+	RadioComponent(String radio_id);
+	~RadioComponent();
+
+	void start_ui();
+
+	//==============================================================================
+	void paint(Graphics&) override;
+	void resized() override;
+
+private:
+	//==============================================================================
+	// ID for this radio
+	String radio_id;
+
+	// Children
+	RadioBox *radio_box;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioComponent)
+};
+
+
 
