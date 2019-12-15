@@ -119,6 +119,9 @@ void RadioBox::paint (Graphics& g)
 {
     // The component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::darkgrey);
+	g.setColour(Colours::grey);
+	g.fillRect(0, 33, getWidth(), 2);
+	g.fillRect(0, 85, getWidth(), 2);
 }
 
 void RadioBox::resized()

@@ -143,19 +143,20 @@ void DisplayPanel::draw_all(Graphics& g) {
 //----------------------------------------------------------------------------
 // Draw horizontal grid lines and dbM scale
 void DisplayPanel::draw_horiz(Graphics& g) {
+	
 	// One horizontal line per 20 db
 	int i, j;
 	int db_divs = (abs(LOW_DB) - abs(HIGH_DB)) / 20;
-	int db_pixels_per_div = ((getHeight() - T_MARGIN - B_MARGIN) / db_divs);
+	float db_pixels_per_div = (((float)getHeight() - t_margin - b_margin) / (float)db_divs);
 	for (i = 0, j = HIGH_DB; i <= db_divs; i++, j -= 20) {
 		g.setColour(legend_colour);
-		g.drawText(String(j), 5, Y_V_LABEL_ADJ + (i * db_pixels_per_div), 40, 20, Justification(Justification::left));
+		g.drawText(String(j), 5, Y_V_LABEL_ADJ + (i * (int)db_pixels_per_div), 40, 20, Justification(Justification::left));
 		g.setColour(grid_colour);
 		g.drawLine(
-			(float)(L_MARGIN),
-			(float)(T_MARGIN + (i * db_pixels_per_div)),
-			(float(getWidth() - R_MARGIN)),
-			(float)(T_MARGIN + (i * db_pixels_per_div))
+			l_margin,
+			t_margin + (i * db_pixels_per_div),
+			(float)getWidth() - r_margin,
+			t_margin + (i * db_pixels_per_div)
 		);
 	}
 }
@@ -171,19 +172,19 @@ void DisplayPanel::draw_vert(Graphics& g) {
 	int freq = RadioInterface::getInstance()->get_current_frequency(i_radio);
 	float start_freq = (float)(freq - (SPAN_FREQ / 2));
 	float freq_inc = (float)SPAN_FREQ / (float)(DIVS);
-	float pixels_per_div = (float)((getWidth() - L_MARGIN - R_MARGIN) / DIVS);
+	float pixels_per_div = ((float)getWidth() - l_margin - r_margin) / (float)DIVS;
 	for (i = 0, j = start_freq; i <= DIVS; i++, j += freq_inc) {
 		// Centre line in red
 		if (i == DIVS / 2) g.setColour(Colours::red); else g.setColour(Colours::green);
 		sfreq = String(j / 1000000.0f , 3);
 		g.setColour(legend_colour);
-		g.drawText(sfreq, 17 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
+		g.drawText(sfreq, 10 + (i * pixels_per_div), getHeight() - B_MARGIN + X_H_LABEL_ADJ, 40, 20, Justification(Justification::left));
 		g.setColour(grid_colour);
 		g.drawLine(
-			(float)(L_MARGIN + (i * pixels_per_div)),
-			(float)(T_MARGIN),
-			(float)(L_MARGIN + (i * pixels_per_div)),
-			(float)(getHeight() - B_MARGIN)
+			l_margin + (i * pixels_per_div),
+			t_margin,
+			l_margin + (i * pixels_per_div),
+			(float)getHeight() - b_margin
 		);
 	}
 }
@@ -269,7 +270,7 @@ void DisplayPanel::draw_pan(Graphics& g) {
 	path.clear();
 	// We start the path at the bottom right origin of the grid as we need
 	// a closed area in order to fill.
-	path.startNewSubPath((float)L_MARGIN, (float)(getHeight() - B_MARGIN));
+	path.startNewSubPath(l_margin, (float)getHeight() - b_margin);
 	for (x = 0; x < getWidth() - L_MARGIN - R_MARGIN; x++) {
 		y = val_to_coord(buf[getWidth() - L_MARGIN - R_MARGIN - x]);
 		path.lineTo((float)(x + L_MARGIN), y);

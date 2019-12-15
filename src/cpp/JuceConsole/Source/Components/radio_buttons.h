@@ -63,6 +63,29 @@ private:
 };
 
 /*
+	A start/stop button component
+*/
+class ExitButton : public TextButton
+{
+public:
+	//==============================================================================
+	ExitButton(String label);
+	~ExitButton() {}
+
+	//==============================================================================
+	void clicked();
+
+private:
+	//==============================================================================
+	// State variables
+
+	//==============================================================================
+	// Method prototypes
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ExitButton)
+};
+
+/*
 	A radio panel component
 */
 class RadioPanel : public Component
@@ -85,6 +108,7 @@ private:
 	// Button vars
 	RadioButton *StartButton;
 	RadioButton *DiscoverButton;
+	ExitButton *exit_button;
 
 	//==============================================================================
 	// Method prototypes

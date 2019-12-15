@@ -58,7 +58,7 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	radio_panel->setBounds(10, 10, 120, 40);
+	radio_panel->setBounds(10, 10, getWidth()-20, 40);
 
 	// Save metrics
 	if (getWidth() > 0 && getHeight() > 0) {

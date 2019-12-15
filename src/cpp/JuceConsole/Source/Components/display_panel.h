@@ -91,6 +91,11 @@ private:
 	int X;
 	int Y;
 	bool clicked = false;
+	// For calc using floats
+	float l_margin = (float)L_MARGIN;
+	float r_margin = (float)R_MARGIN;
+	float t_margin = (float)T_MARGIN;
+	float b_margin = (float)B_MARGIN;
 
 	// Colours for the various elements of the panadapter
 	Colour grid_colour = Colour((uint8)0, (uint8)255, (uint8)0, (uint8)80);

@@ -119,6 +119,8 @@ private:
 	VFODigit *d_100Hz;
 	VFODigit *d_10Hz;
 	VFODigit *d_1Hz;
+	Label *sep_1;
+	Label *sep_2;
 
 	//==============================================================================
 	// Method prototypes

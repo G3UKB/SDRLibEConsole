@@ -33,7 +33,7 @@ The authors can be reached by email at:
 #include "../RadioWindows/radio_window.h"
 
 //==============================================================================
-
+// Radio control buttons
 RadioButton::RadioButton(BUTTON_TYPE p_type, String p_label, String p_label_down, Colour p_normal, Colour p_down) {
 
 	type = p_type;
@@ -102,6 +102,17 @@ void RadioButton::clicked() {
 }
 
 //==============================================================================
+// App control buttons
+ExitButton::ExitButton(String label) {
+
+	setButtonText(label);
+}
+
+void ExitButton::clicked() {
+	JUCEApplicationBase::quit();
+}
+
+//==============================================================================
 // The panel
 RadioPanel::RadioPanel() {
 
@@ -130,6 +141,8 @@ void RadioPanel::create_buttons() {
 	addAndMakeVisible(StartButton);
 	DiscoverButton = new RadioButton(BUTTON_TYPE::DISCOVER, "Discover", "", Colours::orange, Colours::orange);
 	addAndMakeVisible(DiscoverButton);
+	exit_button = new ExitButton("Exit");
+	addAndMakeVisible(exit_button);
 }
 
 void RadioPanel::layout_buttons_in_grid() {
@@ -137,22 +150,21 @@ void RadioPanel::layout_buttons_in_grid() {
 	// Local grid as its just a bag of behaviour
 	Grid grid;
 
-	// Add digits in one horizontal row
+	// Layout in 1 row by 4 cols so that exit stays right and other stay left
 	using Track = Grid::TrackInfo;
-
-	// Layout in 4 cols by 3 rows
-	grid.templateColumns = { Track(1_fr), Track(1_fr) };
-	grid.templateRows = { Track(1_fr) };
+	grid.templateColumns = { Track(80_px), Track(80_px), Track(1_fr), Track(80_px) };
+	grid.templateRows = { Track(35_px) };
+	grid.autoColumns = Track(1_fr);
+	grid.autoRows = Track(1_fr);
+	grid.autoFlow = Grid::AutoFlow::row;
+	grid.justifyItems = Grid::JustifyItems::center;
 
 	// Add items to the grid
-	grid.items = {
-		GridItem(StartButton),
-		GridItem(DiscoverButton),
-	};
+	grid.items.addArray({
+		GridItem(StartButton).withJustifySelf(GridItem::JustifySelf::start),
+		GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
+		GridItem(exit_button).withArea(1,4),
+	});
 
-	grid.justifyItems = Grid::JustifyItems::stretch;
-	// Add gaps if required
-	//grid.rowGap = Grid::Px::Px(10.0f);
-	//grid.columnGap = Grid::Px::Px(10.0f);
 	grid.performLayout(getLocalBounds());
 }

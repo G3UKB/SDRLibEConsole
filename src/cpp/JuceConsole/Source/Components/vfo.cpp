@@ -175,6 +175,16 @@ void VFOComponent::create_digits() {
 	d_1Hz = new VFODigit(this, String("0"), HZ_COLOR, HZ_FONT);
 	d_1Hz->setComponentID("1Hz");
 	addAndMakeVisible(d_1Hz);
+	
+	// Create two spacers
+	sep_1 = new Label("spacer", ".");
+	sep_1->setText(".", NotificationType::dontSendNotification);
+	sep_1->setColour(Label::textColourId, Colours::antiquewhite);
+	addAndMakeVisible(sep_1);
+	sep_2 = new Label("spacer", ".");
+	sep_2->setText(".", NotificationType::dontSendNotification);
+	sep_2->setColour(Label::textColourId, Colours::antiquewhite);
+	addAndMakeVisible(sep_2);
 
 	set_freq(convertFreq(current_freq));
 }
@@ -187,15 +197,23 @@ void VFOComponent::layout_digits_in_grid() {
 	using Track = Grid::TrackInfo;
 	
 	grid.templateRows = { Track(1_fr) };
-	grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr), Track(1_fr) };
+	grid.templateColumns = { 
+		Track(1_fr), Track(1_fr), Track(1_fr),
+		Track(15_px),
+		Track(1_fr), Track(1_fr), Track(1_fr),
+		Track(15_px),
+		Track(1_fr), Track(1_fr), Track(1_fr)
+	};
 	
 	grid.items = {
 		GridItem(d_100MHz),
 		GridItem(d_10MHz), 
-		GridItem(d_1MHz), 
+		GridItem(d_1MHz),
+		GridItem(sep_1),
 		GridItem(d_100KHz), 
 		GridItem(d_10KHz), 
-		GridItem(d_1KHz), 
+		GridItem(d_1KHz),
+		GridItem(sep_2),
 		GridItem(d_100Hz), 
 		GridItem(d_10Hz), 
 		GridItem(d_1Hz) 
