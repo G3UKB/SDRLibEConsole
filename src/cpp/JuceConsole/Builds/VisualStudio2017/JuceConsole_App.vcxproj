@@ -1861,6 +1861,7 @@
     <ClCompile Include="..\..\Source\RadioInterface\radio_interface.cpp" />
     <ClCompile Include="..\..\Source\RadioWindows\radio_component.cpp" />
     <ClCompile Include="..\..\Source\RadioWindows\radio_window.cpp" />
+    <ClCompile Include="..\..\Source\RadioWindows\radio_win_cache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\extern.h" />
@@ -2550,6 +2551,7 @@
     <ClInclude Include="..\..\Source\RadioInterface\radio_interface.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_component.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_window.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\radio_win_cache.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt" />

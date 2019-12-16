@@ -17,6 +17,7 @@
 #include "RadioInterface/radio_interface.h"
 #include "RadioWindows/radio_component.h"
 #include "RadioWindows/radio_window.h"
+#include "RadioWindows/radio_win_cache.h"
 
 //==============================================================================
 class JuceConsoleApplication  : public JUCEApplication
@@ -71,7 +72,7 @@ public:
 				mainWindow->get_component()->start_ui();
 
 				// Start radio 1 instance
-				RadioWindow *w1 = new RadioWindow("radio-1");
+				RadioWindow * w1 = RadioWinCache::getInstance()->create_window("radio-1");
 				w1->get_component()->start_ui();
 			}
 		}

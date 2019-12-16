@@ -31,6 +31,7 @@ The authors can be reached by email at:
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
 #include "../RadioWindows/radio_window.h"
+#include "../RadioWindows/radio_win_cache.h"
 
 //==============================================================================
 // Radio control buttons
@@ -89,7 +90,7 @@ void RadioButton::clicked() {
 				RadioPanel *p = (RadioPanel *)getParentComponent();
 				p->get_start_button()->setEnabled(true);
 				std::cout << "Starting radio 1" << std::endl;
-				RadioWindow *w1 = new RadioWindow("radio-1");
+				RadioWindow * w1 = RadioWinCache::getInstance()->create_window("radio-1");
 				w1->get_component()->start_ui();
 			}
 		}
@@ -204,14 +205,19 @@ void SelectButton::clicked() {
 				JUCEApplicationBase::quit();
 			}
 			else {
+				// Stop radio 1 instance
+				RadioWinCache::getInstance()->delete_window("radio-1");
+
 				// Start radio instances
 				std::cout << "Starting radios" << std::endl;
+				RadioWindow * w1 = RadioWinCache::getInstance()->create_window("radio-1");
+				w1->get_component()->start_ui();
 				if (num_rx > 1) {
-					RadioWindow *w2 = new RadioWindow("radio-2");
+					RadioWindow * w2 = RadioWinCache::getInstance()->create_window("radio-2");
 					w2->get_component()->start_ui();
 				}
 				if (num_rx > 2) {
-					RadioWindow *w3 = new RadioWindow("radio-3");
+					RadioWindow * w3 = RadioWinCache::getInstance()->create_window("radio-3");
 					w3->get_component()->start_ui();
 				}
 			}

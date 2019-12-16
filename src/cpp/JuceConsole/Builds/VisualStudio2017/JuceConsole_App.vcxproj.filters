@@ -2175,6 +2175,9 @@
     <ClCompile Include="..\..\Source\RadioWindows\radio_window.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\radio_win_cache.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4236,6 +4239,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\RadioWindows\radio_window.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\radio_win_cache.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>
