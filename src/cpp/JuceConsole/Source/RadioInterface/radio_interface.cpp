@@ -42,6 +42,12 @@ RadioInterface::RadioInterface() {
 	all_state = new AllState;
 }
 
+void RadioInterface::reset() {
+	audio_set = false;
+	server_running = false;
+	radio_discovered = false;
+	radio_running = false;
+}
 //==============================================================================
 // Call down methods
 

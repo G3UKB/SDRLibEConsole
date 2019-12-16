@@ -84,18 +84,13 @@ void RadioButton::clicked() {
 				std::cout << std::endl << "Failed to start server processes, unable to continue!" << std::endl;
 				JUCEApplicationBase::quit();
 			} else {
-				// Start radio instance(s)
+				// Start radio 1 instance
 				setEnabled(false);
 				RadioPanel *p = (RadioPanel *)getParentComponent();
 				p->get_start_button()->setEnabled(true);
-				std::cout << "Starting radios" << std::endl;
-				// Temp until we do this dynamically from the UI
+				std::cout << "Starting radio 1" << std::endl;
 				RadioWindow *w1 = new RadioWindow("radio-1");
 				w1->get_component()->start_ui();
-				RadioWindow *w2 = new RadioWindow("radio-2");
-				w2->get_component()->start_ui();
-				RadioWindow *w3 = new RadioWindow("radio-3");
-				w3->get_component()->start_ui();
 			}
 		}
 	}
@@ -157,9 +152,70 @@ SelectButton::SelectButton(String p_radio_id, String label) {
 }
 
 void SelectButton::clicked() {
-	//printf("%d\n", getState());
+	
 	if (getToggleState()) {
+		// Button toggle on
+		// Get number of receivers
+		int num_rx;
+		if (getComponentID() == "radio-1") num_rx = 1;
+		else if (getComponentID() == "radio-2") num_rx = 2;
+		else num_rx = 3;
 
+		// Stop radio and reset interface
+		RadioInterface::getInstance()->ri_radio_stop();
+		RadioInterface::getInstance()->reset();
+
+		// Turn off start button
+		RadioPanel *p = (RadioPanel *)(getParentComponent()->getParentComponent());
+		p->get_start_button()->setToggleState(false, NotificationType::dontSendNotification);
+		p->get_start_button()->setButtonText("Start");
+
+		// Terminate server first as we can't patch this in to a running server
+		if (!c_server_terminate()) {
+			printf("Failed to terminate server, unable to continue!");
+			JUCEApplicationBase::quit();
+		}
+		// Wait a bit to ensure terminated
+		Time::waitForMillisecondCounter(Time::getMillisecondCounter() + 1000);
+		
+		// Now start up from scratch
+		// Initialise server
+		if (!c_server_init()) {
+			printf("Failed to initialise server, unable to continue!");
+			JUCEApplicationBase::quit();
+		}
+		// Set new number of receivers
+		c_server_set_num_rx(num_rx);
+
+		if (!RadioInterface::getInstance()->ri_set_default_audio()) {
+			// Something is kinda wrong here, can't continue
+			std::cout << std::endl << "Failed to configure audio, unable to continue!" << std::endl;
+			JUCEApplicationBase::quit();
+		}
+		
+		if (!RadioInterface::getInstance()->ri_radio_discover()) {
+			// Radio hardware not running or comms problem
+			std::cout << "Failed to discover radio, please check hardware and try again." << std::endl;
+		}
+		else {
+			if (!RadioInterface::getInstance()->ri_server_start()) {
+				// Something also kinda wrong here, cant continue
+				std::cout << std::endl << "Failed to start server processes, unable to continue!" << std::endl;
+				JUCEApplicationBase::quit();
+			}
+			else {
+				// Start radio instances
+				std::cout << "Starting radios" << std::endl;
+				if (num_rx > 1) {
+					RadioWindow *w2 = new RadioWindow("radio-2");
+					w2->get_component()->start_ui();
+				}
+				if (num_rx > 2) {
+					RadioWindow *w3 = new RadioWindow("radio-3");
+					w3->get_component()->start_ui();
+				}
+			}
+		}
 	}		
 }
 

@@ -48,9 +48,9 @@ public:
 			printf("Failed to initialise server!");
 			return;
 		}
-		c_server_set_num_rx(3);
+		c_server_set_num_rx(1);
 		if (!RadioInterface::getInstance()->ri_set_default_audio()) {
-			// Something is kinda wrong here, cant continue
+			// Something is kinda wrong here, can't continue
 			std::cout << std::endl << "Failed to configure audio, unable to continue!" << std::endl;
 			quit();
 		}
@@ -70,14 +70,9 @@ public:
 				MainComponent* c = mainWindow->get_component();
 				mainWindow->get_component()->start_ui();
 
-				// Start radio instance(s)
-				// Temp until we do this dynamically from the UI
+				// Start radio 1 instance
 				RadioWindow *w1 = new RadioWindow("radio-1");
 				w1->get_component()->start_ui();
-				RadioWindow *w2 = new RadioWindow("radio-2");
-				w2->get_component()->start_ui();
-				RadioWindow *w3 = new RadioWindow("radio-3");
-				w3->get_component()->start_ui();
 			}
 		}
     }

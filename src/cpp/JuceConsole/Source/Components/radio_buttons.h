@@ -159,10 +159,6 @@ private:
 	ExitButton *exit_button;
 
 	GroupComponent *select_frame;
-	//SelectButton *select_button_r1;
-	//SelectButton *select_button_r2;
-	//SelectButton *select_button_r3;
-
 
 	//==============================================================================
 	// Method prototypes

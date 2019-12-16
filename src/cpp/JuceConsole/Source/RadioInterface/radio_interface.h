@@ -92,6 +92,9 @@ public:
 	int get_current_frequency(int channel);
 	int get_current_rx_mode(int channel);
 	struct filter_desc get_current_rx_filter_desc(int channel);
+
+	// Reset interface
+	void reset();
 	
 private:
 	//==============================================================================
