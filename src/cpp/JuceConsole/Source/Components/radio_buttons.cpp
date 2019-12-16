@@ -113,6 +113,57 @@ void ExitButton::clicked() {
 }
 
 //==============================================================================
+// Radio select buttons
+// Frame
+SelectFrame::SelectFrame(String label) {
+
+	// Create buttons
+	setText(label);
+
+	select_button_r1 = new SelectButton("radio-1", "1");
+	select_button_r2 = new SelectButton("radio-2", "2");
+	select_button_r3 = new SelectButton("radio-3", "3");
+	addAndMakeVisible(select_button_r1);
+	addAndMakeVisible(select_button_r2);
+	addAndMakeVisible(select_button_r3);
+}
+
+void SelectFrame::resized() {
+	
+	FlexBox flex;
+	flex.justifyContent = FlexBox::JustifyContent::spaceBetween;
+	flex.alignItems = FlexBox::AlignItems::stretch;
+	flex.items.addArray({
+		FlexItem(50,25,*select_button_r1).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f)),
+		FlexItem(50,25,*select_button_r2).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f)),
+		FlexItem(50,25,*select_button_r3).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f))
+		});
+	flex.performLayout(getLocalBounds());
+}
+
+//==============================================================================
+// Select buttons
+SelectButton::SelectButton(String p_radio_id, String label) {
+
+	// Make it a toggle in the select group and set its radio id
+	radio_id = p_radio_id;
+	setButtonText(label);
+	setClickingTogglesState(true);
+	setRadioGroupId(1);
+	setComponentID(p_radio_id);
+	// ToDo: should persist state
+	if (p_radio_id == "radio-1")
+		setToggleState(true, NotificationType::dontSendNotification);
+}
+
+void SelectButton::clicked() {
+	//printf("%d\n", getState());
+	if (getToggleState()) {
+
+	}		
+}
+
+//==============================================================================
 // The panel
 RadioPanel::RadioPanel() {
 
@@ -133,16 +184,30 @@ RadioButton *RadioPanel::get_start_button() {
 	return StartButton;
 }
 
+void RadioPanel::paint(Graphics& g)
+{
+	// The component is opaque, so we must completely fill the background with a solid colour
+	g.fillAll(Colours::darkgrey);
+	// Draw horizontal lines
+	g.setColour(Colours::grey);
+	g.fillRect(0, 45, getWidth(), 2);
+}
+
 //==============================================================================
 // Private
 void RadioPanel::create_buttons() {
 
+	// Radio control buttons
 	StartButton = new RadioButton(BUTTON_TYPE::START_STOP, "Start", "Stop", Colours::green, Colours::red);
 	addAndMakeVisible(StartButton);
 	DiscoverButton = new RadioButton(BUTTON_TYPE::DISCOVER, "Discover", "", Colours::orange, Colours::orange);
 	addAndMakeVisible(DiscoverButton);
+	// Exit app button
 	exit_button = new ExitButton("Exit");
 	addAndMakeVisible(exit_button);
+	// Select radios buttons
+	select_frame = new SelectFrame("Radios");
+	addAndMakeVisible(select_frame);
 }
 
 void RadioPanel::layout_buttons_in_grid() {
@@ -152,8 +217,8 @@ void RadioPanel::layout_buttons_in_grid() {
 
 	// Layout in 1 row by 4 cols so that exit stays right and other stay left
 	using Track = Grid::TrackInfo;
-	grid.templateColumns = { Track(80_px), Track(80_px), Track(1_fr), Track(80_px) };
-	grid.templateRows = { Track(35_px) };
+	grid.templateColumns = { Track(80_px), Track(80_px), Track(80_px), Track(1_fr), Track(80_px) };
+	grid.templateRows = { Track(35_px),  Track(20_px), Track(60_px) };
 	grid.autoColumns = Track(1_fr);
 	grid.autoRows = Track(1_fr);
 	grid.autoFlow = Grid::AutoFlow::row;
@@ -163,7 +228,8 @@ void RadioPanel::layout_buttons_in_grid() {
 	grid.items.addArray({
 		GridItem(StartButton).withJustifySelf(GridItem::JustifySelf::start),
 		GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
-		GridItem(exit_button).withArea(1,4),
+		GridItem(exit_button).withArea(1,5),
+		GridItem(select_frame).withArea(3,1,3,5)
 	});
 
 	grid.performLayout(getLocalBounds());
