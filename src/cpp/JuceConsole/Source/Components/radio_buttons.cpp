@@ -171,7 +171,10 @@ void SelectButton::clicked() {
 		p->get_start_button()->setToggleState(false, NotificationType::dontSendNotification);
 		p->get_start_button()->setButtonText("Start");
 
-		// Terminate server first as we can't patch this in to a running server
+		// Stop radio 1 instance
+		RadioWinCache::getInstance()->delete_window("radio-1");
+
+		// Terminate server as we can't patch this in to a running server
 		if (!c_server_terminate()) {
 			printf("Failed to terminate server, unable to continue!");
 			JUCEApplicationBase::quit();
@@ -205,9 +208,6 @@ void SelectButton::clicked() {
 				JUCEApplicationBase::quit();
 			}
 			else {
-				// Stop radio 1 instance
-				RadioWinCache::getInstance()->delete_window("radio-1");
-
 				// Start radio instances
 				std::cout << "Starting radios" << std::endl;
 				RadioWindow * w1 = RadioWinCache::getInstance()->create_window("radio-1");
