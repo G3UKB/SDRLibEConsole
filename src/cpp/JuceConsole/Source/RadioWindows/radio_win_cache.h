@@ -52,9 +52,9 @@ public:
 private:
 	//==============================================================================
 	// State variables
-	RadioWindow *win_r1;
-	RadioWindow *win_r2;
-	RadioWindow *win_r3;
+	RadioWindow *win_r1 = nullptr;
+	RadioWindow *win_r2 = nullptr;
+	RadioWindow *win_r3 = nullptr;
 	
 
 	//==============================================================================

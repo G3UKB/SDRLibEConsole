@@ -171,8 +171,10 @@ void SelectButton::clicked() {
 		p->get_start_button()->setToggleState(false, NotificationType::dontSendNotification);
 		p->get_start_button()->setButtonText("Start");
 
-		// Stop radio 1 instance
+		// Stop any radio instances
 		RadioWinCache::getInstance()->delete_window("radio-1");
+		RadioWinCache::getInstance()->delete_window("radio-2");
+		RadioWinCache::getInstance()->delete_window("radio-3");
 
 		// Terminate server as we can't patch this in to a running server
 		if (!c_server_terminate()) {

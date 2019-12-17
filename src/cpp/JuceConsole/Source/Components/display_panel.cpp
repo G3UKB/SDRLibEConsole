@@ -113,7 +113,6 @@ void DisplayPanel::mouseDown(const MouseEvent & event) {
 
 void DisplayPanel::draw_all(Graphics& g) {
 
-	
 	// Draw grid with labels within our component bounds
 	g.setColour(grid_colour);
 	draw_horiz(g);

@@ -64,15 +64,15 @@ RadioWindow *RadioWinCache::create_window(String p_radio_id) {
 
 void RadioWinCache::delete_window(String p_radio_id) {
 	if (p_radio_id == "radio-1") {
-		win_r1->removeFromDesktop();
+		if (win_r1 != nullptr) win_r1->removeFromDesktop();
 		win_r1 = nullptr;
 	}
 	else if (p_radio_id == "radio-2") {
-		win_r2->removeFromDesktop();
+		if (win_r2 != nullptr) win_r2->removeFromDesktop();
 		win_r2 = nullptr;
 	}
 	else {
-		win_r3->removeFromDesktop();
+		if (win_r3 != nullptr) win_r3->removeFromDesktop();
 		win_r3 = nullptr;
 	}
 
