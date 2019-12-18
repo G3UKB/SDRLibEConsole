@@ -156,3 +156,33 @@ private:
 	ComboBox comboBox;
 	int row, columnId;
 };
+
+class SetColumnCustomComponent : public Component
+{
+public:
+	SetColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a combo box inside this component
+		textButton.setButtonText("Set");
+		addAndMakeVisible(textButton);
+	}
+
+	void resized() override
+	{
+		textButton.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Our demo code will call this when we may need to update our contents
+	//void setRowAndColumn(int newRow, int newColumn)
+	//{
+	//	row = newRow;
+	//	columnId = newColumn;
+	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
+	//}
+
+private:
+	AudioModel& owner;
+	TextButton textButton;
+	int row, columnId;
+};
+
