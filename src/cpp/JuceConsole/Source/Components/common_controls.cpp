@@ -1,7 +1,7 @@
 /*
 common_controls.cpp
 
-All common controls, i.e. not radio dependent
+All common controls for the Juce Console, i.e. not radio dependent
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 

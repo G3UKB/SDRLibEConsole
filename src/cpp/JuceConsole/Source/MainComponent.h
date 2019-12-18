@@ -29,7 +29,7 @@ The authors can be reached by email at:
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Components/vfo.h"
-#include "Components/radio_buttons.h"
+#include "Components/common_controls.h"
 #include "Components/mode_panel.h"
 #include "Components/filter_panel.h"
 #include "Components/display_panel.h"
