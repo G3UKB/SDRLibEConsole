@@ -56,6 +56,7 @@ void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, i
 }
 
 void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) {
+	g.setFont(12);
 	switch (columnId) {
 	case 1 :
 		g.drawText(audio_outputs->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
