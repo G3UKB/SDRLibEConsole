@@ -32,6 +32,7 @@ The authors can be reached by email at:
 #include "../RadioInterface/radio_interface.h"
 #include "../RadioWindows/radio_window.h"
 #include "../RadioWindows/radio_win_cache.h"
+#include "common_audio.h"
 
 //==============================================================================
 // Radio control buttons
@@ -228,20 +229,20 @@ void SelectButton::clicked() {
 }
 
 //==============================================================================
-// The panel
+// The Panel
 RadioPanel::RadioPanel() {
 
 	// Local vars
 
 	// Create all radio buttons
-	create_buttons();
+	create_components();
 }
 
 RadioPanel::~RadioPanel() {}
 
 void RadioPanel::resized() {
 	// This is called when the radio panel is resized.
-	layout_buttons_in_grid();
+	layout_components_in_grid();
 }
 
 RadioButton *RadioPanel::get_start_button() {
@@ -259,7 +260,7 @@ void RadioPanel::paint(Graphics& g)
 
 //==============================================================================
 // Private
-void RadioPanel::create_buttons() {
+void RadioPanel::create_components() {
 
 	// Radio control buttons
 	StartButton = new RadioButton(BUTTON_TYPE::START_STOP, "Start", "Stop", Colours::green, Colours::red);
@@ -272,9 +273,12 @@ void RadioPanel::create_buttons() {
 	// Select radios buttons
 	select_frame = new SelectFrame("Radios");
 	addAndMakeVisible(select_frame);
+	// Audio selection
+	audio_table = new AudioModel(AudioType::OUTPUT);
+	addAndMakeVisible(audio_table->get_table());
 }
 
-void RadioPanel::layout_buttons_in_grid() {
+void RadioPanel::layout_components_in_grid() {
 
 	// Local grid as its just a bag of behaviour
 	Grid grid;
@@ -282,7 +286,7 @@ void RadioPanel::layout_buttons_in_grid() {
 	// Layout in 1 row by 4 cols so that exit stays right and other stay left
 	using Track = Grid::TrackInfo;
 	grid.templateColumns = { Track(80_px), Track(80_px), Track(80_px), Track(1_fr), Track(80_px) };
-	grid.templateRows = { Track(35_px),  Track(20_px), Track(60_px) };
+	grid.templateRows = { Track(35_px),  Track(20_px), Track(60_px), Track(1_fr) };
 	grid.autoColumns = Track(1_fr);
 	grid.autoRows = Track(1_fr);
 	grid.autoFlow = Grid::AutoFlow::row;
@@ -293,7 +297,8 @@ void RadioPanel::layout_buttons_in_grid() {
 		GridItem(StartButton).withJustifySelf(GridItem::JustifySelf::start),
 		GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
 		GridItem(exit_button).withArea(1,5),
-		GridItem(select_frame).withArea(3,1,3,5)
+		GridItem(select_frame).withArea(3,1,3,5),
+		GridItem(audio_table->get_table()).withArea(4,1,4,50)
 	});
 
 	grid.performLayout(getLocalBounds());

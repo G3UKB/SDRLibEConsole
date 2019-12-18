@@ -2178,6 +2178,9 @@
     <ClCompile Include="..\..\Source\Components\common_controls.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Components\common_audio.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4242,6 +4245,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\common_controls.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Components\common_audio.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

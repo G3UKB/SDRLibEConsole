@@ -28,17 +28,15 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "common_audio.h"
 
-//==============================================================================
-
+//===================================================================================
+// A start/stop button component
 enum class BUTTON_TYPE {
 	START_STOP,
 	DISCOVER
 };
 
-/*
-	A start/stop button component
-*/
 class RadioButton : public TextButton
 {
 public:
@@ -62,9 +60,8 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioButton)
 };
 
-/*
-	Terminate application button
-*/
+//===================================================================================
+// Terminate application button
 class ExitButton : public TextButton
 {
 public:
@@ -85,9 +82,8 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ExitButton)
 };
 
-/*
-	Select number of radios button
-*/
+//===================================================================================
+// Select number of radios button
 class SelectButton : public TextButton
 {
 public:
@@ -109,6 +105,8 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SelectButton)
 };
 
+//===================================================================================
+// The frame to assemble everything in
 class SelectFrame : public GroupComponent
 {
 public:
@@ -157,13 +155,13 @@ private:
 	RadioButton *StartButton;
 	RadioButton *DiscoverButton;
 	ExitButton *exit_button;
-
 	GroupComponent *select_frame;
+	AudioModel *audio_table;
 
 	//==============================================================================
 	// Method prototypes
-	void create_buttons();
-	void layout_buttons_in_grid();
+	void create_components();
+	void layout_components_in_grid();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioPanel)
 };
