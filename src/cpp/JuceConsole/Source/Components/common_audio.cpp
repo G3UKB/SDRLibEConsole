@@ -25,10 +25,8 @@ The authors can be reached by email at:
 
 */
 
-#pragma once
-
-#include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
+#include "../Common/extern.h"
 #include "common_audio.h"
 
 //==============================================================================
@@ -38,34 +36,50 @@ AudioModel::AudioModel(AudioType p_type) {
 	table = new TableListBox();
 	table->setModel(this);
 	
-	table->getHeader().addColumn(
-		"Device",
-		1,
-		100,
-		50, 400,
-		TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Device", 1, 250, 250, 250, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Rx", 2, 80, 80, 80, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("To", 3, 80, 80, 80, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Ch", 4, 80, 80, 80, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Host", 5, 150, 150, 150, TableHeaderComponent::defaultFlags);
+
+	// Get the output enumeration
+	audio_outputs = c_server_enum_audio_outputs();
+	num_rows = audio_outputs->entries;
 }
 
 int AudioModel::getNumRows() {
-	return 0;
+	return num_rows;
 }
 
 void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) {
-
+	g.fillAll(Colours::darkgrey);
 }
 
 void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) {
+	switch (columnId) {
+	case 1 :
+		g.drawText(audio_outputs->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
+		break;
+	case 5:
+		g.drawText(audio_outputs->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
+	}
+}
 
+Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) {
+	switch (columnId) {
+	case 2 : 
+		return new RxColumnCustomComponent(*this);
+		break;
+	case 3:
+		return new ToColumnCustomComponent(*this);
+		break;
+	case 4:
+		return new ChColumnCustomComponent(*this);
+		break;
+	}
+	return nullptr;
 }
 
 TableListBox *AudioModel::get_table() {
 	return table;
 }
-
-//==============================================================================
-// Audio Table
-//AudioTable::AudioTable(AudioType p_type) {
-//	TableListBox::TableListBox("Table");
-
-
-//}

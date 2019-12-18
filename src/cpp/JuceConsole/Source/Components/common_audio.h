@@ -27,6 +27,7 @@ The authors can be reached by email at:
 
 #pragma once
 
+#include "../Common/extern.h"
 #include "../../JuceLibraryCode/JuceHeader.h"
 
 //===================================================================================
@@ -34,26 +35,6 @@ The authors can be reached by email at:
 enum class AudioType {
 	INPUT,
 	OUTPUT
-};
-
-class AudioTable : public TableListBox
-{
-public:
-	//==============================================================================
-	AudioTable(AudioType p_type);
-	~AudioTable() {}
-
-	//==============================================================================
-
-
-private:
-	//==============================================================================
-	// State variables
-
-	//==============================================================================
-	// Method prototypes
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioTable)
 };
 
 class AudioModel : public Component, public TableListBoxModel
@@ -67,15 +48,111 @@ public:
 	int getNumRows() override;
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
+	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override;
 
 	TableListBox *AudioModel::get_table();
 private:
 	//==============================================================================
 	// State variables
 	TableListBox *table;
+	DeviceEnumList *audio_outputs;
+	int num_rows;
 
 	//==============================================================================
 	// Method prototypes
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioModel)
+};
+
+class RxColumnCustomComponent : public Component
+{
+public:
+	RxColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a combo box inside this component
+		addAndMakeVisible(comboBox);
+		comboBox.addItem("RX-1", 1);
+		comboBox.addItem("RX-2", 2);
+		comboBox.addItem("RX-3", 3);
+	}
+
+	void resized() override
+	{
+		comboBox.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Our demo code will call this when we may need to update our contents
+	//void setRowAndColumn(int newRow, int newColumn)
+	//{
+	//	row = newRow;
+	//	columnId = newColumn;
+	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
+	//}
+
+private:
+	AudioModel& owner;
+	ComboBox comboBox;
+	int row, columnId;
+};
+
+class ToColumnCustomComponent : public Component
+{
+public:
+	ToColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a combo box inside this component
+		addAndMakeVisible(comboBox);
+		comboBox.addItem("HPSDR", 1);
+		comboBox.addItem("LOCAL", 2);
+		comboBox.addItem("EXTERNAL", 3);
+	}
+
+	void resized() override
+	{
+		comboBox.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Our demo code will call this when we may need to update our contents
+	//void setRowAndColumn(int newRow, int newColumn)
+	//{
+	//	row = newRow;
+	//	columnId = newColumn;
+	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
+	//}
+
+private:
+	AudioModel& owner;
+	ComboBox comboBox;
+	int row, columnId;
+};
+
+class ChColumnCustomComponent : public Component
+{
+public:
+	ChColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a combo box inside this component
+		addAndMakeVisible(comboBox);
+		comboBox.addItem("LEFT", 1);
+		comboBox.addItem("RIGHT", 2);
+		comboBox.addItem("BOTH", 3);
+	}
+
+	void resized() override
+	{
+		comboBox.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Our demo code will call this when we may need to update our contents
+	//void setRowAndColumn(int newRow, int newColumn)
+	//{
+	//	row = newRow;
+	//	columnId = newColumn;
+	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
+	//}
+
+private:
+	AudioModel& owner;
+	ComboBox comboBox;
+	int row, columnId;
 };

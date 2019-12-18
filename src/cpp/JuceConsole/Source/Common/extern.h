@@ -24,6 +24,7 @@ The authors can be reached by email at:
 	bob@bobcowdery.plus.com
 
 */
+#pragma once
 
 extern "C" {
 	// Common defs
