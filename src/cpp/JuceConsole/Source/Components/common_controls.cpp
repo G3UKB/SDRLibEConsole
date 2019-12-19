@@ -116,6 +116,7 @@ SelectFrame::SelectFrame(String label) {
 
 	// Create buttons
 	setText(label);
+	
 
 	select_button_r1 = new SelectButton("radio-1", "1");
 	select_button_r2 = new SelectButton("radio-2", "2");
@@ -125,17 +126,49 @@ SelectFrame::SelectFrame(String label) {
 	addAndMakeVisible(select_button_r3);
 }
 
+void SelectFrame::paint(Graphics& g) {
+	g.setFont(10);
+	GroupComponent::paint(g);
+}
+
 void SelectFrame::resized() {
 	
+	// Local grid as its just a bag of behaviour
+	Grid grid;
+
+	// Layout in 1 row by 4 cols so that exit stays right and other stay left
+	using Track = Grid::TrackInfo;
+	grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr) };
+	grid.templateRows = { Track(15_px) };
+	grid.autoColumns = Track(1_fr);
+	grid.autoRows = Track(1_fr);
+	grid.autoFlow = Grid::AutoFlow::row;
+	grid.justifyItems = Grid::JustifyItems::center;
+	grid.alignItems = Grid::AlignItems::center;
+	grid.justifyContent = Grid::JustifyContent::center;
+	grid.alignContent = Grid::AlignContent::center;
+
+	// Add items to the grid
+	grid.items.addArray({
+		GridItem(select_button_r1),
+		GridItem(select_button_r2),
+		GridItem(select_button_r3),
+		});
+
+	//grid.performLayout(getLocalBounds());
+	grid.performLayout(Rectangle<int>(10, 15, getWidth() - 20, getHeight() - 20));
+
+	/*
 	FlexBox flex;
-	flex.justifyContent = FlexBox::JustifyContent::spaceBetween;
+	//flex.justifyContent = FlexBox::JustifyContent::spaceBetween;
 	flex.alignItems = FlexBox::AlignItems::stretch;
 	flex.items.addArray({
-		FlexItem(50,25,*select_button_r1).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f)),
-		FlexItem(50,25,*select_button_r2).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f)),
-		FlexItem(50,25,*select_button_r3).withMargin(FlexItem::Margin(15.0f,10.0f,10.0f,10.0f))
+		FlexItem(60,20,*select_button_r1).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f)),
+		FlexItem(60,20,*select_button_r2).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f)),
+		FlexItem(60,20,*select_button_r3).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f))
 		});
 	flex.performLayout(getLocalBounds());
+	*/
 }
 
 //==============================================================================
@@ -285,8 +318,8 @@ void RadioPanel::layout_components_in_grid() {
 
 	// Layout in 1 row by 4 cols so that exit stays right and other stay left
 	using Track = Grid::TrackInfo;
-	grid.templateColumns = { Track(80_px), Track(80_px), Track(80_px), Track(1_fr), Track(80_px) };
-	grid.templateRows = { Track(35_px),  Track(20_px), Track(60_px), Track(1_fr) };
+	grid.templateColumns = { Track(80_px), Track(80_px), Track(20_px), Track(1_fr), Track(20_px), Track(80_px) };
+	grid.templateRows = { Track(35_px),  Track(20_px), Track(1_fr) };
 	grid.autoColumns = Track(1_fr);
 	grid.autoRows = Track(1_fr);
 	grid.autoFlow = Grid::AutoFlow::row;
@@ -296,9 +329,9 @@ void RadioPanel::layout_components_in_grid() {
 	grid.items.addArray({
 		GridItem(StartButton).withJustifySelf(GridItem::JustifySelf::start),
 		GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
-		GridItem(exit_button).withArea(1,5),
-		GridItem(select_frame).withArea(3,1,3,5),
-		GridItem(audio_table->get_table()).withArea(4,1,4,50)
+		GridItem(exit_button).withArea(1,6),
+		GridItem(select_frame).withArea(1,4),
+		GridItem(audio_table->get_table()).withArea(3,1,3,7)
 	});
 
 	grid.performLayout(getLocalBounds());

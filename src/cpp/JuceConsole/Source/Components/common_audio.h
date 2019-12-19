@@ -70,15 +70,12 @@ public:
 	RxColumnCustomComponent(AudioModel& td) : owner(td)
 	{
 		// just put a combo box inside this component
-		addAndMakeVisible(comboBox);
-		comboBox.addItem("RX-1", 1);
-		comboBox.addItem("RX-2", 2);
-		comboBox.addItem("RX-3", 3);
+		addAndMakeVisible(toggleButton);
 	}
 
 	void resized() override
 	{
-		comboBox.setBoundsInset(BorderSize<int>(2));
+		toggleButton.setBoundsInset(BorderSize<int>(2));
 	}
 
 	// Our demo code will call this when we may need to update our contents
@@ -91,7 +88,7 @@ public:
 
 private:
 	AudioModel& owner;
-	ComboBox comboBox;
+	ToggleButton toggleButton;
 	int row, columnId;
 };
 
@@ -104,38 +101,8 @@ public:
 		addAndMakeVisible(comboBox);
 		comboBox.addItem("HPSDR", 1);
 		comboBox.addItem("LOCAL", 2);
-		comboBox.addItem("EXTERNAL", 3);
-	}
-
-	void resized() override
-	{
-		comboBox.setBoundsInset(BorderSize<int>(2));
-	}
-
-	// Our demo code will call this when we may need to update our contents
-	//void setRowAndColumn(int newRow, int newColumn)
-	//{
-	//	row = newRow;
-	//	columnId = newColumn;
-	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
-	//}
-
-private:
-	AudioModel& owner;
-	ComboBox comboBox;
-	int row, columnId;
-};
-
-class ChColumnCustomComponent : public Component
-{
-public:
-	ChColumnCustomComponent(AudioModel& td) : owner(td)
-	{
-		// just put a combo box inside this component
-		addAndMakeVisible(comboBox);
-		comboBox.addItem("LEFT", 1);
-		comboBox.addItem("RIGHT", 2);
-		comboBox.addItem("BOTH", 3);
+		comboBox.addItem("EXT-IQ", 3);
+		comboBox.addItem("EXT-Aud", 4);
 	}
 
 	void resized() override

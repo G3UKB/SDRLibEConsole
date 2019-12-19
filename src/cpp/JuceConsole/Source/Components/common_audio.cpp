@@ -36,12 +36,13 @@ AudioModel::AudioModel(AudioType p_type) {
 	table = new TableListBox();
 	table->setModel(this);
 	
-	table->getHeader().addColumn("Device", 1, 200, 200, 200, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Rx", 2, 80, 80, 80, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("To", 3, 80, 80, 80, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Ch", 4, 80, 80, 80, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Host", 5, 150, 150, 150, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Set", 6, 50, 50, 50, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Device", 1, 150, 100, 200, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Rx-1", 2, 30, 30, 30, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Rx-2", 3, 30, 30, 30, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Rx-3", 4, 30, 30, 30, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("To", 5, 80, 80, 80, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Host", 6, 100, 100, 150, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Set", 7, 50, 50, 50, TableHeaderComponent::defaultFlags);
 
 	// Get the output enumeration
 	audio_outputs = c_server_enum_audio_outputs();
@@ -62,7 +63,7 @@ void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, 
 	case 1 :
 		g.drawText(audio_outputs->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
 		break;
-	case 5:
+	case 6:
 		g.drawText(audio_outputs->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
 	}
 }
@@ -73,12 +74,15 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 		return new RxColumnCustomComponent(*this);
 		break;
 	case 3:
-		return new ToColumnCustomComponent(*this);
+		return new RxColumnCustomComponent(*this);
 		break;
 	case 4:
-		return new ChColumnCustomComponent(*this);
+		return new RxColumnCustomComponent(*this);
 		break;
-	case 6:
+	case 5:
+		return new ToColumnCustomComponent(*this);
+		break;
+	case 7:
 		return new SetColumnCustomComponent(*this);
 		break;
 	}
