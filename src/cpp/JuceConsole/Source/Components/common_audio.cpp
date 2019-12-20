@@ -72,7 +72,10 @@ int AudioModel::getNumRows() {
 }
 
 void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) {
-	g.fillAll(Colours::darkgrey);
+	if(dsl->devices[rowNumber].active)
+		g.fillAll(Colours::blue);
+	else
+		g.fillAll(Colours::darkgrey);
 }
 
 // Manage fixed text

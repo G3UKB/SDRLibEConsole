@@ -191,7 +191,7 @@ public:
 	// Called when the selected item is changed
 	void comboBoxChanged(ComboBox* cb) override {
 		//printf("%s\n", comboBox.getItemText(comboBox.getSelectedItemIndex()));
-		owner.set_dest(row, comboBox.getSelectedItemIndex());
+		//owner.set_dest(row, comboBox.getSelectedItemIndex());
 	}
 
 private:
@@ -202,7 +202,8 @@ private:
 
 //===================================================================================
 // Action custom component
-class SetColumnCustomComponent : public Component
+class SetColumnCustomComponent : public Component,
+								public Button::Listener
 {
 public:
 	SetColumnCustomComponent(AudioModel& td) : owner(td)
@@ -210,11 +211,19 @@ public:
 		// just put a combo box inside this component
 		textButton.setButtonText("Set");
 		addAndMakeVisible(textButton);
+		textButton.addListener(this);
 	}
 
 	void resized() override
 	{
 		textButton.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Called when a button state changes to clicked
+	void buttonClicked(Button *button) override {
+		if (row != -1) {
+			owner.set_active(row, true);
+		}
 	}
 
 	// We set the current row and column on every invocation
@@ -235,7 +244,8 @@ private:
 
 //===================================================================================
 // Action custom component
-class RemColumnCustomComponent : public Component
+class RemColumnCustomComponent : public Component,
+								public Button::Listener
 {
 public:
 	RemColumnCustomComponent(AudioModel& td) : owner(td)
@@ -243,11 +253,19 @@ public:
 		// just put a button inside this component
 		textButton.setButtonText("Rem");
 		addAndMakeVisible(textButton);
+		textButton.addListener(this);
 	}
 
 	void resized() override
 	{
 		textButton.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Called when a button state changes to clicked
+	void buttonClicked(Button *button) override {
+		if (row != -1) {
+			owner.set_active(row, false);
+		}
 	}
 
 	// We set the current row and column on every invocation
