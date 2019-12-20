@@ -233,3 +233,35 @@ private:
 	int row, columnId;
 };
 
+//===================================================================================
+// Action custom component
+class RemColumnCustomComponent : public Component
+{
+public:
+	RemColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a button inside this component
+		textButton.setButtonText("Rem");
+		addAndMakeVisible(textButton);
+	}
+
+	void resized() override
+	{
+		textButton.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// We set the current row and column on every invocation
+	void setRowAndColumn(int newRow, int newColumn)
+	{
+		row = newRow;
+		columnId = newColumn;
+		// As this is an action button we need to state that the
+		// row is active, i.e the audio routing is active. Most
+		// probably set the row to a different colour.
+	}
+
+private:
+	AudioModel& owner;
+	TextButton textButton;
+	int row, columnId;
+};

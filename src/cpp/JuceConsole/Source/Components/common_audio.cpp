@@ -36,7 +36,8 @@ AudioModel::AudioModel(AudioType p_type) {
 	
 	table = new TableListBox();
 	table->setModel(this);
-	
+
+	table->setHeaderHeight(22);
 	table->getHeader().addColumn("Device", 1, 150, 100, 200, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("Rx-1", 2, 30, 30, 30, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("Rx-2", 3, 30, 30, 30, TableHeaderComponent::defaultFlags);
@@ -44,6 +45,7 @@ AudioModel::AudioModel(AudioType p_type) {
 	table->getHeader().addColumn("To", 5, 80, 80, 80, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("Host", 6, 100, 100, 150, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("Set", 7, 50, 50, 50, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Rem", 8, 50, 50, 50, TableHeaderComponent::defaultFlags);
 
 	// Get the output enumeration
 	audio_outputs = c_server_enum_audio_outputs();
@@ -116,6 +118,18 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 			new_set_col = set_col;
 		new_set_col->setRowAndColumn(rowNumber, columnId);
 		return new_set_col;
+	}
+
+	// Remove button
+	if (columnId == 8) {
+		RemColumnCustomComponent *new_rem_col;
+		auto* rem_col = static_cast<RemColumnCustomComponent*> (existingComponentToUpdate);
+		if (rem_col == nullptr)
+			new_rem_col = new RemColumnCustomComponent(*this);
+		else
+			new_rem_col = rem_col;
+		new_rem_col->setRowAndColumn(rowNumber, columnId);
+		return new_rem_col;
 	}
 
 	// Remainder are RX components
