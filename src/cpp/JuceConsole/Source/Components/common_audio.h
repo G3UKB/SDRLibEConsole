@@ -31,7 +31,7 @@ The authors can be reached by email at:
 #include "../../JuceLibraryCode/JuceHeader.h"
 
 //===================================================================================
-// Listbox for audio selection
+// Model class for Audio selection
 enum class AudioType {
 	INPUT,
 	OUTPUT
@@ -52,14 +52,17 @@ public:
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override;
 	// Our table component
 	TableListBox *AudioModel::get_table();
+	int getRows() {
+		return num_rows;
+	}
 
 	// Methods to get/set attributes per row for all fields as these cannot be held
 	// by the custom components themselves as they are reused when scrolling. This is
 	// an efficiency measure as there could be thousands of rows.
 	bool get_active(int row);
 	void set_active(int row, bool state);
-	String get_dest(int row);
-	void set_dest(int row, String value);
+	int get_dest(int row);
+	void set_dest(int row, int index);
 	bool get_rx_1(int row);
 	void set_rx_1(int row, bool state);
 	bool get_rx_2(int row);
@@ -81,7 +84,7 @@ private:
 		bool rx_1;
 		bool rx_2;
 		bool rx_3;
-		String dest;
+		int dest;
 		bool active;
 	}DeviceState;
 
@@ -98,14 +101,19 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioModel)
 };
 
-class RxColumnCustomComponent : public Component
+//===================================================================================
+// RX custom component
+class RxColumnCustomComponent : public Component,
+								public Button::Listener
 {
 public:
 	RxColumnCustomComponent(AudioModel& td, int p_id) : owner(td)
 	{
 		// just put a combo box inside this component
 		addAndMakeVisible(toggleButton);
+		//toggleButton.onClick = std::function<Button>(doToggled());
 		rx_id = p_id;
+		toggleButton.addListener(this);
 	}
 
 	void resized() override
@@ -113,11 +121,13 @@ public:
 		toggleButton.setBoundsInset(BorderSize<int>(2));
 	}
 
-	void clicked() {
-		printf("Clicked\n");
-		if (rx_id == 1) owner.set_rx_1(row, toggleButton.getToggleState());
-		else if (rx_id == 2) owner.set_rx_2(row, toggleButton.getToggleState());
-		else owner.set_rx_3(row, toggleButton.getToggleState());
+	// Called when a button state changes to clicked
+	void buttonClicked(Button *button) override {
+		if (row != -1) {
+			if (rx_id == 1) owner.set_rx_1(row, toggleButton.getToggleState());
+			else if (rx_id == 2) owner.set_rx_2(row, toggleButton.getToggleState());
+			else owner.set_rx_3(row, toggleButton.getToggleState());
+		}
 	}
 
 	// We set the current row and column on every invocation
@@ -137,11 +147,15 @@ public:
 private:
 	AudioModel& owner;
 	ToggleButton toggleButton;
-	int row, columnId;
+	int row = -1;
+	int columnId = -1;
 	int rx_id;
 };
 
-class ToColumnCustomComponent : public Component
+//===================================================================================
+// Destination custom component
+class ToColumnCustomComponent : public Component,
+								public ComboBox::Listener
 {
 public:
 	ToColumnCustomComponent(AudioModel& td) : owner(td)
@@ -153,6 +167,8 @@ public:
 		comboBox.addItem("LOCAL", 3);
 		comboBox.addItem("EXT-IQ", 4);
 		comboBox.addItem("EXT-Aud", 5);
+
+		comboBox.addListener(this);
 	}
 
 	void resized() override
@@ -169,6 +185,13 @@ public:
 		// for the current row and column. Note that if we scroll
 		// the table components are reused. There is not one component
 		// for every row in the table unless the whole table is visible.
+		comboBox.setSelectedItemIndex(owner.get_dest(row), NotificationType::dontSendNotification);	
+	}
+
+	// Called when the selected item is changed
+	void comboBoxChanged(ComboBox* cb) override {
+		//printf("%s\n", comboBox.getItemText(comboBox.getSelectedItemIndex()));
+		owner.set_dest(row, comboBox.getSelectedItemIndex());
 	}
 
 private:
@@ -177,6 +200,8 @@ private:
 	int row, columnId;
 };
 
+//===================================================================================
+// Action custom component
 class SetColumnCustomComponent : public Component
 {
 public:

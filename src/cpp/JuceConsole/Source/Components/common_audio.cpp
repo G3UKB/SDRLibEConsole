@@ -54,7 +54,7 @@ AudioModel::AudioModel(AudioType p_type) {
 		dsl->devices[i].name = audio_outputs->devices[i].name;
 		dsl->devices[i].host_api = audio_outputs->devices[i].host_api;
 		dsl->devices[i].active = false;
-		dsl->devices[i].dest = "NONE";
+		dsl->devices[i].dest = 0;
 		dsl->devices[i].rx_1 = false;
 		dsl->devices[i].rx_2 = false;
 		dsl->devices[i].rx_3 = false;
@@ -96,22 +96,26 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 
 	// Destination component
 	if (columnId == 5) {
+		ToColumnCustomComponent *new_to_col;
 		auto* to_col = static_cast<ToColumnCustomComponent*> (existingComponentToUpdate);
 		if (to_col == nullptr)
-			return new ToColumnCustomComponent(*this);
+			new_to_col = new ToColumnCustomComponent(*this);
 		else
-			return to_col;
-		to_col->setRowAndColumn(rowNumber, columnId);
+			new_to_col = to_col;
+		new_to_col->setRowAndColumn(rowNumber, columnId);
+		return new_to_col;
 	}
 
 	// Set button
 	if (columnId == 7) {
+		SetColumnCustomComponent *new_set_col;
 		auto* set_col = static_cast<SetColumnCustomComponent*> (existingComponentToUpdate);
 		if (set_col == nullptr)
-			return new SetColumnCustomComponent(*this);
+			new_set_col = new SetColumnCustomComponent(*this);
 		else
-			return set_col;
-		set_col->setRowAndColumn(rowNumber, columnId);
+			new_set_col = set_col;
+		new_set_col->setRowAndColumn(rowNumber, columnId);
+		return new_set_col;
 	}
 
 	// Remainder are RX components
@@ -119,12 +123,15 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 	if (columnId == 2) id = 1;
 	else if (columnId == 3) id = 2;
 	else id = 3;
+
+	RxColumnCustomComponent *new_rx_col;
 	auto* rx_col = static_cast<RxColumnCustomComponent*> (existingComponentToUpdate);
 	if (rx_col == nullptr)
-		return new RxColumnCustomComponent(*this, id);
+		new_rx_col = new RxColumnCustomComponent(*this, id);
 	else
-		return rx_col;
-	rx_col->setRowAndColumn(rowNumber, columnId);
+		new_rx_col = rx_col;
+	new_rx_col->setRowAndColumn(rowNumber, columnId);
+	return new_rx_col;
 }
 
 //=====================================================================================================
@@ -143,11 +150,11 @@ void AudioModel::set_active(int row, bool state) {
 	dsl->devices[row].active = state;
 }
 
-String AudioModel::get_dest(int row) {
+int AudioModel::get_dest(int row) {
 	return dsl->devices[row].dest;
 }
-void AudioModel::set_dest(int row, String value) {
-	dsl->devices[row].dest = value;
+void AudioModel::set_dest(int row, int index) {
+	dsl->devices[row].dest = index;
 }
 
 bool AudioModel::get_rx_1(int row) {
