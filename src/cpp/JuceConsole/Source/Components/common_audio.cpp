@@ -81,6 +81,11 @@ void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, i
 // Manage fixed text
 void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) {
 	g.setFont(12);
+	if (dsl->devices[rowNumber].active)
+		g.fillAll(Colours::blue);
+	else
+		g.fillAll(Colours::darkgrey);
+
 	switch (columnId) {
 	case 1 :
 		g.drawText(dsl->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
