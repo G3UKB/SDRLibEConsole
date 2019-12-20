@@ -45,18 +45,52 @@ public:
 	~AudioModel() {}
 
 	//==============================================================================
+	// Overrides
 	int getNumRows() override;
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override;
-
+	// Our table component
 	TableListBox *AudioModel::get_table();
+
+	// Methods to get/set attributes per row for all fields as these cannot be held
+	// by the custom components themselves as they are reused when scrolling. This is
+	// an efficiency measure as there could be thousands of rows.
+	bool get_active(int row);
+	void set_active(int row, bool state);
+	String get_dest(int row);
+	void set_dest(int row, String value);
+	bool get_rx_1(int row);
+	void set_rx_1(int row, bool state);
+	bool get_rx_2(int row);
+	void set_rx_2(int row, bool state);
+	bool get_rx_3(int row);
+	void set_rx_3(int row, bool state);
+
 private:
 	//==============================================================================
 	// State variables
 	TableListBox *table;
 	DeviceEnumList *audio_outputs;
-	int num_rows;
+	int num_rows = 0;
+
+	// Structure to hold all audio info and current state
+	typedef struct DeviceState {
+		String name;
+		String host_api;
+		bool rx_1;
+		bool rx_2;
+		bool rx_3;
+		String dest;
+		bool active;
+	}DeviceState;
+
+	typedef struct DeviceStateList {
+		int entries;
+		DeviceState devices[50];
+	}DeviceStateList;
+
+	DeviceStateList *dsl;
 
 	//==============================================================================
 	// Method prototypes
@@ -67,10 +101,11 @@ private:
 class RxColumnCustomComponent : public Component
 {
 public:
-	RxColumnCustomComponent(AudioModel& td) : owner(td)
+	RxColumnCustomComponent(AudioModel& td, int p_id) : owner(td)
 	{
 		// just put a combo box inside this component
 		addAndMakeVisible(toggleButton);
+		rx_id = p_id;
 	}
 
 	void resized() override
@@ -78,18 +113,32 @@ public:
 		toggleButton.setBoundsInset(BorderSize<int>(2));
 	}
 
-	// Our demo code will call this when we may need to update our contents
-	//void setRowAndColumn(int newRow, int newColumn)
-	//{
-	//	row = newRow;
-	//	columnId = newColumn;
-	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
-	//}
+	void clicked() {
+		printf("Clicked\n");
+		if (rx_id == 1) owner.set_rx_1(row, toggleButton.getToggleState());
+		else if (rx_id == 2) owner.set_rx_2(row, toggleButton.getToggleState());
+		else owner.set_rx_3(row, toggleButton.getToggleState());
+	}
+
+	// We set the current row and column on every invocation
+	void setRowAndColumn(int newRow, int newColumn)
+	{
+		row = newRow;
+		columnId = newColumn;
+		// Here we need to set the current state for the component
+		// for the current row and column. Note that if we scroll
+		// the table components are reused. There is not one component
+		// for every row in the table unless the whole table is visible.
+		if (rx_id == 1) toggleButton.setToggleState(owner.get_rx_1(row), NotificationType::dontSendNotification);
+		else if (rx_id == 2) toggleButton.setToggleState(owner.get_rx_2(row), NotificationType::dontSendNotification);
+		else toggleButton.setToggleState(owner.get_rx_3(row), NotificationType::dontSendNotification);
+	}
 
 private:
 	AudioModel& owner;
 	ToggleButton toggleButton;
 	int row, columnId;
+	int rx_id;
 };
 
 class ToColumnCustomComponent : public Component
@@ -99,10 +148,11 @@ public:
 	{
 		// just put a combo box inside this component
 		addAndMakeVisible(comboBox);
-		comboBox.addItem("HPSDR", 1);
-		comboBox.addItem("LOCAL", 2);
-		comboBox.addItem("EXT-IQ", 3);
-		comboBox.addItem("EXT-Aud", 4);
+		comboBox.addItem("NONE", 1);
+		comboBox.addItem("HPSDR", 2);
+		comboBox.addItem("LOCAL", 3);
+		comboBox.addItem("EXT-IQ", 4);
+		comboBox.addItem("EXT-Aud", 5);
 	}
 
 	void resized() override
@@ -110,13 +160,16 @@ public:
 		comboBox.setBoundsInset(BorderSize<int>(2));
 	}
 
-	// Our demo code will call this when we may need to update our contents
-	//void setRowAndColumn(int newRow, int newColumn)
-	//{
-	//	row = newRow;
-	//	columnId = newColumn;
-	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
-	//}
+	// We set the current row and column on every invocation
+	void setRowAndColumn(int newRow, int newColumn)
+	{
+		row = newRow;
+		columnId = newColumn;
+		// Here we need to set the current state for the component
+		// for the current row and column. Note that if we scroll
+		// the table components are reused. There is not one component
+		// for every row in the table unless the whole table is visible.
+	}
 
 private:
 	AudioModel& owner;
@@ -139,13 +192,15 @@ public:
 		textButton.setBoundsInset(BorderSize<int>(2));
 	}
 
-	// Our demo code will call this when we may need to update our contents
-	//void setRowAndColumn(int newRow, int newColumn)
-	//{
-	//	row = newRow;
-	//	columnId = newColumn;
-	//	comboBox.setSelectedId(owner.getRating(row), dontSendNotification);
-	//}
+	// We set the current row and column on every invocation
+	void setRowAndColumn(int newRow, int newColumn)
+	{
+		row = newRow;
+		columnId = newColumn;
+		// As this is an action button we need to state that the
+		// row is active, i.e the audio routing is active. Most
+		// probably set the row to a different colour.
+	}
 
 private:
 	AudioModel& owner;

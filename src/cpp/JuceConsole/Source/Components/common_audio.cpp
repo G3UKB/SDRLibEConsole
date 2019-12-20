@@ -31,6 +31,7 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Audio Model
+// Constructor
 AudioModel::AudioModel(AudioType p_type) {
 	
 	table = new TableListBox();
@@ -46,9 +47,24 @@ AudioModel::AudioModel(AudioType p_type) {
 
 	// Get the output enumeration
 	audio_outputs = c_server_enum_audio_outputs();
-	num_rows = audio_outputs->entries;
+	// We now copy this into a state structure to drive our table
+	dsl = new DeviceStateList;
+	dsl->entries = audio_outputs->entries;
+	for (int i = 0; i < audio_outputs->entries; i++) {
+		dsl->devices[i].name = audio_outputs->devices[i].name;
+		dsl->devices[i].host_api = audio_outputs->devices[i].host_api;
+		dsl->devices[i].active = false;
+		dsl->devices[i].dest = "NONE";
+		dsl->devices[i].rx_1 = false;
+		dsl->devices[i].rx_2 = false;
+		dsl->devices[i].rx_3 = false;
+	}
+
+	num_rows = dsl->entries;
 }
 
+//=====================================================================================================
+// Overrides
 int AudioModel::getNumRows() {
 	return num_rows;
 }
@@ -57,38 +73,100 @@ void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, i
 	g.fillAll(Colours::darkgrey);
 }
 
+// Manage fixed text
 void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) {
 	g.setFont(12);
 	switch (columnId) {
 	case 1 :
-		g.drawText(audio_outputs->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
+		g.drawText(dsl->devices[rowNumber].name, 2, 0, width - 4, height, Justification::centredLeft, true);
 		break;
 	case 6:
-		g.drawText(audio_outputs->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
+		g.drawText(dsl->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
 	}
 }
 
+// Manage custom components
 Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) {
-	switch (columnId) {
-	case 2 : 
-		return new RxColumnCustomComponent(*this);
-		break;
-	case 3:
-		return new RxColumnCustomComponent(*this);
-		break;
-	case 4:
-		return new RxColumnCustomComponent(*this);
-		break;
-	case 5:
-		return new ToColumnCustomComponent(*this);
-		break;
-	case 7:
-		return new SetColumnCustomComponent(*this);
-		break;
+
+	// Not custom components
+	if (columnId == 1 || columnId == 6) {
+		jassert(existingComponentToUpdate == nullptr);
+		return nullptr;
 	}
-	return nullptr;
+
+	// Destination component
+	if (columnId == 5) {
+		auto* to_col = static_cast<ToColumnCustomComponent*> (existingComponentToUpdate);
+		if (to_col == nullptr)
+			return new ToColumnCustomComponent(*this);
+		else
+			return to_col;
+		to_col->setRowAndColumn(rowNumber, columnId);
+	}
+
+	// Set button
+	if (columnId == 7) {
+		auto* set_col = static_cast<SetColumnCustomComponent*> (existingComponentToUpdate);
+		if (set_col == nullptr)
+			return new SetColumnCustomComponent(*this);
+		else
+			return set_col;
+		set_col->setRowAndColumn(rowNumber, columnId);
+	}
+
+	// Remainder are RX components
+	int id;
+	if (columnId == 2) id = 1;
+	else if (columnId == 3) id = 2;
+	else id = 3;
+	auto* rx_col = static_cast<RxColumnCustomComponent*> (existingComponentToUpdate);
+	if (rx_col == nullptr)
+		return new RxColumnCustomComponent(*this, id);
+	else
+		return rx_col;
+	rx_col->setRowAndColumn(rowNumber, columnId);
 }
 
+//=====================================================================================================
+// Return our table
 TableListBox *AudioModel::get_table() {
 	return table;
+}
+
+//=====================================================================================================
+// Get/set methods
+
+bool AudioModel::get_active(int row) {
+	return dsl->devices[row].active;
+}
+void AudioModel::set_active(int row, bool state) {
+	dsl->devices[row].active = state;
+}
+
+String AudioModel::get_dest(int row) {
+	return dsl->devices[row].dest;
+}
+void AudioModel::set_dest(int row, String value) {
+	dsl->devices[row].dest = value;
+}
+
+bool AudioModel::get_rx_1(int row) {
+	return dsl->devices[row].rx_1;
+}
+void AudioModel::set_rx_1(int row, bool state) {
+	dsl->devices[row].rx_1 = state;
+}
+
+bool AudioModel::get_rx_2(int row) {
+	return dsl->devices[row].rx_2;
+}
+void AudioModel::set_rx_2(int row, bool state) {
+	dsl->devices[row].rx_2 = state;
+}
+
+bool AudioModel::get_rx_3(int row) {
+	return dsl->devices[row].rx_3;
+}
+void AudioModel::set_rx_3(int row, bool state) {
+	dsl->devices[row].rx_3 = state;
 }

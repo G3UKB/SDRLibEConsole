@@ -126,17 +126,12 @@ SelectFrame::SelectFrame(String label) {
 	addAndMakeVisible(select_button_r3);
 }
 
-void SelectFrame::paint(Graphics& g) {
-	g.setFont(10);
-	GroupComponent::paint(g);
-}
-
 void SelectFrame::resized() {
 	
 	// Local grid as its just a bag of behaviour
 	Grid grid;
 
-	// Layout in 1 row by 4 cols so that exit stays right and other stay left
+	// Layout in 1 row by 3 cols
 	using Track = Grid::TrackInfo;
 	grid.templateColumns = { Track(1_fr), Track(1_fr), Track(1_fr) };
 	grid.templateRows = { Track(15_px) };
@@ -155,20 +150,7 @@ void SelectFrame::resized() {
 		GridItem(select_button_r3),
 		});
 
-	//grid.performLayout(getLocalBounds());
 	grid.performLayout(Rectangle<int>(10, 15, getWidth() - 20, getHeight() - 20));
-
-	/*
-	FlexBox flex;
-	//flex.justifyContent = FlexBox::JustifyContent::spaceBetween;
-	flex.alignItems = FlexBox::AlignItems::stretch;
-	flex.items.addArray({
-		FlexItem(60,20,*select_button_r1).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f)),
-		FlexItem(60,20,*select_button_r2).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f)),
-		FlexItem(60,20,*select_button_r3).withMargin(FlexItem::Margin(15.0f,2.0f,10.0f,2.0f))
-		});
-	flex.performLayout(getLocalBounds());
-	*/
 }
 
 //==============================================================================
