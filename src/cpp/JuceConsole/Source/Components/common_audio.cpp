@@ -44,8 +44,7 @@ AudioModel::AudioModel(AudioType p_type) {
 	table->getHeader().addColumn("Rx-3", 4, 30, 30, 30, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("To", 5, 80, 80, 80, TableHeaderComponent::defaultFlags);
 	table->getHeader().addColumn("Host", 6, 100, 100, 150, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Set", 7, 50, 50, 50, TableHeaderComponent::defaultFlags);
-	table->getHeader().addColumn("Rem", 8, 50, 50, 50, TableHeaderComponent::defaultFlags);
+	table->getHeader().addColumn("Set", 7, 30, 30, 30, TableHeaderComponent::defaultFlags);
 
 	// Get the output enumeration
 	audio_outputs = c_server_enum_audio_outputs();
@@ -73,7 +72,7 @@ int AudioModel::getNumRows() {
 
 void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) {
 	if(dsl->devices[rowNumber].active)
-		g.fillAll(Colours::blue);
+		g.fillAll(Colours::lightblue);
 	else
 		g.fillAll(Colours::darkgrey);
 }
@@ -82,7 +81,7 @@ void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, i
 void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) {
 	g.setFont(12);
 	if (dsl->devices[rowNumber].active)
-		g.fillAll(Colours::blue);
+		g.fillAll(Colours::lightblue);
 	else
 		g.fillAll(Colours::darkgrey);
 
@@ -93,6 +92,7 @@ void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, 
 	case 6:
 		g.drawText(dsl->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
 	}
+	table->repaint();
 }
 
 // Manage custom components
@@ -126,18 +126,6 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 			new_set_col = set_col;
 		new_set_col->setRowAndColumn(rowNumber, columnId);
 		return new_set_col;
-	}
-
-	// Remove button
-	if (columnId == 8) {
-		RemColumnCustomComponent *new_rem_col;
-		auto* rem_col = static_cast<RemColumnCustomComponent*> (existingComponentToUpdate);
-		if (rem_col == nullptr)
-			new_rem_col = new RemColumnCustomComponent(*this);
-		else
-			new_rem_col = rem_col;
-		new_rem_col->setRowAndColumn(rowNumber, columnId);
-		return new_rem_col;
 	}
 
 	// Remainder are RX components

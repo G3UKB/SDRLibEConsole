@@ -167,7 +167,7 @@ public:
 		comboBox.addItem("LOCAL", 3);
 		comboBox.addItem("EXT-IQ", 4);
 		comboBox.addItem("EXT-Aud", 5);
-
+		comboBox.setSelectedItemIndex(0);
 		comboBox.addListener(this);
 	}
 
@@ -191,7 +191,7 @@ public:
 	// Called when the selected item is changed
 	void comboBoxChanged(ComboBox* cb) override {
 		//printf("%s\n", comboBox.getItemText(comboBox.getSelectedItemIndex()));
-		//owner.set_dest(row, comboBox.getSelectedItemIndex());
+		owner.set_dest(row, comboBox.getSelectedItemIndex());
 	}
 
 private:
@@ -200,6 +200,51 @@ private:
 	int row, columnId;
 };
 
+//===================================================================================
+// Set custom component
+class SetColumnCustomComponent : public Component,
+								public Button::Listener
+{
+public:
+	SetColumnCustomComponent(AudioModel& td) : owner(td)
+	{
+		// just put a button inside this component
+		addAndMakeVisible(toggleButton);
+		toggleButton.addListener(this);
+	}
+
+	void resized() override
+	{
+		toggleButton.setBoundsInset(BorderSize<int>(2));
+	}
+
+	// Called when a button state changes to clicked
+	void buttonClicked(Button *button) override {
+		if (row != -1) {
+			owner.set_active(row, toggleButton.getToggleState());
+		}
+	}
+
+	// We set the current row and column on every invocation
+	void setRowAndColumn(int newRow, int newColumn)
+	{
+		row = newRow;
+		columnId = newColumn;
+		// Here we need to set the current state for the component
+		// for the current row and column. Note that if we scroll
+		// the table components are reused. There is not one component
+		// for every row in the table unless the whole table is visible.
+		toggleButton.setToggleState(owner.get_active(row), NotificationType::dontSendNotification);
+	}
+
+private:
+	AudioModel& owner;
+	ToggleButton toggleButton;
+	int row = -1;
+	int columnId = -1;
+};
+
+/*
 //===================================================================================
 // Action custom component
 class SetColumnCustomComponent : public Component,
@@ -283,3 +328,4 @@ private:
 	TextButton textButton;
 	int row, columnId;
 };
+*/
