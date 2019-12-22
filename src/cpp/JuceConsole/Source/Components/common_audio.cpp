@@ -78,6 +78,11 @@ void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, i
 		g.fillAll(Colours::lightblue);
 	else
 		g.fillAll(Colours::darkgrey);
+	// This is the only place that always gets called
+	// This will update the custom components
+	table->updateContent();
+	// This will repaint so the highlighting works
+	table->repaint();
 }
 
 // Manage fixed text
@@ -95,12 +100,10 @@ void AudioModel::paintCell(Graphics& g, int rowNumber, int columnId, int width, 
 	case 6:
 		g.drawText(dsl->devices[rowNumber].host_api, 2, 0, width - 4, height, Justification::centredLeft, true);
 	}
-	table->repaint();
 }
 
 // Manage custom components
 Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) {
-
 	// Not custom components
 	if (columnId == 1 || columnId == 6) {
 		jassert(existingComponentToUpdate == nullptr);
@@ -121,7 +124,6 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 
 	// Set button
 	if (columnId == 7) {
-		printf("Set\n");
 		// Need to establish if this row is a candidate for activation.
 		bool enable = false;
 		if ((get_dest(rowNumber) != 0) &&
@@ -137,6 +139,9 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 
 		new_set_col->setRowAndColumn(rowNumber, columnId);
 		new_set_col->setEnabled(enable);
+		if (!enable && get_active(rowNumber))
+			// We were active but something has changed so we are not now eligible
+			set_active(rowNumber, false);
 		return new_set_col;
 	}
 
