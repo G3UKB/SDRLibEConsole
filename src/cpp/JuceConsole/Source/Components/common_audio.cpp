@@ -67,10 +67,12 @@ AudioModel::AudioModel(AudioType p_type) {
 
 //=====================================================================================================
 // Overrides
+
 int AudioModel::getNumRows() {
 	return num_rows;
 }
 
+// Highlight active rows
 void AudioModel::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) {
 	if(dsl->devices[rowNumber].active)
 		g.fillAll(Colours::lightblue);
@@ -119,13 +121,22 @@ Component* AudioModel::refreshComponentForCell(int rowNumber, int columnId, bool
 
 	// Set button
 	if (columnId == 7) {
+		printf("Set\n");
+		// Need to establish if this row is a candidate for activation.
+		bool enable = false;
+		if ((get_dest(rowNumber) != 0) &&
+			(get_rx_1(rowNumber) || get_rx_2(rowNumber) || get_rx_3(rowNumber)))
+			enable = true;
+
 		SetColumnCustomComponent *new_set_col;
 		auto* set_col = static_cast<SetColumnCustomComponent*> (existingComponentToUpdate);
 		if (set_col == nullptr)
 			new_set_col = new SetColumnCustomComponent(*this);
 		else
 			new_set_col = set_col;
+
 		new_set_col->setRowAndColumn(rowNumber, columnId);
+		new_set_col->setEnabled(enable);
 		return new_set_col;
 	}
 

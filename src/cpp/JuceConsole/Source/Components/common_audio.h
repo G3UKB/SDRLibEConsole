@@ -111,7 +111,6 @@ public:
 	{
 		// just put a combo box inside this component
 		addAndMakeVisible(toggleButton);
-		//toggleButton.onClick = std::function<Button>(doToggled());
 		rx_id = p_id;
 		toggleButton.addListener(this);
 	}
@@ -190,8 +189,8 @@ public:
 
 	// Called when the selected item is changed
 	void comboBoxChanged(ComboBox* cb) override {
-		//printf("%s\n", comboBox.getItemText(comboBox.getSelectedItemIndex()));
 		owner.set_dest(row, comboBox.getSelectedItemIndex());
+		//owner.repaint();
 	}
 
 private:
