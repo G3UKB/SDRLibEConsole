@@ -36,6 +36,7 @@ AudioModel::AudioModel(AudioType p_type) {
 	
 	table = new TableListBox();
 	table->setModel(this);
+	table->setColour(TableListBox::backgroundColourId, Colours::darkgrey);
 
 	table->setHeaderHeight(22);
 	table->getHeader().addColumn("Device", 1, 150, 100, 200, TableHeaderComponent::defaultFlags);

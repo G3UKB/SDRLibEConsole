@@ -108,11 +108,12 @@ public:
     {
     public:
         MainWindow (String name)  : DocumentWindow (name,
-                                                    Desktop::getInstance().getDefaultLookAndFeel()
-                                                                          .findColour (ResizableWindow::backgroundColourId),
+                                                    //Desktop::getInstance().getDefaultLookAndFeel()
+                                                    //                      .findColour (ResizableWindow::backgroundColourId),
+													Colours::darkgrey,
                                                     DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
+			setUsingNativeTitleBar (true);
 			c = new MainComponent();
             setContentOwned (c, true);
 
