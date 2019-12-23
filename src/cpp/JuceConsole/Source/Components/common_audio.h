@@ -37,6 +37,22 @@ enum class AudioType {
 	OUTPUT
 };
 
+// Structure to hold all audio info and current state
+typedef struct DeviceState {
+	String name;
+	String host_api;
+	bool rx_1;
+	bool rx_2;
+	bool rx_3;
+	int dest;
+	bool active;
+}DeviceState;
+
+typedef struct DeviceStateList {
+	int entries;
+	DeviceState devices[50];
+}DeviceStateList;
+
 class AudioModel : public Component, public TableListBoxModel
 {
 public:
@@ -69,6 +85,7 @@ public:
 	void set_rx_2(int row, bool state);
 	bool get_rx_3(int row);
 	void set_rx_3(int row, bool state);
+	DeviceStateList *get_state();
 
 private:
 	//==============================================================================
@@ -76,23 +93,6 @@ private:
 	TableListBox *table;
 	DeviceEnumList *audio_outputs;
 	int num_rows = 0;
-
-	// Structure to hold all audio info and current state
-	typedef struct DeviceState {
-		String name;
-		String host_api;
-		bool rx_1;
-		bool rx_2;
-		bool rx_3;
-		int dest;
-		bool active;
-	}DeviceState;
-
-	typedef struct DeviceStateList {
-		int entries;
-		DeviceState devices[50];
-	}DeviceStateList;
-
 	DeviceStateList *dsl;
 
 	//==============================================================================
@@ -190,7 +190,6 @@ public:
 	// Called when the selected item is changed
 	void comboBoxChanged(ComboBox* cb) override {
 		owner.set_dest(row, comboBox.getSelectedItemIndex());
-		//owner.repaint();
 	}
 
 private:
@@ -241,4 +240,55 @@ private:
 	ToggleButton toggleButton;
 	int row = -1;
 	int columnId = -1;
+};
+
+//===================================================================================
+// Apply changes
+class ApplyButton : public TextButton
+{
+public:
+	//==============================================================================
+	ApplyButton(AudioModel* td, String label) {
+		owner = td;
+		setButtonText(label);
+	}
+	~ApplyButton() {}
+
+	//==============================================================================
+	void clicked();
+
+private:
+	//==============================================================================
+	// State variables
+	AudioModel* owner;
+
+	//==============================================================================
+	// Method prototypes
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ApplyButton)
+};
+
+//===================================================================================
+// The frame to assemble everything in
+class AudioPanel : public Component
+{
+public:
+	//==============================================================================
+	AudioPanel();
+	~AudioPanel() {}
+
+	//==============================================================================
+	void resized() override;
+
+private:
+	//==============================================================================
+	// State variables
+	AudioModel *audioModel;
+	ApplyButton *applyButton;
+
+	//==============================================================================
+	// Method prototypes
+	void layout_components_in_grid();
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPanel)
 };

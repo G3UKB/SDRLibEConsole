@@ -204,3 +204,60 @@ bool AudioModel::get_rx_3(int row) {
 void AudioModel::set_rx_3(int row, bool state) {
 	dsl->devices[row].rx_3 = state;
 }
+
+DeviceStateList*  AudioModel::get_state() {
+	return dsl;
+}
+
+//==============================================================================
+// Audio Panel
+// Constructor
+AudioPanel::AudioPanel() {
+
+	// Audio selection
+	audioModel = new AudioModel(AudioType::OUTPUT);
+	addAndMakeVisible(audioModel->get_table());
+	// Apply button
+	applyButton = new ApplyButton(audioModel, "Apply");
+	addAndMakeVisible(applyButton);
+}
+
+void AudioPanel::resized() {
+	// This is called when the radio panel is resized.
+	layout_components_in_grid();
+}
+
+void AudioPanel::layout_components_in_grid() {
+
+	// Local grid as its just a bag of behaviour
+	Grid grid;
+
+	// Layout in 1 row by 4 cols so that exit stays right and other stay left
+	using Track = Grid::TrackInfo;
+	grid.templateColumns = { Track(1_fr) };
+	grid.templateRows = { Track(1_fr),  Track(25_px) };
+	grid.autoColumns = Track(1_fr);
+	grid.autoRows = Track(1_fr);
+	grid.autoFlow = Grid::AutoFlow::column;
+	grid.justifyItems = Grid::JustifyItems::center;
+
+	// Add items to the grid
+	grid.items.addArray({
+		GridItem(audioModel->get_table()),
+		GridItem(applyButton)
+		});
+
+	grid.performLayout(getLocalBounds());
+}
+
+//==============================================================================
+// Apply
+void ApplyButton::clicked() {
+	DeviceStateList *dsl = owner->get_state();
+
+	for (int i = 0; i < dsl->entries; i++) {
+		if (dsl->devices[i].active) {
+			printf("Active: %s, %d\n", dsl->devices[i].name, dsl->devices[i].dest);
+		}
+	}
+}

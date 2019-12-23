@@ -154,17 +154,6 @@ void SelectFrame::resized() {
 }
 
 //==============================================================================
-// Apply buttons
-ApplyButton::ApplyButton(String label) {
-
-	setButtonText(label);
-}
-
-void ApplyButton::clicked() {
-	
-
-}
-//==============================================================================
 // Select buttons
 SelectButton::SelectButton(String p_radio_id, String label) {
 
@@ -299,12 +288,9 @@ void RadioPanel::create_components() {
 	// Select radios buttons
 	select_frame = new SelectFrame("Radios");
 	addAndMakeVisible(select_frame);
-	// Audio selection
-	audio_table = new AudioModel(AudioType::OUTPUT);
-	addAndMakeVisible(audio_table->get_table());
-	// Apply button
-	apply_button = new ApplyButton("Apply");
-	addAndMakeVisible(apply_button);
+	// Audio panel
+	audioPanel = new AudioPanel();
+	addAndMakeVisible(audioPanel);
 }
 
 void RadioPanel::layout_components_in_grid() {
@@ -315,7 +301,7 @@ void RadioPanel::layout_components_in_grid() {
 	// Layout in 1 row by 4 cols so that exit stays right and other stay left
 	using Track = Grid::TrackInfo;
 	grid.templateColumns = { Track(80_px), Track(80_px), Track(20_px), Track(1_fr), Track(20_px), Track(80_px) };
-	grid.templateRows = { Track(35_px),  Track(20_px), Track(1_fr), Track(25_px) };
+	grid.templateRows = { Track(35_px),  Track(20_px), Track(1_fr) };
 	grid.autoColumns = Track(1_fr);
 	grid.autoRows = Track(1_fr);
 	grid.autoFlow = Grid::AutoFlow::row;
@@ -327,8 +313,7 @@ void RadioPanel::layout_components_in_grid() {
 		GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
 		GridItem(exit_button).withArea(1,6),
 		GridItem(select_frame).withArea(1,4),
-		GridItem(audio_table->get_table()).withArea(3,1,3,7),
-		GridItem(apply_button).withArea(4,6)
+		GridItem(audioPanel).withArea(3,1,3,7)
 	});
 
 	grid.performLayout(getLocalBounds());

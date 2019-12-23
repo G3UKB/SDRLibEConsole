@@ -130,28 +130,6 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SelectFrame)
 };
 
-//===================================================================================
-// Terminate application button
-class ApplyButton : public TextButton
-{
-public:
-	//==============================================================================
-	ApplyButton(String label);
-	~ApplyButton() {}
-
-	//==============================================================================
-	void clicked();
-
-private:
-	//==============================================================================
-	// State variables
-
-	//==============================================================================
-	// Method prototypes
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ApplyButton)
-};
-
 /*
 	A radio panel component
 */
@@ -178,8 +156,7 @@ private:
 	RadioButton *DiscoverButton;
 	ExitButton *exit_button;
 	GroupComponent *select_frame;
-	AudioModel *audio_table;
-	ApplyButton *apply_button;
+	AudioPanel *audioPanel;
 
 	//==============================================================================
 	// Method prototypes
