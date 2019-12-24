@@ -45,6 +45,7 @@ typedef struct DeviceState {
 	bool rx_2;
 	bool rx_3;
 	int dest;
+	String sdest;
 	bool active;
 }DeviceState;
 
@@ -78,7 +79,7 @@ public:
 	bool get_active(int row);
 	void set_active(int row, bool state);
 	int get_dest(int row);
-	void set_dest(int row, int index);
+	void set_dest(int row, int index, String item);
 	bool get_rx_1(int row);
 	void set_rx_1(int row, bool state);
 	bool get_rx_2(int row);
@@ -189,7 +190,7 @@ public:
 
 	// Called when the selected item is changed
 	void comboBoxChanged(ComboBox* cb) override {
-		owner.set_dest(row, comboBox.getSelectedItemIndex());
+		owner.set_dest(row, comboBox.getSelectedItemIndex(), comboBox.getItemText(comboBox.getSelectedItemIndex()));
 	}
 
 private:

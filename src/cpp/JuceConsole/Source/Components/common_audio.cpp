@@ -180,8 +180,9 @@ void AudioModel::set_active(int row, bool state) {
 int AudioModel::get_dest(int row) {
 	return dsl->devices[row].dest;
 }
-void AudioModel::set_dest(int row, int index) {
+void AudioModel::set_dest(int row, int index, String item) {
 	dsl->devices[row].dest = index;
+	dsl->devices[row].sdest = item;
 }
 
 bool AudioModel::get_rx_1(int row) {
@@ -255,9 +256,26 @@ void AudioPanel::layout_components_in_grid() {
 void ApplyButton::clicked() {
 	DeviceStateList *dsl = owner->get_state();
 
+	if (!c_server_clear_audio_routes()) {
+		std::cout << "Failed to clear audio routes!" << std::endl;
+	}
 	for (int i = 0; i < dsl->entries; i++) {
 		if (dsl->devices[i].active) {
-			printf("Active: %s, %d\n", dsl->devices[i].name, dsl->devices[i].dest);
+			int rx;
+			if (dsl->devices[i].rx_1) rx = 0;
+			else if (dsl->devices[i].rx_2) rx = 1;
+			else rx = 2;
+
+			printf("Active: %s to %d for RX:%d\n", dsl->devices[i].name, dsl->devices[i].dest, rx);
+			
+			c_server_set_audio_route(
+				(int)AudioType::OUTPUT, 
+				(char*)((dsl->devices[i].sdest).toRawUTF8()), 
+				rx, 
+				(char*)((dsl->devices[i].host_api).toRawUTF8()),
+				(char*)((dsl->devices[i].name).toRawUTF8()),
+				BOTH
+			);
 		}
 	}
 }
