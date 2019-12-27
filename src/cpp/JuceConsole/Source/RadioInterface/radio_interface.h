@@ -87,6 +87,7 @@ public:
 	void ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz);
 
 	// Get methods
+	bool is_server_running();
 	bool is_radio_running();
 	bool is_radio_discovered();
 	int get_current_frequency(int channel);

@@ -183,6 +183,11 @@ bool RadioInterface::is_radio_discovered() {
 	return radio_discovered;
 }
 
+bool RadioInterface::is_server_running() {
+	return server_running;
+
+}
+
 bool RadioInterface::is_radio_running() {
 	return radio_running;
 }

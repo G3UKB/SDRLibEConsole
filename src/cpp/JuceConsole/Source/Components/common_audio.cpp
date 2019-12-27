@@ -256,9 +256,14 @@ void AudioPanel::layout_components_in_grid() {
 void ApplyButton::clicked() {
 	DeviceStateList *dsl = owner->get_state();
 
-	if (!c_server_clear_audio_routes()) {
-		std::cout << "Failed to clear audio routes!" << std::endl;
+	// If server running halt audio processes
+	if (RadioInterface::getInstance()->is_server_running()) {
+		if (!c_server_clear_audio_routes()) {
+			std::cout << "Failed to clear audio routes!" << std::endl;
+		}
 	}
+	// Do audio routes using active data
+	// Might need to clear from route data!
 	for (int i = 0; i < dsl->entries; i++) {
 		if (dsl->devices[i].active) {
 			int rx;
@@ -276,6 +281,12 @@ void ApplyButton::clicked() {
 				(char*)((dsl->devices[i].name).toRawUTF8()),
 				BOTH
 			);
+		}
+	}
+	// If server running restart audio processes
+	if (RadioInterface::getInstance()->is_server_running()) {
+		if (!c_server_restart_audio_routes()) {
+			std::cout << "Failed to restart audio routes!" << std::endl;
 		}
 	}
 }
