@@ -166,7 +166,7 @@ public:
 		comboBox.addItem("HPSDR", 2);
 		comboBox.addItem("LOCAL", 3);
 		comboBox.addItem("EXT-IQ", 4);
-		comboBox.addItem("EXT-Aud", 5);
+		comboBox.addItem("EXT-AF", 5);
 		comboBox.setSelectedItemIndex(0);
 		comboBox.addListener(this);
 	}
@@ -265,6 +265,7 @@ private:
 
 	//==============================================================================
 	// Method prototypes
+	void set_route(String dest, int rx, String host_api, String dev, String channel);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ApplyButton)
 };

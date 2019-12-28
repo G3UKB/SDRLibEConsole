@@ -263,23 +263,39 @@ void ApplyButton::clicked() {
 	}
 
 	// Reset audio routes using active data
+	// We assume here that validity has already been enforced in the UI
+	// such that there are no conflicts or invalid combinations.
 	for (int i = 0; i < dsl->entries; i++) {
 		if (dsl->devices[i].active) {
-			int rx;
-			if (dsl->devices[i].rx_1) rx = 0;
-			else if (dsl->devices[i].rx_2) rx = 1;
-			else rx = 2;
+			// We have an active route to add
+			int rx_count = 0;
+			if (dsl->devices[i].rx_1) rx_count++;
+			if (dsl->devices[i].rx_2) rx_count++;
+			if (dsl->devices[i].rx_3) rx_count++;
+			printf("Count: %d\n", rx_count);
+			String dest;
+			switch (dsl->devices[i].dest) {
+			case 1: dest = HPSDR; break;
+			case 2: dest = LOCAL; break;
+			case 3: dest = LOCAL_AF; break;
+			case 4: dest = LOCAL_IQ; break;
+			}
 
-			printf("Active: %s to %d for RX:%d\n", dsl->devices[i].name, dsl->devices[i].dest, rx);
-			
-			c_server_set_audio_route(
-				(int)AudioType::OUTPUT, 
-				(char*)((dsl->devices[i].sdest).toRawUTF8()), 
-				rx, 
-				(char*)((dsl->devices[i].host_api).toRawUTF8()),
-				(char*)((dsl->devices[i].name).toRawUTF8()),
-				BOTH
-			);
+			if (rx_count == 1) {
+				if (dsl->devices[i].rx_1) set_route(dest, 1, dsl->devices[i].host_api, dsl->devices[i].name, BOTH);
+				if (dsl->devices[i].rx_2) set_route(dest, 2, dsl->devices[i].host_api, dsl->devices[i].name, BOTH);
+				if (dsl->devices[i].rx_3) set_route(dest, 3, dsl->devices[i].host_api, dsl->devices[i].name, BOTH);
+			}
+			else if (rx_count == 2) {
+				if (dsl->devices[i].rx_1 && dsl->devices[i].rx_2) {
+					set_route(dest, 1, dsl->devices[i].host_api, dsl->devices[i].name, LEFT);
+					set_route(dest, 2, dsl->devices[i].host_api, dsl->devices[i].name, RIGHT);
+				}
+				else {
+					set_route(dest, 2, dsl->devices[i].host_api, dsl->devices[i].name, LEFT);
+					set_route(dest, 3, dsl->devices[i].host_api, dsl->devices[i].name, RIGHT);
+				}
+			}
 		}
 	}
 
@@ -287,4 +303,17 @@ void ApplyButton::clicked() {
 	if (!c_server_restart_audio_routes()) {
 		std::cout << "Failed to restart audio routes!" << std::endl;
 	}
+}
+
+// Set a single audio route
+void ApplyButton::set_route(String dest, int rx, String host_api, String dev, String channel) {
+
+	c_server_set_audio_route(
+		(int)AudioType::OUTPUT,
+		(char*)dest.toRawUTF8(),
+		rx,
+		(char*)host_api.toRawUTF8(),
+		(char*)dev.toRawUTF8(),
+		(char*)channel.toRawUTF8()
+	);
 }
