@@ -28,7 +28,7 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "common_controls.h"
+#include "common_content.h"
 
 //===================================================================================
 // Select number of radios button

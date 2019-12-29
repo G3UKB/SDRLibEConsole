@@ -1,7 +1,7 @@
 /*
-common_controls.cpp
+common_content.cpp
 
-All common controls for the Juce Console, i.e. not radio dependent
+Common content for the Juce Console, i.e. not radio dependent
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -31,7 +31,7 @@ The authors can be reached by email at:
 #include "../RadioInterface/radio_interface.h"
 #include "../RadioWindows/radio_window.h"
 #include "../RadioWindows/radio_win_cache.h"
-#include "common_controls.h"
+#include "common_content.h"
 
 //==============================================================================
 // The Panel

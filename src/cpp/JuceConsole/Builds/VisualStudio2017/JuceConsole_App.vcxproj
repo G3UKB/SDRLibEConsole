@@ -133,7 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Common\gui_cache.cpp" />
-    <ClCompile Include="..\..\Source\ControlWindow\common_controls.cpp" />
+    <ClCompile Include="..\..\Source\ControlWindow\common_content.cpp" />
     <ClCompile Include="..\..\Source\ControlWindow\Components\audio_output_panel.cpp" />
     <ClCompile Include="..\..\Source\ControlWindow\Components\exit_button.cpp" />
     <ClCompile Include="..\..\Source\ControlWindow\Components\radio_button.cpp" />
@@ -1871,7 +1871,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\extern.h" />
     <ClInclude Include="..\..\Source\Common\gui_cache.h" />
-    <ClInclude Include="..\..\Source\ControlWindow\common_controls.h" />
+    <ClInclude Include="..\..\Source\ControlWindow\common_content.h" />
     <ClInclude Include="..\..\Source\ControlWindow\Components\audio_output_panel.h" />
     <ClInclude Include="..\..\Source\ControlWindow\Components\exit_button.h" />
     <ClInclude Include="..\..\Source\ControlWindow\Components\radio_button.h" />

@@ -1,7 +1,7 @@
 /*
-common_controls.h
+common_content.h
 
-Header for common_controls component for the Juce Console
+Header for common_content component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 

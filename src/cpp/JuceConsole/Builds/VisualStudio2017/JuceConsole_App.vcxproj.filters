@@ -2175,9 +2175,6 @@
     <ClCompile Include="..\..\Source\RadioWindows\Components\vfo.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ControlWindow\common_controls.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\ControlWindow\Components\audio_output_panel.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
@@ -2191,6 +2188,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ControlWindow\tab_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\common_content.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -4256,9 +4256,6 @@
     <ClInclude Include="..\..\Source\RadioWindows\Components\vfo.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ControlWindow\common_controls.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\ControlWindow\Components\audio_output_panel.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
@@ -4272,6 +4269,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ControlWindow\tab_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\common_content.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>
