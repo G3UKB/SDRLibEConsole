@@ -2190,6 +2190,9 @@
     <ClCompile Include="..\..\Source\ControlWindow\Components\radio_select_frame.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\tab_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4266,6 +4269,9 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ControlWindow\Components\radio_select_frame.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\tab_panel.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

@@ -38,8 +38,10 @@ MainComponent::~MainComponent() {
 
 void MainComponent::start_ui()
 {
-	controlPanel = new ControlPanel();
-	addAndMakeVisible(controlPanel);
+	//controlPanel = new ControlPanel();
+	tabPanel = new TabPanel();
+	//addAndMakeVisible(controlPanel);
+	addAndMakeVisible(tabPanel);
 
 	// Restore metics
 	int W = PropCache::getInstance()->get_prop_inst("main")->getIntValue("Width", var(300));
@@ -58,7 +60,8 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	controlPanel->setBounds(10, 10, getWidth()-20, getHeight()-20);
+	//controlPanel->setBounds(10, 10, getWidth()-20, getHeight()-20);
+	tabPanel->setBounds(10, 10, getWidth() - 20, getHeight() - 20);
 
 	// Save metrics
 	if (getWidth() > 0 && getHeight() > 0) {
