@@ -2163,12 +2163,6 @@
     <ClCompile Include="..\..\Source\RadioWindows\radio_win_cache.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Components\common_controls.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Components\common_audio.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\RadioWindows\Components\display_panel.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
@@ -2179,6 +2173,12 @@
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\RadioWindows\Components\vfo.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\common_audio.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\common_controls.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -4232,12 +4232,6 @@
     <ClInclude Include="..\..\Source\RadioWindows\radio_win_cache.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Components\common_controls.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Components\common_audio.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\RadioWindows\Components\display_panel.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
@@ -4248,6 +4242,12 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\RadioWindows\Components\vfo.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\common_audio.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\common_controls.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

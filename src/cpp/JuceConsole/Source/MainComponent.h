@@ -32,7 +32,7 @@ The authors can be reached by email at:
 #include "RadioWindows/Components/mode_panel.h"
 #include "RadioWindows/Components/filter_panel.h"
 #include "RadioWindows/Components/display_panel.h"
-#include "Components/common_controls.h"
+#include "ControlWindow/common_controls.h"
 
 //==============================================================================
 /*

@@ -28,7 +28,7 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../Components/common_controls.h"
+#include "../ControlWindow/common_controls.h"
 #include "Components/vfo.h"
 #include "Components/mode_panel.h"
 #include "Components/filter_panel.h"

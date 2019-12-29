@@ -133,8 +133,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Common\gui_cache.cpp" />
-    <ClCompile Include="..\..\Source\Components\common_audio.cpp" />
-    <ClCompile Include="..\..\Source\Components\common_controls.cpp" />
+    <ClCompile Include="..\..\Source\ControlWindow\common_audio.cpp" />
+    <ClCompile Include="..\..\Source\ControlWindow\common_controls.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -1867,8 +1867,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\Common\extern.h" />
     <ClInclude Include="..\..\Source\Common\gui_cache.h" />
-    <ClInclude Include="..\..\Source\Components\common_audio.h" />
-    <ClInclude Include="..\..\Source\Components\common_controls.h" />
+    <ClInclude Include="..\..\Source\ControlWindow\common_audio.h" />
+    <ClInclude Include="..\..\Source\ControlWindow\common_controls.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h" />
