@@ -1,7 +1,7 @@
 /*
-radio_select_frame.h
+tab_panel.h
 
-Header for radio select component for the Juce Console
+Header for tab panel for control window for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -27,53 +27,27 @@ The authors can be reached by email at:
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../../JuceLibraryCode/JuceHeader.h"
+#include "common_controls.h"
 
 //===================================================================================
 // Select number of radios button
-class SelectButton : public TextButton
+class TabPanel : public TabbedComponent
 {
 public:
 	//==============================================================================
-	SelectButton(String p_radio_id, String label);
-	~SelectButton() {}
+	TabPanel();
+	~TabPanel() {};
 
 	//==============================================================================
-	void clicked();
 
 private:
 	//==============================================================================
 	// State variables
-	String radio_id;
+	ControlPanel *controlPanel;
 
 	//==============================================================================
 	// Method prototypes
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SelectButton)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TabPanel)
 };
-
-//===================================================================================
-// The frame to assemble everything in
-class SelectFrame : public GroupComponent
-{
-public:
-	//==============================================================================
-	SelectFrame(String label);
-	~SelectFrame() {}
-
-	//==============================================================================
-	void resized() override;
-
-private:
-	//==============================================================================
-	// State variables
-	SelectButton *select_button_r1;
-	SelectButton *select_button_r2;
-	SelectButton *select_button_r3;
-
-	//==============================================================================
-	// Method prototypes
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SelectFrame)
-};
-
