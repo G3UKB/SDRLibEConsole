@@ -2181,6 +2181,12 @@
     <ClCompile Include="..\..\Source\ControlWindow\Components\audio_output_panel.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\Components\radio_button.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlWindow\Components\exit_button.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainComponent.h">
@@ -4248,6 +4254,12 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ControlWindow\Components\audio_output_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\Components\radio_button.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlWindow\Components\exit_button.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>

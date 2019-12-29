@@ -135,6 +135,8 @@
     <ClCompile Include="..\..\Source\Common\gui_cache.cpp" />
     <ClCompile Include="..\..\Source\ControlWindow\common_controls.cpp" />
     <ClCompile Include="..\..\Source\ControlWindow\Components\audio_output_panel.cpp" />
+    <ClCompile Include="..\..\Source\ControlWindow\Components\exit_button.cpp" />
+    <ClCompile Include="..\..\Source\ControlWindow\Components\radio_button.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -1869,6 +1871,8 @@
     <ClInclude Include="..\..\Source\Common\gui_cache.h" />
     <ClInclude Include="..\..\Source\ControlWindow\common_controls.h" />
     <ClInclude Include="..\..\Source\ControlWindow\Components\audio_output_panel.h" />
+    <ClInclude Include="..\..\Source\ControlWindow\Components\exit_button.h" />
+    <ClInclude Include="..\..\Source\ControlWindow\Components\radio_button.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h" />

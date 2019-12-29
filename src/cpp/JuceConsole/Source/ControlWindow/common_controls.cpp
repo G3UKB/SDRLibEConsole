@@ -27,12 +27,13 @@ The authors can be reached by email at:
 
 #pragma once
 
-#include "common_controls.h"
 #include "../Common/extern.h"
 #include "../RadioInterface/radio_interface.h"
 #include "../RadioWindows/radio_window.h"
 #include "../RadioWindows/radio_win_cache.h"
+#include "common_controls.h"
 
+/*
 //==============================================================================
 // Radio control buttons
 RadioButton::RadioButton(BUTTON_TYPE p_type, String p_label, String p_label_down, Colour p_normal, Colour p_down) {
@@ -107,6 +108,7 @@ ExitButton::ExitButton(String label) {
 void ExitButton::clicked() {
 	JUCEApplicationBase::quit();
 }
+*/
 
 //==============================================================================
 // Radio select buttons

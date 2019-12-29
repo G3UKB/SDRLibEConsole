@@ -29,7 +29,10 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/audio_output_panel.h"
+#include "Components/radio_button.h"
+#include "Components/exit_button.h"
 
+/*
 //===================================================================================
 // A start/stop button component
 enum class BUTTON_TYPE {
@@ -81,6 +84,7 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ExitButton)
 };
+*/
 
 //===================================================================================
 // Select number of radios button
