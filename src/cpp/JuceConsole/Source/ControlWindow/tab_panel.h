@@ -29,6 +29,7 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "common_content.h"
+#include "audio_out_content.h"
 
 //===================================================================================
 // Select number of radios button
@@ -45,6 +46,7 @@ private:
 	//==============================================================================
 	// State variables
 	ControlPanel *controlPanel;
+	AudioOutPanel *audioOutPanel;
 
 	//==============================================================================
 	// Method prototypes

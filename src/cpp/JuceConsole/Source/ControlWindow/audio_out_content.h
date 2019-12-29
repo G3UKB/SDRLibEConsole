@@ -1,7 +1,7 @@
 /*
-common_content.h
+audio_out_content.h
 
-Header for common_content component for the Juce Console
+Header for audio out content component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -28,25 +28,25 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-//#include "Components/audio_output_panel.h"
-#include "Components/radio_button.h"
-#include "Components/exit_button.h"
-#include "Components/radio_select_frame.h"
+#include "Components/audio_output_panel.h"
+//#include "Components/radio_button.h"
+//#include "Components/exit_button.h"
+//#include "Components/radio_select_frame.h"
 
 /*
 	A radio panel component
 */
-class ControlPanel : public Component
+class AudioOutPanel : public Component
 {
 public:
 	//==============================================================================
-	ControlPanel();
-	~ControlPanel();
+	AudioOutPanel();
+	~AudioOutPanel();
 
 	void resized() override;
 	void paint(Graphics& g) override;
 
-	RadioButton *get_start_button();
+	//RadioButton *get_start_button();
 
 	//==============================================================================
 
@@ -55,16 +55,16 @@ private:
 	// State variables
 
 	// Button vars
-	RadioButton *StartButton;
-	RadioButton *DiscoverButton;
-	ExitButton *exit_button;
-	GroupComponent *select_frame;
-	//AudioPanel *audioPanel;
+	//RadioButton *StartButton;
+	//RadioButton *DiscoverButton;
+	//ExitButton *exit_button;
+	//GroupComponent *select_frame;
+	AudioPanel *audioPanel;
 
 	//==============================================================================
 	// Method prototypes
 	void create_components();
 	void layout_components_in_grid();
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControlPanel)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioOutPanel)
 };

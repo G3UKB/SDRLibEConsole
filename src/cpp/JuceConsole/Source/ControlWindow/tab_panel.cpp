@@ -37,6 +37,8 @@ TabPanel::TabPanel() : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop) 
 
 	controlPanel = new ControlPanel();
 	addTab("Control", Colours::lightgrey, controlPanel, false);
+	audioOutPanel = new AudioOutPanel();
+	addTab("Audio Out", Colours::lightgrey, audioOutPanel, false);
 }
 
 
