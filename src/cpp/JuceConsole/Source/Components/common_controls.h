@@ -133,12 +133,12 @@ private:
 /*
 	A radio panel component
 */
-class RadioPanel : public Component
+class ControlPanel : public Component
 {
 public:
 	//==============================================================================
-	RadioPanel();
-	~RadioPanel();
+	ControlPanel();
+	~ControlPanel();
 
 	void resized() override;
 	void paint(Graphics& g) override;
@@ -163,5 +163,5 @@ private:
 	void create_components();
 	void layout_components_in_grid();
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RadioPanel)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControlPanel)
 };

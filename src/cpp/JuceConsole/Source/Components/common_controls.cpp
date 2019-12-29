@@ -88,7 +88,7 @@ void RadioButton::clicked() {
 			} else {
 				// Start radio 1 instance
 				setEnabled(false);
-				RadioPanel *p = (RadioPanel *)getParentComponent();
+				ControlPanel *p = (ControlPanel *)getParentComponent();
 				p->get_start_button()->setEnabled(true);
 				std::cout << "Starting radio 1" << std::endl;
 				RadioWindow * w1 = RadioWinCache::getInstance()->create_window("radio-1");
@@ -183,7 +183,7 @@ void SelectButton::clicked() {
 		RadioInterface::getInstance()->reset();
 
 		// Turn off start button
-		RadioPanel *p = (RadioPanel *)(getParentComponent()->getParentComponent());
+		ControlPanel *p = (ControlPanel *)(getParentComponent()->getParentComponent());
 		p->get_start_button()->setToggleState(false, NotificationType::dontSendNotification);
 		p->get_start_button()->setButtonText("Start");
 
@@ -245,7 +245,7 @@ void SelectButton::clicked() {
 
 //==============================================================================
 // The Panel
-RadioPanel::RadioPanel() {
+ControlPanel::ControlPanel() {
 
 	// Local vars
 
@@ -253,18 +253,18 @@ RadioPanel::RadioPanel() {
 	create_components();
 }
 
-RadioPanel::~RadioPanel() {}
+ControlPanel::~ControlPanel() {}
 
-void RadioPanel::resized() {
+void ControlPanel::resized() {
 	// This is called when the radio panel is resized.
 	layout_components_in_grid();
 }
 
-RadioButton *RadioPanel::get_start_button() {
+RadioButton *ControlPanel::get_start_button() {
 	return StartButton;
 }
 
-void RadioPanel::paint(Graphics& g)
+void ControlPanel::paint(Graphics& g)
 {
 	// The component is opaque, so we must completely fill the background with a solid colour
 	g.fillAll(Colours::darkgrey);
@@ -275,7 +275,7 @@ void RadioPanel::paint(Graphics& g)
 
 //==============================================================================
 // Private
-void RadioPanel::create_components() {
+void ControlPanel::create_components() {
 
 	// Radio control buttons
 	StartButton = new RadioButton(BUTTON_TYPE::START_STOP, "Start", "Stop", Colours::green, Colours::red);
@@ -293,7 +293,7 @@ void RadioPanel::create_components() {
 	addAndMakeVisible(audioPanel);
 }
 
-void RadioPanel::layout_components_in_grid() {
+void ControlPanel::layout_components_in_grid() {
 
 	// Local grid as its just a bag of behaviour
 	Grid grid;

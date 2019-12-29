@@ -28,11 +28,11 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Components/vfo.h"
+#include "RadioWindows/Components/vfo.h"
+#include "RadioWindows/Components/mode_panel.h"
+#include "RadioWindows/Components/filter_panel.h"
+#include "RadioWindows/Components/display_panel.h"
 #include "Components/common_controls.h"
-#include "Components/mode_panel.h"
-#include "Components/filter_panel.h"
-#include "Components/display_panel.h"
 
 //==============================================================================
 /*
@@ -54,7 +54,7 @@ public:
 private:
     //==============================================================================
     // Children
-	RadioPanel *radio_panel;
+	ControlPanel *controlPanel;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

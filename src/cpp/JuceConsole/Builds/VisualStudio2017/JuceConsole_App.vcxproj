@@ -135,10 +135,6 @@
     <ClCompile Include="..\..\Source\Common\gui_cache.cpp" />
     <ClCompile Include="..\..\Source\Components\common_audio.cpp" />
     <ClCompile Include="..\..\Source\Components\common_controls.cpp" />
-    <ClCompile Include="..\..\Source\Components\display_panel.cpp" />
-    <ClCompile Include="..\..\Source\Components\filter_panel.cpp" />
-    <ClCompile Include="..\..\Source\Components\mode_panel.cpp" />
-    <ClCompile Include="..\..\Source\Components\vfo.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -1860,6 +1856,10 @@
     <ClCompile Include="..\..\Source\Properties\properties.cpp" />
     <ClCompile Include="..\..\Source\Properties\prop_cache.cpp" />
     <ClCompile Include="..\..\Source\RadioInterface\radio_interface.cpp" />
+    <ClCompile Include="..\..\Source\RadioWindows\Components\display_panel.cpp" />
+    <ClCompile Include="..\..\Source\RadioWindows\Components\filter_panel.cpp" />
+    <ClCompile Include="..\..\Source\RadioWindows\Components\mode_panel.cpp" />
+    <ClCompile Include="..\..\Source\RadioWindows\Components\vfo.cpp" />
     <ClCompile Include="..\..\Source\RadioWindows\radio_component.cpp" />
     <ClCompile Include="..\..\Source\RadioWindows\radio_window.cpp" />
     <ClCompile Include="..\..\Source\RadioWindows\radio_win_cache.cpp" />
@@ -1869,10 +1869,6 @@
     <ClInclude Include="..\..\Source\Common\gui_cache.h" />
     <ClInclude Include="..\..\Source\Components\common_audio.h" />
     <ClInclude Include="..\..\Source\Components\common_controls.h" />
-    <ClInclude Include="..\..\Source\Components\display_panel.h" />
-    <ClInclude Include="..\..\Source\Components\filter_panel.h" />
-    <ClInclude Include="..\..\Source\Components\mode_panel.h" />
-    <ClInclude Include="..\..\Source\Components\vfo.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h" />
     <ClInclude Include="..\..\..\..\..\..\..\..\DevelopmentResources\Juce\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h" />
@@ -2551,6 +2547,10 @@
     <ClInclude Include="..\..\Source\Properties\properties.h" />
     <ClInclude Include="..\..\Source\Properties\prop_cache.h" />
     <ClInclude Include="..\..\Source\RadioInterface\radio_interface.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\Components\display_panel.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\Components\filter_panel.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\Components\mode_panel.h" />
+    <ClInclude Include="..\..\Source\RadioWindows\Components\vfo.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_component.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_window.h" />
     <ClInclude Include="..\..\Source\RadioWindows\radio_win_cache.h" />

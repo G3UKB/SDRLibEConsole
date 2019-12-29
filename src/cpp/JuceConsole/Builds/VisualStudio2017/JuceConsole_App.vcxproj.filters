@@ -2142,19 +2142,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp">
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Components\vfo.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Components\mode_panel.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Components\filter_panel.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\RadioInterface\radio_interface.cpp">
-      <Filter>JuceConsole\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Components\display_panel.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Common\gui_cache.cpp">
@@ -2179,6 +2167,18 @@
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Components\common_audio.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\Components\display_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\Components\filter_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\Components\mode_panel.cpp">
+      <Filter>JuceConsole\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioWindows\Components\vfo.cpp">
       <Filter>JuceConsole\Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -4208,22 +4208,10 @@
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h">
       <Filter>JUCE Library Code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Components\vfo.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Common\extern.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Components\mode_panel.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Components\filter_panel.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\RadioInterface\radio_interface.h">
-      <Filter>JuceConsole\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Components\display_panel.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Common\gui_cache.h">
@@ -4248,6 +4236,18 @@
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Components\common_audio.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\Components\display_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\Components\filter_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\Components\mode_panel.h">
+      <Filter>JuceConsole\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioWindows\Components\vfo.h">
       <Filter>JuceConsole\Source</Filter>
     </ClInclude>
   </ItemGroup>
