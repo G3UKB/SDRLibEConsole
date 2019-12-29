@@ -28,7 +28,7 @@ The authors can be reached by email at:
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "common_audio.h"
+#include "Components/audio_output_panel.h"
 
 //===================================================================================
 // A start/stop button component

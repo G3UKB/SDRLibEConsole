@@ -1,7 +1,7 @@
 /*
-common_audio.cpp
+audio_output_panel.cpp
 
-All common controls audio component for the Juce Console
+Audio output component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -25,9 +25,9 @@ The authors can be reached by email at:
 
 */
 
-#include "../RadioInterface/radio_interface.h"
-#include "../Common/extern.h"
-#include "common_audio.h"
+#include "../../RadioInterface/radio_interface.h"
+#include "../../Common/extern.h"
+#include "audio_output_panel.h"
 
 //==============================================================================
 // Audio Model

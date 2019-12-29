@@ -1,7 +1,7 @@
 /*
-common_audio.h
+audio_output_panel.h
 
-Header for common_controls audio component for the Juce Console
+Header for audio output component for the Juce Console
 
 Copyright (C) 2019 by G3UKB Bob Cowdery
 
@@ -27,8 +27,8 @@ The authors can be reached by email at:
 
 #pragma once
 
-#include "../Common/extern.h"
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include "../../Common/extern.h"
+#include "../../../JuceLibraryCode/JuceHeader.h"
 
 //===================================================================================
 // Model class for Audio selection

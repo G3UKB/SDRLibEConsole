@@ -32,7 +32,6 @@ The authors can be reached by email at:
 #include "../RadioInterface/radio_interface.h"
 #include "../RadioWindows/radio_window.h"
 #include "../RadioWindows/radio_win_cache.h"
-#include "common_audio.h"
 
 //==============================================================================
 // Radio control buttons
