@@ -32,7 +32,6 @@ The authors can be reached by email at:
 #include "RadioWindows/Components/mode_panel.h"
 #include "RadioWindows/Components/filter_panel.h"
 #include "RadioWindows/Components/display_panel.h"
-//#include "ControlWindow/common_controls.h"
 #include "ControlWindow/tab_panel.h"
 
 //==============================================================================
@@ -55,7 +54,6 @@ public:
 private:
     //==============================================================================
     // Children
-	//ControlPanel *controlPanel;
 	TabPanel * tabPanel;
 	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

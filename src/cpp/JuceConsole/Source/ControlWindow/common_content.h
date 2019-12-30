@@ -59,7 +59,6 @@ private:
 	RadioButton *DiscoverButton;
 	ExitButton *exit_button;
 	GroupComponent *select_frame;
-	//AudioPanel *audioPanel;
 
 	//==============================================================================
 	// Method prototypes

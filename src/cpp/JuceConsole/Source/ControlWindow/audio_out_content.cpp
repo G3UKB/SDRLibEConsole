@@ -50,10 +50,6 @@ void AudioOutPanel::resized() {
 	layout_components_in_grid();
 }
 
-//RadioButton *ControlPanel::get_start_button() {
-//	return StartButton;
-//}
-
 void AudioOutPanel::paint(Graphics& g)
 {
 	// The component is opaque, so we must completely fill the background with a solid colour
@@ -67,18 +63,7 @@ void AudioOutPanel::paint(Graphics& g)
 // Private
 void AudioOutPanel::create_components() {
 
-	// Radio control buttons
-	//StartButton = new RadioButton(BUTTON_TYPE::START_STOP, "Start", "Stop", Colours::green, Colours::red);
-	//addAndMakeVisible(StartButton);
-	//DiscoverButton = new RadioButton(BUTTON_TYPE::DISCOVER, "Discover", "", Colours::orange, Colours::orange);
-	//addAndMakeVisible(DiscoverButton);
-	// Exit app button
-	//exit_button = new ExitButton("Exit");
-	//addAndMakeVisible(exit_button);
-	// Select radios buttons
-	//select_frame = new SelectFrame("Radios");
-	//addAndMakeVisible(select_frame);
-	// Audio panel
+	// Audio output panel
 	audioPanel = new AudioPanel();
 	addAndMakeVisible(audioPanel);
 }
@@ -99,10 +84,6 @@ void AudioOutPanel::layout_components_in_grid() {
 
 	// Add items to the grid
 	grid.items.addArray({
-		//GridItem(StartButton).withJustifySelf(GridItem::JustifySelf::start),
-		//GridItem(DiscoverButton).withJustifySelf(GridItem::JustifySelf::start),
-		//GridItem(exit_button).withArea(1,6),
-		//GridItem(select_frame).withArea(1,4),
 		GridItem(audioPanel)
 	});
 

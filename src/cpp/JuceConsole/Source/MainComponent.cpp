@@ -38,9 +38,7 @@ MainComponent::~MainComponent() {
 
 void MainComponent::start_ui()
 {
-	//controlPanel = new ControlPanel();
 	tabPanel = new TabPanel();
-	//addAndMakeVisible(controlPanel);
 	addAndMakeVisible(tabPanel);
 
 	// Restore metics
@@ -60,7 +58,6 @@ void MainComponent::resized()
 {
     // This is called when the MainComponent is resized.
     // Resize children
-	//controlPanel->setBounds(10, 10, getWidth()-20, getHeight()-20);
 	tabPanel->setBounds(10, 10, getWidth() - 20, getHeight() - 20);
 
 	// Save metrics

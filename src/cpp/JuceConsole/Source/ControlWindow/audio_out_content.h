@@ -29,9 +29,6 @@ The authors can be reached by email at:
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Components/audio_output_panel.h"
-//#include "Components/radio_button.h"
-//#include "Components/exit_button.h"
-//#include "Components/radio_select_frame.h"
 
 /*
 	A radio panel component
@@ -46,19 +43,12 @@ public:
 	void resized() override;
 	void paint(Graphics& g) override;
 
-	//RadioButton *get_start_button();
-
 	//==============================================================================
 
 private:
 	//==============================================================================
 	// State variables
-
-	// Button vars
-	//RadioButton *StartButton;
-	//RadioButton *DiscoverButton;
-	//ExitButton *exit_button;
-	//GroupComponent *select_frame;
+	// Output audio panel
 	AudioPanel *audioPanel;
 
 	//==============================================================================
