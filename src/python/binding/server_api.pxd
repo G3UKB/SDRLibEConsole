@@ -14,8 +14,20 @@ cdef extern from "E:\\Projects\\SDRLibE\\libs\\pthreads\\include\\pthread.h":
 cdef extern from "E:\\Projects\\SDRLibE\\libs\\portaudio\\include\\portaudio.h":
     pass
 cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\audio\\local_audio.h":
-    pass
+    # Returned from device enumerator
+    ctypedef struct DeviceEnum:
+        int direction
+        int index
+        char name[50]
+        int channels
+        char host_api[50]
 
+    ctypedef struct DeviceEnumList:
+        int entries
+        DeviceEnum devices[50]
+    DeviceEnumList* c_server_enum_audio_inputs();
+    DeviceEnumList* c_server_enum_audio_outputs();
+    
 cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\server\\server.h":
     # Prototypes
     # General
