@@ -35,7 +35,16 @@ cdef class Server:
     # Terminate server
     def server_terminate(self):
         return api.c_server_terminate()
-        
+    
+    void c_server_set_in_rate(int rate)
+    void c_server_set_out_rate(int rate)
+    void c_server_set_iq_blk_sz(int blk_sz)
+    void c_server_set_mic_blk_sz(int blk_sz)
+    void c_server_set_duplex(int duplex)
+    void c_server_set_fft_size(int size)
+    void c_server_set_window_type(int window_type)
+    void c_server_set_av_mode(int mode)
+    
 # ===================================================
 # Audio functions
 cdef class Audio:
@@ -243,6 +252,18 @@ cdef class DSP:
     def server_get_rx_meter_data(self, channel, which):
         return api.c_server_get_rx_meter_data(channel, which)
 
+    #=============================
+    # TX functions
+    # ----------------------------
+    void c_server_set_tx_mode(int channel, int mode)
+    void c_server_set_tx_filter_run(int channel, int run)
+    void c_server_set_tx_filter_freq(int channel, int low, int high)
+    void c_server_set_tx_filter_window(int channel, int window)
+    double c_server_get_tx_meter_data(int channel, int which)
+    void c_server_set_mic_gain(float gain)
+    void c_server_set_rf_drive(float drive)
+    short c_server_get_peak_input_level()
+    
 # ===================================================
 # Display functions
 cdef class Display:
@@ -251,16 +272,24 @@ cdef class Display:
     # Constructor
     def __cinit__(self):
         self.__display_data = np.zeros(1920, dtype=np.float)
+        self.__wbs_data = np.zeros(1920, dtype=np.float)
     
     # ----------------------------
-    # Set display width
+    # Change display width
+    def server_set_display_width(self, width) :
+        api.c_server_set_display_width(width) 
+
+    # ----------------------------
+    # Set display for channel
     def server_set_display(self, ch_id, display_width):
         api.c_server_set_display(ch_id, display_width)
     
     # ----------------------------
-    # Get last display data    
+    # Get spectrum display data    
     def server_get_display_data(self, display_id, display_data):
-        if api.c_server_get_display_data(display_id, np.PyArray_DATA(self.__display_data)):
+        # a memview can be used to pass in a pointer
+        cdef float[::1] arr_memview = self.__display_data
+        if api.c_server_get_display_data(display_id, &arr_memview[0]):
             return [True, self.__display_data]
         else:
             return [False, None]
@@ -273,8 +302,12 @@ cdef class Display:
     # ----------------------------
     # Get WBS data    
     def server_get_wbs_data(self, width, wbs_data):
-        # return api.c_server_get_wbs_data(width, wbs_data)
-        pass
+        # a memview can be used to pass in a pointer
+        cdef float[::1] arr_memview = self.__wbs_data
+        if api.c_server_get_wbs_data(width, &arr_memview[0]):
+            return [True, self.__wbs_data]
+        else:
+            return [False, None] 
     
 #=======================================================================================	
 # These are functions with C types. They can be called internally in Cython but cannot be exposed.
