@@ -299,6 +299,9 @@ cdef class DSP:
 # Display functions
 cdef class Display:
    
+    cdef object __display_data
+    cdef object __wbs_data
+    
     # ----------------------------
     # Constructor
     def __cinit__(self):

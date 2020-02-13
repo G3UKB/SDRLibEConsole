@@ -1024,10 +1024,12 @@ struct __pyx_obj_6server_DSP {
  * # Display functions
  * cdef class Display:             # <<<<<<<<<<<<<<
  * 
- *     # ----------------------------
+ *     cdef object __display_data
  */
 struct __pyx_obj_6server_Display {
   PyObject_HEAD
+  PyObject *__pyx___display_data;
+  PyObject *__pyx___wbs_data;
 };
 
 
@@ -1336,15 +1338,6 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 #define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 #define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
-#endif
-
-/* PyObjectSetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
-#else
-#define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
-#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
 #endif
 
 /* BufferIndexError.proto */
@@ -1932,7 +1925,6 @@ static const char __pyx_k_location[] = "location";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_receiver[] = "receiver";
 static const char __pyx_k_setstate[] = "__setstate__";
-static const char __pyx_k_wbs_data[] = "__wbs_data";
 static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_direction[] = "direction";
 static const char __pyx_k_enumerate[] = "enumerate";
@@ -1944,7 +1936,6 @@ static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
-static const char __pyx_k_display_data[] = "__display_data";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_sound_mapper[] = "sound mapper";
 static const char __pyx_k_stringsource[] = "stringsource";
@@ -2026,7 +2017,6 @@ static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_dev;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_direction;
-static PyObject *__pyx_n_s_display_data;
 static PyObject *__pyx_n_s_display_width;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_dtype_is_object;
@@ -2099,7 +2089,6 @@ static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
-static PyObject *__pyx_n_s_wbs_data;
 static PyObject *__pyx_n_s_which;
 static PyObject *__pyx_n_s_window;
 static PyObject *__pyx_n_s_zeros;
@@ -7207,7 +7196,7 @@ static PyObject *__pyx_pf_6server_3DSP_36__setstate_cython__(CYTHON_UNUSED struc
   return __pyx_r;
 }
 
-/* "server.pyx":304
+/* "server.pyx":307
  *     # ----------------------------
  *     # Constructor
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -7240,63 +7229,69 @@ static int __pyx_pf_6server_7Display___cinit__(struct __pyx_obj_6server_Display 
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "server.pyx":305
+  /* "server.pyx":308
  *     # Constructor
  *     def __cinit__(self):
  *         self.__display_data = np.zeros(1920, dtype=np.float)             # <<<<<<<<<<<<<<
  *         self.__wbs_data = np.zeros(1920, dtype=np.float)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_float); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(1, 305, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_display_data, __pyx_t_4) < 0) __PYX_ERR(1, 305, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_GIVEREF(__pyx_t_4);
+  __Pyx_GOTREF(__pyx_v_self->__pyx___display_data);
+  __Pyx_DECREF(__pyx_v_self->__pyx___display_data);
+  __pyx_v_self->__pyx___display_data = __pyx_t_4;
+  __pyx_t_4 = 0;
 
-  /* "server.pyx":306
+  /* "server.pyx":309
  *     def __cinit__(self):
  *         self.__display_data = np.zeros(1920, dtype=np.float)
  *         self.__wbs_data = np.zeros(1920, dtype=np.float)             # <<<<<<<<<<<<<<
  * 
  *     # ----------------------------
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_float); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(1, 306, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_dtype, __pyx_t_3) < 0) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__9, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 306, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__9, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_wbs_data, __pyx_t_3) < 0) __PYX_ERR(1, 306, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __Pyx_GOTREF(__pyx_v_self->__pyx___wbs_data);
+  __Pyx_DECREF(__pyx_v_self->__pyx___wbs_data);
+  __pyx_v_self->__pyx___wbs_data = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "server.pyx":304
+  /* "server.pyx":307
  *     # ----------------------------
  *     # Constructor
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -7319,7 +7314,7 @@ static int __pyx_pf_6server_7Display___cinit__(struct __pyx_obj_6server_Display 
   return __pyx_r;
 }
 
-/* "server.pyx":310
+/* "server.pyx":313
  *     # ----------------------------
  *     # Change display width
  *     def server_set_display_width(self, width) :             # <<<<<<<<<<<<<<
@@ -7346,17 +7341,17 @@ static PyObject *__pyx_pf_6server_7Display_2server_set_display_width(CYTHON_UNUS
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("server_set_display_width", 0);
 
-  /* "server.pyx":311
+  /* "server.pyx":314
  *     # Change display width
  *     def server_set_display_width(self, width) :
  *         api.c_server_set_display_width(width)             # <<<<<<<<<<<<<<
  * 
  *     # ----------------------------
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 311, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 314, __pyx_L1_error)
   c_server_set_display_width(__pyx_t_1);
 
-  /* "server.pyx":310
+  /* "server.pyx":313
  *     # ----------------------------
  *     # Change display width
  *     def server_set_display_width(self, width) :             # <<<<<<<<<<<<<<
@@ -7376,7 +7371,7 @@ static PyObject *__pyx_pf_6server_7Display_2server_set_display_width(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "server.pyx":315
+/* "server.pyx":318
  *     # ----------------------------
  *     # Set display for channel
  *     def server_set_display(self, ch_id, display_width):             # <<<<<<<<<<<<<<
@@ -7415,11 +7410,11 @@ static PyObject *__pyx_pw_6server_7Display_5server_set_display(PyObject *__pyx_v
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_display_width)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("server_set_display", 1, 2, 2, 1); __PYX_ERR(1, 315, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("server_set_display", 1, 2, 2, 1); __PYX_ERR(1, 318, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "server_set_display") < 0)) __PYX_ERR(1, 315, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "server_set_display") < 0)) __PYX_ERR(1, 318, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7432,7 +7427,7 @@ static PyObject *__pyx_pw_6server_7Display_5server_set_display(PyObject *__pyx_v
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("server_set_display", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 315, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("server_set_display", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 318, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("server.Display.server_set_display", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7452,18 +7447,18 @@ static PyObject *__pyx_pf_6server_7Display_4server_set_display(CYTHON_UNUSED str
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("server_set_display", 0);
 
-  /* "server.pyx":316
+  /* "server.pyx":319
  *     # Set display for channel
  *     def server_set_display(self, ch_id, display_width):
  *         api.c_server_set_display(ch_id, display_width)             # <<<<<<<<<<<<<<
  * 
  *     # ----------------------------
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_ch_id); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 316, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_display_width); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 316, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_ch_id); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 319, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_display_width); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 319, __pyx_L1_error)
   c_server_set_display(__pyx_t_1, __pyx_t_2);
 
-  /* "server.pyx":315
+  /* "server.pyx":318
  *     # ----------------------------
  *     # Set display for channel
  *     def server_set_display(self, ch_id, display_width):             # <<<<<<<<<<<<<<
@@ -7483,7 +7478,7 @@ static PyObject *__pyx_pf_6server_7Display_4server_set_display(CYTHON_UNUSED str
   return __pyx_r;
 }
 
-/* "server.pyx":320
+/* "server.pyx":323
  *     # ----------------------------
  *     # Get spectrum display data
  *     def server_get_display_data(self, display_id):             # <<<<<<<<<<<<<<
@@ -7508,52 +7503,48 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
   __Pyx_memviewslice __pyx_v_arr_memview = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  __Pyx_memviewslice __pyx_t_2 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_t_3;
-  Py_ssize_t __pyx_t_4;
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_2;
+  Py_ssize_t __pyx_t_3;
+  int __pyx_t_4;
   int __pyx_t_5;
-  int __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("server_get_display_data", 0);
 
-  /* "server.pyx":322
+  /* "server.pyx":325
  *     def server_get_display_data(self, display_id):
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data             # <<<<<<<<<<<<<<
  *         if api.c_server_get_display_data(display_id, &arr_memview[0]):
  *             return [True, self.__display_data]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_display_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 322, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(1, 322, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_arr_memview = __pyx_t_2;
-  __pyx_t_2.memview = NULL;
-  __pyx_t_2.data = NULL;
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_v_self->__pyx___display_data, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(1, 325, __pyx_L1_error)
+  __pyx_v_arr_memview = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
 
-  /* "server.pyx":323
+  /* "server.pyx":326
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data
  *         if api.c_server_get_display_data(display_id, &arr_memview[0]):             # <<<<<<<<<<<<<<
  *             return [True, self.__display_data]
  *         else:
  */
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_v_display_id); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 323, __pyx_L1_error)
-  __pyx_t_4 = 0;
-  __pyx_t_5 = -1;
-  if (__pyx_t_4 < 0) {
-    __pyx_t_4 += __pyx_v_arr_memview.shape[0];
-    if (unlikely(__pyx_t_4 < 0)) __pyx_t_5 = 0;
-  } else if (unlikely(__pyx_t_4 >= __pyx_v_arr_memview.shape[0])) __pyx_t_5 = 0;
-  if (unlikely(__pyx_t_5 != -1)) {
-    __Pyx_RaiseBufferIndexError(__pyx_t_5);
-    __PYX_ERR(1, 323, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_display_id); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 326, __pyx_L1_error)
+  __pyx_t_3 = 0;
+  __pyx_t_4 = -1;
+  if (__pyx_t_3 < 0) {
+    __pyx_t_3 += __pyx_v_arr_memview.shape[0];
+    if (unlikely(__pyx_t_3 < 0)) __pyx_t_4 = 0;
+  } else if (unlikely(__pyx_t_3 >= __pyx_v_arr_memview.shape[0])) __pyx_t_4 = 0;
+  if (unlikely(__pyx_t_4 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_4);
+    __PYX_ERR(1, 326, __pyx_L1_error)
   }
-  __pyx_t_6 = (c_server_get_display_data(__pyx_t_3, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_arr_memview.data) + __pyx_t_4)) ))))) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_5 = (c_server_get_display_data(__pyx_t_2, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_arr_memview.data) + __pyx_t_3)) ))))) != 0);
+  if (__pyx_t_5) {
 
-    /* "server.pyx":324
+    /* "server.pyx":327
  *         cdef float[::1] arr_memview = self.__display_data
  *         if api.c_server_get_display_data(display_id, &arr_memview[0]):
  *             return [True, self.__display_data]             # <<<<<<<<<<<<<<
@@ -7561,21 +7552,19 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
  *             return [False, None]
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_display_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 324, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 324, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 327, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(Py_True);
     __Pyx_GIVEREF(Py_True);
-    PyList_SET_ITEM(__pyx_t_7, 0, Py_True);
-    __Pyx_GIVEREF(__pyx_t_1);
-    PyList_SET_ITEM(__pyx_t_7, 1, __pyx_t_1);
-    __pyx_t_1 = 0;
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    PyList_SET_ITEM(__pyx_t_6, 0, Py_True);
+    __Pyx_INCREF(__pyx_v_self->__pyx___display_data);
+    __Pyx_GIVEREF(__pyx_v_self->__pyx___display_data);
+    PyList_SET_ITEM(__pyx_t_6, 1, __pyx_v_self->__pyx___display_data);
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
 
-    /* "server.pyx":323
+    /* "server.pyx":326
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data
  *         if api.c_server_get_display_data(display_id, &arr_memview[0]):             # <<<<<<<<<<<<<<
@@ -7584,7 +7573,7 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
  */
   }
 
-  /* "server.pyx":326
+  /* "server.pyx":329
  *             return [True, self.__display_data]
  *         else:
  *             return [False, None]             # <<<<<<<<<<<<<<
@@ -7593,20 +7582,20 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 326, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 329, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(Py_False);
     __Pyx_GIVEREF(Py_False);
-    PyList_SET_ITEM(__pyx_t_7, 0, Py_False);
+    PyList_SET_ITEM(__pyx_t_6, 0, Py_False);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    PyList_SET_ITEM(__pyx_t_7, 1, Py_None);
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    PyList_SET_ITEM(__pyx_t_6, 1, Py_None);
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
   }
 
-  /* "server.pyx":320
+  /* "server.pyx":323
  *     # ----------------------------
  *     # Get spectrum display data
  *     def server_get_display_data(self, display_id):             # <<<<<<<<<<<<<<
@@ -7616,9 +7605,8 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_2, 1);
-  __Pyx_XDECREF(__pyx_t_7);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("server.Display.server_get_display_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -7628,7 +7616,7 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
   return __pyx_r;
 }
 
-/* "server.pyx":330
+/* "server.pyx":333
  *     # ----------------------------
  *     # Process WBS frame
  *     def server_process_wbs_frame(self, ptr_in_bytes):             # <<<<<<<<<<<<<<
@@ -7655,17 +7643,17 @@ static PyObject *__pyx_pf_6server_7Display_8server_process_wbs_frame(CYTHON_UNUS
   char *__pyx_t_1;
   __Pyx_RefNannySetupContext("server_process_wbs_frame", 0);
 
-  /* "server.pyx":331
+  /* "server.pyx":334
  *     # Process WBS frame
  *     def server_process_wbs_frame(self, ptr_in_bytes):
  *         api.c_server_process_wbs_frame(ptr_in_bytes)             # <<<<<<<<<<<<<<
  * 
  *     # ----------------------------
  */
-  __pyx_t_1 = __Pyx_PyObject_AsWritableString(__pyx_v_ptr_in_bytes); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(1, 331, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_AsWritableString(__pyx_v_ptr_in_bytes); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(1, 334, __pyx_L1_error)
   c_server_process_wbs_frame(__pyx_t_1);
 
-  /* "server.pyx":330
+  /* "server.pyx":333
  *     # ----------------------------
  *     # Process WBS frame
  *     def server_process_wbs_frame(self, ptr_in_bytes):             # <<<<<<<<<<<<<<
@@ -7685,7 +7673,7 @@ static PyObject *__pyx_pf_6server_7Display_8server_process_wbs_frame(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "server.pyx":335
+/* "server.pyx":338
  *     # ----------------------------
  *     # Get WBS data
  *     def server_get_wbs_data(self, width):             # <<<<<<<<<<<<<<
@@ -7710,52 +7698,48 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
   __Pyx_memviewslice __pyx_v_arr_memview = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  __Pyx_memviewslice __pyx_t_2 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  int __pyx_t_3;
-  Py_ssize_t __pyx_t_4;
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  int __pyx_t_2;
+  Py_ssize_t __pyx_t_3;
+  int __pyx_t_4;
   int __pyx_t_5;
-  int __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("server_get_wbs_data", 0);
 
-  /* "server.pyx":337
+  /* "server.pyx":340
  *     def server_get_wbs_data(self, width):
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data             # <<<<<<<<<<<<<<
  *         if api.c_server_get_wbs_data(width, &arr_memview[0]):
  *             return [True, self.__wbs_data]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_wbs_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 337, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(1, 337, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_arr_memview = __pyx_t_2;
-  __pyx_t_2.memview = NULL;
-  __pyx_t_2.data = NULL;
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_v_self->__pyx___wbs_data, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(1, 340, __pyx_L1_error)
+  __pyx_v_arr_memview = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
 
-  /* "server.pyx":338
+  /* "server.pyx":341
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data
  *         if api.c_server_get_wbs_data(width, &arr_memview[0]):             # <<<<<<<<<<<<<<
  *             return [True, self.__wbs_data]
  *         else:
  */
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 338, __pyx_L1_error)
-  __pyx_t_4 = 0;
-  __pyx_t_5 = -1;
-  if (__pyx_t_4 < 0) {
-    __pyx_t_4 += __pyx_v_arr_memview.shape[0];
-    if (unlikely(__pyx_t_4 < 0)) __pyx_t_5 = 0;
-  } else if (unlikely(__pyx_t_4 >= __pyx_v_arr_memview.shape[0])) __pyx_t_5 = 0;
-  if (unlikely(__pyx_t_5 != -1)) {
-    __Pyx_RaiseBufferIndexError(__pyx_t_5);
-    __PYX_ERR(1, 338, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 341, __pyx_L1_error)
+  __pyx_t_3 = 0;
+  __pyx_t_4 = -1;
+  if (__pyx_t_3 < 0) {
+    __pyx_t_3 += __pyx_v_arr_memview.shape[0];
+    if (unlikely(__pyx_t_3 < 0)) __pyx_t_4 = 0;
+  } else if (unlikely(__pyx_t_3 >= __pyx_v_arr_memview.shape[0])) __pyx_t_4 = 0;
+  if (unlikely(__pyx_t_4 != -1)) {
+    __Pyx_RaiseBufferIndexError(__pyx_t_4);
+    __PYX_ERR(1, 341, __pyx_L1_error)
   }
-  __pyx_t_6 = (c_server_get_wbs_data(__pyx_t_3, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_arr_memview.data) + __pyx_t_4)) ))))) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_5 = (c_server_get_wbs_data(__pyx_t_2, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_arr_memview.data) + __pyx_t_3)) ))))) != 0);
+  if (__pyx_t_5) {
 
-    /* "server.pyx":339
+    /* "server.pyx":342
  *         cdef float[::1] arr_memview = self.__wbs_data
  *         if api.c_server_get_wbs_data(width, &arr_memview[0]):
  *             return [True, self.__wbs_data]             # <<<<<<<<<<<<<<
@@ -7763,21 +7747,19 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
  *             return [False, None]
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_wbs_data); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 339, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 339, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 342, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(Py_True);
     __Pyx_GIVEREF(Py_True);
-    PyList_SET_ITEM(__pyx_t_7, 0, Py_True);
-    __Pyx_GIVEREF(__pyx_t_1);
-    PyList_SET_ITEM(__pyx_t_7, 1, __pyx_t_1);
-    __pyx_t_1 = 0;
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    PyList_SET_ITEM(__pyx_t_6, 0, Py_True);
+    __Pyx_INCREF(__pyx_v_self->__pyx___wbs_data);
+    __Pyx_GIVEREF(__pyx_v_self->__pyx___wbs_data);
+    PyList_SET_ITEM(__pyx_t_6, 1, __pyx_v_self->__pyx___wbs_data);
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
 
-    /* "server.pyx":338
+    /* "server.pyx":341
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data
  *         if api.c_server_get_wbs_data(width, &arr_memview[0]):             # <<<<<<<<<<<<<<
@@ -7786,7 +7768,7 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
  */
   }
 
-  /* "server.pyx":341
+  /* "server.pyx":344
  *             return [True, self.__wbs_data]
  *         else:
  *             return [False, None]             # <<<<<<<<<<<<<<
@@ -7795,20 +7777,20 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 341, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
+    __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 344, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(Py_False);
     __Pyx_GIVEREF(Py_False);
-    PyList_SET_ITEM(__pyx_t_7, 0, Py_False);
+    PyList_SET_ITEM(__pyx_t_6, 0, Py_False);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
-    PyList_SET_ITEM(__pyx_t_7, 1, Py_None);
-    __pyx_r = __pyx_t_7;
-    __pyx_t_7 = 0;
+    PyList_SET_ITEM(__pyx_t_6, 1, Py_None);
+    __pyx_r = __pyx_t_6;
+    __pyx_t_6 = 0;
     goto __pyx_L0;
   }
 
-  /* "server.pyx":335
+  /* "server.pyx":338
  *     # ----------------------------
  *     # Get WBS data
  *     def server_get_wbs_data(self, width):             # <<<<<<<<<<<<<<
@@ -7818,9 +7800,8 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_2, 1);
-  __Pyx_XDECREF(__pyx_t_7);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("server.Display.server_get_wbs_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -7937,7 +7918,7 @@ static PyObject *__pyx_pf_6server_7Display_14__setstate_cython__(CYTHON_UNUSED s
   return __pyx_r;
 }
 
-/* "server.pyx":348
+/* "server.pyx":351
  * # ----------------------------
  * # Convert an audio device list into a python array of entries
  * cdef __convert_device_list(api.DeviceEnumList* devs):             # <<<<<<<<<<<<<<
@@ -7962,19 +7943,19 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
   int __pyx_t_10;
   __Pyx_RefNannySetupContext("__convert_device_list", 0);
 
-  /* "server.pyx":349
+  /* "server.pyx":352
  * # Convert an audio device list into a python array of entries
  * cdef __convert_device_list(api.DeviceEnumList* devs):
  *     device_list = []             # <<<<<<<<<<<<<<
  *     for n in range(devs.entries):
  *         if devs.devices[n].name.decode("ascii").lower().find('sound mapper') == -1:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 349, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_device_list = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "server.pyx":350
+  /* "server.pyx":353
  * cdef __convert_device_list(api.DeviceEnumList* devs):
  *     device_list = []
  *     for n in range(devs.entries):             # <<<<<<<<<<<<<<
@@ -7986,7 +7967,7 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_n = __pyx_t_4;
 
-    /* "server.pyx":351
+    /* "server.pyx":354
  *     device_list = []
  *     for n in range(devs.entries):
  *         if devs.devices[n].name.decode("ascii").lower().find('sound mapper') == -1:             # <<<<<<<<<<<<<<
@@ -7994,9 +7975,9 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
  *     return device_list
  */
     __pyx_t_6 = (__pyx_v_devs->devices[__pyx_v_n]).name;
-    __pyx_t_7 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 351, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_lower); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 351, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_lower); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -8011,10 +7992,10 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
     }
     __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 351, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_find); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 351, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_find); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -8029,46 +8010,46 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
     }
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_5, __pyx_kp_s_sound_mapper) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_kp_s_sound_mapper);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 351, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_neg_1, -1L, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 351, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_neg_1, -1L, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(1, 351, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(1, 354, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_9) {
 
-      /* "server.pyx":352
+      /* "server.pyx":355
  *     for n in range(devs.entries):
  *         if devs.devices[n].name.decode("ascii").lower().find('sound mapper') == -1:
  *             device_list.append({'index':devs.devices[n].index, 'name':devs.devices[n].name.decode("ascii"), 'ch':devs.devices[n].channels, 'hostapi':devs.devices[n].host_api.decode("ascii")})             # <<<<<<<<<<<<<<
  *     return device_list
  */
-      __pyx_t_8 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_devs->devices[__pyx_v_n]).index); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_devs->devices[__pyx_v_n]).index); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_index, __pyx_t_1) < 0) __PYX_ERR(1, 352, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_index, __pyx_t_1) < 0) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_6 = (__pyx_v_devs->devices[__pyx_v_n]).name;
-      __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_name, __pyx_t_1) < 0) __PYX_ERR(1, 352, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_name, __pyx_t_1) < 0) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_devs->devices[__pyx_v_n]).channels); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_devs->devices[__pyx_v_n]).channels); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_ch, __pyx_t_1) < 0) __PYX_ERR(1, 352, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_ch, __pyx_t_1) < 0) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_6 = (__pyx_v_devs->devices[__pyx_v_n]).host_api;
-      __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_decode_c_string(__pyx_t_6, 0, strlen(__pyx_t_6), NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_hostapi, __pyx_t_1) < 0) __PYX_ERR(1, 352, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_hostapi, __pyx_t_1) < 0) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_device_list, __pyx_t_8); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(1, 352, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_device_list, __pyx_t_8); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(1, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "server.pyx":351
+      /* "server.pyx":354
  *     device_list = []
  *     for n in range(devs.entries):
  *         if devs.devices[n].name.decode("ascii").lower().find('sound mapper') == -1:             # <<<<<<<<<<<<<<
@@ -8078,7 +8059,7 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
     }
   }
 
-  /* "server.pyx":353
+  /* "server.pyx":356
  *         if devs.devices[n].name.decode("ascii").lower().find('sound mapper') == -1:
  *             device_list.append({'index':devs.devices[n].index, 'name':devs.devices[n].name.decode("ascii"), 'ch':devs.devices[n].channels, 'hostapi':devs.devices[n].host_api.decode("ascii")})
  *     return device_list             # <<<<<<<<<<<<<<
@@ -8088,7 +8069,7 @@ static PyObject *__pyx_f_6server___convert_device_list(DeviceEnumList *__pyx_v_d
   __pyx_r = __pyx_v_device_list;
   goto __pyx_L0;
 
-  /* "server.pyx":348
+  /* "server.pyx":351
  * # ----------------------------
  * # Convert an audio device list into a python array of entries
  * cdef __convert_device_list(api.DeviceEnumList* devs):             # <<<<<<<<<<<<<<
@@ -21393,6 +21374,7 @@ static PyTypeObject __pyx_type_6server_DSP = {
 };
 
 static PyObject *__pyx_tp_new_6server_Display(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_6server_Display *p;
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -21400,6 +21382,9 @@ static PyObject *__pyx_tp_new_6server_Display(PyTypeObject *t, CYTHON_UNUSED PyO
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
+  p = ((struct __pyx_obj_6server_Display *)o);
+  p->__pyx___display_data = Py_None; Py_INCREF(Py_None);
+  p->__pyx___wbs_data = Py_None; Py_INCREF(Py_None);
   if (unlikely(__pyx_pw_6server_7Display_1__cinit__(o, __pyx_empty_tuple, NULL) < 0)) goto bad;
   return o;
   bad:
@@ -21408,12 +21393,40 @@ static PyObject *__pyx_tp_new_6server_Display(PyTypeObject *t, CYTHON_UNUSED PyO
 }
 
 static void __pyx_tp_dealloc_6server_Display(PyObject *o) {
+  struct __pyx_obj_6server_Display *p = (struct __pyx_obj_6server_Display *)o;
   #if CYTHON_USE_TP_FINALIZE
-  if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
+  if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && !_PyGC_FINALIZED(o)) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
   }
   #endif
+  PyObject_GC_UnTrack(o);
+  Py_CLEAR(p->__pyx___display_data);
+  Py_CLEAR(p->__pyx___wbs_data);
   (*Py_TYPE(o)->tp_free)(o);
+}
+
+static int __pyx_tp_traverse_6server_Display(PyObject *o, visitproc v, void *a) {
+  int e;
+  struct __pyx_obj_6server_Display *p = (struct __pyx_obj_6server_Display *)o;
+  if (p->__pyx___display_data) {
+    e = (*v)(p->__pyx___display_data, a); if (e) return e;
+  }
+  if (p->__pyx___wbs_data) {
+    e = (*v)(p->__pyx___wbs_data, a); if (e) return e;
+  }
+  return 0;
+}
+
+static int __pyx_tp_clear_6server_Display(PyObject *o) {
+  PyObject* tmp;
+  struct __pyx_obj_6server_Display *p = (struct __pyx_obj_6server_Display *)o;
+  tmp = ((PyObject*)p->__pyx___display_data);
+  p->__pyx___display_data = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->__pyx___wbs_data);
+  p->__pyx___wbs_data = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  return 0;
 }
 
 static PyMethodDef __pyx_methods_6server_Display[] = {
@@ -21457,10 +21470,10 @@ static PyTypeObject __pyx_type_6server_Display = {
   0, /*tp_getattro*/
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  0, /*tp_traverse*/
-  0, /*tp_clear*/
+  __pyx_tp_traverse_6server_Display, /*tp_traverse*/
+  __pyx_tp_clear_6server_Display, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
@@ -22300,7 +22313,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dev, __pyx_k_dev, sizeof(__pyx_k_dev), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_direction, __pyx_k_direction, sizeof(__pyx_k_direction), 0, 0, 1, 1},
-  {&__pyx_n_s_display_data, __pyx_k_display_data, sizeof(__pyx_k_display_data), 0, 0, 1, 1},
   {&__pyx_n_s_display_width, __pyx_k_display_width, sizeof(__pyx_k_display_width), 0, 0, 1, 1},
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
@@ -22373,7 +22385,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
-  {&__pyx_n_s_wbs_data, __pyx_k_wbs_data, sizeof(__pyx_k_wbs_data), 0, 0, 1, 1},
   {&__pyx_n_s_which, __pyx_k_which, sizeof(__pyx_k_which), 0, 0, 1, 1},
   {&__pyx_n_s_window, __pyx_k_window, sizeof(__pyx_k_window), 0, 0, 1, 1},
   {&__pyx_n_s_zeros, __pyx_k_zeros, sizeof(__pyx_k_zeros), 0, 0, 1, 1},
@@ -22381,7 +22392,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 2, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 350, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(1, 353, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 133, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 151, __pyx_L1_error)
@@ -22473,14 +22484,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "server.pyx":305
+  /* "server.pyx":308
  *     # Constructor
  *     def __cinit__(self):
  *         self.__display_data = np.zeros(1920, dtype=np.float)             # <<<<<<<<<<<<<<
  *         self.__wbs_data = np.zeros(1920, dtype=np.float)
  * 
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_int_1920); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 305, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_int_1920); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
@@ -23839,20 +23850,6 @@ static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
 #endif
     return __Pyx_GetBuiltinName(name);
 }
-
-/* PyObjectSetAttrStr */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_setattro))
-        return tp->tp_setattro(obj, attr_name, value);
-#if PY_MAJOR_VERSION < 3
-    if (likely(tp->tp_setattr))
-        return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
-#endif
-    return PyObject_SetAttr(obj, attr_name, value);
-}
-#endif
 
 /* BufferIndexError */
 static void __Pyx_RaiseBufferIndexError(int axis) {
