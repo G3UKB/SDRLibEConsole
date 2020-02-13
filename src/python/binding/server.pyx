@@ -10,7 +10,6 @@ cimport server_api as api
 
 # Numpy imports
 import numpy as np
-np.import_array()
 
 # ===================================================
 # Server functions
@@ -36,14 +35,31 @@ cdef class Server:
     def server_terminate(self):
         return api.c_server_terminate()
     
-    void c_server_set_in_rate(int rate)
-    void c_server_set_out_rate(int rate)
-    void c_server_set_iq_blk_sz(int blk_sz)
-    void c_server_set_mic_blk_sz(int blk_sz)
-    void c_server_set_duplex(int duplex)
-    void c_server_set_fft_size(int size)
-    void c_server_set_window_type(int window_type)
-    void c_server_set_av_mode(int mode)
+    #=============================
+    # Param update functions
+    def server_set_in_rate(self, rate):
+        api.c_server_set_in_rate(rate)
+        
+    def server_set_out_rate(self, rate):
+        api.c_server_set_out_rate(rate)
+        
+    def server_set_iq_blk_sz(self, blk_sz):
+        api.c_server_set_iq_blk_sz(blk_sz)
+        
+    def server_set_mic_blk_sz(self, blk_sz):
+        api.c_server_set_mic_blk_sz(blk_sz)
+        
+    def server_set_duplex(self, duplex):
+        api.c_server_set_duplex(duplex)
+        
+    def server_set_fft_size(self, size):
+        api.c_server_set_fft_size(size)
+        
+    def server_set_window_type(self, window_type):
+        api.c_server_set_window_type(window_type)
+        
+    def server_set_av_mode(self, mode):
+        api.c_server_set_av_mode(mode)
     
 # ===================================================
 # Audio functions
@@ -255,14 +271,29 @@ cdef class DSP:
     #=============================
     # TX functions
     # ----------------------------
-    void c_server_set_tx_mode(int channel, int mode)
-    void c_server_set_tx_filter_run(int channel, int run)
-    void c_server_set_tx_filter_freq(int channel, int low, int high)
-    void c_server_set_tx_filter_window(int channel, int window)
-    double c_server_get_tx_meter_data(int channel, int which)
-    void c_server_set_mic_gain(float gain)
-    void c_server_set_rf_drive(float drive)
-    short c_server_get_peak_input_level()
+    def server_set_tx_mode(self, channel, mode):
+        api.c_server_set_tx_mode(channel, mode)
+        
+    def server_set_tx_filter_run(self, channel, run):
+        api.c_server_set_tx_filter_run(channel, run)
+        
+    def server_set_tx_filter_freq(self, channel, low, high):
+        api.c_server_set_tx_filter_freq(channel, low, high)
+        
+    def server_set_tx_filter_window(self, channel, window):
+        api.c_server_set_tx_filter_window(channel, window)
+        
+    def server_get_tx_meter_data(self, channel, which):
+        api.c_server_get_tx_meter_data(channel, which)
+        
+    def server_set_mic_gain(self, gain):
+        api.c_server_set_mic_gain(gain)
+        
+    def server_set_rf_drive(self, drive):
+        api.c_server_set_rf_drive(drive)
+        
+    def server_get_peak_input_level(self):
+        api.c_server_get_peak_input_level()
     
 # ===================================================
 # Display functions
