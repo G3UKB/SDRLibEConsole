@@ -25,8 +25,14 @@ cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\audio\\local_audio.
     ctypedef struct DeviceEnumList:
         int entries
         DeviceEnum devices[50]
-    DeviceEnumList* c_server_enum_audio_inputs();
-    DeviceEnumList* c_server_enum_audio_outputs();
+    DeviceEnumList* c_server_enum_audio_inputs()
+    DeviceEnumList* c_server_enum_audio_outputs()
+    void c_server_set_audio_route(int direction, char* location, int receiver, char* host_api, char* dev, char* channel)
+    int c_server_clear_audio_routes()
+    int c_server_restart_audio_routes()
+    void c_server_change_audio_outputs(int rx, char* audio_ch)
+    void c_server_revert_audio_outputs()
+    int c_server_local_audio_run(int runstate)
     
 cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\server\\server.h":
     # Prototypes
@@ -47,7 +53,7 @@ cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\server\\server.h":
     int c_radio_start(int wbs)
     int c_radio_stop()
     void c_server_mox(int mox_state)
-    # RX & TX
+    # RX functions
     void c_server_set_rx_mode(int channel, int mode)
     void c_server_set_rx_filter_run(int channel, int run)
     void c_server_set_rx_filter_freq(int channel, int low, int high)
@@ -55,6 +61,7 @@ cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\server\\server.h":
     void c_server_set_agc_mode(int channel, int mode)
     void c_server_set_rx_gain(int rx, float gain)
     double c_server_get_rx_meter_data(int channel, int which)
+    # TX functions
     void c_server_set_tx_mode(int channel, int mode)
     void c_server_set_tx_filter_run(int channel, int run)
     void c_server_set_tx_filter_freq(int channel, int low, int high)
@@ -68,15 +75,6 @@ cdef extern from "E:\\Projects\\SDRLibE\\trunk\\server\\src\\server\\server.h":
     int c_server_get_display_data(int display_id, void *display_data)
     void c_server_process_wbs_frame(char *ptr_in_bytes)
     int c_server_get_wbs_data(int width, void *wbs_data)
-    # Audio
-    #DeviceEnumList* c_server_enum_audio_inputs();
-    #DeviceEnumList* c_server_enum_audio_outputs();
-    #void c_server_set_audio_route(int direction, char* location, int receiver, char* host_api, char* dev, char* channel);
-    #int c_server_clear_audio_routes();
-    #int c_server_restart_audio_routes();
-    #void c_server_change_audio_outputs(int rx, char* audio_ch);
-    #void c_server_revert_audio_outputs();
-    #int c_server_local_audio_run(int runstate);
     # Wisdom
     void c_server_make_wisdom(char *dir)
     # CC data
