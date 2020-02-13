@@ -1906,7 +1906,6 @@ static const char __pyx_k_range[] = "range";
 static const char __pyx_k_shape[] = "shape";
 static const char __pyx_k_start[] = "start";
 static const char __pyx_k_which[] = "which";
-static const char __pyx_k_width[] = "width";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_Server[] = "Server";
 static const char __pyx_k_encode[] = "encode";
@@ -1941,10 +1940,8 @@ static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
-static const char __pyx_k_display_id[] = "display_id";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
-static const char __pyx_k_wbs_data_2[] = "wbs_data";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_display_data[] = "__display_data";
@@ -1954,7 +1951,6 @@ static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_display_width[] = "display_width";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_display_data_2[] = "display_data";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
@@ -2031,8 +2027,6 @@ static PyObject *__pyx_n_s_dev;
 static PyObject *__pyx_n_s_dict;
 static PyObject *__pyx_n_s_direction;
 static PyObject *__pyx_n_s_display_data;
-static PyObject *__pyx_n_s_display_data_2;
-static PyObject *__pyx_n_s_display_id;
 static PyObject *__pyx_n_s_display_width;
 static PyObject *__pyx_n_s_dtype;
 static PyObject *__pyx_n_s_dtype_is_object;
@@ -2106,9 +2100,7 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_wbs_data;
-static PyObject *__pyx_n_s_wbs_data_2;
 static PyObject *__pyx_n_s_which;
-static PyObject *__pyx_n_s_width;
 static PyObject *__pyx_n_s_window;
 static PyObject *__pyx_n_s_zeros;
 static int __pyx_pf_6server_6Server___cinit__(CYTHON_UNUSED struct __pyx_obj_6server_Server *__pyx_v_self); /* proto */
@@ -2188,9 +2180,9 @@ static PyObject *__pyx_pf_6server_3DSP_36__setstate_cython__(CYTHON_UNUSED struc
 static int __pyx_pf_6server_7Display___cinit__(struct __pyx_obj_6server_Display *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6server_7Display_2server_set_display_width(CYTHON_UNUSED struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_width); /* proto */
 static PyObject *__pyx_pf_6server_7Display_4server_set_display(CYTHON_UNUSED struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_ch_id, PyObject *__pyx_v_display_width); /* proto */
-static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_display_id, CYTHON_UNUSED PyObject *__pyx_v_display_data); /* proto */
+static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_display_id); /* proto */
 static PyObject *__pyx_pf_6server_7Display_8server_process_wbs_frame(CYTHON_UNUSED struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_ptr_in_bytes); /* proto */
-static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_width, CYTHON_UNUSED PyObject *__pyx_v_wbs_data); /* proto */
+static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_width); /* proto */
 static PyObject *__pyx_pf_6server_7Display_12__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_6server_Display *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6server_7Display_14__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_6server_Display *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -7494,73 +7486,25 @@ static PyObject *__pyx_pf_6server_7Display_4server_set_display(CYTHON_UNUSED str
 /* "server.pyx":320
  *     # ----------------------------
  *     # Get spectrum display data
- *     def server_get_display_data(self, display_id, display_data):             # <<<<<<<<<<<<<<
+ *     def server_get_display_data(self, display_id):             # <<<<<<<<<<<<<<
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6server_7Display_7server_get_display_data(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_6server_7Display_7server_get_display_data(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_display_id = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_display_data = 0;
+static PyObject *__pyx_pw_6server_7Display_7server_get_display_data(PyObject *__pyx_v_self, PyObject *__pyx_v_display_id); /*proto*/
+static PyObject *__pyx_pw_6server_7Display_7server_get_display_data(PyObject *__pyx_v_self, PyObject *__pyx_v_display_id) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("server_get_display_data (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_display_id,&__pyx_n_s_display_data_2,0};
-    PyObject* values[2] = {0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_display_id)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_display_data_2)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("server_get_display_data", 1, 2, 2, 1); __PYX_ERR(1, 320, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "server_get_display_data") < 0)) __PYX_ERR(1, 320, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-    }
-    __pyx_v_display_id = values[0];
-    __pyx_v_display_data = values[1];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("server_get_display_data", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 320, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("server.Display.server_get_display_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6server_7Display_6server_get_display_data(((struct __pyx_obj_6server_Display *)__pyx_v_self), __pyx_v_display_id, __pyx_v_display_data);
+  __pyx_r = __pyx_pf_6server_7Display_6server_get_display_data(((struct __pyx_obj_6server_Display *)__pyx_v_self), ((PyObject *)__pyx_v_display_id));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_display_id, CYTHON_UNUSED PyObject *__pyx_v_display_data) {
+static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_display_id) {
   __Pyx_memviewslice __pyx_v_arr_memview = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -7574,7 +7518,7 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
   __Pyx_RefNannySetupContext("server_get_display_data", 0);
 
   /* "server.pyx":322
- *     def server_get_display_data(self, display_id, display_data):
+ *     def server_get_display_data(self, display_id):
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data             # <<<<<<<<<<<<<<
  *         if api.c_server_get_display_data(display_id, &arr_memview[0]):
@@ -7665,7 +7609,7 @@ static PyObject *__pyx_pf_6server_7Display_6server_get_display_data(struct __pyx
   /* "server.pyx":320
  *     # ----------------------------
  *     # Get spectrum display data
- *     def server_get_display_data(self, display_id, display_data):             # <<<<<<<<<<<<<<
+ *     def server_get_display_data(self, display_id):             # <<<<<<<<<<<<<<
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__display_data
  */
@@ -7744,73 +7688,25 @@ static PyObject *__pyx_pf_6server_7Display_8server_process_wbs_frame(CYTHON_UNUS
 /* "server.pyx":335
  *     # ----------------------------
  *     # Get WBS data
- *     def server_get_wbs_data(self, width, wbs_data):             # <<<<<<<<<<<<<<
+ *     def server_get_wbs_data(self, width):             # <<<<<<<<<<<<<<
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6server_7Display_11server_get_wbs_data(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_6server_7Display_11server_get_wbs_data(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_width = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_wbs_data = 0;
+static PyObject *__pyx_pw_6server_7Display_11server_get_wbs_data(PyObject *__pyx_v_self, PyObject *__pyx_v_width); /*proto*/
+static PyObject *__pyx_pw_6server_7Display_11server_get_wbs_data(PyObject *__pyx_v_self, PyObject *__pyx_v_width) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("server_get_wbs_data (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_width,&__pyx_n_s_wbs_data_2,0};
-    PyObject* values[2] = {0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_width)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_wbs_data_2)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("server_get_wbs_data", 1, 2, 2, 1); __PYX_ERR(1, 335, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "server_get_wbs_data") < 0)) __PYX_ERR(1, 335, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-    }
-    __pyx_v_width = values[0];
-    __pyx_v_wbs_data = values[1];
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("server_get_wbs_data", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 335, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("server.Display.server_get_wbs_data", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6server_7Display_10server_get_wbs_data(((struct __pyx_obj_6server_Display *)__pyx_v_self), __pyx_v_width, __pyx_v_wbs_data);
+  __pyx_r = __pyx_pf_6server_7Display_10server_get_wbs_data(((struct __pyx_obj_6server_Display *)__pyx_v_self), ((PyObject *)__pyx_v_width));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_width, CYTHON_UNUSED PyObject *__pyx_v_wbs_data) {
+static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_obj_6server_Display *__pyx_v_self, PyObject *__pyx_v_width) {
   __Pyx_memviewslice __pyx_v_arr_memview = { 0, 0, { 0 }, { 0 }, { 0 } };
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -7824,7 +7720,7 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
   __Pyx_RefNannySetupContext("server_get_wbs_data", 0);
 
   /* "server.pyx":337
- *     def server_get_wbs_data(self, width, wbs_data):
+ *     def server_get_wbs_data(self, width):
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data             # <<<<<<<<<<<<<<
  *         if api.c_server_get_wbs_data(width, &arr_memview[0]):
@@ -7915,7 +7811,7 @@ static PyObject *__pyx_pf_6server_7Display_10server_get_wbs_data(struct __pyx_ob
   /* "server.pyx":335
  *     # ----------------------------
  *     # Get WBS data
- *     def server_get_wbs_data(self, width, wbs_data):             # <<<<<<<<<<<<<<
+ *     def server_get_wbs_data(self, width):             # <<<<<<<<<<<<<<
  *         # a memview can be used to pass in a pointer
  *         cdef float[::1] arr_memview = self.__wbs_data
  */
@@ -21523,9 +21419,9 @@ static void __pyx_tp_dealloc_6server_Display(PyObject *o) {
 static PyMethodDef __pyx_methods_6server_Display[] = {
   {"server_set_display_width", (PyCFunction)__pyx_pw_6server_7Display_3server_set_display_width, METH_O, 0},
   {"server_set_display", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6server_7Display_5server_set_display, METH_VARARGS|METH_KEYWORDS, 0},
-  {"server_get_display_data", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6server_7Display_7server_get_display_data, METH_VARARGS|METH_KEYWORDS, 0},
+  {"server_get_display_data", (PyCFunction)__pyx_pw_6server_7Display_7server_get_display_data, METH_O, 0},
   {"server_process_wbs_frame", (PyCFunction)__pyx_pw_6server_7Display_9server_process_wbs_frame, METH_O, 0},
-  {"server_get_wbs_data", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6server_7Display_11server_get_wbs_data, METH_VARARGS|METH_KEYWORDS, 0},
+  {"server_get_wbs_data", (PyCFunction)__pyx_pw_6server_7Display_11server_get_wbs_data, METH_O, 0},
   {"__reduce_cython__", (PyCFunction)__pyx_pw_6server_7Display_13__reduce_cython__, METH_NOARGS, 0},
   {"__setstate_cython__", (PyCFunction)__pyx_pw_6server_7Display_15__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
@@ -22405,8 +22301,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
   {&__pyx_n_s_direction, __pyx_k_direction, sizeof(__pyx_k_direction), 0, 0, 1, 1},
   {&__pyx_n_s_display_data, __pyx_k_display_data, sizeof(__pyx_k_display_data), 0, 0, 1, 1},
-  {&__pyx_n_s_display_data_2, __pyx_k_display_data_2, sizeof(__pyx_k_display_data_2), 0, 0, 1, 1},
-  {&__pyx_n_s_display_id, __pyx_k_display_id, sizeof(__pyx_k_display_id), 0, 0, 1, 1},
   {&__pyx_n_s_display_width, __pyx_k_display_width, sizeof(__pyx_k_display_width), 0, 0, 1, 1},
   {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
   {&__pyx_n_s_dtype_is_object, __pyx_k_dtype_is_object, sizeof(__pyx_k_dtype_is_object), 0, 0, 1, 1},
@@ -22480,9 +22374,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_unpack, __pyx_k_unpack, sizeof(__pyx_k_unpack), 0, 0, 1, 1},
   {&__pyx_n_s_update, __pyx_k_update, sizeof(__pyx_k_update), 0, 0, 1, 1},
   {&__pyx_n_s_wbs_data, __pyx_k_wbs_data, sizeof(__pyx_k_wbs_data), 0, 0, 1, 1},
-  {&__pyx_n_s_wbs_data_2, __pyx_k_wbs_data_2, sizeof(__pyx_k_wbs_data_2), 0, 0, 1, 1},
   {&__pyx_n_s_which, __pyx_k_which, sizeof(__pyx_k_which), 0, 0, 1, 1},
-  {&__pyx_n_s_width, __pyx_k_width, sizeof(__pyx_k_width), 0, 0, 1, 1},
   {&__pyx_n_s_window, __pyx_k_window, sizeof(__pyx_k_window), 0, 0, 1, 1},
   {&__pyx_n_s_zeros, __pyx_k_zeros, sizeof(__pyx_k_zeros), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}

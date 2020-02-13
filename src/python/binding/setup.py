@@ -3,7 +3,7 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 extensions = [
-    Extension("libserver", ["server.pyx"],
+    Extension("server", ["server.pyx"],
         library_dirs=["E:\\Projects\\SDRLibE\\trunk\\server\\x64\\Release",
                       "E:\\Projects\\SDRLibE\\trunk\\wdsp_win\\x64\\Release",
                       "E:\\Projects\\SDRLibE\\libs\\fftw\\x64",

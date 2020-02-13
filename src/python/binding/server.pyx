@@ -317,7 +317,7 @@ cdef class Display:
     
     # ----------------------------
     # Get spectrum display data    
-    def server_get_display_data(self, display_id, display_data):
+    def server_get_display_data(self, display_id):
         # a memview can be used to pass in a pointer
         cdef float[::1] arr_memview = self.__display_data
         if api.c_server_get_display_data(display_id, &arr_memview[0]):
@@ -332,7 +332,7 @@ cdef class Display:
     
     # ----------------------------
     # Get WBS data    
-    def server_get_wbs_data(self, width, wbs_data):
+    def server_get_wbs_data(self, width):
         # a memview can be used to pass in a pointer
         cdef float[::1] arr_memview = self.__wbs_data
         if api.c_server_get_wbs_data(width, &arr_memview[0]):
