@@ -45,10 +45,6 @@ class Model:
                 # Dict of arrays {id:[x,y,width,height], id:[...]}
                 'METRICS' : {}
             },
-            'SERVER' : {
-                'SERVER-IP' : '127.0.0.1',
-                'SERVER-CMD-PORT' : 10010,
-            },
             'RADIO' : {
                 'NUM_RX' : 1,
                 1 : {
@@ -112,13 +108,6 @@ class Model:
     def get_app_model(cls):
         m = getInstance('model_inst')
         return m.get_model()['APP']
-    
-    #-------------------------------------------------
-    # Get server model section 
-    @classmethod
-    def get_server_model(cls):
-        m = getInstance('model_inst')
-        return m.get_model()['SERVER']
     
     #-------------------------------------------------
     # Get radio model section 

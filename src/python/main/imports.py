@@ -53,6 +53,8 @@ from common.defs import *
 from framework.instance_cache import *
 # Model
 from model.model import *
+# Bindings
+from bindings.server import *
 # Connector
 from connector.connector import *
 # UI

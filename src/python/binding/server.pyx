@@ -37,6 +37,9 @@ cdef class Server:
     
     #=============================
     # Param update functions
+    def server_set_num_rx(self, num_rx):
+        api.c_server_set_num_rx(num_rx)
+        
     def server_set_in_rate(self, rate):
         api.c_server_set_in_rate(rate)
         

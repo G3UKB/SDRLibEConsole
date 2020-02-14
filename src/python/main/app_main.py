@@ -39,7 +39,7 @@ class AppMain:
     
     #-------------------------------------------------
     # Start processing and wait for user to exit the application
-    def main(self, auto):
+    def main(self):
         # The one and only QT application
         self.__qtapp = QApplication([])
         
@@ -48,14 +48,24 @@ class AppMain:
         addToCache('model_inst', self.__m)
         self.__m.restore_model()
         
-        # Create a connector interface
-        self.__con = Connector()
-        addToCache('conn_inst', self.__con)
+        # Create the lib interfaces
+        self.__server = Server()
+        addToCache('server_inst', self.__server)
+        self.__audio = Audio()
+        addToCache('audio_inst', self.__audio)
+        self.__radio = Radio()
+        addToCache('radio_inst', self.__radio)
+        self.__dsp = DSP()
+        addToCache('dsp_inst', self.__dsp)
+        self.__display = Display()
+        addToCache('display_inst', self.__display)
         
-        # Start the server unless manual start
-        if auto:
-            if not self.__con.coldstart():
-                print("Failed to coldstart server!")
+        # See if we need to run wisdom
+        self.__dsp.server_make_wisdom("../wisdom")
+        
+        # Attempt to initialise the server
+        if not self.__con.coldstart():
+            print("Failed to coldstart server!")
         
         # Create the main window class
         self.__w = MainWindow()
@@ -90,12 +100,8 @@ class AppMain:
 # Start processing and wait for user to exit the application
 def main():
     try:
-        arg = True
-        if len(sys.argv) > 1:
-            if sys.argv[1] == "manual":
-                arg = False
         app = AppMain()
-        sys.exit(app.main(arg))
+        sys.exit(app.main())
         
     except Exception as e:
         print ('Exception from main code','Exception [%s][%s]' % (str(e), traceback.format_exc()))
