@@ -204,18 +204,18 @@ class Connector:
      
     #-------------------------------------------------
     # Set RX mode 
-    def set_rx_mode(self, id, new_mode_id):
-        self.__set_mode_filter(id, new_mode_id, self.__last_state[id]["filter"])
+    def set_rx_mode(self, rx_id, new_mode_id):
+        self.__set_mode_filter(rx_id, new_mode_id, self.__last_state[rx_id]["filter"])
     
     #-------------------------------------------------
     # Set RX filter 
-    def set_rx_filter(self, id, filter_id):
-        self.__set_mode_filter(id, self.__last_state[id]["mode"], filter_id)
+    def set_rx_filter(self, rx_id, filter_id):
+        self.__set_mode_filter(rx_id, self.__last_state[rx_id]["mode"], filter_id)
     
     #-------------------------------------------------
     # Set RX AGC 
-    def set_agc(self, id, agc_id):
-        self.__dsp.server_set_agc_mode(id, agc_id)
+    def set_agc(self, rx_id, agc_id):
+        self.__dsp.server_set_agc_mode(rx_id-1, agc_id)
            
     #==============================================================================================
     # PRIVATE
@@ -230,7 +230,7 @@ class Connector:
     
     #-------------------------------------------------
     # Set mode and filter together as they inter-relate
-    def __set_mode_filter(self, id, mode_id, filter_id):
+    def __set_mode_filter(self, rx_id, mode_id, filter_id):
         # Get filter values
         low = filter_lookup[filter_id][1]
         high = filter_lookup[filter_id][2]
@@ -248,10 +248,10 @@ class Connector:
             new_high = high
             
         # Set the radio mode and filter
-        self.__dsp.server_set_rx_mode(id, mode_id)
-        self.__dsp.server_set_rx_filter_freq(id, new_low, new_high)
+        self.__dsp.server_set_rx_mode(rx_id-1, mode_id)
+        self.__dsp.server_set_rx_filter_freq(rx_id-1, new_low, new_high)
             
         # Update the state
-        self.__last_state[id]["mode"] = mode_id
-        self.__last_state[id]["filter"] = filter_id
+        self.__last_state[rx_id]["mode"] = mode_id
+        self.__last_state[rx_id]["filter"] = filter_id
                      

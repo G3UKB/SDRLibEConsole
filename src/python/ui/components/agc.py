@@ -101,11 +101,11 @@ class AGC(ButtonBase):
         if self.direction == CH_RX:
             # Execute AGC change
             agc_id = self.btn_grp.id(btn)
-            self.__con.set_agc(id, agc_id)
+            self.__con.set_agc(self.__id, agc_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
-            self.__radio_model[self.id]['AGC'] = agc_id
+            self.__radio_model[self.__id]['AGC'] = agc_id
             # Its a popup
             self.close()
         

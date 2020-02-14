@@ -108,11 +108,11 @@ class Modes(ButtonBase):
         if self.direction == CH_RX:
             # Execute mode change
             mode_id = self.btn_grp.id(btn)
-            self.__con.set_rx_mode(self.id, mode_id)
+            self.__con.set_rx_mode(self.__id, mode_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
-            self.__radio_model[self.id]['MODE'] = mode_id
+            self.__radio_model[self.__id]['MODE'] = mode_id
             # Its a popup
             self.close()
         

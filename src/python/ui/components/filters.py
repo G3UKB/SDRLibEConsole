@@ -105,11 +105,11 @@ class Filters(ButtonBase):
         if self.direction == CH_RX:
             # Execute filter change
             filt_id = self.btn_grp.id(btn)
-            self.__con.set_rx_filter(id, filt_id)
+            self.__con.set_rx_filter(self.__id, filt_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
-            self.__radio_model[self.id]['FILTER'] = filt_id
+            self.__radio_model[self.__id]['FILTER'] = filt_id
             # Its a popup
             self.close()
         
