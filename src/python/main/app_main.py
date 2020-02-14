@@ -61,11 +61,11 @@ class AppMain:
         addToCache('display_inst', self.__display)
         
         # Create a connector inst
-        self.__con = connector.Connector()
+        self.__con = Connector()
         addToCache('conn_inst', self.__con)
         
         # See if we need to run wisdom
-        self.__dsp.server_make_wisdom("../wisdom")
+        self.__dsp.server_make_wisdom("..\\wisdom\\".encode('utf-8'))
         
         # Attempt to initialise the server
         if not self.__con.coldstart():

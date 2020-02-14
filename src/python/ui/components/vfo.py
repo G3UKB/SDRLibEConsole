@@ -193,7 +193,7 @@ class Vfo:
         self.__current_freq = freq
         if self.__direction == CH_RX:
             # Tune radio
-            self.__con.set_freq(self.__vfo_id, self.__current_freq*1000000))
+            self.__con.set_freq(self.__vfo_id, self.__current_freq*1000000)
             # Update state
             self.__radio_model[self.__vfo_id]['FREQ'] = self.__current_freq
     

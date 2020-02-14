@@ -33,7 +33,7 @@ from main.imports import *
 #=====================================================
 # Audio main class
 #===================================================== 
-class Audio(QWidget):
+class AudioOptions(QWidget):
     
     #-------------------------------------------------
     # Constructor
@@ -45,7 +45,7 @@ class Audio(QWidget):
             id  -- the radio id
             
         """
-        super(Audio, self).__init__()
+        super(AudioOptions, self).__init__()
         
         # radio id
         self.__id = id
@@ -95,14 +95,14 @@ class Audio(QWidget):
         dev_label.setStyleSheet("QLabel {color: rgb(196,196,196)}")
         grid.addWidget(dev_label, 1, 0)
         self.__dev_combo = QComboBox()
-        output_list = self.__con.cmd_exchange(M_ID.ENUM_OUTPUTS, [])
+        output_list = self.__con.enum_audio_outputs()
         devices = []
         if output_list == None:
             print("Failed to enumerate audio outputs!")
         else:
             devices.append('No selection')
-            for device in output_list['outputs']:
-                devices.append('%s@%s' % (device['api'], device['name']))
+            for device in output_list:
+                devices.append('%s@%s' % (device['hostapi'], device['name']))
         self.__dev_combo.addItems(devices)
         grid.addWidget(self.__dev_combo, 1, 1, 1, 3)
         self.__dev_combo.activated.connect(self.__dev_evnt)

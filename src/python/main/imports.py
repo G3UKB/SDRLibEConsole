@@ -54,7 +54,7 @@ from framework.instance_cache import *
 # Model
 from model.model import *
 # Bindings
-from bindings.server import *
+from binding.server import *
 # Connector
 from connector.connector import *
 # UI

@@ -188,7 +188,7 @@ class WindowBase(QMainWindow):
     #-------------------------------------------------
     # Audio button event
     def __audio_evnt(self) :
-        self.audio = Audio(self.__id)
+        self.audio = AudioOptions(self.__id)
         self.audio.set_context(self.setAudio, self.x() + self.width() + 20, self.y() + 32 , CH_RX)
         self.audio.show()
         

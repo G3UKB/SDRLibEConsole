@@ -67,6 +67,14 @@ class Connector:
     #==============================================================================================
     
     #-------------------------------------------------
+    def enum_audio_inputs(self):
+        return self.__audio.enum_inputs()
+
+    #-------------------------------------------------
+    def enum_audio_outputs(self):
+        return self.__audio.enum_outputs()
+    
+    #-------------------------------------------------
     def set_audio_routes(self, reset):
         # Set all server audio route
         if reset:
@@ -197,12 +205,12 @@ class Connector:
     #-------------------------------------------------
     # Set RX mode 
     def set_rx_mode(self, id, new_mode_id):
-        self.__adjust_mode_filter(id, new_mode_id, self.__last_state[id]["filter"])
+        self.__set_mode_filter(id, new_mode_id, self.__last_state[id]["filter"])
     
     #-------------------------------------------------
     # Set RX filter 
     def set_rx_filter(self, id, filter_id):
-        self.__adjust_mode_filter(id, self.__last_state[id]["mode"], filter_id)
+        self.__set_mode_filter(id, self.__last_state[id]["mode"], filter_id)
     
     #-------------------------------------------------
     # Set RX AGC 
@@ -218,7 +226,7 @@ class Connector:
         
         if dev != NONE and ch != NONE:
             (api, dev) = dev.split('@')
-            self.__audio.server_set_audio_route(DIR_OUTPUT, sink, radio, api, dev, ch)
+            self.__audio.server_set_audio_route(DIR_OUTPUT, sink.encode('utf-8'), radio, api.encode('utf-8'), dev.encode('utf-8'), ch.encode('utf-8'))
     
     #-------------------------------------------------
     # Set mode and filter together as they inter-relate
