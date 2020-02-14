@@ -123,10 +123,12 @@ class MainWindow(WindowBase):
     def __stop(self):
         # Stop radio
         state = Model.get_state_model()
-        self.con.cmd_exchange(M_ID.RADIO_STOP, [])
-        self.statusBar.showMessage("Stopped",0)
-        self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
-        state['RADIO-RUN'] = False
+        if self.con.stop_radio():
+            self.statusBar.showMessage("Stopped",0)
+            self.statusBar.setStyleSheet("QStatusBar {background-color: rgb(102,102,102); color: rgb(147,11,11); font: bold 12px}")
+            state['RADIO-RUN'] = False
+        else:
+            print("Sorry, radio failed to stop!")
         
     #-------------------------------------------------
     # Exit button event

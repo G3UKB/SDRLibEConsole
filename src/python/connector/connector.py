@@ -46,7 +46,21 @@ class Connector:
         self.__radio = getInstance('radio_inst')
         self.__dsp = getInstance('dsp_inst')
         self.__display = getInstance('display_inst')
-        
+        # Initial state
+        self.__last_state = {
+            1: {
+                "mode": CH_LSB,
+                "filter": CH_2K7
+                },
+            2: {
+                "mode": CH_LSB,
+                "filter": CH_2K7
+                },
+            3: {
+                "mode": CH_LSB,
+                "filter": CH_2K7
+                },
+        }
 
     #==============================================================================================
     # PUBLIC
@@ -147,7 +161,12 @@ class Connector:
                 state['RADIO-RUN'] = False
             
         return success
-            
+    
+    #-------------------------------------------------
+    # Stop radio
+    def stop_radio(self):
+        return self.__radio.radio_stop()
+
     #-------------------------------------------------
     # Bounce the server
     def restart(self):
@@ -164,7 +183,32 @@ class Connector:
         
         if not self.__server.server_terminate():
             print("Failed to terminate server!")
-            
+     
+    #-------------------------------------------------
+    # Set frequency
+    def set_freq(self, id, freq):
+        if id == 1:
+            self.__radio.server_cc_out_set_rx_1_freq(freq)
+        elif id == 2:
+            self.__radio.server_cc_out_set_rx_2_freq(freq)
+        else:
+            self.__radio.server_cc_out_set_rx_3_freq(freq)
+     
+    #-------------------------------------------------
+    # Set RX mode 
+    def set_rx_mode(self, id, new_mode_id):
+        self.__adjust_mode_filter(id, new_mode_id, self.__last_state[id]["filter"])
+    
+    #-------------------------------------------------
+    # Set RX filter 
+    def set_rx_filter(self, id, filter_id):
+        self.__adjust_mode_filter(id, self.__last_state[id]["mode"], filter_id)
+    
+    #-------------------------------------------------
+    # Set RX AGC 
+    def set_agc(self, id, agc_id):
+        self.__dsp.server_set_agc_mode(id, agc_id)
+           
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
@@ -175,4 +219,31 @@ class Connector:
         if dev != NONE and ch != NONE:
             (api, dev) = dev.split('@')
             self.__audio.server_set_audio_route(DIR_OUTPUT, sink, radio, api, dev, ch)
-                
+    
+    #-------------------------------------------------
+    # Set mode and filter together as they inter-relate
+    def __set_mode_filter(self, id, mode_id, filter_id):
+        # Get filter values
+        low = filter_lookup[filter_id][1]
+        high = filter_lookup[filter_id][2]
+        if mode_id == CH_LSB or mode_id == CH_CWL or mode_id == CH_DIGL:
+            # We are on the left side of the spectrum so reverse the and negate the filter
+            new_low = -high
+            new_high = - low
+        elif mode_id == CH_DSB or mode_id == CH_FM or mode_id == CH_AM or mode_id == CH_SPEC or mode_id == CH_SAM or mode_id == CH_DRM:
+            # Mode centered on 0
+            new_low = -high
+            new_high = high
+        else:
+            #we are on the right side and the values are correct
+            new_low = low
+            new_high = high
+            
+        # Set the radio mode and filter
+        self.__dsp.server_set_rx_mode(id, mode_id)
+        self.__dsp.server_set_rx_filter_freq(id, new_low, new_high)
+            
+        # Update the state
+        self.__last_state[id]["mode"] = mode_id
+        self.__last_state[id]["filter"] = filter_id
+                     

@@ -103,15 +103,9 @@ class Filters(ButtonBase):
             
         """
         if self.direction == CH_RX:
-            if self.id == 1:
-                r = M_ID.R1_FILT
-            elif self.id == 2:
-                r = M_ID.R2_FILT
-            else:
-                r = M_ID.R3_FILT
             # Execute filter change
             filt_id = self.btn_grp.id(btn)
-            self.__con.cmd_exchange(r, [filter_lookup[filt_id][1], filter_lookup[filt_id][2]])
+            self.__con.set_rx_filter(id, filt_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model

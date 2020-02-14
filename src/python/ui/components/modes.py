@@ -106,15 +106,9 @@ class Modes(ButtonBase):
             
         """
         if self.direction == CH_RX:
-            if self.id == 1:
-                r = M_ID.R1_MODE
-            elif self.id == 2:
-                r = M_ID.R2_MODE
-            else:
-                r = M_ID.R3_MODE
             # Execute mode change
             mode_id = self.btn_grp.id(btn)
-            self.__con.cmd_exchange(r, [mode_id])
+            self.__con.set_rx_mode(self.id, mode_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model

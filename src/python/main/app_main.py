@@ -60,6 +60,10 @@ class AppMain:
         self.__display = Display()
         addToCache('display_inst', self.__display)
         
+        # Create a connector inst
+        self.__con = connector.Connector()
+        addToCache('conn_inst', self.__con)
+        
         # See if we need to run wisdom
         self.__dsp.server_make_wisdom("../wisdom")
         

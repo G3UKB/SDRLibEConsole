@@ -99,15 +99,9 @@ class AGC(ButtonBase):
             
         """
         if self.direction == CH_RX:
-            if self.id == 1:
-                r = M_ID.R1_AGC
-            elif self.id == 2:
-                r = M_ID.R2_AGC
-            else:
-                r = M_ID.R3_AGC
             # Execute AGC change
             agc_id = self.btn_grp.id(btn)
-            self.__con.cmd_exchange(r, [agc_id])
+            self.__con.set_agc(id, agc_id)
             # Tell parent what was selected
             self.callback(btn.text())
             # Update the model
