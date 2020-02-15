@@ -1,0 +1,380 @@
+#!/usr/bin/env python
+#
+# display.py
+#
+# Python panadapter display GUI for the SDRLibEConsole application
+# 
+# Copyright (C) 2020 by G3UKB Bob Cowdery
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#    
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#    
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#    
+#  The author can be reached by email at:   
+#     bob@bobcowdery.plus.com
+#
+
+# Import all
+from main.imports import *
+
+"""
+	panadapter display for one receiver.
+	Multi-instance for each active receiver.
+	The widget is placed within the display window for display.
+"""
+class Panadapter(QtGui.QWidget):
+	
+	def __init__(self, rx_id, freq_callback):
+		"""
+		Constructor
+		
+		Arguments:
+			rx_id			--	RX ID this display belongs to
+			freq_callback	--	callback for click tune
+		"""
+		
+		super(Panadapter, self).__init__()
+		
+		self.__rx_id = rx_id
+		self.__freq_callback = freq_callback
+		
+		# Create a lock
+		self.__lock = Lock()
+		
+		# Set the back colour
+		palette = QtGui.QPalette()
+		palette.setColor(QtGui.QPalette.Background,QtGui.QColor(43,63,68,255))
+		self.setPalette(palette)
+
+		# Initialise vars
+		self.__center_freq = 7.1
+		self.__bandwidth = 0.048
+		self.__half_bandwidth = 0.048/2.0
+		self.__filter_low = -2700
+		self.__filter_high = -300
+		self.__mouse_x = 0
+		self.__mouse_y = 0
+		self.__show_freq = False
+		self.__ignore_resize = False
+		# Drawing params
+		self.__top_border = 10
+		self.__left_border = 50
+		self.__right_border = 10
+		self.__bottom_border = 25
+		self.__h_text_base = 40
+		self.__h_text_left = 35
+		self.__v_text_left = 8
+		self.__h_no = 11
+		self.__pixels = None
+		# Display ref and data holding
+		self.__display_ob = None
+		self.__display_data = None
+		
+		# Set the resources
+		self.__grid_pen = QtGui.QPen(QtGui.QColor(39,83,109))
+		self.__grid_pen.setWidth(1)
+		self.__grid_pen.setStyle(QtCore.Qt.DotLine)
+		self.__legend_pen = QtGui.QPen(QtGui.QColor(178,178,178))
+		self.__legend_pen.setWidth(1)
+		self.__label_pen = QtGui.QPen(QtGui.QColor(255,0,0))
+		self.__label_pen.setWidth(1)
+		self.__filter_pen = QtGui.QPen(QtGui.QColor(0,255,0, 20))
+		self.__filter_pen.setWidth(1)
+		self.__filter_brush = QtGui.QBrush(QtGui.QColor(0,255,0, 20))
+		self.__freq_pen = QtGui.QPen(QtGui.QColor(255,0,0))
+		self.__freq_pen.setWidth(1)
+		self.__data_pen = QtGui.QPen(QtGui.QColor(0,255,0))
+		self.__data_pen.setWidth(1)
+		self.__font = QtGui.QFont('Times', 8)
+		
+		# Define the painter paths
+		self.__painter_paths = {
+			'grid': [[QtGui.QPainterPath(), self.__grid_pen, None],],
+			'legend': [[QtGui.QPainterPath(), self.__legend_pen, None],],
+			'label': [[QtGui.QPainterPath(), self.__label_pen, None],],
+			'dynamic': [
+					[QtGui.QPainterPath(), self.__filter_pen, self.__filter_brush],
+					[QtGui.QPainterPath(), self.__freq_pen, None]
+				],
+			'data': [[QtGui.QPainterPath(), self.__data_pen, None],]
+		}
+		# Enable mouseMoveEvent()
+		self.setMouseTracking(True)
+		
+		# Create a label for showing freq at cursor
+		self.__freq_disp = QtGui.QLabel('', self)
+		self.__freq_disp.setStyleSheet("QLabel {color: rgb(255,0,0);  font: bold 12px}")
+		self.__freq_disp.setText('')
+		
+		# Dispatch worker threads to the main thread
+		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
+	
+	#===========================================================================================
+	# PUBLIC
+	
+	def create_display_unit(self, blk_sz, pan_mode, over_frames, win_type, fft_sz):
+		
+		self.__blk_sz = blk_sz
+		self.__pan_mode = pan_mode
+		self.__over_frames = over_frames
+		self.__win_type = win_type
+		self.__fft_sz = fft_sz
+		sub_spans = 1
+		self.__pixels = self.__width - self.__left_border - self.__right_border
+		callback_period = 100 # ms
+		self.__display_ob = DisplayUnitApi(fft_sz, win_type, sub_spans, blk_sz, self.__pixels, pan_mode, over_frames, self.__bandwidth*1000000, callback_period, self.pan_data_callback, self.__q)
+		return self.__display_ob
+
+	def set_display(self, blk_sz, pan_mode, over_frames, win_type, fft_sz):
+		
+		self.__blk_sz = blk_sz
+		self.__pan_mode = pan_mode
+		self.__over_frames = over_frames
+		self.__win_type = win_type
+		self.__fft_sz = fft_sz
+		sub_spans = 1
+		self.__pixels = self.__width - self.__left_border - self.__right_border
+		self.__display_ob.set_display(fft_sz, win_type, sub_spans, blk_sz, self.__pixels, pan_mode, over_frames, self.__bandwidth*1000000)
+
+	def showDisplay(self):
+		# Make paths
+		self.__makePainterPaths()
+		self.show()
+	
+	def closedown(self):
+		""" Request to close """
+		
+		# Update window position
+		position = self.pos()
+		self.__state[WINDOW_X] = position.x()
+		self.__state[WINDOW_Y] = position.y()
+		self.__state[WINDOW_WIDTH] = self.width()
+		self.__state[WINDOW_HEIGHT] = self.height()
+		# Save to the state file
+		persist.saveState(self.STATE_FILE, self.__state)
+		# Quit the window
+		self.close()
+		
+	def setCenterFreq(self, freq):
+		self.__lock.acquire()
+		self.__center_freq = freq
+		self.__makePainterPaths()
+		self.__lock.release()
+	
+	def setBandwidth(self, bandwidth):
+		self.__lock.acquire()
+		self.__bandwidth = bandwidth
+		self.__half_bandwidth = bandwidth/2.0
+		self.__makePainterPaths()
+		self.__lock.release()
+		
+	def setFilterLimits(self, filter_low, filter_high):
+		self.__lock.acquire()
+		self.__filter_low = float(filter_low)/1000000.0
+		self.__filter_high = float(filter_high)/1000000.0
+		self.__makePainterPaths()
+		self.__lock.release()
+	
+	#===========================================================================================
+	# Callbacks 
+	def pan_data_callback(self, data):
+		"""
+		Callback from the display poller at cyserver.DisplayPoller.run()
+		NOTE: This is called on the poller thread
+		
+		Arguments:
+			data	--	List of db by pixel
+			
+		"""
+				
+		# Copy the data array
+		self.__lock.acquire()
+		self.__display_data = np.copy(data)
+		self.__lock.release()
+	
+	def __process_pan_data(self):
+		""" Process and write the display data  """
+		
+		if self.__display_data != None and self.__pixels != None:
+			# Take the lock before updating the painter path
+			self.__lock.acquire()
+			self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
+			data_path = self.__painter_paths['data'][0][0]
+			#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
+			data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+			data_path.lineTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+			index = self.__pixels-2
+			for x_coord in range(self.__left_border + 1, self.__left_border + self.__h_space):
+				data_path.lineTo(*(x_coord, self.__dbToY(self.__display_data[index])))
+				if index > 0:
+					index -= 1
+			self.__display_data = None
+			self.__lock.release()
+			self.update()
+		
+	#===========================================================================================
+	# Qt EVENTS
+	def closeEvent(self, event):
+		""" User hit little x """
+	
+		# We never close the display, but if it was floating re-dock it
+		self.setFloating(False)
+		self.__float_callback(False, self.__width)
+		self.__ignore_resize = True
+		event.ignore()
+	
+	def floatEvent(self, event):
+		""" User hit float button """
+		
+		self.__float_callback(True, self.__width)
+	
+	def resizeEvent(self, e):
+		
+		if self.__ignore_resize:
+		    self.__ignore_resize = False
+		else:
+			if e.oldSize().width() < 100 or e.oldSize().height() < 100: return
+			# Don't try and track changes, repaint in 500ms
+			QtCore.QTimer.singleShot(500, self.__timeout)
+			self.__width = e.oldSize().width()
+			self.__height = e.oldSize().height()
+		
+	def paintEvent(self, e):
+		
+		self.__lock.acquire()
+		# Paint context
+		qp = QtGui.QPainter()
+		qp.begin(self)
+		qp.setRenderHints(QtGui.QPainter.Antialiasing)
+		# Paint according to the definition
+		self.__freq_disp.setGeometry(self.__mouse_x, self.__mouse_y, 50, 20)
+		for key, value in self.__painter_paths.items():
+			for (path, pen, brush) in value:
+				if pen != None: qp.setPen(pen)
+				if brush != None: qp.setBrush(brush)
+				qp.drawPath(path)
+		qp.end()
+		self.__lock.release()
+		
+	def mouseMoveEvent(self, e):		
+		# Display a frequency label at the cursor position.
+		self.__mouse_x = e.x() + 10
+		self.__mouse_y = e.y() - 10
+		self.__lock.acquire()
+		self.__freq_disp.setText('{:.3f}'.format(self.__st_freq + (self.__fpp*(e.x() - self.__left_border))))
+		self.__lock.release()
+		self.update()
+	
+	def enterEvent(self, e):
+		self.__freq_disp.show()
+		
+	def leaveEvent(self, e):
+		self.__freq_disp.hide()
+		
+	def mousePressEvent(self, e):
+		self.__lock.acquire()
+		freq = self.__st_freq + (self.__fpp*(e.x() - self.__left_border))
+		self.__lock.release()
+		self.__freq_callback(freq)
+	
+	def timerEvent(self):
+	    """ Process any waiting update """
+	    
+	    self.__process_pan_data()
+	    QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
+	    
+	#===========================================================================================
+	# PRIVATE
+	def __timeout(self):		
+		# Recalculate paths and update the display
+		sub_spans = 1
+		self.__lock.acquire()
+		self.__pixels = self.__width - self.__left_border - self.__right_border
+		self.__display_ob.set_display(self.__fft_sz, self.__win_type, sub_spans, self.__blk_sz, self.__pixels, self.__pan_mode, self.__over_frames, self.__bandwidth*1000000)
+		self.__makePainterPaths()
+		# Repaint
+		self.update()
+		self.__lock.release()
+		
+	def __makePainterPaths(self):
+		
+		# Set up the context to calculate the paths 
+		v_no = int(self.__width/50)
+		self.__h_space = self.__width - self.__left_border - self.__right_border
+		h_step = self.__h_space/(v_no)
+		self.__v_space = self.__height - self.__top_border - self.__bottom_border
+		v_step = self.__v_space/(self.__h_no-1)
+		self.__h_text_base = self.__top_border + self.__v_space + 15
+		
+		# Frequency calculations
+		center_freq = self.__center_freq
+		self.__st_freq = center_freq - self.__half_bandwidth
+		end_freq = center_freq + self.__half_bandwidth
+		span = end_freq - self.__st_freq
+		f_span_step = float(span)/float(v_no)
+		self.__fpp = float(self.__half_bandwidth * 2.0)/float(self.__h_space)
+		center_freq_x = int(float(self.__left_border) + ((center_freq - self.__st_freq)/self.__fpp))
+		
+		# Filter calculations
+		filter_low_x = int(float(self.__left_border) + (((center_freq - self.__st_freq) + self.__filter_low)/self.__fpp))
+		filter_high_x = int(float(self.__left_border) + (((center_freq - self.__st_freq) + self.__filter_high)/self.__fpp))
+		
+		# db calculations
+		self.__st_db = -140.0
+		db_span_step = 10.0
+		db_range = db_span_step * (self.__h_no - 1)
+		self.__dbpp = float(float(self.__v_space)/db_range)
+		
+		# Clear (except data) and assign the painter paths
+		for key, value in self.__painter_paths.items():
+			for path in value:
+				if key != 'data':
+					path[0] = QtGui.QPainterPath()
+		grid_path = self.__painter_paths['grid'][0][0]
+		legend_path = self.__painter_paths['legend'][0][0]
+		label_path = self.__painter_paths['label'][0][0]
+		filter_path = self.__painter_paths['dynamic'][0][0]
+		freq_path = self.__painter_paths['dynamic'][1][0]
+		
+		# Create the grid
+		for n in range (self.__h_no):
+			grid_path.moveTo(*(self.__left_border, (v_step*n) + self.__top_border))
+			grid_path.lineTo(*(self.__left_border + self.__h_space,  (v_step*n) + self.__top_border))
+		for n in range (v_no+1):
+			grid_path.moveTo(*((h_step*n) + self.__left_border, self.__top_border))
+			grid_path.lineTo(*((h_step*n) + self.__left_border, self.__top_border + self.__v_space))
+			
+		# Create the legends
+		for n in range (v_no):
+			# Frequency
+			legend_path.addText(QtCore.QPointF(float(((h_step*n) + self.__h_text_left)), float(self.__h_text_base)), self.__font, "{:7.3f}".format(self.__st_freq+(n*f_span_step)))		
+		for n in range (1, self.__h_no):
+			# dBM
+			legend_path.addText(QtCore.QPointF(float(self.__v_text_left), float(self.__top_border + self.__v_space - (v_step*n))), self.__font, "{:5.1f}".format(self.__st_db+(n*db_span_step)))
+		
+		# Additional text
+		label_path.addText(QtCore.QPointF(10, float(self.__h_text_base - 20)), self.__font, 'dbM')
+		label_path.addText(QtCore.QPointF(float(self.__left_border + self.__h_space - 20), float(self.__h_text_base)), self.__font, 'MHz')
+		
+		# Dynamic data
+		filter_path.addRect(filter_low_x, self.__top_border, filter_high_x - filter_low_x, self.__v_space)
+		freq_path.moveTo(*(center_freq_x, self.__top_border))		
+		freq_path.lineTo(*(center_freq_x, self.__top_border + self.__v_space))
+		
+	def __dbToY(self, dbm):
+		
+		# Not sure how to offset and scale this
+		#rel_db = (abs(self.__st_db) - abs(int(dbm))) + 150
+		rel_db = (abs(self.__st_db) - abs(int(dbm)))
+		return (self.__top_border + self.__v_space) - (rel_db * self.__dbpp)
+
+		

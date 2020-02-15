@@ -32,7 +32,7 @@ from main.imports import *
 
 #=====================================================
 # Base window class
-# The base class for receiver and ytansmitter windows
+# The base class for receiver and tansmitter windows
 #=====================================================
 class WindowBase(QMainWindow):
     
