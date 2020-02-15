@@ -190,6 +190,7 @@ class Panadapter(QWidget):
 		# Make context for rendering
 		# Get data if ready
 		r, self.__display_data = self.__con.get_display_data(self.__rx_id)
+		#print(r,self.__display_data)
 		if r:
 			# Render
 			self.__makePainterPaths()
