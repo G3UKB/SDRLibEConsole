@@ -64,6 +64,10 @@ class MainWindow(WindowBase):
         stopAct.setShortcut('Ctrl+S')
         stopAct.triggered.connect(self.__stop)
         
+        dispAct = QAction(self.style().standardIcon(QStyle.SP_ToolBarHorizontalExtensionButton), 'Disp', self)
+        dispAct.setShortcut('Ctrl+D')
+        dispAct.triggered.connect(self.__disp)
+        
         self.__num_rx = QComboBox()
         self.__num_rx.addItems(('1','2','3'))
         self.__num_rx.activated.connect(self.__num_rx_evnt)
@@ -82,6 +86,7 @@ class MainWindow(WindowBase):
         self.toolbar.addAction(exitAct)
         self.toolbar.addAction(runAct)
         self.toolbar.addAction(stopAct)
+        self.toolbar.addAction(dispAct)
         self.toolbar.addWidget(self.__num_rx)
         self.toolbar.addAction(self.__r2Act)
         self.toolbar.addAction(self.__r3Act)
@@ -129,7 +134,13 @@ class MainWindow(WindowBase):
             state['RADIO-RUN'] = False
         else:
             print("Sorry, radio failed to stop!")
-        
+    
+    #-------------------------------------------------
+    # Display button event        
+    def __disp(self):
+        # Invoke displays
+        self.__disp = DisplayWindow("Panadapter", 0)
+            
     #-------------------------------------------------
     # Exit button event
     def closeEvent(self, win) :

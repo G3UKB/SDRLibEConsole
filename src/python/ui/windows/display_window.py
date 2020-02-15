@@ -57,7 +57,7 @@ class DisplayWindow(QMainWindow):
         self.setPalette(palette)
         # Temp set a size
         self.setGeometry(100,100,self.__width, self.__height)
-        setup_ui()
+        self.__setup_ui()
         
         #-------------------------------------------------
         # Get app model
@@ -74,16 +74,6 @@ class DisplayWindow(QMainWindow):
     # Temp until real callback
     def freq_callback(self, f):
         print(f)
-        
-    #-------------------------------------------------
-    # Setup UI contents
-    def setup_ui(self) :
-        
-        # Create a display instance
-        # Temp for RX1
-        self.__display_inst = Panadapter(0, self.__width, self.__height, freq_callback)
-        
-        self.setCentralWidget(self.__display_inst)
     
     #==============================================================================================
     # PUBLIC
@@ -109,6 +99,13 @@ class DisplayWindow(QMainWindow):
     #==============================================================================================
     # PRIVATE
     #==============================================================================================
-    
+    # Setup UI contents
+    def __setup_ui(self) :
+        
+        # Create a display instance
+        # Temp for RX1
+        self.__display_inst = Panadapter(0, self.__width, self.__height, self.freq_callback)
+        
+        self.setCentralWidget(self.__display_inst)
 
     

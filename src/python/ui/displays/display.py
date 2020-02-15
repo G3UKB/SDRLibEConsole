@@ -52,8 +52,8 @@ class Panadapter(QWidget):
 		self.__freq_callback = freq_callback
 		
 		# Set the back colour
-		palette = QtGui.QPalette()
-		palette.setColor(QtGui.QPalette.Background,QtGui.QColor(43,63,68,255))
+		palette = QPalette()
+		palette.setColor(QPalette.Background,QColor(43,63,68,255))
 		self.setPalette(palette)
 
 		# Initialise vars
@@ -80,38 +80,38 @@ class Panadapter(QWidget):
 		self.__display_data = None
 		
 		# Set the resources
-		self.__grid_pen = QtGui.QPen(QtGui.QColor(39,83,109))
+		self.__grid_pen = QPen(QColor(39,83,109))
 		self.__grid_pen.setWidth(1)
-		self.__grid_pen.setStyle(QtCore.Qt.DotLine)
-		self.__legend_pen = QtGui.QPen(QtGui.QColor(178,178,178))
+		self.__grid_pen.setStyle(Qt.DotLine)
+		self.__legend_pen = QPen(QColor(178,178,178))
 		self.__legend_pen.setWidth(1)
-		self.__label_pen = QtGui.QPen(QtGui.QColor(255,0,0))
+		self.__label_pen = QPen(QColor(255,0,0))
 		self.__label_pen.setWidth(1)
-		self.__filter_pen = QtGui.QPen(QtGui.QColor(0,255,0, 20))
+		self.__filter_pen = QPen(QColor(0,255,0, 20))
 		self.__filter_pen.setWidth(1)
-		self.__filter_brush = QtGui.QBrush(QtGui.QColor(0,255,0, 20))
-		self.__freq_pen = QtGui.QPen(QtGui.QColor(255,0,0))
+		self.__filter_brush = QBrush(QColor(0,255,0, 20))
+		self.__freq_pen = QPen(QColor(255,0,0))
 		self.__freq_pen.setWidth(1)
-		self.__data_pen = QtGui.QPen(QtGui.QColor(0,255,0))
+		self.__data_pen = QPen(QColor(0,255,0))
 		self.__data_pen.setWidth(1)
-		self.__font = QtGui.QFont('Times', 8)
+		self.__font = QFont('Times', 8)
 		
 		# Define the painter paths
 		self.__painter_paths = {
-			'grid': [[QtGui.QPainterPath(), self.__grid_pen, None],],
-			'legend': [[QtGui.QPainterPath(), self.__legend_pen, None],],
-			'label': [[QtGui.QPainterPath(), self.__label_pen, None],],
+			'grid': [[QPainterPath(), self.__grid_pen, None],],
+			'legend': [[QPainterPath(), self.__legend_pen, None],],
+			'label': [[QPainterPath(), self.__label_pen, None],],
 			'dynamic': [
-					[QtGui.QPainterPath(), self.__filter_pen, self.__filter_brush],
-					[QtGui.QPainterPath(), self.__freq_pen, None]
+					[QPainterPath(), self.__filter_pen, self.__filter_brush],
+					[QPainterPath(), self.__freq_pen, None]
 				],
-			'data': [[QtGui.QPainterPath(), self.__data_pen, None],]
+			'data': [[QPainterPath(), self.__data_pen, None],]
 		}
 		# Enable mouseMoveEvent()
 		self.setMouseTracking(True)
 		
 		# Create a label for showing freq at cursor
-		self.__freq_disp = QtGui.QLabel('', self)
+		self.__freq_disp = QLabel('', self)
 		self.__freq_disp.setStyleSheet("QLabel {color: rgb(255,0,0);  font: bold 12px}")
 		self.__freq_disp.setText('')
 		

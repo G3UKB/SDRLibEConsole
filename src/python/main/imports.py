@@ -40,7 +40,7 @@ pp = pprint.PrettyPrinter(indent=4)
 #=====================================================
 # Lib imports
 from PyQt5.QtCore import Qt, QObject, QEvent, QMargins
-from PyQt5.QtGui import QPalette, QColor, QIcon
+from PyQt5.QtGui import QPalette, QColor, QIcon, QPen, QBrush, QFont, QPainterPath
 from PyQt5.QtWidgets import QApplication, qApp
 from PyQt5.QtWidgets import QWidget, QStyle, QStatusBar, QMainWindow, QAction
 from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QButtonGroup, QComboBox, QCheckBox
@@ -67,9 +67,10 @@ from ui.components.audio import *
 from ui.displays.display import *
 # Windows
 from ui.windows.window_base import *
+from ui.windows.display_window import *
 from ui.windows.main_window import *
 from ui.windows.aux_window import *
-from ui.windows.display_window import *
+
 
 
 
