@@ -1,9 +1,11 @@
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
+import numpy
 
 extensions = [
     Extension("server", ["server.pyx"],
+        include_dirs=[numpy.get_include()],
         library_dirs=["E:\\Projects\\SDRLibE\\trunk\\server\\x64\\Release",
                       "E:\\Projects\\SDRLibE\\trunk\\wdsp_win\\x64\\Release",
                       "E:\\Projects\\SDRLibE\\libs\\fftw\\x64",

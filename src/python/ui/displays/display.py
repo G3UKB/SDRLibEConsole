@@ -119,34 +119,28 @@ class Panadapter(QWidget):
 		self.__con = getInstance('conn_inst')
 		
 		# Set display
-		self.__con.set_display(rx_id, width - self.__left_border - self.__right_border)
 		self.__pixels = width - self.__left_border - self.__right_border
+		self.__con.set_display(rx_id, self.__pixels)
 		
 		# Refresh display every IDLE_TICKER ms
-		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
+		QTimer.singleShot(IDLE_TICKER, self.timerEvent)
 	
 	#===========================================================================================
 	# PUBLIC
 		
 	def setCenterFreq(self, freq):
-		self.__lock.acquire()
 		self.__center_freq = freq
 		self.__makePainterPaths()
-		self.__lock.release()
 	
 	def setBandwidth(self, bandwidth):
-		self.__lock.acquire()
 		self.__bandwidth = bandwidth
 		self.__half_bandwidth = bandwidth/2.0
 		self.__makePainterPaths()
-		self.__lock.release()
 		
 	def setFilterLimits(self, filter_low, filter_high):
-		self.__lock.acquire()
 		self.__filter_low = float(filter_low)/1000000.0
 		self.__filter_high = float(filter_high)/1000000.0
 		self.__makePainterPaths()
-		self.__lock.release()
 		
 	#===========================================================================================
 	# Qt EVENTS
@@ -158,13 +152,13 @@ class Panadapter(QWidget):
 		self.__pixels = self.__width - self.__left_border - self.__right_border
 		# Tell server width has changed
 		# This changes the number of pixels returned to match the width
-		self.__con.set_display_width(self.__pixels)
+		self.__con.set_display_width(self.__rx_id, self.__pixels)
 		
 	def paintEvent(self, e):
 		# Paint context
-		qp = QtGui.QPainter()
+		qp = QPainter()
 		qp.begin(self)
-		qp.setRenderHints(QtGui.QPainter.Antialiasing)
+		qp.setRenderHints(QPainter.Antialiasing)
 		# Paint according to the definition
 		self.__freq_disp.setGeometry(self.__mouse_x, self.__mouse_y, 50, 20)
 		for key, value in self.__painter_paths.items():
@@ -173,15 +167,12 @@ class Panadapter(QWidget):
 				if brush != None: qp.setBrush(brush)
 				qp.drawPath(path)
 		qp.end()
-		self.__lock.release()
 		
 	def mouseMoveEvent(self, e):		
 		# Display a frequency label at the cursor position.
 		self.__mouse_x = e.x() + 10
 		self.__mouse_y = e.y() - 10
-		self.__lock.acquire()
-		self.__freq_disp.setText('{:.3f}'.format(self.__st_freq + (self.__fpp*(e.x() - self.__left_border))))
-		self.__lock.release()
+		#self.__freq_disp.setText('{:.3f}'.format(self.__st_freq + (self.__fpp*(e.x() - self.__left_border))))
 		self.update()
 	
 	def enterEvent(self, e):
@@ -191,16 +182,14 @@ class Panadapter(QWidget):
 		self.__freq_disp.hide()
 		
 	def mousePressEvent(self, e):
-		self.__lock.acquire()
 		freq = self.__st_freq + (self.__fpp*(e.x() - self.__left_border))
-		self.__lock.release()
 		self.__freq_callback(freq)
 	
 	def timerEvent(self):
 		""" Process any waiting update """
 		# Make context for rendering
 		# Get data if ready
-		r, self.__display_data = self.__con.server_get_display_data(self.__rx_id)
+		r, self.__display_data = self.__con.get_display_data(self.__rx_id)
 		if r:
 			# Render
 			self.__makePainterPaths()
@@ -209,7 +198,7 @@ class Panadapter(QWidget):
 			self.update()
 		
 		# Call again in IDLE_TICKER ms
-		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
+		QTimer.singleShot(IDLE_TICKER, self.timerEvent)
 
 	#===========================================================================================
 	# PRIVATE
@@ -246,7 +235,7 @@ class Panadapter(QWidget):
 		for key, value in self.__painter_paths.items():
 			for path in value:
 				if key != 'data':
-					path[0] = QtGui.QPainterPath()
+					path[0] = QPainterPath()
 		grid_path = self.__painter_paths['grid'][0][0]
 		legend_path = self.__painter_paths['legend'][0][0]
 		label_path = self.__painter_paths['label'][0][0]
@@ -264,14 +253,14 @@ class Panadapter(QWidget):
 		# Create the legends
 		for n in range (v_no):
 			# Frequency
-			legend_path.addText(QtCore.QPointF(float(((h_step*n) + self.__h_text_left)), float(self.__h_text_base)), self.__font, "{:7.3f}".format(self.__st_freq+(n*f_span_step)))		
+			legend_path.addText(QPointF(float(((h_step*n) + self.__h_text_left)), float(self.__h_text_base)), self.__font, "{:7.3f}".format(self.__st_freq+(n*f_span_step)))		
 		for n in range (1, self.__h_no):
 			# dBM
-			legend_path.addText(QtCore.QPointF(float(self.__v_text_left), float(self.__top_border + self.__v_space - (v_step*n))), self.__font, "{:5.1f}".format(self.__st_db+(n*db_span_step)))
+			legend_path.addText(QPointF(float(self.__v_text_left), float(self.__top_border + self.__v_space - (v_step*n))), self.__font, "{:5.1f}".format(self.__st_db+(n*db_span_step)))
 		
 		# Additional text
-		label_path.addText(QtCore.QPointF(10, float(self.__h_text_base - 20)), self.__font, 'dbM')
-		label_path.addText(QtCore.QPointF(float(self.__left_border + self.__h_space - 20), float(self.__h_text_base)), self.__font, 'MHz')
+		label_path.addText(QPointF(10, float(self.__h_text_base - 20)), self.__font, 'dbM')
+		label_path.addText(QPointF(float(self.__left_border + self.__h_space - 20), float(self.__h_text_base)), self.__font, 'MHz')
 		
 		# Dynamic data
 		filter_path.addRect(filter_low_x, self.__top_border, filter_high_x - filter_low_x, self.__v_space)
@@ -280,7 +269,7 @@ class Panadapter(QWidget):
 	
 	def __process_pan_data(self):
 		""" Process and write the display data  """
-		self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
+		self.__painter_paths['data'][0][0] = QPainterPath()
 		data_path = self.__painter_paths['data'][0][0]
 		#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
 		data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))

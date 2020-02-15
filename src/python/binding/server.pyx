@@ -10,6 +10,7 @@ cimport server_api as api
 
 # Numpy imports
 import numpy as np
+cimport numpy as np
 
 # ===================================================
 # Server functions
@@ -302,14 +303,14 @@ cdef class DSP:
 # Display functions
 cdef class Display:
    
-    cdef object __display_data
-    cdef object __wbs_data
+    cdef object display_data
+    cdef object wbs_data
     
     # ----------------------------
     # Constructor
     def __cinit__(self):
-        self.__display_data = np.zeros(1920, dtype=np.float)
-        self.__wbs_data = np.zeros(1920, dtype=np.float)
+        self.display_data = np.zeros(1920, dtype=np.float)
+        self.wbs_data = np.zeros(1920, dtype=np.float)
     
     # ----------------------------
     # Change display width
@@ -325,9 +326,9 @@ cdef class Display:
     # Get spectrum display data    
     def server_get_display_data(self, display_id):
         # a memview can be used to pass in a pointer
-        cdef float[::1] arr_memview = self.__display_data
+        cdef double[::1] arr_memview = self.display_data
         if api.c_server_get_display_data(display_id, &arr_memview[0]):
-            return [True, self.__display_data]
+            return [True, self.display_data]
         else:
             return [False, None]
           
@@ -340,9 +341,9 @@ cdef class Display:
     # Get WBS data    
     def server_get_wbs_data(self, width):
         # a memview can be used to pass in a pointer
-        cdef float[::1] arr_memview = self.__wbs_data
+        cdef float[::1] arr_memview = self.wbs_data
         if api.c_server_get_wbs_data(width, &arr_memview[0]):
-            return [True, self.__wbs_data]
+            return [True, self.wbs_data]
         else:
             return [False, None] 
     

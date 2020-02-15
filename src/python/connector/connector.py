@@ -225,8 +225,13 @@ class Connector:
     #-------------------------------------------------
     # Set display width
     def set_display_width(self, rx_id, width):
-        self.__display.server_set_display_width(rx_id-1, width)
+        self.__display.server_set_display_width(width)
 
+    #-------------------------------------------------
+    # Get display data
+    def get_display_data(self, rx_id):
+        return self.__display.server_get_display_data(rx_id-1)
+        
     #==============================================================================================
     # PRIVATE
     #==============================================================================================

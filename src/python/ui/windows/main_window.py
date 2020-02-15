@@ -140,6 +140,7 @@ class MainWindow(WindowBase):
     def __disp(self):
         # Invoke displays
         self.__disp = DisplayWindow("Panadapter", 0)
+        self.__disp.show()
             
     #-------------------------------------------------
     # Exit button event

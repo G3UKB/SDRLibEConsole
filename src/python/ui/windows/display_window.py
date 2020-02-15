@@ -57,8 +57,11 @@ class DisplayWindow(QMainWindow):
         self.setPalette(palette)
         # Temp set a size
         self.setGeometry(100,100,self.__width, self.__height)
-        self.__setup_ui()
         
+        # Temp for RX1
+        self.__display_inst = Panadapter(1, self.__width, self.__height, self.freq_callback)
+        
+        self.__setup_ui()
         #-------------------------------------------------
         # Get app model
         #self.__app_model = Model.get_app_model()
@@ -102,10 +105,7 @@ class DisplayWindow(QMainWindow):
     # Setup UI contents
     def __setup_ui(self) :
         
-        # Create a display instance
-        # Temp for RX1
-        self.__display_inst = Panadapter(0, self.__width, self.__height, self.freq_callback)
-        
+        # Set the display in the window
         self.setCentralWidget(self.__display_inst)
 
     
