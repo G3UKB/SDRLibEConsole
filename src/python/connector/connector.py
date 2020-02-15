@@ -216,7 +216,17 @@ class Connector:
     # Set RX AGC 
     def set_agc(self, rx_id, agc_id):
         self.__dsp.server_set_agc_mode(rx_id-1, agc_id)
-           
+    
+    #-------------------------------------------------
+    # Set display 
+    def set_display(self, rx_id, width):
+        self.__display.server_set_display(rx_id-1, width)
+    
+    #-------------------------------------------------
+    # Set display width
+    def set_display_width(self, rx_id, width):
+        self.__display.server_set_display_width(rx_id-1, width)
+
     #==============================================================================================
     # PRIVATE
     #==============================================================================================

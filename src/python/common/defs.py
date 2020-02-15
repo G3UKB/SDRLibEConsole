@@ -131,3 +131,7 @@ BOTH = 'both'
 NONE = 'none'
 DIR_INPUT = 0
 DIR_OUTPUT = 1
+
+#=====================================================
+# Displays
+IDLE_TICKER = 100

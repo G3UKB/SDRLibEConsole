@@ -27,28 +27,29 @@
 from main.imports import *
 
 """
-	panadapter display for one receiver.
+	Panadapter display for one receiver.
 	Multi-instance for each active receiver.
 	The widget is placed within the display window for display.
 """
 class Panadapter(QtGui.QWidget):
 	
-	def __init__(self, rx_id, freq_callback):
+	def __init__(self, rx_id, width, height, freq_callback):
 		"""
 		Constructor
 		
 		Arguments:
 			rx_id			--	RX ID this display belongs to
+			width			-- 	Full display area width
+			height			--	Full display area height
 			freq_callback	--	callback for click tune
 		"""
 		
 		super(Panadapter, self).__init__()
 		
 		self.__rx_id = rx_id
+		self.__width = width
+		self.__height = height
 		self.__freq_callback = freq_callback
-		
-		# Create a lock
-		self.__lock = Lock()
 		
 		# Set the back colour
 		palette = QtGui.QPalette()
@@ -64,7 +65,6 @@ class Panadapter(QtGui.QWidget):
 		self.__mouse_x = 0
 		self.__mouse_y = 0
 		self.__show_freq = False
-		self.__ignore_resize = False
 		# Drawing params
 		self.__top_border = 10
 		self.__left_border = 50
@@ -115,54 +115,14 @@ class Panadapter(QtGui.QWidget):
 		self.__freq_disp.setStyleSheet("QLabel {color: rgb(255,0,0);  font: bold 12px}")
 		self.__freq_disp.setText('')
 		
-		# Dispatch worker threads to the main thread
+		# Set display
+		self.__con.set_display(rx_id, width - self.__left_border - self.__right_border)
+		
+		# Refresh display every IDLE_TICKER ms
 		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
 	
 	#===========================================================================================
 	# PUBLIC
-	
-	def create_display_unit(self, blk_sz, pan_mode, over_frames, win_type, fft_sz):
-		
-		self.__blk_sz = blk_sz
-		self.__pan_mode = pan_mode
-		self.__over_frames = over_frames
-		self.__win_type = win_type
-		self.__fft_sz = fft_sz
-		sub_spans = 1
-		self.__pixels = self.__width - self.__left_border - self.__right_border
-		callback_period = 100 # ms
-		self.__display_ob = DisplayUnitApi(fft_sz, win_type, sub_spans, blk_sz, self.__pixels, pan_mode, over_frames, self.__bandwidth*1000000, callback_period, self.pan_data_callback, self.__q)
-		return self.__display_ob
-
-	def set_display(self, blk_sz, pan_mode, over_frames, win_type, fft_sz):
-		
-		self.__blk_sz = blk_sz
-		self.__pan_mode = pan_mode
-		self.__over_frames = over_frames
-		self.__win_type = win_type
-		self.__fft_sz = fft_sz
-		sub_spans = 1
-		self.__pixels = self.__width - self.__left_border - self.__right_border
-		self.__display_ob.set_display(fft_sz, win_type, sub_spans, blk_sz, self.__pixels, pan_mode, over_frames, self.__bandwidth*1000000)
-
-	def showDisplay(self):
-		# Make paths
-		self.__makePainterPaths()
-		self.show()
-	
-	def closedown(self):
-		""" Request to close """
-		
-		# Update window position
-		position = self.pos()
-		self.__state[WINDOW_X] = position.x()
-		self.__state[WINDOW_Y] = position.y()
-		self.__state[WINDOW_WIDTH] = self.width()
-		self.__state[WINDOW_HEIGHT] = self.height()
-		# Save to the state file
-		persist.saveState(self.STATE_FILE, self.__state)
-		# Quit the window
-		self.close()
 		
 	def setCenterFreq(self, freq):
 		self.__lock.acquire()
@@ -183,74 +143,19 @@ class Panadapter(QtGui.QWidget):
 		self.__filter_high = float(filter_high)/1000000.0
 		self.__makePainterPaths()
 		self.__lock.release()
-	
-	#===========================================================================================
-	# Callbacks 
-	def pan_data_callback(self, data):
-		"""
-		Callback from the display poller at cyserver.DisplayPoller.run()
-		NOTE: This is called on the poller thread
-		
-		Arguments:
-			data	--	List of db by pixel
-			
-		"""
-				
-		# Copy the data array
-		self.__lock.acquire()
-		self.__display_data = np.copy(data)
-		self.__lock.release()
-	
-	def __process_pan_data(self):
-		""" Process and write the display data  """
-		
-		if self.__display_data != None and self.__pixels != None:
-			# Take the lock before updating the painter path
-			self.__lock.acquire()
-			self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
-			data_path = self.__painter_paths['data'][0][0]
-			#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
-			data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
-			data_path.lineTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
-			index = self.__pixels-2
-			for x_coord in range(self.__left_border + 1, self.__left_border + self.__h_space):
-				data_path.lineTo(*(x_coord, self.__dbToY(self.__display_data[index])))
-				if index > 0:
-					index -= 1
-			self.__display_data = None
-			self.__lock.release()
-			self.update()
 		
 	#===========================================================================================
 	# Qt EVENTS
-	def closeEvent(self, event):
-		""" User hit little x """
-	
-		# We never close the display, but if it was floating re-dock it
-		self.setFloating(False)
-		self.__float_callback(False, self.__width)
-		self.__ignore_resize = True
-		event.ignore()
-	
-	def floatEvent(self, event):
-		""" User hit float button """
-		
-		self.__float_callback(True, self.__width)
 	
 	def resizeEvent(self, e):
-		
-		if self.__ignore_resize:
-		    self.__ignore_resize = False
-		else:
-			if e.oldSize().width() < 100 or e.oldSize().height() < 100: return
-			# Don't try and track changes, repaint in 500ms
-			QtCore.QTimer.singleShot(500, self.__timeout)
-			self.__width = e.oldSize().width()
-			self.__height = e.oldSize().height()
+		# Save change
+		self.__width = e.size().width()
+		self.__height = e.size().height()
+		# Tell server width has changed
+		# This changes the number of pixels returned to match the width
+		self.__con.set_display_width(self.__width - self.__left_border - self.__right_border)
 		
 	def paintEvent(self, e):
-		
-		self.__lock.acquire()
 		# Paint context
 		qp = QtGui.QPainter()
 		qp.begin(self)
@@ -287,24 +192,37 @@ class Panadapter(QtGui.QWidget):
 		self.__freq_callback(freq)
 	
 	def timerEvent(self):
-	    """ Process any waiting update """
-	    
-	    self.__process_pan_data()
-	    QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
-	    
+		""" Process any waiting update """
+		# Make context for rendering
+		if self.__process_pan_data():
+			self.__makePainterPaths()
+			# Force a paint
+			self.update()
+		
+		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
+
 	#===========================================================================================
 	# PRIVATE
-	def __timeout(self):		
-		# Recalculate paths and update the display
-		sub_spans = 1
-		self.__lock.acquire()
-		self.__pixels = self.__width - self.__left_border - self.__right_border
-		self.__display_ob.set_display(self.__fft_sz, self.__win_type, sub_spans, self.__blk_sz, self.__pixels, self.__pan_mode, self.__over_frames, self.__bandwidth*1000000)
-		self.__makePainterPaths()
-		# Repaint
-		self.update()
-		self.__lock.release()
+	def __process_pan_data(self):
+		""" Process and write the display data  """
 		
+		if self.__display_data != None and self.__pixels != None:
+			# Take the lock before updating the painter path
+			self.__lock.acquire()
+			self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
+			data_path = self.__painter_paths['data'][0][0]
+			#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
+			data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+			data_path.lineTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+			index = self.__pixels-2
+			for x_coord in range(self.__left_border + 1, self.__left_border + self.__h_space):
+				data_path.lineTo(*(x_coord, self.__dbToY(self.__display_data[index])))
+				if index > 0:
+					index -= 1
+			self.__display_data = None
+			self.__lock.release()
+			self.update()
+			
 	def __makePainterPaths(self):
 		
 		# Set up the context to calculate the paths 
