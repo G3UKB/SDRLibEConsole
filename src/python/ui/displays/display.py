@@ -31,7 +31,7 @@ from main.imports import *
 	Multi-instance for each active receiver.
 	The widget is placed within the display window for display.
 """
-class Panadapter(QtGui.QWidget):
+class Panadapter(QWidget):
 	
 	def __init__(self, rx_id, width, height, freq_callback):
 		"""
@@ -115,8 +115,12 @@ class Panadapter(QtGui.QWidget):
 		self.__freq_disp.setStyleSheet("QLabel {color: rgb(255,0,0);  font: bold 12px}")
 		self.__freq_disp.setText('')
 		
+		# Get the connector instance
+		self.__con = getInstance('conn_inst')
+		
 		# Set display
 		self.__con.set_display(rx_id, width - self.__left_border - self.__right_border)
+		self.__pixels = width - self.__left_border - self.__right_border
 		
 		# Refresh display every IDLE_TICKER ms
 		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
@@ -151,9 +155,10 @@ class Panadapter(QtGui.QWidget):
 		# Save change
 		self.__width = e.size().width()
 		self.__height = e.size().height()
+		self.__pixels = self.__width - self.__left_border - self.__right_border
 		# Tell server width has changed
 		# This changes the number of pixels returned to match the width
-		self.__con.set_display_width(self.__width - self.__left_border - self.__right_border)
+		self.__con.set_display_width(self.__pixels)
 		
 	def paintEvent(self, e):
 		# Paint context
@@ -194,37 +199,22 @@ class Panadapter(QtGui.QWidget):
 	def timerEvent(self):
 		""" Process any waiting update """
 		# Make context for rendering
-		if self.__process_pan_data():
+		# Get data if ready
+		r, self.__display_data = self.__con.server_get_display_data(self.__rx_id)
+		if r:
+			# Render
 			self.__makePainterPaths()
+			self.__process_pan_data()
 			# Force a paint
 			self.update()
 		
+		# Call again in IDLE_TICKER ms
 		QtCore.QTimer.singleShot(IDLE_TICKER, self.timerEvent)
 
 	#===========================================================================================
 	# PRIVATE
-	def __process_pan_data(self):
-		""" Process and write the display data  """
-		
-		if self.__display_data != None and self.__pixels != None:
-			# Take the lock before updating the painter path
-			self.__lock.acquire()
-			self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
-			data_path = self.__painter_paths['data'][0][0]
-			#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
-			data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
-			data_path.lineTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
-			index = self.__pixels-2
-			for x_coord in range(self.__left_border + 1, self.__left_border + self.__h_space):
-				data_path.lineTo(*(x_coord, self.__dbToY(self.__display_data[index])))
-				if index > 0:
-					index -= 1
-			self.__display_data = None
-			self.__lock.release()
-			self.update()
-			
+	
 	def __makePainterPaths(self):
-		
 		# Set up the context to calculate the paths 
 		v_no = int(self.__width/50)
 		self.__h_space = self.__width - self.__left_border - self.__right_border
@@ -287,7 +277,21 @@ class Panadapter(QtGui.QWidget):
 		filter_path.addRect(filter_low_x, self.__top_border, filter_high_x - filter_low_x, self.__v_space)
 		freq_path.moveTo(*(center_freq_x, self.__top_border))		
 		freq_path.lineTo(*(center_freq_x, self.__top_border + self.__v_space))
-		
+	
+	def __process_pan_data(self):
+		""" Process and write the display data  """
+		self.__painter_paths['data'][0][0] = QtGui.QPainterPath()
+		data_path = self.__painter_paths['data'][0][0]
+		#data_path.moveTo(*(self.__left_border, self.height() - self.__bottom_border))
+		data_path.moveTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+		data_path.lineTo(*(self.__left_border, self.__dbToY(self.__display_data[self.__pixels-1])))
+		index = self.__pixels-2
+		for x_coord in range(self.__left_border + 1, self.__left_border + self.__h_space):
+			data_path.lineTo(*(x_coord, self.__dbToY(self.__display_data[index])))
+			if index > 0:
+				index -= 1
+		self.__display_data = None
+				
 	def __dbToY(self, dbm):
 		
 		# Not sure how to offset and scale this

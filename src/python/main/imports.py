@@ -64,10 +64,12 @@ from ui.components.modes import *
 from ui.components.filters import *
 from ui.components.agc import *
 from ui.components.audio import *
+from ui.displays.display import *
 # Windows
 from ui.windows.window_base import *
 from ui.windows.main_window import *
 from ui.windows.aux_window import *
+from ui.windows.display_window import *
 
 
 
