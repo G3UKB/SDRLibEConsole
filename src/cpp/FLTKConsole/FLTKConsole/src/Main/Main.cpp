@@ -1,6 +1,7 @@
 #include <iostream>
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
+#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
@@ -48,15 +49,16 @@ int main(int argc, char **argv) {
 			// Do GUI stuff
 			Fl_Window *window = new Fl_Window(340, 300);
 			window->resizable(window);
-			Fl_Box *box = new Fl_Box(20, 40, 300, 100, "Hello, World!");
-			box->box(FL_UP_BOX);
-			box->labelfont(FL_BOLD + FL_ITALIC);
-			box->labelsize(36);
-			box->labeltype(FL_SHADOW_LABEL);
-			Fl_Round_Clock *clock = new Fl_Round_Clock(120, 150, 100, 100);
-			Fl_Pack *pack = new Fl_Pack(20, 150, 100, 100);
-			Fl_Light_Button *b1 = new Fl_Light_Button(5, 5, 30, 20, "B1");
-			Fl_Light_Button *b2 = new Fl_Light_Button(35, 5, 30, 20, "B2");
+			Fl_Group *group = new Fl_Group(25, 25, 200, 100);
+			group->box(FL_EMBOSSED_FRAME);
+			Fl_Pack *pack = new Fl_Pack(28, 28, 194, 94);
+			//pack->box(FL_EMBOSSED_FRAME);
+			//Fl_Group *group = new Fl_Group(25, 25, 200, 100);
+			//group->box(FL_UP_FRAME);
+			//group->begin();
+			Fl_Light_Button *b1 = new Fl_Light_Button(10, 10, 60, 20, "Start");
+			Fl_Light_Button *b2 = new Fl_Light_Button(10, 10, 60, 20, "Stop");
+			//group->end();
 			window->end();
 			window->show(argc, argv);
 		}
