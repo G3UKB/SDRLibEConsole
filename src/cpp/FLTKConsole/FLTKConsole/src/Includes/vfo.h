@@ -31,6 +31,8 @@ The authors can be reached by email at:
 #include <map>
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Widget.H"
+#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
+#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Output.H"
 
 //==============================================================================
@@ -41,9 +43,9 @@ The authors can be reached by email at:
 #define MHZ_FONT_OVER 40.0f
 #define KHZ_FONT_OVER 40.0f
 #define HZ_FONT_OVER 30.0f
-#define MHZ_COLOR Colours::white
-#define KHZ_COLOR Colours::white
-#define HZ_COLOR Colours::orange
+#define MHZ_COLOR FL_WHITE
+#define KHZ_COLOR FL_WHITE
+#define HZ_COLOR FL_RED
 #define RX 0
 #define TX 1
 #define MIN_FREQ 1000
@@ -102,6 +104,10 @@ public:
 
 private:
 	//==============================================================================
+	// Containers
+	Fl_Group *group;
+	Fl_Pack *pack;
+
 	// State variables
 	int vfo_type = RX;			// RX|TX
 	std::string radio_id = "";	// Radio id of VFO instance
@@ -127,7 +133,7 @@ private:
 	//==============================================================================
 	// Method prototypes
 	void create_digits();
-	void layout_digits_in_grid();
+	void layout_digits();
 	void set_radio_freq();
 };
 

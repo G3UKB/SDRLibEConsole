@@ -35,6 +35,7 @@ The authors can be reached by email at:
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Light_Button.H"
 #include "../Includes/extern.h"
 #include "../Includes/radio_interface.h"
+#include "../Includes/vfo.h"
 
 RadioInterface* r_i;
 
@@ -72,15 +73,16 @@ int main(int argc, char **argv) {
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
 	// Do GUI stuff
-	Fl_Window *window = new Fl_Window(340, 300);
+	Fl_Window *window = new Fl_Window(200, 400);
 	window->resizable(window);
-	Fl_Group *group = new Fl_Group(25, 25, 200, 100);
+	Fl_Group *group = new Fl_Group(5, 5,190, 390);
 	group->box(FL_EMBOSSED_FRAME);
-	Fl_Pack *pack = new Fl_Pack(28, 28, 194, 94);
-	Fl_Light_Button *b1 = new Fl_Light_Button(10, 10, 60, 20, "Start");
+	Fl_Pack *pack = new Fl_Pack(10, 10, 180, 380);
+	Fl_Light_Button *b1 = new Fl_Light_Button(0, 0, 60, 20, "Start");
 	b1->callback(startradio, 0);
-	Fl_Light_Button *b2 = new Fl_Light_Button(10, 10, 60, 20, "Stop");
+	Fl_Light_Button *b2 = new Fl_Light_Button(0, 0, 60, 20, "Stop");
 	b2->callback(stopradio, 0);
+	VFOComponent *c = new VFOComponent("1", 0, 0,0, 170, 330);
 	window->end();
 	window->show(argc, argv);
 

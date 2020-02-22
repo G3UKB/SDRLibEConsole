@@ -31,7 +31,7 @@ The authors can be reached by email at:
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Draw.H"
+//#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Draw.H"
 #include "../../Includes/extern.h"
 #include "../../Includes/radio_interface.h"
 #include "../../Includes/vfo.h"
@@ -47,10 +47,6 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	// Local vars
 	vfo_type = p_vfo_type;
 	radio_id = p_radio_id;
-
-	// WE make content here but arrange it in resized
-	create_digits();
-
 	// Create freq_inc_map
 	freq_inc_map.insert (std::pair <std::string, int> ("100MHz", 100000000));
 	freq_inc_map.insert (std::pair <std::string, int> ("10MHz", 10000000));
@@ -62,11 +58,15 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	freq_inc_map.insert (std::pair <std::string, int> ("10Hz", 10));
 	freq_inc_map.insert (std::pair <std::string, int> ("1Hz", 1));
 
+	// WE make content here but arrange it in resized ??
+	layout_digits();
+
 	// Update frequency
 	int freq = 7100000;
-	set_freq(convertFreq(7100000));
+	//set_freq(convertFreq(7100000));
+
 	current_freq = freq;
-	set_radio_freq();
+	//set_radio_freq();
 }
 
 VFOComponent::~VFOComponent()
@@ -117,7 +117,6 @@ std::string VFOComponent::convertFreq(int freq) {
 }
 
 void VFOComponent::set_freq(std::string freq) {
-	//const wchar_t * wcstr = std::wstring(freq); // .toWideCharPointer();
 	char c[] = "\0\0";
 	c[0] = freq[0]; d_100MHz->label(c);
 	c[0] = freq[1]; d_10MHz->label(c);
@@ -145,7 +144,12 @@ void VFOComponent::draw()
 void VFOComponent::resize()
 {
 	// This is called when the VFOComponent is resized.
-	layout_digits_in_grid();
+	//layout_digits();
+}
+
+int VFOComponent::handle(int event) {
+	printf("Handle component\n");
+	return 0;
 }
 
 //==============================================================================
@@ -154,111 +158,87 @@ void VFOComponent::create_digits() {
 
 	// Create digits
 	d_100MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
-	d_100MHz->setComponentID("100MHz");
-	addAndMakeVisible(d_100MHz);
+	d_100MHz->argument(1);
 	d_10MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
-	d_10MHz->setComponentID("10MHz");
-	addAndMakeVisible(d_10MHz);
+	d_10MHz->argument(2);
 	d_1MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
-	d_1MHz->setComponentID("1MHz");
-	addAndMakeVisible(d_1MHz);
+	d_1MHz->argument(3);
 	d_100KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
-	d_100KHz->setComponentID("100KHz");
-	addAndMakeVisible(d_100KHz);
+	d_100KHz->argument(4);
 	d_10KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
-	d_10KHz->setComponentID("10KHz");
-	addAndMakeVisible(d_10KHz);
+	d_10KHz->argument(5);
 	d_1KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
-	d_1KHz->setComponentID("1KHz");
-	addAndMakeVisible(d_1KHz);
+	d_1KHz->argument(6);
 	d_100Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
-	d_100Hz->setComponentID("100Hz");
-	addAndMakeVisible(d_100Hz);
+	d_100Hz->argument(7);
 	d_10Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
-	d_10Hz->setComponentID("10Hz");
-	addAndMakeVisible(d_10Hz);
+	d_10Hz->argument(8);
 	d_1Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
-	d_1Hz->setComponentID("1Hz");
-	addAndMakeVisible(d_1Hz);
+	d_1Hz->argument(9);
 
 	// Create two spacers
-	sep_1 = new Label("spacer", ".");
-	sep_1->setText(".", NotificationType::dontSendNotification);
-	sep_1->setColour(Label::textColourId, Colours::antiquewhite);
-	addAndMakeVisible(sep_1);
-	sep_2 = new Label("spacer", ".");
-	sep_2->setText(".", NotificationType::dontSendNotification);
-	sep_2->setColour(Label::textColourId, Colours::antiquewhite);
-	addAndMakeVisible(sep_2);
+	sep_1 = new Fl_Output(0,0,0,0, ".");
+	sep_1->textcolor(FL_LIGHT1);
+	sep_2 = new Fl_Output(0, 0, 0, 0, ".");
+	sep_2->textcolor(FL_LIGHT1);
 
 	set_freq(convertFreq(current_freq));
 }
 
-void VFOComponent::layout_digits_in_grid() {
+void VFOComponent::layout_digits() {
 
-	Grid grid;
-
-	// Add digits in one horizontal row
-	using Track = Grid::TrackInfo;
-
-	grid.templateRows = { Track(1_fr) };
-	grid.templateColumns = {
-		Track(1_fr), Track(1_fr), Track(1_fr),
-		Track(15_px),
-		Track(1_fr), Track(1_fr), Track(1_fr),
-		Track(15_px),
-		Track(1_fr), Track(1_fr), Track(1_fr)
-	};
-
-	grid.items = {
-		GridItem(d_100MHz),
-		GridItem(d_10MHz),
-		GridItem(d_1MHz),
-		GridItem(sep_1),
-		GridItem(d_100KHz),
-		GridItem(d_10KHz),
-		GridItem(d_1KHz),
-		GridItem(sep_2),
-		GridItem(d_100Hz),
-		GridItem(d_10Hz),
-		GridItem(d_1Hz)
-	};
-
-	grid.justifyItems = Grid::JustifyItems::stretch;
-	// Add gaps if required
-	//grid.rowGap = Grid::Px::Px(10.0f);
-	//grid.columnGap = Grid::Px::Px(10.0f);
-	grid.performLayout(getLocalBounds());
+	// Create containers
+	group = new Fl_Group(0,0, 170, 330);
+	group->box(FL_EMBOSSED_FRAME);
+	pack = new Fl_Pack(0,0, 170, 330);
+	// Pack digits
+	create_digits();
+	pack->end();
+	group->end();
+	
 }
 
 void VFOComponent::set_radio_freq() {
 	if (radio_id == "radio-1")
-		RadioInterface::getInstance()->ri_server_cc_out_set_rx_1_freq(current_freq);
+		;
 	else if (radio_id == "radio-2")
-		RadioInterface::getInstance()->ri_server_cc_out_set_rx_2_freq(current_freq);
+		;
 	else if (radio_id == "radio-3")
-		RadioInterface::getInstance()->ri_server_cc_out_set_rx_3_freq(current_freq);
+		;
 }
 
 //==============================================================================
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(VFOComponent *parent, String text, Colour colour, float size) {
+VFODigit::VFODigit(VFOComponent *parent, std::string text, Fl_Color colour, float size) : Fl_Output(20,20,50,20) {
 
-	Label::Label();
 	my_parent = parent;
 	// Create a digit ready to add to the grid
-	setText(text, dontSendNotification);
-	setJustificationType(Justification::centred);
-	setColour(Label::textColourId, colour);
-	setFont(Font(size, Font::plain));
+	label(text.data());
+	textcolor(colour);
+	//labelfont(1);
+	labelsize(size);
 };
 
 VFODigit::~VFODigit() {
 
 }
 
+void VFODigit::draw() {
+
+}
+
+void VFODigit::resize() {
+
+}
+
+int VFODigit::handle(int event) {
+	printf("Handle digit\n");
+	return 0;
+}
+
+/*
 void VFODigit::paint(Graphics& g) {
 	// Add any additional painting here
 	Label::paint(g);
@@ -298,3 +278,4 @@ void VFODigit::mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& 
 		my_parent->freq_plus();
 	}
 }
+*/
