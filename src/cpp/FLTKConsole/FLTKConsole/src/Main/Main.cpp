@@ -100,6 +100,7 @@ int main(int argc, char **argv) {
 	VFOComponent *c = new VFOComponent("1", 0, 25, 50, 300, 50);
 
 	// Close up and display
+	top_group->end();
 	main_window->end();
 	main_window->show(argc, argv);
 

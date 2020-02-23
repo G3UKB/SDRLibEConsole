@@ -56,6 +56,10 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	freq_inc_map.insert (std::pair <std::string, int> ("10Hz", 10));
 	freq_inc_map.insert (std::pair <std::string, int> ("1Hz", 1));
 
+	// Make it look decent
+	box(FL_GTK_THIN_UP_BOX);
+	color((Fl_Color)24);
+
 	// Create VFO digits
 	create_digits();
 
@@ -64,7 +68,8 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	current_freq = freq;
 
 	set_display_freq(convertFreq(7100000));
-	set_radio_freq();
+	//set_radio_freq();
+
 }
 
 VFOComponent::~VFOComponent()
@@ -133,11 +138,11 @@ void VFOComponent::set_freq_from_hz(int freq) {
 
 //==============================================================================
 // GUI Events
-void VFOComponent::draw()
-{
-	// Our component is opaque, so we must completely fill the background with a solid colour
-	Fl::background(100,100,100);
-}
+//void VFOComponent::draw()
+//{
+//	// Our component is opaque, so we must completely fill the background with a solid colour
+//	Fl::background(100,100,100);
+//}
 
 void VFOComponent::resize()
 {
@@ -154,7 +159,7 @@ int VFOComponent::handle(int event) {
 //==============================================================================
 // Private
 void VFOComponent::create_digits() {
-
+	
 	// Create digits
 	d_100MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 35, 63, 35, 17);
 	d_100MHz->argument(1);
@@ -213,9 +218,9 @@ VFODigit::~VFODigit() {
 
 }
 
-void VFODigit::draw() {
-
-}
+//void VFODigit::draw() {
+//
+//}
 
 void VFODigit::resize() {
 

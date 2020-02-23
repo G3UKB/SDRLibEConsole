@@ -63,7 +63,7 @@ public:
 
 	//==============================================================================
 	int handle(int event) override;
-	void draw();
+	//void draw();
 	void resize();
 
 private:
@@ -89,7 +89,7 @@ public:
 
 	//==============================================================================
 	int handle(int event) override;
-	void draw();
+	//void draw();
 	void resize();
 
 	void set_freq_inc(std::string);
