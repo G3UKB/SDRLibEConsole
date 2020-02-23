@@ -67,7 +67,7 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	int freq = 7100000;
 	current_freq = freq;
 
-	set_display_freq(convertFreq(7100000));
+	//set_display_freq(convertFreq(7100000));
 	//set_radio_freq();
 
 }
@@ -133,51 +133,35 @@ void VFOComponent::set_display_freq(std::string freq) {
 }
 
 void VFOComponent::set_freq_from_hz(int freq) {
-	set_display_freq(convertFreq(freq));
+	//set_display_freq(convertFreq(freq));
 }
 
 //==============================================================================
 // GUI Events
-//void VFOComponent::draw()
-//{
-//	// Our component is opaque, so we must completely fill the background with a solid colour
-//	Fl::background(100,100,100);
-//}
 
-void VFOComponent::resize()
-{
-	// This is called when the VFOComponent is resized.
-	// Any action required?
-}
-
-// Handle all events
-int VFOComponent::handle(int event) {
-	printf("Handle component\n");
-	return 0;
-}
 
 //==============================================================================
 // Private
 void VFOComponent::create_digits() {
 	
 	// Create digits
-	d_100MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 35, 63, 35, 17);
+	d_100MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 35, 63, 35, 17);
 	d_100MHz->argument(1);
-	d_10MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 60, 63, 35, 17);
+	d_10MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 60, 63, 35, 17);
 	d_10MHz->argument(2);
-	d_1MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 85, 63, 35, 17);
+	d_1MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 85, 63, 35, 17);
 	d_1MHz->argument(3);
-	d_100KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 130, 63, 35, 17);
+	d_100KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 130, 63, 35, 17);
 	d_100KHz->argument(4);
-	d_10KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 155, 63, 35, 17);
+	d_10KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 155, 63, 35, 17);
 	d_10KHz->argument(5);
-	d_1KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 180, 63, 35, 17);
+	d_1KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 180, 63, 35, 17);
 	d_1KHz->argument(6);
-	d_100Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 220, 63, 35, 17);
+	d_100Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 220, 63, 35, 17);
 	d_100Hz->argument(7);
-	d_10Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 245, 63, 35, 17);
+	d_10Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 245, 63, 35, 17);
 	d_10Hz->argument(8);
-	d_1Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 105, 63, 35, 17);
+	d_1Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 270, 63, 35, 17);
 	d_1Hz->argument(9);
 
 	// Create and place two dot spacers
@@ -205,7 +189,7 @@ void VFOComponent::set_radio_freq() {
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(VFOComponent *parent, std::string label, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(x, y, w, h, label.data()) {
+VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(x, y, w, h, "0") {
 
 	my_parent = parent;
 
@@ -218,18 +202,26 @@ VFODigit::~VFODigit() {
 
 }
 
-//void VFODigit::draw() {
-//
-//}
-
-void VFODigit::resize() {
-
-}
-
 // Handle all events
 int VFODigit::handle(int event) {
-	printf("Handle digit\n");
-	return 0;
+	switch (event) {
+		case FL_ENTER: {
+			printf("Enter\n");
+			labelsize(MHZ_FONT_OVER);
+			//labelcolor((Fl_Color)91);
+			redraw();
+			return 1;
+		}
+		case FL_LEAVE: {
+			printf("Leave\n");
+			labelsize(HZ_FONT);
+			//labelcolor((Fl_Color)40);
+			redraw();
+			return 1;
+		}
+		default:
+			return Fl_Widget::handle(event);
+	}
 }
 
 /*

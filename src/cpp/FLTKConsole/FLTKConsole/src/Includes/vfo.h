@@ -41,9 +41,9 @@ The authors can be reached by email at:
 #define MHZ_FONT_OVER 40.0f
 #define KHZ_FONT_OVER 40.0f
 #define HZ_FONT_OVER 30.0f
-#define MHZ_COLOR FL_WHITE
-#define KHZ_COLOR FL_WHITE
-#define HZ_COLOR FL_RED
+#define MHZ_COLOR (Fl_Color)40
+#define KHZ_COLOR (Fl_Color)40
+#define HZ_COLOR (Fl_Color)91
 #define RX 0
 #define TX 1
 #define MIN_FREQ 1000
@@ -58,13 +58,11 @@ class VFODigit : public Fl_Box
 {
 public:
 	//==============================================================================
-	VFODigit(VFOComponent *parent, std::string label, Fl_Color label_colour, float font_size, int x, int y, int w, int h);
+	VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h);
 	~VFODigit();
 
 	//==============================================================================
 	int handle(int event) override;
-	//void draw();
-	void resize();
 
 private:
 	//==============================================================================
@@ -88,10 +86,6 @@ public:
 	~VFOComponent();
 
 	//==============================================================================
-	int handle(int event) override;
-	//void draw();
-	void resize();
-
 	void set_freq_inc(std::string);
 	void reset_freq_inc();
 	void freq_plus();
@@ -129,7 +123,6 @@ private:
 	//==============================================================================
 	// Method prototypes
 	void create_digits();
-	void layout_digits();
 	void set_radio_freq();
 };
 
