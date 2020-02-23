@@ -30,8 +30,6 @@ The authors can be reached by email at:
 #include <map>
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
-//#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Draw.H"
 #include "../../Includes/extern.h"
 #include "../../Includes/radio_interface.h"
 #include "../../Includes/vfo.h"
@@ -42,7 +40,7 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Widget(x, y, w, h)
+VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
 {
 	// Local vars
 	vfo_type = p_vfo_type;
@@ -58,15 +56,15 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	freq_inc_map.insert (std::pair <std::string, int> ("10Hz", 10));
 	freq_inc_map.insert (std::pair <std::string, int> ("1Hz", 1));
 
-	// WE make content here but arrange it in resized ??
-	layout_digits();
+	// Create VFO digits
+	create_digits();
 
 	// Update frequency
 	int freq = 7100000;
-	//set_freq(convertFreq(7100000));
-
 	current_freq = freq;
-	//set_radio_freq();
+
+	set_display_freq(convertFreq(7100000));
+	set_radio_freq();
 }
 
 VFOComponent::~VFOComponent()
@@ -86,7 +84,7 @@ void VFOComponent::freq_plus() {
 		int ifreq = current_freq + freq_inc;
 		if (ifreq <= MAX_FREQ) {
 			current_freq = ifreq;
-			set_freq(convertFreq(current_freq));
+			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
 		}
 	}
@@ -97,7 +95,7 @@ void VFOComponent::freq_minus() {
 		int ifreq = current_freq - freq_inc;
 		if (ifreq >= MIN_FREQ) {
 			current_freq = ifreq;
-			set_freq(convertFreq(current_freq));
+			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
 		}
 	}
@@ -116,7 +114,7 @@ std::string VFOComponent::convertFreq(int freq) {
 	return (leading_zeros += sfreq);
 }
 
-void VFOComponent::set_freq(std::string freq) {
+void VFOComponent::set_display_freq(std::string freq) {
 	char c[] = "\0\0";
 	c[0] = freq[0]; d_100MHz->label(c);
 	c[0] = freq[1]; d_10MHz->label(c);
@@ -130,7 +128,7 @@ void VFOComponent::set_freq(std::string freq) {
 }
 
 void VFOComponent::set_freq_from_hz(int freq) {
-	set_freq(convertFreq(freq));
+	set_display_freq(convertFreq(freq));
 }
 
 //==============================================================================
@@ -144,9 +142,10 @@ void VFOComponent::draw()
 void VFOComponent::resize()
 {
 	// This is called when the VFOComponent is resized.
-	//layout_digits();
+	// Any action required?
 }
 
+// Handle all events
 int VFOComponent::handle(int event) {
 	printf("Handle component\n");
 	return 0;
@@ -157,45 +156,35 @@ int VFOComponent::handle(int event) {
 void VFOComponent::create_digits() {
 
 	// Create digits
-	d_100MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
+	d_100MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 35, 63, 35, 17);
 	d_100MHz->argument(1);
-	d_10MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
+	d_10MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 60, 63, 35, 17);
 	d_10MHz->argument(2);
-	d_1MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT);
+	d_1MHz = new VFODigit(this, std::string("0"), MHZ_COLOR, MHZ_FONT, 85, 63, 35, 17);
 	d_1MHz->argument(3);
-	d_100KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
+	d_100KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 130, 63, 35, 17);
 	d_100KHz->argument(4);
-	d_10KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
+	d_10KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 155, 63, 35, 17);
 	d_10KHz->argument(5);
-	d_1KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT);
+	d_1KHz = new VFODigit(this, std::string("0"), KHZ_COLOR, KHZ_FONT, 180, 63, 35, 17);
 	d_1KHz->argument(6);
-	d_100Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
+	d_100Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 220, 63, 35, 17);
 	d_100Hz->argument(7);
-	d_10Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
+	d_10Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 245, 63, 35, 17);
 	d_10Hz->argument(8);
-	d_1Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT);
+	d_1Hz = new VFODigit(this, std::string("0"), HZ_COLOR, HZ_FONT, 105, 63, 35, 17);
 	d_1Hz->argument(9);
 
-	// Create two spacers
-	sep_1 = new Fl_Output(0,0,0,0, ".");
-	sep_1->textcolor(FL_LIGHT1);
-	sep_2 = new Fl_Output(0, 0, 0, 0, ".");
-	sep_2->textcolor(FL_LIGHT1);
+	// Create and place two dot spacers
+	sep_1 = new Fl_Box(105, 63, 35, 17, ".");
+	sep_1->labelsize(36);
+	sep_1->labelcolor((Fl_Color)90);
+	sep_2 = new Fl_Box(200, 63, 35, 17, ".");
+	sep_2->labelsize(36);
+	sep_2->labelcolor((Fl_Color)90);
 
-	set_freq(convertFreq(current_freq));
-}
-
-void VFOComponent::layout_digits() {
-
-	// Create containers
-	group = new Fl_Group(0,0, 170, 330);
-	group->box(FL_EMBOSSED_FRAME);
-	pack = new Fl_Pack(0,0, 170, 330);
-	// Pack digits
-	create_digits();
-	pack->end();
-	group->end();
-	
+	// Close off the group
+	end();
 }
 
 void VFOComponent::set_radio_freq() {
@@ -211,14 +200,13 @@ void VFOComponent::set_radio_freq() {
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(VFOComponent *parent, std::string text, Fl_Color colour, float size) : Fl_Output(20,20,50,20) {
+VFODigit::VFODigit(VFOComponent *parent, std::string label, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(x, y, w, h, label.data()) {
 
 	my_parent = parent;
-	// Create a digit ready to add to the grid
-	label(text.data());
-	textcolor(colour);
-	//labelfont(1);
-	labelsize(size);
+
+	// Set attributes
+	labelsize(font_size);
+	labelcolor((Fl_Color)label_colour);
 };
 
 VFODigit::~VFODigit() {
@@ -233,6 +221,7 @@ void VFODigit::resize() {
 
 }
 
+// Handle all events
 int VFODigit::handle(int event) {
 	printf("Handle digit\n");
 	return 0;

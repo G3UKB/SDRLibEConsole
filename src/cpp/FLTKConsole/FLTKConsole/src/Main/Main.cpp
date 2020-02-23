@@ -28,6 +28,8 @@ The authors can be reached by email at:
 #include <iostream>
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
+#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Double_Window.H"
+
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
@@ -72,21 +74,36 @@ int main(int argc, char **argv) {
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
-	// Do GUI stuff
-	Fl_Window *window = new Fl_Window(200, 400);
-	window->resizable(window);
-	Fl_Group *group = new Fl_Group(5, 5,190, 390);
-	group->box(FL_EMBOSSED_FRAME);
-	Fl_Pack *pack = new Fl_Pack(10, 10, 180, 380);
-	Fl_Light_Button *b1 = new Fl_Light_Button(0, 0, 60, 20, "Start");
-	b1->callback(startradio, 0);
-	Fl_Light_Button *b2 = new Fl_Light_Button(0, 0, 60, 20, "Stop");
-	b2->callback(stopradio, 0);
-	VFOComponent *c = new VFOComponent("1", 0, 0,0, 170, 330);
-	window->end();
-	window->show(argc, argv);
+	// Create a main window
+	Fl_Window* main_window = new Fl_Double_Window(349, 127);
+	main_window->resizable(main_window);
+	main_window->color((Fl_Color)24);
+	main_window->align(Fl_Align(65));
 
-	// Run until quit
+	// Add a group box
+	Fl_Group *top_group = new Fl_Group(10, 10, 330, 105);
+	top_group->box(FL_GTK_THIN_UP_BOX);
+	top_group->color((Fl_Color)24);
+
+	// Add start and stop buttons to the group
+	Fl_Button* start_btn = new Fl_Button(25, 25, 100, 20, "Start");
+	start_btn->color((Fl_Color)33);
+	start_btn->labelcolor((Fl_Color)67);
+	start_btn->callback(startradio, 0);
+	Fl_Button* stop_button = new Fl_Button(130, 25, 100, 20, "Stop");
+	stop_button->color((Fl_Color)33);
+	stop_button->labelcolor((Fl_Color)80);
+	stop_button->callback(stopradio, 0);
+	
+	// Add the VFO component
+	// This extends Fl_Group so we place the group below the buttons
+	VFOComponent *c = new VFOComponent("1", 0, 25, 50, 300, 50);
+
+	// Close up and display
+	main_window->end();
+	main_window->show(argc, argv);
+
+	// Run event loop until quit
 	return Fl::run();
 }
 

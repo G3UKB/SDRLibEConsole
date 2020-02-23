@@ -30,10 +30,8 @@ The authors can be reached by email at:
 #include <string>
 #include <map>
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Widget.H"
 #include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Output.H"
+#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
 
 //==============================================================================
 // Defines
@@ -56,11 +54,11 @@ class VFOComponent;
 /*
 	A VFO Digit component
 */
-class VFODigit : public Fl_Output
+class VFODigit : public Fl_Box
 {
 public:
 	//==============================================================================
-	VFODigit(VFOComponent *parent, std::string text, Fl_Color colour, float size);
+	VFODigit(VFOComponent *parent, std::string label, Fl_Color label_colour, float font_size, int x, int y, int w, int h);
 	~VFODigit();
 
 	//==============================================================================
@@ -82,7 +80,7 @@ private:
 /*
 	Multi-instance VFO component
 */
-class VFOComponent : public Fl_Widget
+class VFOComponent : public Fl_Group
 {
 public:
 	//==============================================================================
@@ -99,14 +97,12 @@ public:
 	void freq_plus();
 	void freq_minus();
 	std::string convertFreq(int freq);
-	void set_freq(std::string freq);
+	void set_display_freq(std::string freq);
 	void set_freq_from_hz(int freq);
 
 private:
 	//==============================================================================
 	// Containers
-	Fl_Group *group;
-	Fl_Pack *pack;
 
 	// State variables
 	int vfo_type = RX;			// RX|TX
@@ -127,8 +123,8 @@ private:
 	VFODigit *d_100Hz;
 	VFODigit *d_10Hz;
 	VFODigit *d_1Hz;
-	Fl_Output *sep_1;
-	Fl_Output *sep_2;
+	Fl_Box *sep_1;
+	Fl_Box *sep_2;
 
 	//==============================================================================
 	// Method prototypes
