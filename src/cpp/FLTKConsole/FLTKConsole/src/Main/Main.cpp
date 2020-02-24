@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
 	
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
-	VFOComponent *c = new VFOComponent("1", 0, 15, 50, 300, 55);
+	VFOComponent *c = new VFOComponent(r_i, "radio-1", 0, 15, 50, 300, 55);
 
 	// Close up and display
 	top_group->end();
