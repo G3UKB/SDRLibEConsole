@@ -202,7 +202,7 @@ void VFOComponent::set_radio_freq() {
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(FL_NO_BOX, x, y, w, h, "0") {
+VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(FL_FLAT_BOX, x, y, w, h, "0") {
 
 	my_parent = parent;
 
@@ -221,7 +221,9 @@ VFODigit::~VFODigit() {
 }
 
 void VFODigit::draw() {
+	Fl_Box::draw_box();
 	Fl_Widget::draw_label();
+
 }
 
 // Handle all events
@@ -235,8 +237,6 @@ int VFODigit::handle(int event) {
 				labelsize(KHZ_FONT_OVER);
 			else
 				labelsize(MHZ_FONT_OVER);
-			// Necessary to make the label redraw correctly
-			label(label());
 			// Remember where we are
 			active_digit = argument();
 			my_parent->set_freq_inc(active_digit);
@@ -251,8 +251,6 @@ int VFODigit::handle(int event) {
 				labelsize(KHZ_FONT);
 			else
 				labelsize(MHZ_FONT);
-			// Necessary to make the label redraw correctly
-			label(label());
 			// Nothing active
 			active_digit = -1;
 			my_parent->reset_freq_inc();
