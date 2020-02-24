@@ -67,7 +67,8 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	int freq = 7100000;
 	current_freq = freq;
 
-	//set_display_freq(convertFreq(7100000));
+	convertFreq(freq);
+	set_display_freq(convertFreq(7100000));
 	//set_radio_freq();
 
 }
@@ -112,7 +113,7 @@ std::string VFOComponent::convertFreq(int freq) {
 	// Add leading zeros to make it a 9 digit string
 	// Number of leading zeros to add
 	int l = 9 - sfreq.length();
-	std::string leading_zeros;
+	std::string leading_zeros("");
 	for (int i = 0; i < l; i++) {
 		leading_zeros += "0";
 	}
@@ -120,16 +121,27 @@ std::string VFOComponent::convertFreq(int freq) {
 }
 
 void VFOComponent::set_display_freq(std::string freq) {
-	char c[] = "\0\0";
-	c[0] = freq[0]; d_100MHz->label(c);
-	c[0] = freq[1]; d_10MHz->label(c);
-	c[0] = freq[2]; d_1MHz->label(c);
-	c[0] = freq[3]; d_100KHz->label(c);
-	c[0] = freq[4]; d_10KHz->label(c);
-	c[0] = freq[5]; d_1KHz->label(c);
-	c[0] = freq[6]; d_100Hz->label(c);
-	c[0] = freq[7]; d_10Hz->label(c);
-	c[0] = freq[8]; d_1Hz->label(c);
+	// The string passed to label is not copied so it must be
+	// unique and not go out of scope.
+	static char c0[] = "\0\0";
+	static char c1[] = "\0\0";
+	static char c2[] = "\0\0";
+	static char c3[] = "\0\0";
+	static char c4[] = "\0\0";
+	static char c5[] = "\0\0";
+	static char c6[] = "\0\0";
+	static char c7[] = "\0\0";
+	static char c8[] = "\0\0";
+	// Update all the frequency digits
+	c0[0] = freq[0]; d_100MHz->label(c0);
+	c1[0] = freq[1]; d_10MHz->label(c1);
+	c2[0] = freq[2]; d_1MHz->label(c2);
+	c3[0] = freq[3]; d_100KHz->label(c3);
+	c4[0] = freq[4]; d_10KHz->label(c4);
+	c5[0] = freq[5]; d_1KHz->label(c5);
+	c6[0] = freq[6]; d_100Hz->label(c6);
+	c7[0] = freq[7]; d_10Hz->label(c7);
+	c8[0] = freq[8]; d_1Hz->label(c8);
 }
 
 void VFOComponent::set_freq_from_hz(int freq) {
@@ -189,11 +201,11 @@ void VFOComponent::set_radio_freq() {
 // A VFO Digit
 //==============================================================================
 
-VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(x, y, w, h, "0") {
+VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(FL_NO_BOX, x, y, w, h, "0") {
 
 	my_parent = parent;
 
-	// Set attributes
+	// Set attribute
 	labelsize(font_size);
 	labelcolor((Fl_Color)label_colour);
 };
@@ -202,20 +214,32 @@ VFODigit::~VFODigit() {
 
 }
 
+void VFODigit::draw() {
+	Fl_Widget::draw_label();
+}
+
 // Handle all events
 int VFODigit::handle(int event) {
 	switch (event) {
 		case FL_ENTER: {
-			printf("Enter\n");
-			labelsize(MHZ_FONT_OVER);
-			//labelcolor((Fl_Color)91);
+			// Grow the digit a little
+			if (argument() > 6)
+				labelsize(HZ_FONT_OVER);
+			else
+				labelsize(MHZ_FONT_OVER);
+			// Necessary to make the label redraw correctly
+			label(label());
 			redraw();
 			return 1;
 		}
 		case FL_LEAVE: {
-			printf("Leave\n");
-			labelsize(HZ_FONT);
-			//labelcolor((Fl_Color)40);
+			// Shrink back to normal size
+			if (argument() > 6)
+				labelsize(HZ_FONT);
+			else
+				labelsize(MHZ_FONT);
+			// Necessary to make the label redraw correctly
+			label(label());
 			redraw();
 			return 1;
 		}
