@@ -46,15 +46,15 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	vfo_type = p_vfo_type;
 	radio_id = p_radio_id;
 	// Create freq_inc_map
-	freq_inc_map.insert (std::pair <std::string, int> ("100MHz", 100000000));
-	freq_inc_map.insert (std::pair <std::string, int> ("10MHz", 10000000));
-	freq_inc_map.insert (std::pair <std::string, int> ("1MHz", 1000000));
-	freq_inc_map.insert (std::pair <std::string, int> ("100KHz", 100000));
-	freq_inc_map.insert (std::pair <std::string, int> ("10KHz", 10000));
-	freq_inc_map.insert (std::pair <std::string, int> ("1KHz", 1000));
-	freq_inc_map.insert (std::pair <std::string, int> ("100Hz", 100));
-	freq_inc_map.insert (std::pair <std::string, int> ("10Hz", 10));
-	freq_inc_map.insert (std::pair <std::string, int> ("1Hz", 1));
+	freq_inc_map.insert (std::pair <int, int> (1, 100000000));
+	freq_inc_map.insert (std::pair <int, int> (2, 10000000));
+	freq_inc_map.insert (std::pair <int, int> (3, 1000000));
+	freq_inc_map.insert (std::pair <int, int> (4, 100000));
+	freq_inc_map.insert (std::pair <int, int> (5, 10000));
+	freq_inc_map.insert (std::pair <int, int> (6, 1000));
+	freq_inc_map.insert (std::pair <int, int> (7, 100));
+	freq_inc_map.insert (std::pair <int, int> (8, 10));
+	freq_inc_map.insert (std::pair <int, int> (9, 1));
 
 	// Make it look decent
 	box(FL_GTK_THIN_UP_BOX);
@@ -77,7 +77,7 @@ VFOComponent::~VFOComponent()
 {
 }
 
-void VFOComponent::set_freq_inc(std::string id) {
+void VFOComponent::set_freq_inc(int id) {
 	freq_inc = freq_inc_map.at(id);
 }
 
@@ -91,7 +91,7 @@ void VFOComponent::freq_plus() {
 		if (ifreq <= MAX_FREQ) {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
-			set_radio_freq();
+			//set_radio_freq();
 		}
 	}
 }
@@ -102,7 +102,7 @@ void VFOComponent::freq_minus() {
 		if (ifreq >= MIN_FREQ) {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
-			set_radio_freq();
+			//set_radio_freq();
 		}
 	}
 }
@@ -208,6 +208,11 @@ VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size,
 	// Set attribute
 	labelsize(font_size);
 	labelcolor((Fl_Color)label_colour);
+	Fl_Color parent_col = my_parent->color();
+	color(parent_col);
+
+	// No active digits
+	active_digit = -1;
 };
 
 VFODigit::~VFODigit() {
@@ -225,10 +230,15 @@ int VFODigit::handle(int event) {
 			// Grow the digit a little
 			if (argument() > 6)
 				labelsize(HZ_FONT_OVER);
+			else if (argument() > 3)
+				labelsize(KHZ_FONT_OVER);
 			else
 				labelsize(MHZ_FONT_OVER);
 			// Necessary to make the label redraw correctly
 			label(label());
+			// Remember where we are
+			active_digit = argument();
+			my_parent->set_freq_inc(active_digit);
 			redraw();
 			return 1;
 		}
@@ -236,12 +246,32 @@ int VFODigit::handle(int event) {
 			// Shrink back to normal size
 			if (argument() > 6)
 				labelsize(HZ_FONT);
+			else if (argument() > 3)
+				labelsize(KHZ_FONT);
 			else
 				labelsize(MHZ_FONT);
 			// Necessary to make the label redraw correctly
 			label(label());
+			// Nothing active
+			active_digit = -1;
+			my_parent->reset_freq_inc();
 			redraw();
 			return 1;
+		}
+		case FL_MOUSEWHEEL: {
+			// Scrolling
+			if (active_digit != -1) {
+				printf("Click\n");
+				// event_dx and event_dy return 1 or -1
+				if (Fl::event_dx < 0) {
+					// Freq decreasing
+					my_parent->freq_minus();
+				}
+				else {
+					// Freq increasing
+					my_parent->freq_plus();
+				}
+			}
 		}
 		default:
 			return Fl_Widget::handle(event);

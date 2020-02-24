@@ -41,9 +41,9 @@ The authors can be reached by email at:
 #define MHZ_FONT_OVER 40.0f
 #define KHZ_FONT_OVER 40.0f
 #define HZ_FONT_OVER 30.0f
-#define MHZ_COLOR (Fl_Color)40
-#define KHZ_COLOR (Fl_Color)40
-#define HZ_COLOR (Fl_Color)91
+#define MHZ_COLOR (Fl_Color)fl_rgb_color(228,228,228)
+#define KHZ_COLOR (Fl_Color)fl_rgb_color(228,228,228)
+#define HZ_COLOR (Fl_Color)fl_rgb_color(237,100,41)
 #define RX 0
 #define TX 1
 #define MIN_FREQ 1000
@@ -69,6 +69,7 @@ private:
 	//==============================================================================
 	// State variables
 	VFOComponent *my_parent;
+	int active_digit;
 
 	//==============================================================================
 	// Method prototypes
@@ -87,7 +88,7 @@ public:
 	~VFOComponent();
 
 	//==============================================================================
-	void set_freq_inc(std::string);
+	void set_freq_inc(int inc);
 	void reset_freq_inc();
 	void freq_plus();
 	void freq_minus();
@@ -106,7 +107,7 @@ private:
 	int current_freq = 7100000;	// Current frequency in MHz
 
 	// Map for lookup of increments
-	std::map<std::string, int> freq_inc_map;
+	std::map<int, int> freq_inc_map;
 
 	// Digits
 	VFODigit *d_100MHz;
