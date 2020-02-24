@@ -271,50 +271,9 @@ int VFODigit::handle(int event) {
 					my_parent->freq_minus();
 				}
 			}
+			return 1;
 		}
 		default:
 			return Fl_Widget::handle(event);
 	}
 }
-
-/*
-void VFODigit::paint(Graphics& g) {
-	// Add any additional painting here
-	Label::paint(g);
-};
-
-void VFODigit::resized() {
-
-};
-
-void VFODigit::mouseEnter(const MouseEvent& event) {
-	String id = event.eventComponent->getComponentID();
-	my_parent->set_freq_inc(id);
-
-	// Grow font by 5 points
-	Font f = getFont();
-	int h = f.getHeight();
-	setFont(Font(h + 5, Font::plain));
-}
-
-void VFODigit::mouseExit(const MouseEvent& event) {
-	my_parent->reset_freq_inc();
-
-	// Shrink font by 5 points
-	Font f = getFont();
-	int h = f.getHeight();
-	setFont(Font(h - 5, Font::plain));
-}
-
-void VFODigit::mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) {
-	float dir = wheel.deltaY;
-	if (dir < 0) {
-		// Freq going down
-		my_parent->freq_minus();
-	}
-	else {
-		// Freq going up
-		my_parent->freq_plus();
-	}
-}
-*/
