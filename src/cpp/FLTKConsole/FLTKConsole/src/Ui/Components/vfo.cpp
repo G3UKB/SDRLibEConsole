@@ -157,30 +157,30 @@ void VFOComponent::set_freq_from_hz(int freq) {
 void VFOComponent::create_digits() {
 	
 	// Create digits
-	d_100MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 35, 63, 35, 17);
+	d_100MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 20, 58, 30, 37);
 	d_100MHz->argument(1);
-	d_10MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 60, 63, 35, 17);
+	d_10MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 50, 58, 30, 37);
 	d_10MHz->argument(2);
-	d_1MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 85, 63, 35, 17);
+	d_1MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 80, 58, 30, 37);
 	d_1MHz->argument(3);
-	d_100KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 130, 63, 35, 17);
+	d_100KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 125, 58, 30, 37);
 	d_100KHz->argument(4);
-	d_10KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 155, 63, 35, 17);
+	d_10KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 155, 58, 30, 37);
 	d_10KHz->argument(5);
-	d_1KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 180, 63, 35, 17);
+	d_1KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 185, 58, 30, 37);
 	d_1KHz->argument(6);
-	d_100Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 220, 63, 35, 17);
+	d_100Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 230, 60, 30, 30);
 	d_100Hz->argument(7);
-	d_10Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 245, 63, 35, 17);
+	d_10Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 255, 60, 30, 30);
 	d_10Hz->argument(8);
-	d_1Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 270, 63, 35, 17);
+	d_1Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 280, 60, 30, 30);
 	d_1Hz->argument(9);
 
 	// Create and place two dot spacers
-	sep_1 = new Fl_Box(105, 63, 35, 17, ".");
+	sep_1 = new Fl_Box(110, 58, 15, 32, ".");
 	sep_1->labelsize(36);
 	sep_1->labelcolor((Fl_Color)90);
-	sep_2 = new Fl_Box(200, 63, 35, 17, ".");
+	sep_2 = new Fl_Box(215, 61, 20, 29, ".");
 	sep_2->labelsize(36);
 	sep_2->labelcolor((Fl_Color)90);
 
@@ -261,15 +261,14 @@ int VFODigit::handle(int event) {
 		case FL_MOUSEWHEEL: {
 			// Scrolling
 			if (active_digit != -1) {
-				printf("Click\n");
-				// event_dx and event_dy return 1 or -1
-				if (Fl::event_dx < 0) {
-					// Freq decreasing
-					my_parent->freq_minus();
-				}
-				else {
+				// event_dy returns 1 or -1
+				if (Fl::event_dy() < 0) {
 					// Freq increasing
 					my_parent->freq_plus();
+				}
+				else {
+					// Freq decreasing
+					my_parent->freq_minus();
 				}
 			}
 		}
