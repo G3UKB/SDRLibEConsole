@@ -73,7 +73,6 @@ int main(int argc, char **argv) {
 	}
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
-
 	// Create a main window
 	Fl_Window* main_window = new Fl_Double_Window(331, 124);
 	main_window->resizable(main_window);
