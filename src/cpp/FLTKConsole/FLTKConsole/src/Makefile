@@ -13,7 +13,7 @@ LIBS=-lpthreads -lfftw3 -lportaudio -lwdsp_uni -lSDRLibE -lfontconfig -lfltk -lX
 #_DEPS = hellomake.h
 #DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = Main/Main.cpp.cpp RadioInterface/radio_interface.cpp Ui/Components/vfo.cpp
+_OBJ = Main/Main.cpp RadioInterface/radio_interface.cpp Ui/Components/vfo.cpp
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
