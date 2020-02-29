@@ -10,7 +10,7 @@ LDIR =	-L/home/bob/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
 	-L/usr/lib/x86_64-linux-gnu \
 	-L/usr/local/lib 
 
-LIBS=-lpthreads -lfftw3 -lportaudio -lwdsp_uni -lSDRLibE -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
+LIBS=-lpthread -lfftw3 -lportaudio -lwdsp_uni -lSDRLibE -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
 $(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
 	$(CC) $(CFLAGS) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
