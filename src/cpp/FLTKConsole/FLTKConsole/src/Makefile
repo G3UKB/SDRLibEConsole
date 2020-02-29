@@ -5,15 +5,15 @@ OUTPUTFILE  = FLTKConsole
 INSTALLDIR  = ../Linux
 
 ODIR=obj
-LDIR =	~/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux\
-	~/Projects/SDRLibE/server/Linux\
-	/usr/lib/x86_64-linux-gnu\
-	/usr/local/lib 
+LDIR =	-L/home/bob/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
+	-L/home/bob/Projects/SDRLibE/server/Linux \
+	-L/usr/lib/x86_64-linux-gnu \
+	-L/usr/local/lib 
 
 LIBS=-lpthreads -lfftw3 -lportaudio -lwdsp_uni -lSDRLibE -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
 $(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
-	$(CC) $(CFLAGS) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o\
+	$(CC) $(CFLAGS) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
 	$(LIBS)
                    
 Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
@@ -33,6 +33,5 @@ install:
 .PHONY: clean
 clean :
 	rm Main/Main.o RadioInterface/radio_interface.o Ui/Components/vfo.o
-	
            
            
