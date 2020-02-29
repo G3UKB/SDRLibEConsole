@@ -35,11 +35,11 @@ The authors can be reached by email at:
 // FLTK includes
 #ifdef linux
 	#include <FL/Fl.H>
-	#include <Fl_Window.H>
-	#include <Fl_Double_Window.H>
-	#include <Fl_Group.H>
-	#include <Fl_Box.H>
-	#include <Fl_Button.H>
+	#include <FL/Fl_Window.H>
+	#include <FL/Fl_Double_Window.H>
+	#include <FL/Fl_Group.H>
+	#include <FL/Fl_Box.H>
+	#include <FL/Fl_Button.H>
 #else
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
