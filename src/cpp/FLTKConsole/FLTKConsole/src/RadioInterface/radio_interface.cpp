@@ -26,12 +26,6 @@ The authors can be reached by email at:
 */
 
 #include "../Includes/includes.h"
-/*
-#include <iostream>
-#include <string>
-#include "../Includes/extern.h"
-#include "../Includes/radio_interface.h"
-*/
 
 //==============================================================================
 // Radio Interface Singleton class

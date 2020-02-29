@@ -28,13 +28,6 @@ The authors can be reached by email at:
 #pragma once
 
 #include "includes.h"
-/*
-#include <string>
-#include <map>
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
-*/
 
 //==============================================================================
 // Defines

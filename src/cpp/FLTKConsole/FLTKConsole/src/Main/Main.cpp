@@ -26,21 +26,6 @@ The authors can be reached by email at:
 */
 
 #include "../Includes/includes.h"
-/*
-#include <iostream>
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Double_Window.H"
-
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Pack.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Light_Button.H"
-#include "../Includes/extern.h"
-#include "../Includes/radio_interface.h"
-#include "../Includes/vfo.h"
-*/
 
 RadioInterface* r_i;
 

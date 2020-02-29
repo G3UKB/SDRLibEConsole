@@ -26,16 +26,6 @@ The authors can be reached by email at:
 */
 
 #include "../../Includes/includes.h"
-/*
-#include <iostream>
-#include <string>
-#include <map>
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "../../Includes/extern.h"
-#include "../../Includes/radio_interface.h"
-#include "../../Includes/vfo.h"
-*/
 
 //==============================================================================
 // Main VFO Component Panel

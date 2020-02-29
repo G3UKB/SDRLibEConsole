@@ -33,12 +33,21 @@ The authors can be reached by email at:
 #include <map>
 
 // FLTK includes
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Double_Window.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
-#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
+#ifdef linux
+	#include "<FL/Fl.H>
+	#include "<Fl_Window.H>
+	#include "<Fl_Double_Window.H>
+	#include "<Fl_Group.H>
+	#include "<Fl_Box.H>
+	#include "<Fl_Button.H>
+#else
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Double_Window.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
+#endif
 
 // Application includes
 #include "extern.h"
