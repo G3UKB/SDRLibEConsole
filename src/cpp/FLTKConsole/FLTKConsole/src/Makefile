@@ -18,13 +18,13 @@ $(OUTPUTFILE) : Main.o radio_interface.o vfo.o
 	$(LIBS)
                    
 Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
-	$(CC) -c Main/Main.cpp
+	$(CC) $(IDIR) -c Main/Main.cpp
         
 radio_interface.o : RadioInterface/radio_interface.cpp Includes/extern.h Includes/radio_interface.h
-	$(CC) -c RadioInterface/radio_interface.cpp
+	$(CC) $(IDIR) -c RadioInterface/radio_interface.cpp
         
 vfo.o : Ui/Components/vfo.cpp Includes/radio_interface.h Includes/vfo.h
-	$(CC) -c Ui/Components/vfo.cpp
+	$(CC) $(IDIR) -c Ui/Components/vfo.cpp
 
 .PHONY: install
 install:
