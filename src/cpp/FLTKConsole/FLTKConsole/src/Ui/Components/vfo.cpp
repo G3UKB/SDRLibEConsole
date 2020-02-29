@@ -25,6 +25,8 @@ The authors can be reached by email at:
 
 */
 
+#include "../../Includes/includes.h"
+/*
 #include <iostream>
 #include <string>
 #include <map>
@@ -33,6 +35,7 @@ The authors can be reached by email at:
 #include "../../Includes/extern.h"
 #include "../../Includes/radio_interface.h"
 #include "../../Includes/vfo.h"
+*/
 
 //==============================================================================
 // Main VFO Component Panel

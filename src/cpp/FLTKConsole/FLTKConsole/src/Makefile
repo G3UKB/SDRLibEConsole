@@ -13,18 +13,18 @@ LDIR =	~/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux\
 
 LIBS=-lpthreads -lfftw3 -lportaudio -lwdsp_uni -lSDRLibE -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
-$(OUTPUTFILE) : Main/Main.o RadioInterface/radio_interface.o Ui/Components/vfo.o 
-	$(CC) $(IDIR) $(LDIR) -o FLTKConsole Main/Main.o RadioInterface/radio_interface.o Ui/Components/vfo.o\
+$(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
+	$(CC) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o\
 	$(LIBS)
                    
-Main.o : Main/Main.c extern.h radio_interface.h vfo.h
-	cc -c Main/Main.c
+Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
+	$(CC) -c Main/Main.cpp
         
-radio_interface.o : RadioInterface/radio_interface.c extern.h radio_interface.h
-	cc -c RadioInterface/radio_interface.c
+radio_interface.o : RadioInterface/radio_interface.cpp Includes/extern.h Includes/radio_interface.h
+	$(CC) -c RadioInterface/radio_interface.cpp
         
-vfo.o : Ui/Components/vfo.c radio_interface.h vfo.h
-	cc -c Ui/Components/vfo.c
+vfo.o : Ui/Components/vfo.cpp Includes/radio_interface.h Includes/vfo.h
+	$(CC) -c Ui/Components/vfo.cpp
 
 .PHONY: install
 install:
