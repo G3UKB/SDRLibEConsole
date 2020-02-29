@@ -28,8 +28,11 @@ The authors can be reached by email at:
 
 extern "C" {
 	// Common defs
+#ifdef linux
+	#include "~/Projects/SDRLibE/trunk/server/src/common/defs.h"
+#else
 	#include "E:/Projects/SDRLibE/trunk/server/src/common/defs.h"
-
+#endif
 	// Required structures
 	// Returned from device enumerator
 	typedef struct DeviceEnum {
