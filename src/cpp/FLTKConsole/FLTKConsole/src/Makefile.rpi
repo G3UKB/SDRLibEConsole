@@ -1,0 +1,36 @@
+IDIR = -I/usr/local/include -I/usr/local/include/FL
+CC=g++
+CFLAGS = -I$(IDIR)
+OUTPUTFILE  = FLTKConsole
+INSTALLDIR  = ../Linux
+
+ODIR=obj
+LDIR =	-L/home/pi/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
+	-L/home/pi/Projects/SDRLibE/server/Linux \
+	-L/usr/lib/arm-linux-gnueabihf \
+	-L/usr/local/lib 
+
+LIBS=-lpthread -lfftw3 -lportaudio -lSDRLibE -lwdsp_uni -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
+
+$(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
+	$(CC) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
+	$(LIBS)
+                   
+Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
+	$(CC) $(IDIR) -c Main/Main.cpp
+        
+radio_interface.o : RadioInterface/radio_interface.cpp Includes/extern.h Includes/radio_interface.h
+	$(CC) $(IDIR) -c RadioInterface/radio_interface.cpp
+        
+vfo.o : Ui/Components/vfo.cpp Includes/radio_interface.h Includes/vfo.h
+	$(CC) $(IDIR) -c Ui/Components/vfo.cpp
+
+.PHONY: install
+install:
+	mkdir -p $(INSTALLDIR)
+	cp -p $(OUTPUTFILE) $(INSTALLDIR)
+
+.PHONY: clean
+clean :
+	rm Main/Main.o RadioInterface/radio_interface.o Ui/Components/vfo.o
+           
