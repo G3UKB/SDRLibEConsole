@@ -57,8 +57,14 @@ bool RadioInterface::ri_set_default_audio() {
 		DeviceEnumList* l = c_server_enum_audio_outputs();
 		for (int i = 0; i < l->entries; i++) {
 			printf("%s,%s\n", l->devices[i].name, l->devices[i].host_api);
+#ifdef linux
+			// This is the standard inbuilt audio port on RPi 
+			if (std::string(l->devices[i].name).find("dmix") != std::string::npos) {
+				if (std::string(l->devices[i].host_api) == "ALSA") {
+#else
 			if (std::string(l->devices[i].name).find("Speakers") != std::string::npos) {
 				if (std::string(l->devices[i].host_api) == "MME") {
+#endif
 					direction = l->devices[i].direction;
 					host_api = l->devices[i].host_api;
 					dev = l->devices[i].name;
