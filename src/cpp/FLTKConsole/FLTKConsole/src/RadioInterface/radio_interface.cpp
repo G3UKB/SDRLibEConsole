@@ -59,7 +59,7 @@ bool RadioInterface::ri_set_default_audio() {
 			printf("%s,%s\n", l->devices[i].name, l->devices[i].host_api);
 #ifdef linux
 			// This is the standard inbuilt audio port on RPi 
-			if (std::string(l->devices[i].name).find("dmix") != std::string::npos) {
+			if (std::string(l->devices[i].name).find("(hw:0,1)") != std::string::npos) {
 				if (std::string(l->devices[i].host_api) == "ALSA") {
 #else
 			if (std::string(l->devices[i].name).find("Speakers") != std::string::npos) {
