@@ -43,8 +43,11 @@ int main(int argc, char **argv) {
 	r_i = new RadioInterface();
 
 	// Make wisdom file if not already made
+#ifdef linux
 	c_server_make_wisdom((char *)"E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom/");
-
+#else
+	c_server_make_wisdom((char *)"./wisdom/");
+#endif
 	// Initialise and run server
 	if (c_server_init()) {
 		c_server_set_num_rx(1);
