@@ -1,6 +1,5 @@
 IDIR = -I/usr/local/include -I/usr/local/include/FL
 CC=g++
-CFLAGS = -I$(IDIR)
 OUTPUTFILE  = FLTKConsole
 INSTALLDIR  = ../Linux
 
