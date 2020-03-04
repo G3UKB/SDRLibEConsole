@@ -6,10 +6,11 @@ INSTALLDIR  = ../Linux
 ODIR=obj
 LDIR =	-L/home/bob/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
 	-L/home/bob/Projects/SDRLibE/server/Linux \
+	-L/lib/x86_64-Linux-gnu \
 	-L/usr/lib/x86_64-linux-gnu \
 	-L/usr/local/lib 
 
-LIBS=-lpthread -lfftw3 -lportaudio -lSDRLibE -lwdsp_uni -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
+LIBS = -lSDRLibE -lwdsp_uni -lpthread -lfftw3 -lportaudio -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
 $(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
 	$(CC) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
