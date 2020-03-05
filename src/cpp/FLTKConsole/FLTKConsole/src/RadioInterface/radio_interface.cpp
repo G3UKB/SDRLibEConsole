@@ -45,7 +45,7 @@ void RadioInterface::reset() {
 }
 //==============================================================================
 // Call down methods
-
+/*
 bool RadioInterface::ri_set_default_audio() {
 	int direction;
 	char* host_api = nullptr;
@@ -72,6 +72,32 @@ bool RadioInterface::ri_set_default_audio() {
 				}
 			}
 		}
+		if (host_api != nullptr && dev != nullptr) {
+			c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
+			return true;
+		}
+	}
+	return false;
+}
+*/
+bool RadioInterface::ri_set_default_audio() {
+	int direction;
+	char* host_api = nullptr;
+	char* dev = nullptr;
+
+	if (!audio_set) {
+		audio_set = true;
+		// Set up a route for RX1 to default output
+		DeviceEnumList* l = c_server_enum_audio_outputs();
+		for (int i = 0; i < l->entries; i++) {
+			printf("%d,%s,%s\n", l->devices[i].default_id, l->devices[i].name, l->devices[i].host_api);
+			if (l->devices[i].default_id) {
+				direction = l->devices[i].direction;
+				host_api = l->devices[i].host_api;
+				dev = l->devices[i].name;
+				break;
+			}
+				}
 		if (host_api != nullptr && dev != nullptr) {
 			c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
 			return true;
