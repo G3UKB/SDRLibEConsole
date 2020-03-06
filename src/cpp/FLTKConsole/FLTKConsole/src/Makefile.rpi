@@ -1,5 +1,6 @@
 IDIR = -I/usr/local/include -I/usr/local/include/FL
 CC=g++
+CPPFLAGS = -DRPI
 OUTPUTFILE  = FLTKConsole
 INSTALLDIR  = ../Linux
 
@@ -12,17 +13,17 @@ LDIR =	-L/home/pi/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
 LIBS=-lpthread -lfftw3 -lportaudio -lSDRLibE -lwdsp_uni -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
 $(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
-	$(CC) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
+	$(CC) $(CPPFLAGS) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
 	$(LIBS)
                    
 Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
-	$(CC) $(IDIR) -c Main/Main.cpp
+	$(CC) $(CPPFLAGS) $(IDIR) -c Main/Main.cpp
         
 radio_interface.o : RadioInterface/radio_interface.cpp Includes/extern.h Includes/radio_interface.h
-	$(CC) $(IDIR) -c RadioInterface/radio_interface.cpp
+	$(CC) $(CPPFLAGS) $(IDIR) -c RadioInterface/radio_interface.cpp
         
 vfo.o : Ui/Components/vfo.cpp Includes/radio_interface.h Includes/vfo.h
-	$(CC) $(IDIR) -c Ui/Components/vfo.cpp
+	$(CC) $(CPPFLAGS) $(IDIR) -c Ui/Components/vfo.cpp
 
 .PHONY: install
 install:
