@@ -28,13 +28,14 @@ The authors can be reached by email at:
 
 extern "C" {
 	// Common defs
-#ifdef linux
-	#include "/home/bob/Projects/SDRLibE/server/src/common/defs.h"
-#ifdef rpi
-	#include "/home/pi/Projects/SDRLibE/server/src/common/defs.h"
-#endif
+#ifdef RPI
+#include "/home/pi/Projects/SDRLibE/server/src/common/defs.h"
 #else
-	#include "E:/Projects/SDRLibE/trunk/server/src/common/defs.h"
+#ifdef linux
+#include "/home/bob/Projects/SDRLibE/server/src/common/defs.h"
+#else
+#include "E:/Projects/SDRLibE/trunk/server/src/common/defs.h"
+#endif
 #endif
 	// Required structures
 	// Returned from device enumerator
