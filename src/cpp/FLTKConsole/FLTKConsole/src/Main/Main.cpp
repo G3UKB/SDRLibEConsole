@@ -94,6 +94,9 @@ int main(int argc, char **argv) {
 	main_window->end();
 	main_window->show(argc, argv);
 
+	// Show temp modes window
+	Modes *m = new Modes(r_i, 300,110);
+
 	// Run event loop until quit
 	return Fl::run();
 }

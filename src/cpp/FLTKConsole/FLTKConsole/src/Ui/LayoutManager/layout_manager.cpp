@@ -67,18 +67,12 @@ GridLayout::GridLayout(int x, int y, int w, int h, int rows, int cols) {
 // Return cell metrics
 metrics GridLayout::get_cell_metrics(int row, int col) {
 
-	int i, j;
-	// Iterate all rows and cols
-	for (i = 0; i < grid_rows; i++) {
-		for (j = 0; j < grid_cols; j++) {
-			// We are calculating for row i, col j
-			printf("Row: %d, Col: %d\n", i, j);
-			m.x = origin_x + i * col;
-			m.y = origin_y + j * row;
-			m.w = row_width;
-			m.h = row_height;
-		}
-	}
+	printf("Row: %d, Col: %d\n", row, col);
+	m.x = origin_x + row_width * col;
+	m.y = origin_y + row_height * row;
+	m.w = row_width;
+	m.h = row_height;
+		
 	return m;
 }
 
