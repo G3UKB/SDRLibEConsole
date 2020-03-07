@@ -53,3 +53,4 @@ The authors can be reached by email at:
 #include "extern.h"
 #include "radio_interface.h"
 #include "vfo.h"
+#include "layout_manager.h"
