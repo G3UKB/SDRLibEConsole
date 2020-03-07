@@ -102,3 +102,8 @@ int ModeButton::handle(int event) {
 		return Fl_Widget::handle(event);
 	}
 }
+
+void ModeButton::draw() {
+	Fl_Button::draw();
+	Fl_Widget::draw_label();
+}
