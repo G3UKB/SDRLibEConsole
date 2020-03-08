@@ -53,27 +53,27 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	m = grid->get_cell_metrics(0, 0);
 	mode_0_btn = new ModeButton(r_i, lsb, 0 , m);
 	m = grid->get_cell_metrics(0, 1);
-	ModeButton* mode_1_btn = new ModeButton(r_i, "USB", 1, m);
+	ModeButton* mode_1_btn = new ModeButton(r_i, usb, 1, m);
 	m = grid->get_cell_metrics(0, 2);
-	ModeButton* mode_2_btn = new ModeButton(r_i, "DSB", 2, m);
+	ModeButton* mode_2_btn = new ModeButton(r_i, dsb, 2, m);
 	m = grid->get_cell_metrics(0, 3);
-	ModeButton* mode_3_btn = new ModeButton(r_i, "CW-L", 3, m);
+	ModeButton* mode_3_btn = new ModeButton(r_i, cwl, 3, m);
 	m = grid->get_cell_metrics(1, 0);
-	ModeButton* mode_4_btn = new ModeButton(r_i, "CW-U", 4, m);
+	ModeButton* mode_4_btn = new ModeButton(r_i, cwu, 4, m);
 	m = grid->get_cell_metrics(1, 1);
-	ModeButton* mode_5_btn = new ModeButton(r_i, "FM", 5, m);
+	ModeButton* mode_5_btn = new ModeButton(r_i, fm, 5, m);
 	m = grid->get_cell_metrics(1, 2);
-	ModeButton* mode_6_btn = new ModeButton(r_i, "AM", 6, m);
+	ModeButton* mode_6_btn = new ModeButton(r_i, am, 6, m);
 	m = grid->get_cell_metrics(1, 3);
-	ModeButton* mode_7_btn = new ModeButton(r_i, "DIG-U", 7, m);
+	ModeButton* mode_7_btn = new ModeButton(r_i, digu, 7, m);
 	m = grid->get_cell_metrics(2, 0);
-	ModeButton* mode_8_btn = new ModeButton(r_i, "SPEC", 8, m);
+	ModeButton* mode_8_btn = new ModeButton(r_i, spec, 8, m);
 	m = grid->get_cell_metrics(2, 1);
-	ModeButton* mode_9_btn = new ModeButton(r_i, "DIG-L", 9, m);
+	ModeButton* mode_9_btn = new ModeButton(r_i, digl, 9, m);
 	m = grid->get_cell_metrics(2, 2);
-	ModeButton* mode_10_btn = new ModeButton(r_i, "SAM", 10, m);
+	ModeButton* mode_10_btn = new ModeButton(r_i, sam, 10, m);
 	m = grid->get_cell_metrics(2, 3);
-	ModeButton* mode_11_btn = new ModeButton(r_i, "DRM", 11, m);
+	ModeButton* mode_11_btn = new ModeButton(r_i, drm, 11, m);
 
 	// Close up and display
 	top_group->end();
@@ -83,7 +83,7 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(RadioInterface* radio_interface, std::string button_label, int mode_id, metrics m) : Fl_Button(m.x, m.y, m.w, m.h, button_label.c_str()) {
+ModeButton::ModeButton(RadioInterface* radio_interface, char* button_label, int mode_id, metrics m) : Fl_Button(m.x, m.y, m.w, m.h, button_label) {
 	r_i = radio_interface;
 	id = mode_id;
 	color((Fl_Color)33);

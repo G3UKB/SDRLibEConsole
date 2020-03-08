@@ -50,7 +50,18 @@ private:
 	//==============================================================================
 	// State variables
 	RadioInterface* r_i;
-	std::string lsb = "LSB";
+	char lsb[10] = "LSB";
+	char usb[10] = "USB";
+	char dsb[10] = "DSB";
+	char cwl[10] = "CW-L";
+	char cwu[10] = "CW-U";
+	char fm[10] = "FM";
+	char am[10] = "AM";
+	char digu[10] = "DIG-U";
+	char spec[10] = "SPEC";
+	char digl[10] = "DIG-L";
+	char sam[10] = "SAM";
+	char drm[10] = "DRM";
 	ModeButton* mode_0_btn;
 
 	//==============================================================================
@@ -62,7 +73,7 @@ class ModeButton : public Fl_Button
 {
 public:
 	//==============================================================================
-	ModeButton(RadioInterface* radio_interface, std::string label, int mode_id, metrics m);
+	ModeButton(RadioInterface* radio_interface, char* label, int mode_id, metrics m);
 	~ModeButton() {};
 
 	//==============================================================================
