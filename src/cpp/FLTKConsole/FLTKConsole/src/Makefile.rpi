@@ -12,8 +12,8 @@ LDIR =	-L/home/pi/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
 
 LIBS=-lpthread -lfftw3 -lportaudio -lSDRLibE -lwdsp_uni -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
-$(OUTPUTFILE) : Main.o radio_interface.o vfo.o 
-	$(CC) $(CPPFLAGS) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o \
+$(OUTPUTFILE) : Main.o radio_interface.o vfo.o layout_manager.o modes.o
+	$(CC) $(CPPFLAGS) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o layout_manager.o modes.o \
 	$(LIBS)
                    
 Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
@@ -21,9 +21,16 @@ Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo
         
 radio_interface.o : RadioInterface/radio_interface.cpp Includes/extern.h Includes/radio_interface.h
 	$(CC) $(CPPFLAGS) $(IDIR) -c RadioInterface/radio_interface.cpp
-        
+
+modes.o : Ui/Components/modes.cpp Includes/radio_interface.h Includes/modes.h
+	$(CC) $(CPPFLAGS) $(IDIR) -c Ui/Components/modes.cpp
+	
 vfo.o : Ui/Components/vfo.cpp Includes/radio_interface.h Includes/vfo.h
 	$(CC) $(CPPFLAGS) $(IDIR) -c Ui/Components/vfo.cpp
+	
+layout_manager.o : Ui/LayoutManager/layout_manager.cpp Includes/radio_interface.h Includes/vfo.h Includes/layout_manager.h
+	$(CC) $(CPPFLAGS) $(IDIR) -c Ui/LayoutManager/layout_manager.cpp
+
 
 .PHONY: install
 install:
