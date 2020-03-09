@@ -40,6 +40,7 @@ The authors can be reached by email at:
 	#include <FL/Fl_Group.H>
 	#include <FL/Fl_Box.H>
 	#include <FL/Fl_Button.H>
+	#include <FL/Fl_Toggle_Button.H>
 #else
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
