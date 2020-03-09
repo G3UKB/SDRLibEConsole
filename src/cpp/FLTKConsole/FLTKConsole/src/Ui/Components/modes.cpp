@@ -60,33 +60,7 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 			j++;
 		}
 	}
-	/*
-	metrics m;
-	m = grid->get_cell_metrics(0, 0);
-	mode_0_btn = new ModeButton(this, r_i, lsb, 0 , m);
-	m = grid->get_cell_metrics(0, 1);
-	mode_1_btn = new ModeButton(this, r_i, usb, 1, m);
-	m = grid->get_cell_metrics(0, 2);
-	mode_2_btn = new ModeButton(this, r_i, dsb, 2, m);
-	m = grid->get_cell_metrics(0, 3);
-	mode_3_btn = new ModeButton(this, r_i, cwl, 3, m);
-	m = grid->get_cell_metrics(1, 0);
-	mode_4_btn = new ModeButton(this, r_i, cwu, 4, m);
-	m = grid->get_cell_metrics(1, 1);
-	mode_5_btn = new ModeButton(this, r_i, fm, 5, m);
-	m = grid->get_cell_metrics(1, 2);
-	mode_6_btn = new ModeButton(this, r_i, am, 6, m);
-	m = grid->get_cell_metrics(1, 3);
-	mode_7_btn = new ModeButton(this, r_i, digu, 7, m);
-	m = grid->get_cell_metrics(2, 0);
-	mode_8_btn = new ModeButton(this, r_i, spec, 8, m);
-	m = grid->get_cell_metrics(2, 1);
-	mode_9_btn = new ModeButton(this, r_i, digl, 9, m);
-	m = grid->get_cell_metrics(2, 2);
-	mode_10_btn = new ModeButton(this, r_i, sam, 10, m);
-	m = grid->get_cell_metrics(2, 3);
-	mode_11_btn = new ModeButton(this, r_i, drm, 11, m);
-	*/
+	
 	// Close up and display
 	top_group->end();
 	end();

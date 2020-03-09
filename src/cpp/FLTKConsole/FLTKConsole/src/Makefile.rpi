@@ -13,7 +13,7 @@ LDIR =	-L/home/pi/Projects/SDRLibE/wdsp_uni/wdsp_uni/Linux \
 LIBS=-lpthread -lfftw3 -lportaudio -lSDRLibE -lwdsp_uni -lfontconfig -lfltk -lXext -lXinerama -lXft -lX11 -lXi -lm
 
 $(OUTPUTFILE) : Main.o radio_interface.o vfo.o layout_manager.o modes.o
-	$(CC) $(CPPFLAGS) $(IDIR) $(LDIR) -o FLTKConsole Main.o radio_interface.o vfo.o layout_manager.o modes.o \
+	$(CC) $(CPPFLAGS) $(IDIR) $(LDIR) -o FLTKConsole Main.o modes.o radio_interface.o vfo.o layout_manager.o \
 	$(LIBS)
                    
 Main.o : Main/Main.cpp Includes/extern.h Includes/radio_interface.h Includes/vfo.h
