@@ -31,7 +31,7 @@ The authors can be reached by email at:
 // Main Modes Component Window
 //==============================================================================
 
-//==============================================================================
+//----------------------------------------------------
 // Constructor/Destructor
 Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 
@@ -49,41 +49,71 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	GridLayout *grid = new GridLayout(5, 5, w-10, h-10, 3, 4);
 
 	// Add the mode buttons to the group
+	int i, j, k;
+	metrics m;
+	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
+		m = grid->get_cell_metrics(j, k);
+		mode_0_btn = new ModeButton(this, r_i, lsb, 0, m);
+		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m);
+		if (++k == 3) {
+			k = 0;
+			j++;
+		}
+	}
+	/*
 	metrics m;
 	m = grid->get_cell_metrics(0, 0);
-	mode_0_btn = new ModeButton(r_i, lsb, 0 , m);
+	mode_0_btn = new ModeButton(this, r_i, lsb, 0 , m);
 	m = grid->get_cell_metrics(0, 1);
-	ModeButton* mode_1_btn = new ModeButton(r_i, usb, 1, m);
+	mode_1_btn = new ModeButton(this, r_i, usb, 1, m);
 	m = grid->get_cell_metrics(0, 2);
-	ModeButton* mode_2_btn = new ModeButton(r_i, dsb, 2, m);
+	mode_2_btn = new ModeButton(this, r_i, dsb, 2, m);
 	m = grid->get_cell_metrics(0, 3);
-	ModeButton* mode_3_btn = new ModeButton(r_i, cwl, 3, m);
+	mode_3_btn = new ModeButton(this, r_i, cwl, 3, m);
 	m = grid->get_cell_metrics(1, 0);
-	ModeButton* mode_4_btn = new ModeButton(r_i, cwu, 4, m);
+	mode_4_btn = new ModeButton(this, r_i, cwu, 4, m);
 	m = grid->get_cell_metrics(1, 1);
-	ModeButton* mode_5_btn = new ModeButton(r_i, fm, 5, m);
+	mode_5_btn = new ModeButton(this, r_i, fm, 5, m);
 	m = grid->get_cell_metrics(1, 2);
-	ModeButton* mode_6_btn = new ModeButton(r_i, am, 6, m);
+	mode_6_btn = new ModeButton(this, r_i, am, 6, m);
 	m = grid->get_cell_metrics(1, 3);
-	ModeButton* mode_7_btn = new ModeButton(r_i, digu, 7, m);
+	mode_7_btn = new ModeButton(this, r_i, digu, 7, m);
 	m = grid->get_cell_metrics(2, 0);
-	ModeButton* mode_8_btn = new ModeButton(r_i, spec, 8, m);
+	mode_8_btn = new ModeButton(this, r_i, spec, 8, m);
 	m = grid->get_cell_metrics(2, 1);
-	ModeButton* mode_9_btn = new ModeButton(r_i, digl, 9, m);
+	mode_9_btn = new ModeButton(this, r_i, digl, 9, m);
 	m = grid->get_cell_metrics(2, 2);
-	ModeButton* mode_10_btn = new ModeButton(r_i, sam, 10, m);
+	mode_10_btn = new ModeButton(this, r_i, sam, 10, m);
 	m = grid->get_cell_metrics(2, 3);
-	ModeButton* mode_11_btn = new ModeButton(r_i, drm, 11, m);
-
+	mode_11_btn = new ModeButton(this, r_i, drm, 11, m);
+	*/
 	// Close up and display
 	top_group->end();
 	end();
 	show();
 }
 
+//----------------------------------------------------
+// Handle button state
+void Modes::handle_button_state(int id) {
+	int i;
+
+	for (i = 0 ; i < m_b.n; i++) {
+		if (m_b.items[i].id == id) {
+			// Toggle pressed
+			m_b.items[i].mode->set();
+		}
+		else {
+			// Toggle released
+			m_b.items[i].mode->clear();
+		}
+	}
+}
+
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(RadioInterface* radio_interface, char* button_label, int mode_id, metrics m) : Fl_Button(m.x, m.y, m.w, m.h, button_label) {
+ModeButton::ModeButton(Modes *top_level, RadioInterface* radio_interface, char* button_label, int mode_id, metrics m) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+	t_l = top_level;
 	r_i = radio_interface;
 	id = mode_id;
 	color((Fl_Color)33);
@@ -94,16 +124,13 @@ ModeButton::ModeButton(RadioInterface* radio_interface, char* button_label, int 
 int ModeButton::handle(int event) {
 	switch (event) {
 	case FL_LEFT_MOUSE: {
-		printf("Clicked %d\n", id);
+		// Tell radio to change mode
 		r_i->ri_server_set_rx_mode(0, id);
+		// Tell parent to reflect state in buttons
+		t_l->handle_button_state(id);
 		return 1;
 	}
 	default:
 		return Fl_Widget::handle(event);
 	}
-}
-
-void ModeButton::draw() {
-	Fl_Button::draw();
-	Fl_Widget::draw_label();
 }

@@ -32,6 +32,7 @@ The authors can be reached by email at:
 //==============================================================================
 // Defines
 
+//==============================================================================
 /*
 	A modes window component
 */
@@ -44,12 +45,16 @@ public:
 	~Modes() {};
 
 	//==============================================================================
-	//int handle(int event) override;
+	void handle_button_state(int id);
 
 private:
 	//==============================================================================
 	// State variables
+	// Ref to set radio parameters
 	RadioInterface* r_i;
+	// Fixed labels (labels are not copied and must remain in scope
+	// Note: dont use std:string as std:string.cstr() creates a new
+	// cstr in a fixed overwritten area and all labels will be the last label..
 	char lsb[10] = "LSB";
 	char usb[10] = "USB";
 	char dsb[10] = "DSB";
@@ -62,27 +67,68 @@ private:
 	char digl[10] = "DIG-L";
 	char sam[10] = "SAM";
 	char drm[10] = "DRM";
+	// Button references
 	ModeButton* mode_0_btn;
+	ModeButton* mode_1_btn;
+	ModeButton* mode_2_btn;
+	ModeButton* mode_3_btn;
+	ModeButton* mode_4_btn;
+	ModeButton* mode_5_btn;
+	ModeButton* mode_6_btn;
+	ModeButton* mode_7_btn;
+	ModeButton* mode_8_btn;
+	ModeButton* mode_9_btn;
+	ModeButton* mode_10_btn;
+	ModeButton* mode_11_btn;
+
+	// Structures to drive generation and updating
+	struct mode_button {
+		ModeButton* mode;
+		char *label;
+		int id;
+	};
+	struct mode_buttons {
+		int n;					// Number of buttons
+		mode_button items[12];	// Button descriptors
+	}m_b = {
+		12,
+		{
+			{ mode_0_btn, lsb, 0 },
+			{ mode_1_btn, usb, 1 },
+			{ mode_2_btn, dsb, 2 },
+			{ mode_3_btn, cwl, 3 },
+			{ mode_4_btn, cwu, 4 },
+			{ mode_5_btn, fm, 5 },
+			{ mode_6_btn, am, 6 },
+			{ mode_7_btn, digu, 7 },
+			{ mode_8_btn, spec, 8 },
+			{ mode_9_btn, digl, 9 },
+			{ mode_10_btn, sam, 10 },
+			{ mode_11_btn, drm, 11 }
+		}
+	};
 
 	//==============================================================================
 	// Method prototypes
 
 };
 
-class ModeButton : public Fl_Button
+//==============================================================================
+// A mode button
+class ModeButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
-	ModeButton(RadioInterface* radio_interface, char* label, int mode_id, metrics m);
+	ModeButton(Modes *modes, RadioInterface* radio_interface, char* label, int mode_id, metrics m);
 	~ModeButton() {};
 
 	//==============================================================================
 	int handle(int event) override;
-	void draw() override;
 
 private:
 	//==============================================================================
 	// State variables
+	Modes *t_l;
 	RadioInterface* r_i;
 	int row;
 	int col;

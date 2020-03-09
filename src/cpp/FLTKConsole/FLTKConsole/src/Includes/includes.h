@@ -47,6 +47,7 @@ The authors can be reached by email at:
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Group.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Toggle_Button.H"
 #endif
 
 // Application includes
