@@ -130,8 +130,6 @@ private:
 	// State variables
 	Modes *t_l;
 	RadioInterface* r_i;
-	int row;
-	int col;
 	int id;
 
 	//==============================================================================

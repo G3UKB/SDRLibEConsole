@@ -58,7 +58,6 @@ GridLayout::GridLayout(int x, int y, int w, int h, int rows, int cols) {
 	area_height = h;
 	grid_rows = rows;
 	grid_cols = cols;
-
 	// Calculate the default coordinates and position of each cell.
 	calculate_cell_metrics();
 }
@@ -66,8 +65,6 @@ GridLayout::GridLayout(int x, int y, int w, int h, int rows, int cols) {
 //==============================================================================
 // Return cell metrics
 metrics GridLayout::get_cell_metrics(int row, int col) {
-
-	//printf("Row: %d, Col: %d\n", row, col);
 	m.x = origin_x + row_width * col;
 	m.y = origin_y + row_height * row;
 	m.w = row_width;

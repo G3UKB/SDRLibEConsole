@@ -35,14 +35,6 @@ The authors can be reached by email at:
 	The one and only main window
 */
 
-void startradio(Fl_Widget *, void *) {
-	r_i->ri_radio_start(0);
-}
-
-void stopradio(Fl_Widget *, void *) {
-	r_i->ri_radio_stop();
-}
-
 //==============================================================================
 MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Double_Window(w, h) {
 
@@ -58,18 +50,12 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	top_group->color((Fl_Color)24);
 
 	// Add start and stop buttons to the group
-	start_btn = new Fl_Button(15, 20, 100, 20, "Start");
-	start_btn->color((Fl_Color)33);
-	start_btn->labelcolor((Fl_Color)67);
-	start_btn->callback(startradio, 0);
-	stop_btn = new Fl_Button(120, 20, 100, 20, "Stop");
-	stop_btn->color((Fl_Color)33);
-	stop_btn->labelcolor((Fl_Color)80);
-	stop_btn->callback(stopradio, 0);
+	StartBtn = new ToggleButtonBase(r_i, start_str, 0, 15, 20, 100, 20, (Fl_Color)33, (Fl_Color)67);
+	StopBtn = new ToggleButtonBase(r_i, stop_str, 1, 120, 20, 100, 20, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
-	VFOComponent *c = new VFOComponent(r_i, "radio-1", 0, 15, 50, 300, 55);
+	VFOComponent *c = new VFOComponent(r_i, radio_id, 0, 15, 50, 300, 55);
 
 	// Close up and display
 	top_group->end();
@@ -77,7 +63,7 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	show();
 
 	// Show temp modes window
-	m = new Modes(r_i, 300, 110);
+	m = new Modes(r_i, 270, 110);
 }
 
 //==============================================================================

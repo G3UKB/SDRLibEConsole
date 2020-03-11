@@ -53,9 +53,8 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	metrics m;
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		mode_0_btn = new ModeButton(this, r_i, lsb, 0, m);
 		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m);
-		if (++k == 3) {
+		if (k++ == 3) {
 			k = 0;
 			j++;
 		}
@@ -91,6 +90,7 @@ ModeButton::ModeButton(Modes *top_level, RadioInterface* radio_interface, char* 
 	r_i = radio_interface;
 	id = mode_id;
 	color((Fl_Color)33);
+	labelcolor((Fl_Color)16);
 }
 
 //----------------------------------------------------

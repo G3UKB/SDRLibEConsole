@@ -49,11 +49,20 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	// labels must be fixed storage
+	char start_str[10] = "Start";
+	char stop_str[10] = "Stop";
+	char radio_id[10] = "radio-1";
+
 	// Ref to set radio parameters
 	RadioInterface* r_i;
+
+	// Widgets
 	Fl_Group *top_group;
-	Fl_Button* start_btn;
-	Fl_Button* stop_btn;
+
+	// Components
+	ToggleButtonBase* StartBtn;
+	ToggleButtonBase* StopBtn;
 	Modes *m;
 
 	//==============================================================================
