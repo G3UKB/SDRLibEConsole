@@ -57,3 +57,4 @@ The authors can be reached by email at:
 #include "vfo.h"
 #include "layout_manager.h"
 #include "modes.h"
+#include "main_window.h"
