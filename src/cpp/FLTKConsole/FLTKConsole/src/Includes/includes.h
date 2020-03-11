@@ -55,8 +55,9 @@ The authors can be reached by email at:
 // Application includes
 #include "extern.h"
 #include "radio_interface.h"
-#include "toggle_base.h"
 #include "vfo.h"
 #include "layout_manager.h"
 #include "modes.h"
+#include "toggle_base.h"
 #include "main_window.h"
+

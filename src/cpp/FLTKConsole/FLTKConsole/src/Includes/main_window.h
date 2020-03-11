@@ -36,13 +36,13 @@ The authors can be reached by email at:
 /*
 	The one and only main window
 */
-
 class MainWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
 	MainWindow(RadioInterface* radio_interface, int w, int h);
 	~MainWindow() {};
+	void handle_button_state(int id);
 
 	//==============================================================================
 

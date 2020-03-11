@@ -35,7 +35,8 @@ The authors can be reached by email at:
 	The one and only main window
 */
 
-//==============================================================================
+//----------------------------------------------------
+// Constructor
 MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Double_Window(w, h) {
 
 	r_i = radio_interface;
@@ -50,8 +51,8 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	top_group->color((Fl_Color)24);
 
 	// Add start and stop buttons to the group
-	StartBtn = new ToggleButtonBase(r_i, start_str, 0, 15, 20, 100, 20, (Fl_Color)33, (Fl_Color)67);
-	StopBtn = new ToggleButtonBase(r_i, stop_str, 1, 120, 20, 100, 20, (Fl_Color)33, (Fl_Color)80);
+	StartBtn = new ToggleButtonBase(this, r_i, start_str, 0, 15, 20, 100, 20, (Fl_Color)33, (Fl_Color)67);
+	StopBtn = new ToggleButtonBase(this, r_i, stop_str, 1, 120, 20, 100, 20, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
@@ -64,6 +65,21 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 
 	// Show temp modes window
 	m = new Modes(r_i, 270, 110);
+}
+
+//----------------------------------------------------
+// Handle button state
+void MainWindow::handle_button_state(int id) {
+	if (id == 0) {
+		// Start button pressed
+		StartBtn->set();
+		StopBtn->clear();
+	}
+	else if (id == 1) {
+		// Stop button pressed
+		StartBtn->clear();
+		StopBtn->set();
+	}
 }
 
 //==============================================================================
