@@ -29,14 +29,6 @@ The authors can be reached by email at:
 
 RadioInterface* r_i;
 
-void startradio(Fl_Widget *, void *) {
-	r_i->ri_radio_start(0);
-}
-
-void stopradio(Fl_Widget *, void *) {
-	r_i->ri_radio_stop();
-}
-
 int main(int argc, char **argv) {
 
 	// Create radio interface
@@ -65,6 +57,9 @@ int main(int argc, char **argv) {
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 	// Create a main window
+
+	Fl_Window* main_window = new MainWindow(r_i, 331, 124);
+	/*
 	Fl_Window* main_window = new Fl_Double_Window(331, 124);
 	main_window->resizable(main_window);
 	main_window->color((Fl_Color)24);
@@ -96,6 +91,7 @@ int main(int argc, char **argv) {
 
 	// Show temp modes window
 	Modes *m = new Modes(r_i, 300,110);
+	*/
 
 	// Run event loop until quit
 	return Fl::run();

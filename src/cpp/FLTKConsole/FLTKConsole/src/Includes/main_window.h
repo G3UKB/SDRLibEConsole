@@ -51,6 +51,10 @@ private:
 	// State variables
 	// Ref to set radio parameters
 	RadioInterface* r_i;
+	Fl_Group *top_group;
+	Fl_Button* start_btn;
+	Fl_Button* stop_btn;
+	Modes *m;
 
 	//==============================================================================
 	// Method prototypes
