@@ -36,6 +36,7 @@ The authors can be reached by email at:
 /*
 	The one and only main window
 */
+class ControlButton;
 class MainWindow : public Fl_Double_Window
 {
 public:
@@ -61,9 +62,33 @@ private:
 	Fl_Group *top_group;
 
 	// Components
-	ToggleButtonBase* StartBtn;
-	ToggleButtonBase* StopBtn;
+	ControlButton* StartBtn;
+	ControlButton* StopBtn;
 	Modes *m;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+//==============================================================================
+// The start/stop button
+class ControlButton : public ToggleButtonBase
+{
+public:
+	//==============================================================================
+	ControlButton(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	~ControlButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	MainWindow* myparent;
 
 	//==============================================================================
 	// Method prototypes
