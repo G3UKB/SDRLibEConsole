@@ -37,6 +37,7 @@ The authors can be reached by email at:
 	The one and only main window
 */
 class ControlButton;
+class ModeTrigger;
 class MainWindow : public Fl_Double_Window
 {
 public:
@@ -44,6 +45,7 @@ public:
 	MainWindow(RadioInterface* radio_interface, int w, int h);
 	~MainWindow() {};
 	void handle_button_state(int id);
+	Modes* get_mode_panel();
 
 	//==============================================================================
 
@@ -65,7 +67,7 @@ private:
 	// Components
 	ControlButton* StartBtn;
 	ControlButton* StopBtn;
-	Fl_Button* ModeBtn;
+	ModeTrigger* ModeBtn;
 	Modes *modes;
 
 	//==============================================================================
@@ -91,6 +93,29 @@ private:
 	RadioInterface* r_i;
 	int id;
 	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+// The mode button
+class ModeTrigger : public ToggleButtonBase
+{
+public:
+	//==============================================================================
+	ModeTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	~ModeTrigger() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	MainWindow* parent;
 
 	//==============================================================================
 	// Method prototypes

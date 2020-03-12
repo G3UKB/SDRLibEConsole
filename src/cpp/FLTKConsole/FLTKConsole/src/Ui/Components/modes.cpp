@@ -63,6 +63,7 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	// Close up and display
 	top_group->end();
 	end();
+	border(false);
 	show();
 }
 
