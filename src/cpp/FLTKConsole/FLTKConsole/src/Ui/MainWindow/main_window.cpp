@@ -142,12 +142,14 @@ int ModeTrigger::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
 		if (value()) {
-			// Show 
-			parent->get_mode_panel()->show();
-		}
-		else if (id == 1) {
-			// Hide
+			// Hide 
 			parent->get_mode_panel()->hide();
+			clear();
+		}
+		else {
+			// Show
+			parent->get_mode_panel()->show();
+			set();
 		}
 		return 1;
 	}
