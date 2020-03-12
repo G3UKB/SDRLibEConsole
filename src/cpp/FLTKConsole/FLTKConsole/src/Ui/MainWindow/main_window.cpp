@@ -46,17 +46,28 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	align(Fl_Align(65));
 
 	// Add a group box
-	top_group = new Fl_Group(5, 10, 320, 105);
+	top_group = new Fl_Group(5, 5, w - 10, h - 10);
 	top_group->box(FL_GTK_THIN_UP_BOX);
 	top_group->color((Fl_Color)24);
 
+	// Create a grid layout handler
+	GridLayout *grid = new GridLayout(10, 10, w - 20, h - 20, 3, 3);
+	metrics m;
+
 	// Add start and stop buttons to the group
-	StartBtn = new ControlButton(this, r_i, start_str, 0, 15, 20, 100, 20, (Fl_Color)33, (Fl_Color)67);
-	StopBtn = new ControlButton(this, r_i, stop_str, 1, 120, 20, 100, 20, (Fl_Color)33, (Fl_Color)80);
+	m = grid->get_cell_metrics(0, 0);
+	StartBtn = new ControlButton(this, r_i, start_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+	m = grid->get_cell_metrics(0, 1);
+	StopBtn = new ControlButton(this, r_i, stop_str, 1, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
-	VFOComponent *c = new VFOComponent(r_i, radio_id, 0, 15, 50, 300, 55);
+	m = grid->get_cell_metrics(1, 0, 2, 3);
+	VFOComponent *c = new VFOComponent(r_i, radio_id, 0, m.x, m.y, m.w, m.h);
+
+	// Add modes etc to the left
+	//m = grid->get_cell_metrics(1, 4);
+	//ModeBtn = new Fl_Button(m.x, m.y, m.w, m.h, mode_str);
 
 	// Close up and display
 	top_group->end();
@@ -64,7 +75,7 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	show();
 
 	// Show temp modes window
-	m = new Modes(r_i, 270, 110);
+	modes = new Modes(r_i, 270, 110);
 }
 
 //----------------------------------------------------

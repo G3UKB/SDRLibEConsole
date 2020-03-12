@@ -97,6 +97,12 @@ private:
 	// Containers
 
 	// State variables
+	// Container
+	int x_ord;
+	int y_ord;
+	int width;
+	int height;
+
 	RadioInterface* r_i;
 	int vfo_type = RX;			// RX|TX
 	std::string radio_id = "";	// Radio id of VFO instance

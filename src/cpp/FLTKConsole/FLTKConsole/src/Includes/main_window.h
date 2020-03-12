@@ -54,6 +54,7 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char radio_id[10] = "radio-1";
+	char mode_str[10] = "Mode";
 
 	// Ref to set radio parameters
 	RadioInterface* r_i;
@@ -64,7 +65,8 @@ private:
 	// Components
 	ControlButton* StartBtn;
 	ControlButton* StopBtn;
-	Modes *m;
+	Fl_Button* ModeBtn;
+	Modes *modes;
 
 	//==============================================================================
 	// Method prototypes

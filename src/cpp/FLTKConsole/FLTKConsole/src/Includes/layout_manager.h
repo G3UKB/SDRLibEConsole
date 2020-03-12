@@ -59,6 +59,7 @@ public:
 	~GridLayout() {};
 
 	metrics get_cell_metrics(int row, int col);
+	metrics get_cell_metrics(int start_row, int start_col, int num_rows, int num_cols);
 
 	//==============================================================================
 

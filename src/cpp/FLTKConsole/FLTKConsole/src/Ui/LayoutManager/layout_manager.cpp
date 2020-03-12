@@ -63,13 +63,23 @@ GridLayout::GridLayout(int x, int y, int w, int h, int rows, int cols) {
 }
 
 //==============================================================================
-// Return cell metrics
+// Return cell metrics for a single cell
 metrics GridLayout::get_cell_metrics(int row, int col) {
 	m.x = origin_x + row_width * col;
 	m.y = origin_y + row_height * row;
 	m.w = row_width;
 	m.h = row_height;
 		
+	return m;
+}
+
+// Return cell metrics for a spenned cell
+metrics GridLayout::get_cell_metrics(int start_row, int start_col, int num_rows, int num_cols) {
+	m.x = origin_x + row_width * start_col;
+	m.y = origin_y + row_height * start_row;
+	m.w = row_width * num_cols;
+	m.h = row_height * num_rows;
+
 	return m;
 }
 

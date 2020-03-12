@@ -35,6 +35,11 @@ The authors can be reached by email at:
 // Constructor/Destructor
 VFOComponent::VFOComponent(RadioInterface* radio_interface, std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
 {
+	x_ord = x;
+	y_ord = y;
+	width = w;
+	height = h;
+
 	// Local vars
 	r_i = radio_interface;
 	vfo_type = p_vfo_type;
@@ -150,33 +155,50 @@ void VFOComponent::set_freq_from_hz(int freq) {
 // Private
 void VFOComponent::create_digits() {
 	
-	// Create digits
-	d_100MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 20, 58, 30, 37);
-	d_100MHz->argument(1);
-	d_10MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 50, 58, 30, 37);
-	d_10MHz->argument(2);
-	d_1MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, 80, 58, 30, 37);
-	d_1MHz->argument(3);
-	d_100KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 125, 58, 30, 37);
-	d_100KHz->argument(4);
-	d_10KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 155, 58, 30, 37);
-	d_10KHz->argument(5);
-	d_1KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, 185, 58, 30, 37);
-	d_1KHz->argument(6);
-	d_100Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 230, 60, 30, 30);
-	d_100Hz->argument(7);
-	d_10Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 255, 60, 30, 30);
-	d_10Hz->argument(8);
-	d_1Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, 280, 60, 30, 30);
-	d_1Hz->argument(9);
+	// Create a grid layout handler
+	GridLayout *grid = new GridLayout(x_ord+5, y_ord+5, width - 10, height - 10, 1, 11);
+	metrics m;
 
-	// Create and place two dot spacers
-	sep_1 = new Fl_Box(110, 58, 15, 32, ".");
+	// Create digits
+	m = grid->get_cell_metrics(0, 0);
+	d_100MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, m.x, m.y, m.w, m.h);
+	d_100MHz->argument(1);
+	m = grid->get_cell_metrics(0, 1);
+	d_10MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, m.x, m.y, m.w, m.h);
+	d_10MHz->argument(2);
+	m = grid->get_cell_metrics(0, 2);
+	d_1MHz = new VFODigit(this, MHZ_COLOR, MHZ_FONT, m.x, m.y, m.w, m.h);
+	d_1MHz->argument(3);
+
+	m = grid->get_cell_metrics(0, 3);
+	sep_1 = new Fl_Box(m.x, m.y, m.w, m.h, ".");
 	sep_1->labelsize(36);
 	sep_1->labelcolor((Fl_Color)90);
-	sep_2 = new Fl_Box(215, 61, 20, 29, ".");
+
+	m = grid->get_cell_metrics(0, 4);
+	d_100KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, m.x, m.y, m.w, m.h);
+	d_100KHz->argument(4);
+	m = grid->get_cell_metrics(0, 5);
+	d_10KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, m.x, m.y, m.w, m.h);
+	d_10KHz->argument(5);
+	m = grid->get_cell_metrics(0, 6);
+	d_1KHz = new VFODigit(this, KHZ_COLOR, KHZ_FONT, m.x, m.y, m.w, m.h);
+	d_1KHz->argument(6);
+
+	m = grid->get_cell_metrics(0, 7);
+	sep_2 = new Fl_Box(m.x, m.y, m.w, m.h, ".");
 	sep_2->labelsize(36);
 	sep_2->labelcolor((Fl_Color)90);
+
+	m = grid->get_cell_metrics(0, 8);
+	d_100Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, m.x, m.y, m.w, m.h);
+	d_100Hz->argument(7);
+	m = grid->get_cell_metrics(0, 9);
+	d_10Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, m.x, m.y, m.w, m.h);
+	d_10Hz->argument(8);
+	m = grid->get_cell_metrics(0, 10);
+	d_1Hz = new VFODigit(this, HZ_COLOR, HZ_FONT, m.x, m.y, m.w, m.h);
+	d_1Hz->argument(9);
 
 	// Close off the group
 	end();
