@@ -29,6 +29,8 @@ The authors can be reached by email at:
 
 RadioInterface* r_i;
 
+//==============================================================================
+// FLTKConsole entry point
 int main(int argc, char **argv) {
 
 	// Create radio interface
@@ -56,42 +58,9 @@ int main(int argc, char **argv) {
 	}
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
-	// Create a main window
 
+	// Create the main window
 	Fl_Window* main_window = new MainWindow(r_i, 331, 124);
-	/*
-	Fl_Window* main_window = new Fl_Double_Window(331, 124);
-	main_window->resizable(main_window);
-	main_window->color((Fl_Color)24);
-	main_window->align(Fl_Align(65));
-
-	// Add a group box
-	Fl_Group *top_group = new Fl_Group(5, 10, 320, 105);
-	top_group->box(FL_GTK_THIN_UP_BOX);
-	top_group->color((Fl_Color)24);
-
-	// Add start and stop buttons to the group
-	Fl_Button* start_btn = new Fl_Button(15, 20, 100, 20, "Start");
-	start_btn->color((Fl_Color)33);
-	start_btn->labelcolor((Fl_Color)67);
-	start_btn->callback(startradio, 0);
-	Fl_Button* stop_button = new Fl_Button(120, 20, 100, 20, "Stop");
-	stop_button->color((Fl_Color)33);
-	stop_button->labelcolor((Fl_Color)80);
-	stop_button->callback(stopradio, 0);
-	
-	// Add the VFO component
-	// This extends Fl_Group so we place the group below the buttons
-	VFOComponent *c = new VFOComponent(r_i, "radio-1", 0, 15, 50, 300, 55);
-
-	// Close up and display
-	top_group->end();
-	main_window->end();
-	main_window->show(argc, argv);
-
-	// Show temp modes window
-	Modes *m = new Modes(r_i, 300,110);
-	*/
 
 	// Run event loop until quit
 	return Fl::run();
