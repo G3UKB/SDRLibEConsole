@@ -53,7 +53,7 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	metrics m;
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m);
+		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (k++ == 3) {
 			k = 0;
 			j++;
@@ -85,12 +85,10 @@ void Modes::handle_button_state(int id) {
 
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(Modes *top_level, RadioInterface* radio_interface, char* button_label, int mode_id, metrics m) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+ModeButton::ModeButton(Modes *top_level, RadioInterface* radio_interface, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, m.x, m.y, m.w, m.h, back_col, label_col) {
 	t_l = top_level;
 	r_i = radio_interface;
 	id = mode_id;
-	color((Fl_Color)33);
-	labelcolor((Fl_Color)16);
 }
 
 //----------------------------------------------------

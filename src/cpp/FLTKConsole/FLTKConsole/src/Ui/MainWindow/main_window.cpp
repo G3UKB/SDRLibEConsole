@@ -88,8 +88,6 @@ ControlButton::ControlButton(MainWindow* parent_widget, RadioInterface* radio_in
 	myparent = parent_widget;
 	r_i = radio_interface;
 	id = button_id;
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)label_col);
 }
 
 //----------------------------------------------------

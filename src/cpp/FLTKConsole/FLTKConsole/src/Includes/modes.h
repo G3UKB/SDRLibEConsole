@@ -115,11 +115,11 @@ private:
 
 //==============================================================================
 // A mode button
-class ModeButton : public Fl_Toggle_Button
+class ModeButton : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	ModeButton(Modes *modes, RadioInterface* radio_interface, char* label, int mode_id, metrics m);
+	ModeButton(Modes *modes, RadioInterface* radio_interface, char* label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col);
 	~ModeButton() {};
 
 	//==============================================================================
