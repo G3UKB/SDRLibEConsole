@@ -41,7 +41,7 @@ class Preferences : public Fl_Preferences
 {
 public:
 	//==============================================================================
-	Preferences();
+	Preferences(const char* vendor, const char * application);
 	~Preferences() {};
 
 	//==============================================================================
