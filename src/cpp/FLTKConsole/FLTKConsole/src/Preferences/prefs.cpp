@@ -28,4 +28,5 @@ The authors can be reached by email at:
 /*
 	Provides a high level interface to save/restore all application prefs. The underlying
 	mechanism uses Fl-Preferences with a group for each logically related dataset.
+
 */
