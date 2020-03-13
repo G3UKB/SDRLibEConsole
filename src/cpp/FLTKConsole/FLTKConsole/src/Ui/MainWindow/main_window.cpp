@@ -51,7 +51,7 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	top_group->color((Fl_Color)24);
 
 	// Create a grid layout handler
-	GridLayout *grid = new GridLayout(10, 10, w - 20, h - 20, 3, 4);
+	GridLayout *grid = new GridLayout(5, 5, w - 10, h - 10, 3, 4, 5);
 	metrics m;
 
 	// Add start and stop buttons to the group

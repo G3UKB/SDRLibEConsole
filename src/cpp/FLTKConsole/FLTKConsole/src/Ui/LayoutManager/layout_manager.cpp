@@ -63,38 +63,13 @@ GridLayout::GridLayout(int x, int y, int w, int h, int rows, int cols, int margi
 	calculate_cell_metrics();
 }
 
-/*
 //==============================================================================
 // Return cell metrics for a single cell
 metrics GridLayout::get_cell_metrics(int row, int col) {
-	m.x = origin_x + row_width * col;
-	m.y = origin_y + row_height * row;
-	m.w = row_width;
-	m.h = row_height;
-		
-	return m;
-}
-
-// Return cell metrics for a spanned cell
-metrics GridLayout::get_cell_metrics(int start_row, int start_col, int num_rows, int num_cols) {
-	m.x = origin_x + row_width * start_col;
-	m.y = origin_y + row_height * start_row;
-	m.w = row_width * num_cols;
-	m.h = row_height * num_rows;
-
-	return m;
-}
-*/
-
-// ToDo: Take account of margins
-//		Allow setting of individual margins.
-//==============================================================================
-// Return cell metrics for a single cell
-metrics GridLayout::get_cell_metrics(int row, int col) {
-	m.x = origin_x + grid_metrics.cells[row][col].w * col;
-	m.y = origin_y + grid_metrics.cells[row][col].h * row;
-	m.w = grid_metrics.cells[row][col].w;
-	m.h = grid_metrics.cells[row][col].h;
+	m.x = (origin_x + grid_metrics.cells[row][col].w * col) + grid_metrics.cells[row][col].left;
+	m.y = (origin_y + grid_metrics.cells[row][col].h * row) + grid_metrics.cells[row][col].top;
+	m.w = grid_metrics.cells[row][col].w - grid_metrics.cells[row][col].left - grid_metrics.cells[row][col].right;
+	m.h = grid_metrics.cells[row][col].h - grid_metrics.cells[row][col].top - grid_metrics.cells[row][col].bottom;
 
 	return m;
 }
@@ -102,10 +77,10 @@ metrics GridLayout::get_cell_metrics(int row, int col) {
 // Return cell metrics for a spanned cell
 // Note, this works for now but when weighting is applied will need to accumulate cols and rows size
 metrics GridLayout::get_cell_metrics(int start_row, int start_col, int num_rows, int num_cols) {
-	m.x = origin_x + grid_metrics.cells[start_row][start_col].w * start_col;
-	m.y = origin_y + grid_metrics.cells[start_row][start_col].h * start_row;
-	m.w = grid_metrics.cells[start_row][start_col].w * num_cols;
-	m.h = grid_metrics.cells[start_row][start_col].h * num_rows;
+	m.x = (origin_x + grid_metrics.cells[start_row][start_col].w * start_col) + grid_metrics.cells[start_row][start_col].left;
+	m.y = (origin_y + grid_metrics.cells[start_row][start_col].h * start_row) + grid_metrics.cells[start_row][start_col].top;
+	m.w = (grid_metrics.cells[start_row][start_col].w * num_cols) - grid_metrics.cells[start_row][start_col].left - grid_metrics.cells[start_row + num_rows - 1][start_col + num_cols - 1].right;
+	m.h = (grid_metrics.cells[start_row][start_col].h * num_rows) - grid_metrics.cells[start_row][start_col].top - grid_metrics.cells[start_row + num_rows - 1][start_col + num_cols - 1].bottom;
 
 	return m;
 }
@@ -114,15 +89,6 @@ metrics GridLayout::get_cell_metrics(int start_row, int start_col, int num_rows,
 // PRIVATE
 
 // Calculate metrics for current state
-/*
-void GridLayout::calculate_cell_metrics() {
-	// At present this is the simple form of unisize layout with no margins
-	// weighting or spanning.
-	// Calculate in-line for now
-	row_width = area_width / grid_cols;
-	row_height = area_height / grid_rows;
-}
-*/
 void GridLayout::calculate_cell_metrics() {
 	// At present this is the simple form of unisize layout.
 	// Margins and spanning are implemented
