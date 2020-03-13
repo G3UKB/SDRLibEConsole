@@ -1,7 +1,7 @@
 /*
-prefs.cpp
+toggle_base.cpp
 
-Preferences for the FLTK Console
+Toggle button base component implementation for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -25,7 +25,13 @@ The authors can be reached by email at:
 
 */
 
-/*
-	Provides a high level interface to save/restore all application prefs. The underlying
-	mechanism uses Fl-Preferences with a group for each logically related dataset.
-*/
+#include "../../Includes/includes.h"
+
+//==============================================================================
+// Toggle button base
+ToggleButtonBase::ToggleButtonBase(RadioInterface* radio_interface, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
+	r_i = radio_interface;
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
+}
+

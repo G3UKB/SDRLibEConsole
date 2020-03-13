@@ -35,6 +35,7 @@ The authors can be reached by email at:
 // FLTK includes
 #ifdef linux
 	#include <FL/Fl.H>
+	#include <FL/Fl_Preferences.H>
 	#include <FL/Fl_Window.H>
 	#include <FL/Fl_Double_Window.H>
 	#include <FL/Fl_Group.H>
@@ -43,6 +44,7 @@ The authors can be reached by email at:
 	#include <FL/Fl_Toggle_Button.H>
 #else
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Preferences.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/names.h"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Window.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Double_Window.H"
@@ -54,6 +56,7 @@ The authors can be reached by email at:
 
 // Application includes
 #include "extern.h"
+#include "prefs.h"
 #include "radio_interface.h"
 #include "vfo.h"
 #include "layout_manager.h"
