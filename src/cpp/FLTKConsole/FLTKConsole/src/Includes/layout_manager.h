@@ -28,16 +28,20 @@ The authors can be reached by email at:
 #pragma once
 
 // Cell metric 
-typedef struct cell {
-	int x;
-	int y;
+typedef struct grid_cell {
+	// Width/height of cell
 	int w;
 	int h;
+	// Margins
+	int left;
+	int right;
+	int top;
+	int bottom;
 };
 
-typedef struct cell_metrics {
+typedef struct grid_cells {
 	// Allow 10 rows and 10 cols for 100 cells
-	cell cells[10][10];
+	grid_cell cells[10][10];
 };
 
 // Return from get_cell_metrics()
@@ -55,9 +59,10 @@ class GridLayout
 {
 public:
 	//==============================================================================
-	GridLayout(int x, int y, int w, int h, int rows, int cols);
+	GridLayout(int x, int y, int w, int h, int rows, int cols, int margins = 0);
 	~GridLayout() {};
 
+	// Return cell metrics for single or spanned cells
 	metrics get_cell_metrics(int row, int col);
 	metrics get_cell_metrics(int start_row, int start_col, int num_rows, int num_cols);
 
@@ -73,6 +78,7 @@ private:
 	int area_height;
 	int grid_rows;
 	int grid_cols;
+	int cell_margins;
 
 	// Intermediates
 	int row_width;
@@ -80,7 +86,8 @@ private:
 
 	// Metrics
 	metrics m;
-	cell_metrics c_m;
+	// The grid_metrics instance
+	grid_cells grid_metrics;
 
 	//==============================================================================
 	// Method prototypes
