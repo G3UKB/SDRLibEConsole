@@ -45,6 +45,7 @@ public:
 	MainWindow(Preferences* prefs, RadioInterface* radio_interface);
 	~MainWindow() {};
 	void resize(int x, int y, int w, int h) override;
+	int handle(int event);
 	void handle_button_state(int id);
 	Modes* get_mode_panel();
 

@@ -44,10 +44,6 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	int w = 331;
 	int h = 124;
 
-	// Set window position
-	x(p->get_window_x());
-	y(p->get_window_y());
-
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
@@ -80,6 +76,10 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	top_group->end();
 	end();
 	show();
+	// Set window position
+	printf("%d,%d\n", p->get_window_x(), p->get_window_y());
+	x(p->get_window_x());
+	y(p->get_window_y());
 
 	// Create the modes panel hidden
 	modes = new Modes(r_i, 270, 110);
@@ -93,6 +93,17 @@ void  MainWindow::resize(int x, int y, int w, int h) {
 
 Modes*  MainWindow::get_mode_panel() {
 	return modes;
+}
+
+
+int MainWindow::handle(int event) {
+	switch (event) {
+	case FL_HIDE: {
+			// Save prefs
+			p->save();
+		}
+	}
+	return 0;
 }
 
 //----------------------------------------------------

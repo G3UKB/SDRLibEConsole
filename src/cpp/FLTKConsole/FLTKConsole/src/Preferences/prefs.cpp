@@ -86,4 +86,5 @@ void Preferences::restore() {
 	Fl_Preferences app(root, "APP");
 	app.get("window_x", window_x, 100);
 	app.get("window_y", window_y, 100);
+	printf("%d,%d\n", window_x, window_y);
 }

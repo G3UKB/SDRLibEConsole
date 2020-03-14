@@ -69,9 +69,6 @@ int main(int argc, char **argv) {
 	// Run event loop until quit
 	return Fl::run();
 
-	// Save prefs
-	printf("Save\n");
-	prefs->save();
 }
 
 
