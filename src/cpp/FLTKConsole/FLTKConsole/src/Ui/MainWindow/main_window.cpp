@@ -37,9 +37,16 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor
-MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Double_Window(w, h) {
+MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl_Double_Window(331, 124) {
 
 	r_i = radio_interface;
+	p = prefs;
+	int w = 331;
+	int h = 124;
+
+	// Set window position
+	x(p->get_window_x());
+	y(p->get_window_y());
 
 	resizable(this);
 	color((Fl_Color)24);
@@ -77,6 +84,11 @@ MainWindow::MainWindow(RadioInterface* radio_interface, int w, int h) : Fl_Doubl
 	// Create the modes panel hidden
 	modes = new Modes(r_i, 270, 110);
 	modes->hide();
+}
+
+void  MainWindow::resize(int x, int y, int w, int h) {
+	p->set_window_x(x);
+	p->set_window_y(y);
 }
 
 Modes*  MainWindow::get_mode_panel() {

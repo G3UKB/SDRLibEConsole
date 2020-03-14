@@ -28,10 +28,14 @@ The authors can be reached by email at:
 #include "../Includes/includes.h"
 
 RadioInterface* r_i;
+Preferences* prefs;
 
 //==============================================================================
 // FLTKConsole entry point
 int main(int argc, char **argv) {
+
+	// Create preferences
+	prefs = new Preferences();
 
 	// Create radio interface
 	r_i = new RadioInterface();
@@ -60,10 +64,14 @@ int main(int argc, char **argv) {
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
 	// Create the main window
-	Fl_Window* main_window = new MainWindow(r_i, 331, 124);
+	Fl_Window* main_window = new MainWindow(prefs, r_i);
 
 	// Run event loop until quit
 	return Fl::run();
+
+	// Save prefs
+	printf("Save\n");
+	prefs->save();
 }
 
 

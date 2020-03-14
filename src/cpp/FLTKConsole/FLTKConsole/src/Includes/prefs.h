@@ -27,8 +27,6 @@ The authors can be reached by email at:
 
 #pragma once
 
-#include "includes.h"
-
 //==============================================================================
 // Defines
 
@@ -37,20 +35,34 @@ The authors can be reached by email at:
 	The one and only main window
 */
 
-class Preferences : public Fl_Preferences
+class Preferences
 {
 public:
 	//==============================================================================
-	Preferences(const char* vendor, const char * application);
+	Preferences();
 	~Preferences() {};
 
 	//==============================================================================
+	// Method prototypes
+	void save();
+	int get_window_x();
+	int get_window_y();
+	void set_window_x(int x);
+	void set_window_y(int y);
 
 private:
 	//==============================================================================
 	// State variables
+	// For Fl_Preferences constructor
+	char project[6] = "G3UKB";
+	char application[12] = "FLTKConsole";
+
+	// Prefs items
+	int window_x;
+	int window_y;
 
 	//==============================================================================
 	// Method prototypes
-
+	void restore();
+	
 };

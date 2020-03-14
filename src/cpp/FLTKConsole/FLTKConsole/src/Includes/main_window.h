@@ -42,8 +42,9 @@ class MainWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
-	MainWindow(RadioInterface* radio_interface, int w, int h);
+	MainWindow(Preferences* prefs, RadioInterface* radio_interface);
 	~MainWindow() {};
+	void resize(int x, int y, int w, int h) override;
 	void handle_button_state(int id);
 	Modes* get_mode_panel();
 
@@ -57,6 +58,9 @@ private:
 	char stop_str[10] = "Stop";
 	char radio_id[10] = "radio-1";
 	char mode_str[10] = "Mode";
+
+	// Preferences
+	Preferences* p;
 
 	// Ref to set radio parameters
 	RadioInterface* r_i;
