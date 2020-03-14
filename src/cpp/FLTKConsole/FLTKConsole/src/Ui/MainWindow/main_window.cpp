@@ -48,6 +48,12 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 
+	// Set window position
+	//printf("Set: %d,%d\n", p->get_window_x(), p->get_window_y());
+	//position(p->get_window_x(), p->get_window_y());
+	//resize(p->get_window_x(), p->get_window_y(), 331, 124);
+	//size(p->get_window_x(), p->get_window_y());
+
 	// Add a group box
 	top_group = new Fl_Group(5, 5, w - 10, h - 10);
 	top_group->box(FL_GTK_THIN_UP_BOX);
@@ -76,19 +82,10 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	top_group->end();
 	end();
 	show();
-	// Set window position
-	printf("%d,%d\n", p->get_window_x(), p->get_window_y());
-	x(p->get_window_x());
-	y(p->get_window_y());
 
 	// Create the modes panel hidden
 	modes = new Modes(r_i, 270, 110);
 	modes->hide();
-}
-
-void  MainWindow::resize(int x, int y, int w, int h) {
-	p->set_window_x(x);
-	p->set_window_y(y);
 }
 
 Modes*  MainWindow::get_mode_panel() {
@@ -97,10 +94,12 @@ Modes*  MainWindow::get_mode_panel() {
 
 
 int MainWindow::handle(int event) {
+	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
 	switch (event) {
 	case FL_HIDE: {
 			// Save prefs
 			p->save();
+			break;
 		}
 	}
 	return 0;
