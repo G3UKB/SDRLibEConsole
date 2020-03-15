@@ -38,6 +38,7 @@ The authors can be reached by email at:
 */
 class ControlButton;
 class ModeTrigger;
+class FilterTrigger;
 class MainWindow : public Fl_Double_Window
 {
 public:
@@ -48,6 +49,7 @@ public:
 	int handle(int event);
 	void handle_button_state(int id);
 	void manage_mode_panel(bool show);
+	void manage_filter_panel(bool show);
 
 	//==============================================================================
 
@@ -59,6 +61,7 @@ private:
 	char stop_str[10] = "Stop";
 	char radio_id[10] = "radio-1";
 	char mode_str[10] = "Mode";
+	char filter_str[10] = "Filter";
 
 	// Preferences
 	Preferences* p;
@@ -74,6 +77,8 @@ private:
 	ControlButton* StopBtn;
 	ModeTrigger* ModeBtn;
 	Modes *modes;
+	FilterTrigger* FilterBtn;
+	Filters *filters;
 
 	//==============================================================================
 	// Method prototypes
@@ -104,13 +109,38 @@ private:
 
 };
 
-// The mode button
+//==============================================================================
+// The mode button class
 class ModeTrigger : public ToggleButtonBase
 {
 public:
 	//==============================================================================
 	ModeTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
 	~ModeTrigger() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	MainWindow* parent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+//==============================================================================
+// The filter button class
+class FilterTrigger : public ToggleButtonBase
+{
+public:
+	//==============================================================================
+	FilterTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	~FilterTrigger() {};
 	int handle(int event);
 
 	//==============================================================================

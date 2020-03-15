@@ -75,14 +75,22 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	m = grid->get_cell_metrics(1, 3);
 	ModeBtn = new ModeTrigger(this, r_i, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 
+	// Add filter trigger
+	m = grid->get_cell_metrics(2, 3);
+	FilterBtn = new FilterTrigger(this, r_i, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+
 	// Close up and display
 	top_group->end();
 	end();
 	show();
 
 	// Create the modes panel hidden
-	modes = new Modes(p, r_i, 270, 110);
+	modes = new Modes(p, r_i, 230, 80);
 	modes->hide();
+
+	// Create the filters panel hidden
+	filters = new Filters(p, r_i, 230, 80);
+	filters->hide();
 }
 
 //===================================================
@@ -146,6 +154,21 @@ void  MainWindow::manage_mode_panel(bool show) {
 	}
 }
 
+//----------------------------------------------------
+// Show or hide the filter panel
+void  MainWindow::manage_filter_panel(bool show) {
+
+	if (show) {
+		int x = p->get_window_x() + p->get_window_w() + 5;
+		int y = p->get_window_y();
+		filters->position(x, y);
+		filters->show();
+	}
+	else {
+		filters->hide();
+	}
+}
+
 //==============================================================================
 // Control button (start/stop)
 ControlButton::ControlButton(MainWindow* parent_widget, RadioInterface* radio_interface, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, x, y, w, h, back_col, label_col) {
@@ -198,6 +221,38 @@ int ModeTrigger::handle(int event) {
 		else {
 			// Show
 			parent->manage_mode_panel(true);
+			// Button depressed
+			set();
+		}
+		return 1;
+	}
+	default:
+		return Fl_Widget::handle(event);
+	}
+}
+
+//==============================================================================
+// Filter button
+FilterTrigger::FilterTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, x, y, w, h, back_col, label_col) {
+	parent = parent_widget;
+	r_i = radio_interface;
+	id = button_id;
+}
+
+//----------------------------------------------------
+// Handle click event
+int FilterTrigger::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		if (value()) {
+			// Hide 
+			parent->manage_filter_panel(false);
+			// Button release
+			clear();
+		}
+		else {
+			// Show
+			parent->manage_filter_panel(true);
 			// Button depressed
 			set();
 		}

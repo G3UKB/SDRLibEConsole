@@ -71,6 +71,9 @@ void Preferences::save() {
 	radio.set("mode-1", radio_mode[0]);
 	radio.set("mode-2", radio_mode[1]);
 	radio.set("mode-3", radio_mode[2]);
+	radio.set("filter-1", radio_filter[0]);
+	radio.set("filter-2", radio_filter[1]);
+	radio.set("filter-3", radio_filter[2]);
 }
 
 //==============================================================================
@@ -108,9 +111,14 @@ void Preferences::set_window_h(int h) {
 int Preferences::get_mode(int radio) {
 	return radio_mode[radio];
 }
-
 void Preferences::set_mode(int radio, int mode) {
 	radio_mode[radio] = mode;
+}
+int Preferences::get_filter(int radio) {
+	return radio_filter[radio];
+}
+void Preferences::set_filter(int radio, int filter) {
+	radio_filter[radio] = filter;
 }
 
 //==============================================================================
@@ -133,4 +141,7 @@ void Preferences::restore() {
 	radio.get("mode-1", radio_mode[0], radio_mode[0]);
 	radio.get("mode-2", radio_mode[1], radio_mode[1]);
 	radio.get("mode-3", radio_mode[2], radio_mode[2]);
+	radio.get("filter-1", radio_filter[0], radio_filter[0]);
+	radio.get("filter-2", radio_filter[1], radio_filter[1]);
+	radio.get("filter-3", radio_filter[2], radio_filter[2]);
 }

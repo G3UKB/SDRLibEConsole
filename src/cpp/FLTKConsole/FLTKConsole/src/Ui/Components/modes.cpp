@@ -77,7 +77,7 @@ Modes::Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h) 
 
 //----------------------------------------------------
 // Handle button state
-void Modes::handle_button_state(int id) {
+void Modes::handle_mode_button_state(int id) {
 	int i;
 
 	for (i = 0 ; i < m_b.n; i++) {
@@ -110,7 +110,7 @@ int ModeButton::handle(int event) {
 		// Tell radio to change mode
 		r_i->ri_server_set_rx_mode(0, id);
 		// Tell parent to reflect state in buttons
-		t_l->handle_button_state(id);
+		t_l->handle_mode_button_state(id);
 		return 1;
 	}
 	default:

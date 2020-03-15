@@ -60,7 +60,9 @@ public:
 	void set_window_h(int h);
 	// Radio mode, filter etc
 	int get_mode(int radio);
-	void set_mode(int radio, int mode);
+	void set_mode(int radio, int filter);
+	int get_filter(int radio);
+	void set_filter(int radio, int filter);
 
 private:
 	//==============================================================================
@@ -78,6 +80,7 @@ private:
 	int window_h;
 	// Radio mode, filter etc
 	int radio_mode[3] = { 0,0,0 };
+	int radio_filter[3] = { 2,2,2 };
 
 	//==============================================================================
 	// Method prototypes
