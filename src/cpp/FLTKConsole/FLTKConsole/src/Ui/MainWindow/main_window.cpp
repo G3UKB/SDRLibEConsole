@@ -31,10 +31,18 @@ The authors can be reached by email at:
 // Defines
 
 //==============================================================================
+
+// Idle time callback
+// We call back to the window to do housekeeping
+void idle_cb(void* data) {
+	MainWindow* w = (MainWindow*)data;
+	Fl::repeat_timeout(1.0, idle_cb);
+	w->handle_idle_timeout();
+}
+
 /*
 	The one and only main window
 */
-
 //----------------------------------------------------
 // Constructor
 MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl_Double_Window(prefs->get_window_w(), prefs->get_window_h()) {
@@ -91,6 +99,8 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	// Create the filters panel hidden
 	filters = new Filters(p, r_i, 230, 80);
 	filters->hide();
+
+	Fl::repeat_timeout(1.0, idle_cb, (void*)this);
 }
 
 //===================================================
@@ -122,7 +132,12 @@ int MainWindow::handle(int event) {
 }
 
 //===================================================
-// Callbacks from children
+// Callbacks
+//----------------------------------------------------
+// Handle idle timeout
+void MainWindow::handle_idle_timeout() {
+	// Handle enable/disable of controls here
+}
 
 //----------------------------------------------------
 // Handle control button state

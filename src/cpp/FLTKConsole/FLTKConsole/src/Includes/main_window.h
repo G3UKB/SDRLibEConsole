@@ -50,6 +50,7 @@ public:
 	void handle_button_state(int id);
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
+	void handle_idle_timeout();
 
 	//==============================================================================
 
