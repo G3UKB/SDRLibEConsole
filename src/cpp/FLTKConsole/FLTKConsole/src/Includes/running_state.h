@@ -37,22 +37,22 @@ The authors can be reached by email at:
 	data and running state.
 */
 
-class RunningState
+class RSt
 {
 public:
-	static RunningState& getInstance()
+	static RSt& getInstance()
 	{
-		static RunningState instance;	// Guaranteed to be destroyed.
+		static RSt instance;	// Guaranteed to be destroyed.
 										// Instantiated on first use.
 		return instance;
 	}
 private:
-	RunningState() {}                    // Constructor? (the {} brackets) are needed here.
+	RSt() {}                    // Constructor? (the {} brackets) are needed here.
 
 public:
 	// Delete methods we don't need
-	RunningState(RunningState const&) = delete;
-	void operator=(RunningState const&) = delete;
+	RSt(RSt const&) = delete;
+	void operator=(RSt const&) = delete;
 
 
 };
