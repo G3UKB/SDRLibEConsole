@@ -57,16 +57,27 @@ Preferences::Preferences() {
 // Save
 void Preferences::save() {
 	// Save the application data
+	// Root database
 	Fl_Preferences root(Fl_Preferences::USER, project, application);
+	// APP
 	Fl_Preferences app(root, "APP");
 	app.set("window_x", window_x);
 	app.set("window_y", window_y);
 	app.set("window_w", window_w);
 	app.set("window_h", window_h);
+
+	// RADIO
+	Fl_Preferences radio(root, "RADIO");
+	radio.set("mode-1", radio_mode[0]);
+	radio.set("mode-2", radio_mode[1]);
+	radio.set("mode-3", radio_mode[2]);
 }
 
 //==============================================================================
 // API
+
+//----------------------------------------------------
+// APP
 int Preferences::get_window_x() {
 	return window_x;
 }
@@ -91,6 +102,17 @@ void Preferences::set_window_w(int w) {
 void Preferences::set_window_h(int h) {
 	window_h = h;
 }
+
+//----------------------------------------------------
+// RADIO
+int Preferences::get_mode(int radio) {
+	return radio_mode[radio];
+}
+
+void Preferences::set_mode(int radio, int mode) {
+	radio_mode[radio] = mode;
+}
+
 //==============================================================================
 // PRIVATE
 
@@ -105,4 +127,10 @@ void Preferences::restore() {
 	app.get("window_y", window_y, DEFAULT_Y);
 	app.get("window_w", window_w, DEFAULT_W);
 	app.get("window_h", window_h, DEFAULT_H);
+
+	// Read the radio data
+	Fl_Preferences radio(root, "RADIO");
+	radio.get("mode-1", radio_mode[0], radio_mode[0]);
+	radio.get("mode-2", radio_mode[1], radio_mode[1]);
+	radio.get("mode-3", radio_mode[2], radio_mode[2]);
 }

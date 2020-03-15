@@ -81,7 +81,7 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	show();
 
 	// Create the modes panel hidden
-	modes = new Modes(r_i, 270, 110);
+	modes = new Modes(p, r_i, 270, 110);
 	modes->hide();
 }
 

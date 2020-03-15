@@ -41,7 +41,7 @@ class Modes : public Fl_Window
 {
 public:
 	//==============================================================================
-	Modes(RadioInterface* radio_interface, int w, int h);
+	Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h);
 	~Modes() {};
 
 	//==============================================================================
@@ -50,6 +50,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	// Our prefs
+	Preferences* p;
 	// Ref to set radio parameters
 	RadioInterface* r_i;
 	// Fixed labels (labels are not copied and must remain in scope

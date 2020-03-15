@@ -33,12 +33,16 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor/Destructor
-Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
+Modes::Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 
+	p = prefs;
 	r_i = radio_interface;
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
+
+	// Get the mode
+	int mode = p->get_mode(0);
 
 	// Add a group box
 	Fl_Group *top_group = new Fl_Group(5, 5, w-10, h-10);
@@ -54,6 +58,10 @@ Modes::Modes(RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
 		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
+		if (i == mode) {
+			m_b.items[i].mode->set();
+			r_i->ri_server_set_rx_mode(0, mode);
+		}
 		if (k++ == 3) {
 			k = 0;
 			j++;
@@ -76,6 +84,8 @@ void Modes::handle_button_state(int id) {
 		if (m_b.items[i].id == id) {
 			// Toggle pressed
 			m_b.items[i].mode->set();
+			// Remember mode
+			p->set_mode(0, id);
 		}
 		else {
 			// Toggle released

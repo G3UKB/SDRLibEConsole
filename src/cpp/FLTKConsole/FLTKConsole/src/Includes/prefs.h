@@ -49,7 +49,7 @@ public:
 
 	//------------------------------------
 	// Public API
-	// Windoe position and size
+	// Main window position and size
 	int get_window_x();
 	int get_window_y();
 	void set_window_x(int x);
@@ -58,6 +58,9 @@ public:
 	int get_window_h();
 	void set_window_w(int w);
 	void set_window_h(int h);
+	// Radio mode, filter etc
+	int get_mode(int radio);
+	void set_mode(int radio, int mode);
 
 private:
 	//==============================================================================
@@ -73,6 +76,8 @@ private:
 	int window_y;
 	int window_w;
 	int window_h;
+	// Radio mode, filter etc
+	int radio_mode[3] = { 0,0,0 };
 
 	//==============================================================================
 	// Method prototypes
