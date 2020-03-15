@@ -56,6 +56,7 @@ The authors can be reached by email at:
 
 // Application includes
 #include "extern.h"
+#include "running_state.h"
 #include "prefs.h"
 #include "radio_interface.h"
 #include "vfo.h"
