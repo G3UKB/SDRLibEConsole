@@ -85,20 +85,21 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	modes->hide();
 }
 
-Modes*  MainWindow::get_mode_panel() {
-	return modes;
-}
-
+//===================================================
+// Event handlers
+// Resize event
 void  MainWindow::resize(int x, int y, int w, int h) {
 	// Tell window to resize all widgets
 	Fl_Double_Window::resize(x, y, w, h);
-	// Save position
+	// Save position and size
 	p->set_window_x(x);
 	p->set_window_y(y);
 	p->set_window_w(w);
 	p->set_window_h(h);
 }
 
+//----------------------------------------------------
+// General event handler
 int MainWindow::handle(int event) {
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
 	switch (event) {
@@ -108,8 +109,12 @@ int MainWindow::handle(int event) {
 			break;
 		}
 	}
-	return 0;
+	// Pass all events down
+	return Fl_Window::handle(event);
 }
+
+//===================================================
+// Callbacks from children
 
 //----------------------------------------------------
 // Handle control button state
@@ -123,6 +128,21 @@ void MainWindow::handle_button_state(int id) {
 		// Stop button pressed
 		StartBtn->clear();
 		StopBtn->set();
+	}
+}
+
+//----------------------------------------------------
+// Show or hide the modes panel
+void  MainWindow::manage_mode_panel(bool show) {
+
+	if (show) {
+		int x = p->get_window_x() + p->get_window_w() + 5;
+		int y = p->get_window_y();
+		modes->position(x, y);
+		modes->show();
+	}
+	else {
+		modes->hide();
 	}
 }
 
@@ -171,12 +191,14 @@ int ModeTrigger::handle(int event) {
 	case FL_PUSH: {
 		if (value()) {
 			// Hide 
-			parent->get_mode_panel()->hide();
+			parent->manage_mode_panel(false);
+			// Button release
 			clear();
 		}
 		else {
 			// Show
-			parent->get_mode_panel()->show();
+			parent->manage_mode_panel(true);
+			// Button depressed
 			set();
 		}
 		return 1;

@@ -47,7 +47,7 @@ public:
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
 	void handle_button_state(int id);
-	Modes* get_mode_panel();
+	void manage_mode_panel(bool show);
 
 	//==============================================================================
 
