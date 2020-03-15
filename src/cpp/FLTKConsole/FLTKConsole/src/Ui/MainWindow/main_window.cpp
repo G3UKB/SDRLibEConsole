@@ -37,22 +37,19 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor
-MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl_Double_Window(331, 124) {
+MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl_Double_Window(prefs->get_window_w(), prefs->get_window_h()) {
 
 	r_i = radio_interface;
 	p = prefs;
-	int w = 331;
-	int h = 124;
+	int w = p->get_window_w();
+	int h = p->get_window_h();
 
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 
 	// Set window position
-	//printf("Set: %d,%d\n", p->get_window_x(), p->get_window_y());
-	//position(p->get_window_x(), p->get_window_y());
-	//resize(p->get_window_x(), p->get_window_y(), 331, 124);
-	//size(p->get_window_x(), p->get_window_y());
+	position(p->get_window_x(), p->get_window_y());
 
 	// Add a group box
 	top_group = new Fl_Group(5, 5, w - 10, h - 10);
@@ -92,6 +89,15 @@ Modes*  MainWindow::get_mode_panel() {
 	return modes;
 }
 
+void  MainWindow::resize(int x, int y, int w, int h) {
+	// Tell window to resize all widgets
+	Fl_Double_Window::resize(x, y, w, h);
+	// Save position
+	p->set_window_x(x);
+	p->set_window_y(y);
+	p->set_window_w(w);
+	p->set_window_h(h);
+}
 
 int MainWindow::handle(int event) {
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);

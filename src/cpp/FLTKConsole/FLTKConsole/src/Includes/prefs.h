@@ -44,11 +44,20 @@ public:
 
 	//==============================================================================
 	// Method prototypes
+	// Save prefs
 	void save();
+
+	//------------------------------------
+	// Public API
+	// Windoe position and size
 	int get_window_x();
 	int get_window_y();
 	void set_window_x(int x);
 	void set_window_y(int y);
+	int get_window_w();
+	int get_window_h();
+	void set_window_w(int w);
+	void set_window_h(int h);
 
 private:
 	//==============================================================================
@@ -57,9 +66,13 @@ private:
 	char project[6] = "G3UKB";
 	char application[12] = "FLTKConsole";
 
+	//------------------------------------
 	// Prefs items
+	// Main window position and size
 	int window_x;
 	int window_y;
+	int window_w;
+	int window_h;
 
 	//==============================================================================
 	// Method prototypes
