@@ -53,7 +53,10 @@ int main(int argc, char **argv) {
 		c_server_set_num_rx(1);
 		if (r_i->ri_set_default_audio()) {
 			if (r_i->ri_radio_discover()) {
-				if (!r_i->ri_server_start())
+				RSt::inst().set_discovered(true);
+				if (r_i->ri_server_start())
+					RSt::inst().set_server_running(true);
+				else
 					std::cout << std::endl << "Failed to start server!" << std::endl;
 			}
 			else

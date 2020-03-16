@@ -45,11 +45,37 @@ The authors can be reached by email at:
 //==============================================================================
 // PUBLIC
 //----------------------------------------------------
-
+// Object cache
 void RSt::put_obj(std::string name, void* obj) {
 	obj_map.insert(std::pair<std::string, void*>(name, obj));
 }
 
 void* RSt::get_obj(std::string name) {
 	return obj_map.at(name);
+}
+
+//----------------------------------------------------
+// Application state
+void RSt::set_discovered(bool found) {
+	app_state.discovered = found;
+}
+
+bool RSt::get_discovered() {
+	return app_state.discovered;
+}
+
+void RSt::set_server_running(bool running) {
+	app_state.server_running = running;
+}
+
+bool RSt::get_server_running() {
+	return app_state.server_running;
+}
+
+void RSt::set_radio_running(bool running) {
+	app_state.radio_running = running;
+}
+
+bool RSt::get_radio_running() {
+	return app_state.radio_running;
 }

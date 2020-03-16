@@ -199,11 +199,13 @@ int ControlButton::handle(int event) {
 		if (id == 0) {
 			// Start events
 			r_i->ri_radio_start(0);
+			RSt::inst().set_radio_running(true);
 			myparent->handle_button_state(id);
 		}
 		else if (id == 1) {
 			// Stop events
 			r_i->ri_radio_stop();
+			RSt::inst().set_radio_running(false);
 			myparent->handle_button_state(id);
 		}
 		return 1;

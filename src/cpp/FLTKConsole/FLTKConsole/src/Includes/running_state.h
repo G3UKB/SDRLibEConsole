@@ -37,6 +37,12 @@ The authors can be reached by email at:
 	data and running state.
 */
 
+typedef struct t_app_state{
+	bool discovered = false;
+	bool server_running = false;
+	bool radio_running = false;
+};
+
 class RSt
 {
 public:
@@ -50,12 +56,23 @@ private:
 	RSt() {}                    // Constructor? (the {} brackets) are needed here.
 	// Map for cache of objects
 	std::map < std::string, void* > obj_map;
+	// Repository for state
+	t_app_state app_state;
 
 public:
 	// Delete methods we don't need
 	RSt(RSt const&) = delete;
 	void operator=(RSt const&) = delete;
 	// API
+	// Object cache
 	void put_obj(std::string name, void* obj);
 	void* get_obj(std::string name);
+
+	// State
+	void set_discovered(bool found);
+	bool get_discovered();
+	void set_server_running(bool running);
+	bool get_server_running();
+	void set_radio_running(bool running);
+	bool get_radio_running();
 };
