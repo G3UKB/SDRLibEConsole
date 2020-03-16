@@ -45,12 +45,11 @@ void idle_cb(void* data) {
 */
 //----------------------------------------------------
 // Constructor
-MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl_Double_Window(prefs->get_window_w(), prefs->get_window_h()) {
+MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 
-	r_i = radio_interface;
-	p = prefs;
-	int w = p->get_window_w();
-	int h = p->get_window_h();
+	// Get dependent objects from the cache
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
 	resizable(this);
 	color((Fl_Color)24);
@@ -70,22 +69,22 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 
 	// Add start and stop buttons to the group
 	m = grid->get_cell_metrics(0, 0);
-	StartBtn = new ControlButton(this, r_i, start_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+	StartBtn = new ControlButton(this, start_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 	m = grid->get_cell_metrics(0, 1);
-	StopBtn = new ControlButton(this, r_i, stop_str, 1, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	StopBtn = new ControlButton(this, stop_str, 1, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
 	m = grid->get_cell_metrics(1, 0, 2, 3);
-	VFOComponent *c = new VFOComponent(r_i, radio_id, 0, m.x, m.y, m.w, m.h);
+	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
 
 	// Add mode trigger
 	m = grid->get_cell_metrics(1, 3);
-	ModeBtn = new ModeTrigger(this, r_i, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+	ModeBtn = new ModeTrigger(this, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 
 	// Add filter trigger
 	m = grid->get_cell_metrics(2, 3);
-	FilterBtn = new FilterTrigger(this, r_i, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+	FilterBtn = new FilterTrigger(this, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 
 	// Close up and display
 	top_group->end();
@@ -93,11 +92,11 @@ MainWindow::MainWindow(Preferences* prefs, RadioInterface* radio_interface) : Fl
 	show();
 
 	// Create the modes panel hidden
-	modes = new Modes(p, r_i, 230, 80);
+	modes = new Modes(230, 80);
 	modes->hide();
 
 	// Create the filters panel hidden
-	filters = new Filters(p, r_i, 230, 80);
+	filters = new Filters(230, 80);
 	filters->hide();
 
 	Fl::repeat_timeout(1.0, idle_cb, (void*)this);
@@ -186,9 +185,9 @@ void  MainWindow::manage_filter_panel(bool show) {
 
 //==============================================================================
 // Control button (start/stop)
-ControlButton::ControlButton(MainWindow* parent_widget, RadioInterface* radio_interface, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, x, y, w, h, back_col, label_col) {
+ControlButton::ControlButton(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
 	myparent = parent_widget;
-	r_i = radio_interface;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
 }
 
@@ -216,9 +215,9 @@ int ControlButton::handle(int event) {
 
 //==============================================================================
 // Mode button
-ModeTrigger::ModeTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, x, y, w, h, back_col, label_col) {
+ModeTrigger::ModeTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
 	parent = parent_widget;
-	r_i = radio_interface;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
 }
 
@@ -248,9 +247,9 @@ int ModeTrigger::handle(int event) {
 
 //==============================================================================
 // Filter button
-FilterTrigger::FilterTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, x, y, w, h, back_col, label_col) {
+FilterTrigger::FilterTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
 	parent = parent_widget;
-	r_i = radio_interface;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
 }
 

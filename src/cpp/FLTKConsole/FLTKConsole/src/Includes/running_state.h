@@ -40,7 +40,7 @@ The authors can be reached by email at:
 class RSt
 {
 public:
-	static RSt& getInstance()
+	static RSt& inst()
 	{
 		static RSt instance;	// Guaranteed to be destroyed.
 										// Instantiated on first use.
@@ -48,11 +48,14 @@ public:
 	}
 private:
 	RSt() {}                    // Constructor? (the {} brackets) are needed here.
+	// Map for cache of objects
+	std::map < std::string, void* > obj_map;
 
 public:
 	// Delete methods we don't need
 	RSt(RSt const&) = delete;
 	void operator=(RSt const&) = delete;
-
-
+	// API
+	void put_obj(std::string name, void* obj);
+	void* get_obj(std::string name);
 };

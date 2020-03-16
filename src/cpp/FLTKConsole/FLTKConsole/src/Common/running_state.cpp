@@ -46,3 +46,10 @@ The authors can be reached by email at:
 // PUBLIC
 //----------------------------------------------------
 
+void RSt::put_obj(std::string name, void* obj) {
+	obj_map.insert(std::pair<std::string, void*>(name, obj));
+}
+
+void* RSt::get_obj(std::string name) {
+	return obj_map.at(name);
+}

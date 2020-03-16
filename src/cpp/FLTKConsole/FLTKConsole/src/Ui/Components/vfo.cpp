@@ -33,15 +33,18 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-VFOComponent::VFOComponent(RadioInterface* radio_interface, std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
+VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
 {
 	x_ord = x;
 	y_ord = y;
 	width = w;
 	height = h;
 
+	// Get dependent objects from the cache
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
+
 	// Local vars
-	r_i = radio_interface;
 	vfo_type = p_vfo_type;
 	radio_id = p_radio_id;
 	// Create freq_inc_map

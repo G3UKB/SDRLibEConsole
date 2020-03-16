@@ -29,8 +29,8 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Toggle button base
-ToggleButtonBase::ToggleButtonBase(RadioInterface* radio_interface, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
-	r_i = radio_interface;
+ToggleButtonBase::ToggleButtonBase(char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	color((Fl_Color)back_col);
 	labelcolor((Fl_Color)label_col);
 }

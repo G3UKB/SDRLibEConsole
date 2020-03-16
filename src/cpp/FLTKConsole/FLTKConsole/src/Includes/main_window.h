@@ -43,7 +43,7 @@ class MainWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
-	MainWindow(Preferences* prefs, RadioInterface* radio_interface);
+	MainWindow(int w, int h);
 	~MainWindow() {};
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
@@ -92,7 +92,7 @@ class ControlButton : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	ControlButton(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	ControlButton(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
 	~ControlButton() {};
 	int handle(int event);
 
@@ -116,7 +116,7 @@ class ModeTrigger : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	ModeTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	ModeTrigger(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
 	~ModeTrigger() {};
 	int handle(int event);
 
@@ -140,7 +140,7 @@ class FilterTrigger : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	FilterTrigger(MainWindow* parent_widget, RadioInterface* radio_interface, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	FilterTrigger(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
 	~FilterTrigger() {};
 	int handle(int event);
 

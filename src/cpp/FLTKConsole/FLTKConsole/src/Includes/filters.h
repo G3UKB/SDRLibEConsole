@@ -41,7 +41,7 @@ class Filters : public Fl_Window
 {
 public:
 	//==============================================================================
-	Filters(Preferences* prefs, RadioInterface* radio_interface, int w, int h);
+	Filters(int w, int h);
 	~Filters() {};
 
 	//==============================================================================
@@ -113,7 +113,7 @@ class FilterButton : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	FilterButton(Filters *filters, RadioInterface* radio_interface, char* label, int filter_id, metrics m, Fl_Color back_col, Fl_Color label_col);
+	FilterButton(Filters *filters, char* label, int filter_id, metrics m, Fl_Color back_col, Fl_Color label_col);
 	~FilterButton() {};
 
 	//==============================================================================

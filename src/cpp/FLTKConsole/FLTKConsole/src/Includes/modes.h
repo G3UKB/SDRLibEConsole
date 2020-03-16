@@ -41,7 +41,7 @@ class Modes : public Fl_Window
 {
 public:
 	//==============================================================================
-	Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h);
+	Modes(int w, int h);
 	~Modes() {};
 
 	//==============================================================================
@@ -121,7 +121,7 @@ class ModeButton : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	ModeButton(Modes *modes, RadioInterface* radio_interface, char* label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col);
+	ModeButton(Modes *modes, char* label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col);
 	~ModeButton() {};
 
 	//==============================================================================

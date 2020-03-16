@@ -33,10 +33,12 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor/Destructor
-Modes::Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h) : Fl_Window(w, h) {
+Modes::Modes(int w, int h) : Fl_Window(w, h) {
 
-	p = prefs;
-	r_i = radio_interface;
+	// Get dependent objects from the cache
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
+
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
@@ -57,7 +59,7 @@ Modes::Modes(Preferences* prefs, RadioInterface* radio_interface, int w, int h) 
 	metrics m;
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		m_b.items[i].mode = new ModeButton(this, r_i, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
+		m_b.items[i].mode = new ModeButton(this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == mode) {
 			m_b.items[i].mode->set();
 			r_i->ri_server_set_rx_mode(0, mode);
@@ -96,9 +98,9 @@ void Modes::handle_mode_button_state(int id) {
 
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(Modes *top_level, RadioInterface* radio_interface, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(radio_interface, button_label, m.x, m.y, m.w, m.h, back_col, label_col) {
+ModeButton::ModeButton(Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, m.x, m.y, m.w, m.h, back_col, label_col) {
 	t_l = top_level;
-	r_i = radio_interface;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = mode_id;
 }
 

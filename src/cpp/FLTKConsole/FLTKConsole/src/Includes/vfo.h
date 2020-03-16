@@ -80,7 +80,7 @@ class VFOComponent : public Fl_Group
 {
 public:
 	//==============================================================================
-	VFOComponent(RadioInterface* r_i, std::string p_vfo_id, int p_vfo_type, int x, int y, int w, int h);
+	VFOComponent(std::string p_vfo_id, int p_vfo_type, int x, int y, int w, int h);
 	~VFOComponent();
 
 	//==============================================================================
@@ -103,6 +103,7 @@ private:
 	int width;
 	int height;
 
+	Preferences* p;
 	RadioInterface* r_i;
 	int vfo_type = RX;			// RX|TX
 	std::string radio_id = "";	// Radio id of VFO instance

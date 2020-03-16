@@ -42,7 +42,7 @@ class ToggleButtonBase : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
-	ToggleButtonBase(RadioInterface* radio_interface, char* label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	ToggleButtonBase(char* label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
 	~ToggleButtonBase() {};
 
 	//==============================================================================

@@ -36,9 +36,11 @@ int main(int argc, char **argv) {
 
 	// Create preferences
 	prefs = new Preferences();
+	RSt::inst().put_obj("PREFS", (void*)prefs);
 
 	// Create radio interface
 	r_i = new RadioInterface();
+	RSt::inst().put_obj("RADIO-IF", (void*)r_i);
 
 	// Make wisdom file if not already made
 #ifdef linux
@@ -64,7 +66,8 @@ int main(int argc, char **argv) {
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
 	// Create the main window
-	Fl_Window* main_window = new MainWindow(prefs, r_i);
+	Fl_Window* main_window = new MainWindow(prefs->get_window_w(), prefs->get_window_h());
+	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
 	// Run event loop until quit
 	return Fl::run();
