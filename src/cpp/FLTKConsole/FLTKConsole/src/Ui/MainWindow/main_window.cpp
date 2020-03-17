@@ -36,7 +36,7 @@ The authors can be reached by email at:
 // We call back to the window to do housekeeping
 void idle_cb(void* data) {
 	MainWindow* w = (MainWindow*)data;
-	Fl::repeat_timeout(0.2, idle_cb);
+	//Fl::add_timeout(0.2, idle_cb);
 	w->handle_idle_timeout();
 }
 
@@ -108,7 +108,7 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	filters->hide();
 
 	// Set an idle timeout
-	Fl::repeat_timeout(1.0, idle_cb, (void*)this);
+	Fl::add_timeout(0.2, idle_cb, (void*)this);
 }
 
 //===================================================
@@ -146,6 +146,7 @@ int MainWindow::handle(int event) {
 void MainWindow::handle_idle_timeout() {
 	// Handle enable/disable of controls here
 	bool discovered = RSt::inst().get_discovered();
+	
 	if(discovered) {
 		StartBtn->activate();
 		DiscoverBtn->deactivate();
