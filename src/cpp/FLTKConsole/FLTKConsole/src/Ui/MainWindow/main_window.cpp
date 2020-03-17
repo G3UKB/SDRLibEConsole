@@ -36,7 +36,7 @@ The authors can be reached by email at:
 // We call back to the window to do housekeeping
 void idle_cb(void* data) {
 	MainWindow* w = (MainWindow*)data;
-	Fl::repeat_timeout(1.0, idle_cb);
+	Fl::repeat_timeout(0.2, idle_cb);
 	w->handle_idle_timeout();
 }
 
@@ -69,9 +69,9 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 
 	// Add start and stop buttons to the group
 	m = grid->get_cell_metrics(0, 0);
-	StartBtn = new ControlButton(this, start_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+	StartBtn = new ControlButton(this, start_str, stop_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	m = grid->get_cell_metrics(0, 1);
-	StopBtn = new ControlButton(this, stop_str, 1, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
@@ -88,7 +88,15 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 
 	// Close up and display
 	top_group->end();
+	// Finish up
 	end();
+	// Initially deactivate all buttons
+	StartBtn->deactivate();
+	DiscoverBtn->deactivate();
+	ModeBtn->deactivate();
+	FilterBtn->deactivate();
+
+	// Display main window
 	show();
 
 	// Create the modes panel hidden
@@ -99,6 +107,7 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	filters = new Filters(230, 80);
 	filters->hide();
 
+	// Set an idle timeout
 	Fl::repeat_timeout(1.0, idle_cb, (void*)this);
 }
 
@@ -136,20 +145,18 @@ int MainWindow::handle(int event) {
 // Handle idle timeout
 void MainWindow::handle_idle_timeout() {
 	// Handle enable/disable of controls here
-}
-
-//----------------------------------------------------
-// Handle control button state
-void MainWindow::handle_button_state(int id) {
-	if (id == 0) {
-		// Start button pressed
-		StartBtn->set();
-		StopBtn->clear();
+	bool discovered = RSt::inst().get_discovered();
+	if(discovered) {
+		StartBtn->activate();
+		DiscoverBtn->deactivate();
+		ModeBtn->activate();
+		FilterBtn->activate();
 	}
-	else if (id == 1) {
-		// Stop button pressed
-		StartBtn->clear();
-		StopBtn->set();
+	else {
+		StartBtn->deactivate();
+		DiscoverBtn->activate();
+		ModeBtn->deactivate();
+		FilterBtn->deactivate();
 	}
 }
 
@@ -185,8 +192,12 @@ void  MainWindow::manage_filter_panel(bool show) {
 
 //==============================================================================
 // Control button (start/stop)
-ControlButton::ControlButton(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
+ControlButton::ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : ToggleButtonBase(button_up_label, x, y, w, h, back_col, button_up_col) {
 	myparent = parent_widget;
+	up_label = button_up_label;
+	down_label = button_down_label;
+	up_col = button_up_col;
+	down_col = button_down_col;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
 }
@@ -197,19 +208,58 @@ int ControlButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
 		if (id == 0) {
-			// Start events
-			r_i->ri_radio_start(0);
-			RSt::inst().set_radio_running(true);
-			myparent->handle_button_state(id);
-		}
-		else if (id == 1) {
-			// Stop events
-			r_i->ri_radio_stop();
-			RSt::inst().set_radio_running(false);
-			myparent->handle_button_state(id);
+			// Start/stop events
+			bool running = RSt::inst().get_radio_running();
+			if (running) {
+				// Stop event
+				r_i->ri_radio_stop();
+				RSt::inst().set_radio_running(false);
+				clear();
+				label(up_label);
+				labelcolor(up_col);
+			}
+			else {
+				// Start event
+				r_i->ri_radio_start(0);
+				RSt::inst().set_radio_running(true);
+				set();
+				label(down_label);
+				labelcolor(down_col);
+			}
 		}
 		return 1;
 	}
+	default:
+		return Fl_Widget::handle(event);
+	}
+}
+
+//==============================================================================
+// Discover button
+DiscoverButton::DiscoverButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Button(x, y, w, h, button_label) {
+	myparent = parent_widget;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
+}
+
+//----------------------------------------------------
+// Handle click event
+int DiscoverButton::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		// Discover event
+		if (r_i->ri_radio_discover()) {
+			RSt::inst().set_discovered(true);
+			if (r_i->ri_server_start())
+				RSt::inst().set_server_running(true);
+			else
+				std::cout << std::endl << "Failed to start server!" << std::endl;
+		}
+		else
+			std::cout << std::endl << "Failed to discover radio!" << std::endl;
+		return 1;	
+		}
 	default:
 		return Fl_Widget::handle(event);
 	}

@@ -37,6 +37,7 @@ The authors can be reached by email at:
 	The one and only main window
 */
 class ControlButton;
+class DiscoverButton;
 class ModeTrigger;
 class FilterTrigger;
 class MainWindow : public Fl_Double_Window
@@ -47,7 +48,6 @@ public:
 	~MainWindow() {};
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
-	void handle_button_state(int id);
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
 	void handle_idle_timeout();
@@ -63,6 +63,7 @@ private:
 	char radio_id[10] = "radio-1";
 	char mode_str[10] = "Mode";
 	char filter_str[10] = "Filter";
+	char discover_str[10] = "Discover";
 
 	// Preferences
 	Preferences* p;
@@ -75,7 +76,7 @@ private:
 
 	// Components
 	ControlButton* StartBtn;
-	ControlButton* StopBtn;
+	DiscoverButton* DiscoverBtn;
 	ModeTrigger* ModeBtn;
 	Modes *modes;
 	FilterTrigger* FilterBtn;
@@ -92,7 +93,7 @@ class ControlButton : public ToggleButtonBase
 {
 public:
 	//==============================================================================
-	ControlButton(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
 	~ControlButton() {};
 	int handle(int event);
 
@@ -103,6 +104,33 @@ private:
 	// State variables
 	RadioInterface* r_i;
 	int id;
+	char* up_label;
+	char* down_label;
+	Fl_Color up_col;
+	Fl_Color down_col;
+	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+//==============================================================================
+// The start/stop button
+class DiscoverButton : public Fl_Button
+{
+public:
+	//==============================================================================
+	DiscoverButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_col);
+	~DiscoverButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
 	MainWindow* myparent;
 
 	//==============================================================================
