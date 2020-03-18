@@ -36,8 +36,8 @@ The authors can be reached by email at:
 // We call back to the window to do housekeeping
 void idle_cb(void* data) {
 	MainWindow* w = (MainWindow*)data;
-	//Fl::add_timeout(0.2, idle_cb);
 	w->handle_idle_timeout();
+	Fl::repeat_timeout(0.2, idle_cb, data);
 }
 
 /*
@@ -145,20 +145,23 @@ int MainWindow::handle(int event) {
 // Handle idle timeout
 void MainWindow::handle_idle_timeout() {
 	// Handle enable/disable of controls here
+	static int last_discovered = -1;
 	bool discovered = RSt::inst().get_discovered();
-	
-	if(discovered) {
-		StartBtn->activate();
-		DiscoverBtn->deactivate();
-		ModeBtn->activate();
-		FilterBtn->activate();
+	if (discovered != last_discovered) {
+		if (discovered) {
+			StartBtn->activate();
+			DiscoverBtn->deactivate();
+			ModeBtn->activate();
+			FilterBtn->activate();
+		}
+		else {
+			StartBtn->deactivate();
+			DiscoverBtn->activate();
+			ModeBtn->deactivate();
+			FilterBtn->deactivate();
+		}
 	}
-	else {
-		StartBtn->deactivate();
-		DiscoverBtn->activate();
-		ModeBtn->deactivate();
-		FilterBtn->deactivate();
-	}
+	last_discovered = discovered;
 }
 
 //----------------------------------------------------
