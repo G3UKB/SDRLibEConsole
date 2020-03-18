@@ -108,8 +108,8 @@ private:
 };
 
 //==============================================================================
-// A mode button
-class FilterButton : public ToggleButtonBase
+// A filters button
+class FilterButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================

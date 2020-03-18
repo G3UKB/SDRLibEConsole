@@ -117,7 +117,7 @@ private:
 
 //==============================================================================
 // A mode button
-class ModeButton : public ToggleButtonBase
+class ModeButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================

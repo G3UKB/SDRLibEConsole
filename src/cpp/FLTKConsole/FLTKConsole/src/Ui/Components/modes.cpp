@@ -98,10 +98,12 @@ void Modes::handle_mode_button_state(int id) {
 
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, m.x, m.y, m.w, m.h, back_col, label_col) {
+ModeButton::ModeButton(Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
 	t_l = top_level;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = mode_id;
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
 }
 
 //----------------------------------------------------

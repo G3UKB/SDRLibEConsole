@@ -89,7 +89,7 @@ private:
 
 //==============================================================================
 // The start/stop button
-class ControlButton : public ToggleButtonBase
+class ControlButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
@@ -140,7 +140,7 @@ private:
 
 //==============================================================================
 // The mode button class
-class ModeTrigger : public ToggleButtonBase
+class ModeTrigger : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
@@ -164,7 +164,7 @@ private:
 
 //==============================================================================
 // The filter button class
-class FilterTrigger : public ToggleButtonBase
+class FilterTrigger : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================

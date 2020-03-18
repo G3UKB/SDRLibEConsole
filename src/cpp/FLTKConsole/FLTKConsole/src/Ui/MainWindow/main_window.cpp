@@ -196,13 +196,15 @@ void  MainWindow::manage_filter_panel(bool show) {
 
 //==============================================================================
 // Control button (start/stop)
-ControlButton::ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : ToggleButtonBase(button_up_label, x, y, w, h, back_col, button_up_col) {
+ControlButton::ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
 	myparent = parent_widget;
 	up_label = button_up_label;
 	down_label = button_down_label;
 	up_col = button_up_col;
 	down_col = button_down_col;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)button_up_col);
 	id = button_id;
 }
 
@@ -271,10 +273,12 @@ int DiscoverButton::handle(int event) {
 
 //==============================================================================
 // Mode button
-ModeTrigger::ModeTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
+ModeTrigger::ModeTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
 	parent = parent_widget;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
 }
 
 //----------------------------------------------------
@@ -303,10 +307,12 @@ int ModeTrigger::handle(int event) {
 
 //==============================================================================
 // Filter button
-FilterTrigger::FilterTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : ToggleButtonBase(button_label, x, y, w, h, back_col, label_col) {
+FilterTrigger::FilterTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
 	parent = parent_widget;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = button_id;
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
 }
 
 //----------------------------------------------------
