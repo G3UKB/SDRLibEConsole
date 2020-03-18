@@ -68,6 +68,9 @@ void Preferences::save() {
 
 	// RADIO
 	Fl_Preferences radio(root, "RADIO");
+	radio.set("freq-1", radio_freq[0]);
+	radio.set("freq-2", radio_freq[1]);
+	radio.set("freq-3", radio_freq[2]);
 	radio.set("mode-1", radio_mode[0]);
 	radio.set("mode-2", radio_mode[1]);
 	radio.set("mode-3", radio_mode[2]);
@@ -108,6 +111,12 @@ void Preferences::set_window_h(int h) {
 
 //----------------------------------------------------
 // RADIO
+int Preferences::get_freq(int radio) {
+	return radio_freq[radio];
+}
+void Preferences::set_freq(int radio, int freq) {
+	radio_freq[radio] = freq;
+}
 int Preferences::get_mode(int radio) {
 	return radio_mode[radio];
 }
@@ -138,6 +147,9 @@ void Preferences::restore() {
 
 	// Read the radio data
 	Fl_Preferences radio(root, "RADIO");
+	radio.get("freq-1", radio_freq[0], radio_freq[0]);
+	radio.get("freq-2", radio_freq[1], radio_freq[1]);
+	radio.get("freq-3", radio_freq[2], radio_freq[2]);
 	radio.get("mode-1", radio_mode[0], radio_mode[0]);
 	radio.get("mode-2", radio_mode[1], radio_mode[1]);
 	radio.get("mode-3", radio_mode[2], radio_mode[2]);

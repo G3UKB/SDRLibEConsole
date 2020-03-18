@@ -78,12 +78,18 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	m = grid->get_cell_metrics(1, 0, 2, 3);
 	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
 
-	// Add mode trigger
-	m = grid->get_cell_metrics(1, 3);
+	// We place the radio buttons into another grid
+	// Get metrics from grid
+	m = grid->get_cell_metrics(1, 3, 2, 1);
+	// Create grid_1 with the new metrics
+	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
+
+	// Add mode trigger in grid_1
+	m = grid_1->get_cell_metrics(0, 0);
 	ModeBtn = new ModeTrigger(this, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 
-	// Add filter trigger
-	m = grid->get_cell_metrics(2, 3);
+	// Add filter trigger in grid_1
+	m = grid_1->get_cell_metrics(1, 0);
 	FilterBtn = new FilterTrigger(this, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
 
 	// Close up and display

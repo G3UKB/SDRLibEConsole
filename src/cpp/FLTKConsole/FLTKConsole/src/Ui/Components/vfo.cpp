@@ -66,13 +66,11 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	create_digits();
 
 	// Update frequency
-	int freq = 7100000;
-	current_freq = freq;
+	current_freq = p->get_freq(0);
 
-	convertFreq(freq);
-	set_display_freq(convertFreq(7100000));
+	convertFreq(current_freq);
+	set_display_freq(convertFreq(current_freq));
 	set_radio_freq();
-
 }
 
 VFOComponent::~VFOComponent()
@@ -94,6 +92,7 @@ void VFOComponent::freq_plus() {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
+			p->set_freq(0, current_freq);
 		}
 	}
 }
@@ -105,6 +104,7 @@ void VFOComponent::freq_minus() {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
+			p->set_freq(0, current_freq);
 		}
 	}
 }

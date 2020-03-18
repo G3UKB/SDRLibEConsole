@@ -61,7 +61,6 @@ The authors can be reached by email at:
 #include "radio_interface.h"
 #include "vfo.h"
 #include "layout_manager.h"
-#include "toggle_base.h"
 #include "modes.h"
 #include "filters.h"
 #include "main_window.h"

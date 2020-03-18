@@ -59,6 +59,8 @@ public:
 	void set_window_w(int w);
 	void set_window_h(int h);
 	// Radio mode, filter etc
+	int get_freq(int radio);
+	void set_freq(int radio, int freq);
 	int get_mode(int radio);
 	void set_mode(int radio, int filter);
 	int get_filter(int radio);
@@ -79,6 +81,7 @@ private:
 	int window_w;
 	int window_h;
 	// Radio mode, filter etc
+	int radio_freq[3] = { 7100000,7100000,7100000 };
 	int radio_mode[3] = { 0,0,0 };
 	int radio_filter[3] = { 2,2,2 };
 
