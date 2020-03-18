@@ -67,11 +67,15 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	GridLayout *grid = new GridLayout(5, 5, w - 10, h - 10, 3, 4, 5);
 	metrics m;
 
-	// Add start and stop buttons to the group
+	// Add start/stop buttons to the group
 	m = grid->get_cell_metrics(0, 0);
 	StartBtn = new ControlButton(this, start_str, stop_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	// Add discover button
 	m = grid->get_cell_metrics(0, 1);
 	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	// Add audio buton
+	m = grid->get_cell_metrics(0, 3);
+	AudioBtn = new AudioTrigger(this, audio_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
@@ -338,6 +342,29 @@ int FilterTrigger::handle(int event) {
 			// Button depressed
 			set();
 		}
+		return 1;
+	}
+	default:
+		return Fl_Widget::handle(event);
+	}
+}
+
+//==============================================================================
+// Audio button
+AudioTrigger::AudioTrigger(MainWindow* parent_widget, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
+	parent = parent_widget;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	id = button_id;
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)label_col);
+}
+
+//----------------------------------------------------
+// Handle click event
+int AudioTrigger::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		
 		return 1;
 	}
 	default:
