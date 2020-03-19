@@ -44,6 +44,11 @@ public:
 	~Audio() {};
 
 	//==============================================================================
+	// Method prototypes
+	void handle_apply();
+	void handle_cancel();
+
+	//==============================================================================
 
 private:
 	//==============================================================================
@@ -52,6 +57,15 @@ private:
 	Preferences* p;
 	// Ref to set radio parameters
 	RadioInterface* r_i;
+
+	Fl_Choice* sink;
+	Fl_Choice* device;
+	Fl_Radio_Light_Button* left;
+	Fl_Radio_Light_Button* right;
+	Fl_Radio_Light_Button* both;
+	Fl_Radio_Light_Button* none;
+	Fl_Button* apply;
+	Fl_Button* cancel;
 
 	//==============================================================================
 	// Method prototypes

@@ -31,6 +31,14 @@ The authors can be reached by email at:
 // Main Audio Component Window
 //==============================================================================
 
+void apply_cb(void* user_data) {
+	((Audio*)user_data)->handle_apply();
+}
+
+void cancel_cb(void* user_data) {
+	((Audio*)user_data)->handle_cancel();
+}
+
 //----------------------------------------------------
 // Constructor/Destructor
 Audio::Audio(int w, int h) : Fl_Window(w, h) {
@@ -61,32 +69,49 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	
 	// Add choices
 	m = grid->get_cell_metrics(0, 1, 1, 4);
-	Fl_Choice* sink = new Fl_Choice(m.x, m.y, m.w, m.h);
+	sink = new Fl_Choice(m.x, m.y, m.w, m.h);
+	sink->add("HPSDR", 0, 0);
+	sink->add("Local-AF", 0, 0);
+	sink->add("Local-IQ", 0, 0);
 	m = grid->get_cell_metrics(1, 1, 1, 4);
-	Fl_Choice* device = new Fl_Choice(m.x, m.y, m.w, m.h);
+	device = new Fl_Choice(m.x, m.y, m.w, m.h);
 
 	// Add channel selection
 	m = grid->get_cell_metrics(2, 1, 1, 4);
 	Fl_Group *ch_group = new Fl_Group(m.x, m.y, m.w, m.h);
 	m = grid->get_cell_metrics(2, 1);
-	Fl_Radio_Light_Button* left = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Left");
+	left = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Left");
 	m = grid->get_cell_metrics(2, 2);
-	Fl_Radio_Light_Button* right = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Right");
+	right = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Right");
 	m = grid->get_cell_metrics(2, 3);
-	Fl_Radio_Light_Button* both = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Both");
+	both = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Both");
 	m = grid->get_cell_metrics(2, 4);
-	Fl_Radio_Light_Button* none = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "None");
+	none = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "None");
 	ch_group->end();
 
 	// Add buttons
 	m = grid->get_cell_metrics(3, 3);
-	Fl_Button* apply = new Fl_Button(m.x, m.y, m.w, m.h, "Apply");
+	apply = new Fl_Button(m.x, m.y, m.w, m.h, "Apply");
+	apply->callback((Fl_Callback*)apply_cb, (void*)this);
 	m = grid->get_cell_metrics(3, 4);
-	Fl_Button* cancel = new Fl_Button(m.x, m.y, m.w, m.h, "Cancel");
+	cancel = new Fl_Button(m.x, m.y, m.w, m.h, "Cancel");
+	cancel->callback((Fl_Callback*)cancel_cb, (void*)this);
 
 	// Close up and display
 	top_group->end();
 	end();
 	border(false);
 	show();
+}
+
+//----------------------------------------------------
+// Apply current state as a new audio path
+void Audio::handle_apply() {
+	
+}
+
+//----------------------------------------------------
+// Cancel changes?
+void Audio::handle_cancel() {
+	
 }
