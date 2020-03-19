@@ -51,6 +51,7 @@ public:
 	int handle(int event);
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
+	void manage_audio_panel(bool show);
 	void handle_idle_timeout();
 
 	//==============================================================================
@@ -81,6 +82,7 @@ private:
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
 	AudioTrigger* AudioBtn;
+	Audio* audio;
 	ModeTrigger* ModeBtn;
 	Modes *modes;
 	FilterTrigger* FilterBtn;

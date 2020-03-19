@@ -109,6 +109,10 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	// Display main window
 	show();
 
+	// Create the audio panel hidden
+	audio = new Audio(400, 130);
+	audio->hide();
+
 	// Create the modes panel hidden
 	modes = new Modes(230, 80);
 	modes->hide();
@@ -172,6 +176,21 @@ void MainWindow::handle_idle_timeout() {
 		}
 	}
 	last_discovered = discovered;
+}
+
+//----------------------------------------------------
+// Show or hide the audio panel
+void  MainWindow::manage_audio_panel(bool show) {
+
+	if (show) {
+		int x = p->get_window_x() + p->get_window_w() + 5;
+		int y = p->get_window_y();
+		audio->position(x, y);
+		audio->show();
+	}
+	else {
+		audio->hide();
+	}
 }
 
 //----------------------------------------------------
@@ -364,7 +383,18 @@ AudioTrigger::AudioTrigger(MainWindow* parent_widget, char* button_label, int bu
 int AudioTrigger::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
-		
+		if (value()) {
+			// Hide 
+			parent->manage_audio_panel(false);
+			// Button release
+			clear();
+		}
+		else {
+			// Show
+			parent->manage_audio_panel(true);
+			// Button depressed
+			set();
+		}
 		return 1;
 	}
 	default:
