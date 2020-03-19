@@ -51,21 +51,34 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	// Create a grid layout handler
 	GridLayout *grid = new GridLayout(5, 5, w - 10, h - 10, 4, 5, 5);
 	metrics m;
-	// Add chooices
+	// Add labels
+	m = grid->get_cell_metrics(0, 0);
+	Fl_Box* l_sink = new Fl_Box(m.x, m.y, m.w, m.h, "Sink");
+	m = grid->get_cell_metrics(1, 0);
+	Fl_Box* l_dev = new Fl_Box(m.x, m.y, m.w, m.h, "Dev");
+	m = grid->get_cell_metrics(2, 0);
+	Fl_Box* l_ch = new Fl_Box(m.x, m.y, m.w, m.h, "Ch");
+	
+	// Add choices
 	m = grid->get_cell_metrics(0, 1, 1, 4);
 	Fl_Choice* sink = new Fl_Choice(m.x, m.y, m.w, m.h);
 	m = grid->get_cell_metrics(1, 1, 1, 4);
 	Fl_Choice* device = new Fl_Choice(m.x, m.y, m.w, m.h);
-	// Add 
-	m = grid->get_cell_metrics(2, 1);
-	Fl_Check_Button* left = new Fl_Check_Button(m.x, m.y, m.w, m.h, "Left");
-	m = grid->get_cell_metrics(2, 2);
-	Fl_Check_Button* right = new Fl_Check_Button(m.x, m.y, m.w, m.h, "Right");
-	m = grid->get_cell_metrics(2, 3);
-	Fl_Check_Button* both = new Fl_Check_Button(m.x, m.y, m.w, m.h, "Both");
-	m = grid->get_cell_metrics(2, 4);
-	Fl_Check_Button* none = new Fl_Check_Button(m.x, m.y, m.w, m.h, "None");
 
+	// Add channel selection
+	m = grid->get_cell_metrics(2, 1, 1, 4);
+	Fl_Group *ch_group = new Fl_Group(m.x, m.y, m.w, m.h);
+	m = grid->get_cell_metrics(2, 1);
+	Fl_Radio_Light_Button* left = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Left");
+	m = grid->get_cell_metrics(2, 2);
+	Fl_Radio_Light_Button* right = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Right");
+	m = grid->get_cell_metrics(2, 3);
+	Fl_Radio_Light_Button* both = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "Both");
+	m = grid->get_cell_metrics(2, 4);
+	Fl_Radio_Light_Button* none = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "None");
+	ch_group->end();
+
+	// Add buttons
 	m = grid->get_cell_metrics(3, 3);
 	Fl_Button* apply = new Fl_Button(m.x, m.y, m.w, m.h, "Apply");
 	m = grid->get_cell_metrics(3, 4);

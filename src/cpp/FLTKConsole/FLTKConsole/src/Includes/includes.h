@@ -44,6 +44,8 @@ The authors can be reached by email at:
 	#include <FL/Fl_Toggle_Button.H>
 	#include <FL/Fl_Choice.H>
 	#include <FL/Fl_Check_Button.H>
+	#include <FL/Fl_Radio_Round_Button.H>
+	#include <FL/Fl_Radio_Light_Button.H>
 #else
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Preferences.H"
@@ -56,6 +58,8 @@ The authors can be reached by email at:
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Toggle_Button.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Choice.H";
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Check_Button.H";
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Round_Button.H";
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Light_Button.H";
 #endif
 
 // Application includes
