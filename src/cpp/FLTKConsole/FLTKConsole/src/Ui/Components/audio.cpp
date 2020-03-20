@@ -69,12 +69,24 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	
 	// Add choices
 	m = grid->get_cell_metrics(0, 1, 1, 4);
+	// Sink selection
 	sink = new Fl_Choice(m.x, m.y, m.w, m.h);
-	sink->add("HPSDR", 0, 0);
-	sink->add("Local-AF", 0, 0);
-	sink->add("Local-IQ", 0, 0);
+	sink->add("HPSDR");
+	sink->add("Local-AF");
+	sink->add("Local-IQ");
 	m = grid->get_cell_metrics(1, 1, 1, 4);
+	// Device selection
 	device = new Fl_Choice(m.x, m.y, m.w, m.h);
+	// Get the output enumeration
+	DeviceEnumList* audio_outputs = c_server_enum_audio_outputs();
+	// Populate the list
+	char str[100];
+	for (int i = 0; i < audio_outputs->entries; i++) {
+		strcpy_s(str, 100, audio_outputs->devices[i].name);
+		strcat_s(str, 100, ":");
+		strcat_s(str, 100, audio_outputs->devices[i].host_api);
+		device->add(str);
+	}
 
 	// Add channel selection
 	m = grid->get_cell_metrics(2, 1, 1, 4);
