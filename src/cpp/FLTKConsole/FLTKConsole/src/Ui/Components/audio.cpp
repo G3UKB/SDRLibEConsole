@@ -31,12 +31,9 @@ The authors can be reached by email at:
 // Main Audio Component Window
 //==============================================================================
 
-void apply_cb(void* user_data) {
+void apply_cb(Fl_Widget* w, void* user_data) {
+	// Call down to our Audio instance
 	((Audio*)user_data)->handle_apply();
-}
-
-void cancel_cb(void* user_data) {
-	((Audio*)user_data)->handle_cancel();
 }
 
 //----------------------------------------------------
@@ -101,13 +98,10 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	none = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "None");
 	ch_group->end();
 
-	// Add buttons
-	m = grid->get_cell_metrics(3, 3);
+	// Add apply button
+	m = grid->get_cell_metrics(3, 4);
 	apply = new Fl_Button(m.x, m.y, m.w, m.h, "Apply");
 	apply->callback((Fl_Callback*)apply_cb, (void*)this);
-	m = grid->get_cell_metrics(3, 4);
-	cancel = new Fl_Button(m.x, m.y, m.w, m.h, "Cancel");
-	cancel->callback((Fl_Callback*)cancel_cb, (void*)this);
 
 	// Close up and display
 	top_group->end();
@@ -119,11 +113,23 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 //----------------------------------------------------
 // Apply current state as a new audio path
 void Audio::handle_apply() {
-	
-}
+	// Gather all the required information
+	char sink_str[10];
+	char dev_str[100];
+	char ch_str[10];
+	strcpy_s(sink_str, 9, ((Fl_Choice*)sink)->text());
+	strcpy_s(dev_str, 100, ((Fl_Choice*)device)->text());
+	if (((Fl_Radio_Light_Button*)left)->value()) {
+		strcpy_s(ch_str, 10, "left");
+	}
+	else if (((Fl_Radio_Light_Button*)right)->value()) {
+		strcpy_s(ch_str, 10, "right");
+	}
+	else {
+		strcpy_s(ch_str, 10, "both");
+	}
+	printf("%s,%s,%s\n", sink_str, dev_str, ch_str);
 
-//----------------------------------------------------
-// Cancel changes?
-void Audio::handle_cancel() {
-	
+	// Now reset the audio path for this receiver 
+	// and set in the new path.
 }
