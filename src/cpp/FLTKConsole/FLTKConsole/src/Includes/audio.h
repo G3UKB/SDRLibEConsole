@@ -36,6 +36,11 @@ The authors can be reached by email at:
 /*
 	A modes window component
 */
+enum class AudioType {
+	INPUT,
+	OUTPUT
+};
+
 class Audio : public Fl_Window
 {
 public:

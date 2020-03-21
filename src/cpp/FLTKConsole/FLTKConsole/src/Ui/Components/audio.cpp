@@ -116,6 +116,8 @@ void Audio::handle_apply() {
 	// Gather all the required information
 	char sink_str[10];
 	char dev_str[100];
+	char *dev_part;
+	char *api_part;
 	char ch_str[10];
 	strcpy_s(sink_str, 9, ((Fl_Choice*)sink)->text());
 	strcpy_s(dev_str, 100, ((Fl_Choice*)device)->text());
@@ -129,7 +131,21 @@ void Audio::handle_apply() {
 		strcpy_s(ch_str, 10, "both");
 	}
 	printf("%s,%s,%s\n", sink_str, dev_str, ch_str);
+	// Split the dev part
+	dev_part = strtok_s(dev_str, ":", &api_part);
 
 	// Now reset the audio path for this receiver 
-	// and set in the new path.
+	if (!c_server_clear_audio_routes()) {
+		std::cout << "Failed to clear audio routes!" << std::endl;
+		return;
+	}
+	// Set the new path
+	c_server_set_audio_route(
+		(int)AudioType::OUTPUT,
+		sink_str,
+		0,
+		api_part,
+		dev_part,
+		ch_str
+	);
 }
