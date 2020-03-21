@@ -119,20 +119,31 @@ void Audio::handle_apply() {
 	char *dev_part;
 	char *api_part;
 	char ch_str[10];
-	strcpy_s(sink_str, 9, ((Fl_Choice*)sink)->text());
+
+	// Set sink type
+	if (strcmp(((Fl_Choice*)sink)->text(), "LOCAL-AF")) {
+		strcpy_s(sink_str, 9, "Local/AF");
+	} else if (strcmp(((Fl_Choice*)sink)->text(), "LOCAL-IQ")) {
+		strcpy_s(sink_str, 9, "Local/IQ");
+	} else if (strcmp(((Fl_Choice*)sink)->text(), "HPSDR")) {
+		strcpy_s(sink_str, 9, "HPSDR");
+	}
+
+	// Set dev type
 	strcpy_s(dev_str, 100, ((Fl_Choice*)device)->text());
-	if (((Fl_Radio_Light_Button*)left)->value()) {
-		strcpy_s(ch_str, 10, "left");
-	}
-	else if (((Fl_Radio_Light_Button*)right)->value()) {
-		strcpy_s(ch_str, 10, "right");
-	}
-	else {
-		strcpy_s(ch_str, 10, "both");
-	}
-	printf("%s,%s,%s\n", sink_str, dev_str, ch_str);
 	// Split the dev part
 	dev_part = strtok_s(dev_str, ":", &api_part);
+
+	// Set channel type
+	if (((Fl_Radio_Light_Button*)left)->value()) {
+		strcpy_s(ch_str, 10, "LEFT");
+	}
+	else if (((Fl_Radio_Light_Button*)right)->value()) {
+		strcpy_s(ch_str, 10, "RIGHT");
+	}
+	else {
+		strcpy_s(ch_str, 10, "BOTH");
+	}
 
 	// Now reset the audio path for this receiver 
 	if (!c_server_clear_audio_routes()) {
@@ -143,9 +154,11 @@ void Audio::handle_apply() {
 	c_server_set_audio_route(
 		(int)AudioType::OUTPUT,
 		sink_str,
-		0,
+		1,
 		api_part,
 		dev_part,
 		ch_str
 	);
+	// Restart audio
+	c_server_restart_audio_routes();
 }
