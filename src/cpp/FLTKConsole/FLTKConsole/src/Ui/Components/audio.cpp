@@ -47,7 +47,7 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
-
+	
 	// Add a group box
 	Fl_Group *top_group = new Fl_Group(5, 5, w - 10, h - 10);
 	top_group->box(FL_GTK_THIN_UP_BOX);
@@ -107,6 +107,68 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 	top_group->end();
 	end();
 	border(false);
+
+	// Retrieve audio path
+	char* p_audio_path = p->get_audio_path(1);
+	char audio_path[100];
+	strcpy_s(audio_path, 100, p_audio_path);
+	if (strlen(audio_path) > 0) {
+		// We have a path to set
+		// Otherwise the default path set in main init applies
+		char* sink_part;
+		char* dev_part;
+		char* api_part;
+		char* ch_part;
+		// Split into tokens
+		sink_part = strtok_s(audio_path, ":", &sink_part);
+		dev_part = strtok_s(audio_path, ":", &dev_part);
+		api_part = strtok_s(audio_path, ":", &api_part);
+		ch_part = strtok_s(audio_path, ":", &ch_part);
+
+		// Set the widget state
+		// Set sink
+		if (strcmp(sink_part, "Local/AF")) {
+			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("LOCAL_AF"));
+		}
+		else if (strcmp(sink_part, "Local/IQ")) {
+			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("LOCAL_IQ"));
+		}
+		else if (strcmp(sink_part, "HPSDR")) {
+			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
+		}
+		// Set device
+		((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(dev_part));
+		// Set channel
+		if (strcmp(ch_part, "LEFT")) {
+			((Fl_Radio_Light_Button*)left)->set();
+		}
+		if (strcmp(ch_part, "RIGHT")) {
+			((Fl_Radio_Light_Button*)right)->set();
+		}
+		if (strcmp(ch_part, "BOTH")) {
+			((Fl_Radio_Light_Button*)both)->set();
+		}
+
+		// Set the new audio path
+		// Now reset the audio path for this receiver 
+		if (!c_server_clear_audio_routes()) {
+			std::cout << "Failed to clear audio routes!" << std::endl;
+			return;
+		}
+		// Set the new path
+		c_server_set_audio_route(
+			(int)AudioType::OUTPUT,
+			sink_part,
+			1,
+			api_part,
+			dev_part,
+			ch_part
+		);
+		// Restart audio
+		c_server_restart_audio_routes();
+	}
+
+	// Finally show window
 	show();
 }
 
@@ -169,6 +231,5 @@ void Audio::handle_apply() {
 	strcat_s(current_route, 100, dev_str);
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, ch_str);
-	//p->set_audio_path(1, current_route);
-	printf("%s", current_route);
+	p->set_audio_path(1, current_route);
 }

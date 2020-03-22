@@ -177,14 +177,7 @@ void Preferences::restore() {
 	radio.get("filter-2", radio_filter[1], radio_filter[1]);
 	radio.get("filter-3", radio_filter[2], radio_filter[2]);
 	// Audio route data
-	char* temp = 0;
-	radio.get("audio-1", temp, "", 100);
-	strcpy_s(radio_audio_path_1, temp);
-	free(temp);
-	radio.get("audio-2", temp, "", 100);
-	strcpy_s(radio_audio_path_2, temp);
-	free(temp);
-	radio.get("audio-3", temp, "", 100);
-	strcpy_s(radio_audio_path_3, temp);
-	free(temp);
+	radio.get("audio-1", radio_audio_path_1, "", 100);
+	radio.get("audio-2", radio_audio_path_2, "", 100);
+	radio.get("audio-3", radio_audio_path_3, "", 100);
 }
