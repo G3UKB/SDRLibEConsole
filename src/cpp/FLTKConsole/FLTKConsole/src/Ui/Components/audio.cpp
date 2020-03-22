@@ -161,4 +161,14 @@ void Audio::handle_apply() {
 	);
 	// Restart audio
 	c_server_restart_audio_routes();
+
+	// Save the current route
+	char current_route[100];
+	strcpy_s(current_route, 100, sink_str);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, dev_str);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, ch_str);
+	//p->set_audio_path(1, current_route);
+	printf("%s", current_route);
 }

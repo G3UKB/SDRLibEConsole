@@ -77,6 +77,9 @@ void Preferences::save() {
 	radio.set("filter-1", radio_filter[0]);
 	radio.set("filter-2", radio_filter[1]);
 	radio.set("filter-3", radio_filter[2]);
+	radio.set("audio-1", radio_audio_path_1);
+	radio.set("audio-2", radio_audio_path_2);
+	radio.set("audio-3", radio_audio_path_3);
 }
 
 //==============================================================================
@@ -129,6 +132,22 @@ int Preferences::get_filter(int radio) {
 void Preferences::set_filter(int radio, int filter) {
 	radio_filter[radio] = filter;
 }
+char* Preferences::get_audio_path(int radio) {
+	if (radio == 1)
+		return radio_audio_path_1;
+	else if (radio == 2)
+		return radio_audio_path_2;
+	else
+		return radio_audio_path_3;
+}
+void Preferences::set_audio_path(int radio, char* path) {
+	if (radio == 1)
+		strcpy_s(radio_audio_path_1, path);
+	else if (radio == 2)
+		strcpy_s(radio_audio_path_2, path);
+	else
+		strcpy_s(radio_audio_path_3, path);
+}
 
 //==============================================================================
 // PRIVATE
@@ -138,14 +157,15 @@ void Preferences::set_filter(int radio, int filter) {
 void Preferences::restore() {
 	// Restore the database
 	Fl_Preferences root(Fl_Preferences::USER, project, application);
-	// Read the application data
+
+	// Read application data
 	Fl_Preferences app(root, "APP");
 	app.get("window_x", window_x, DEFAULT_X);
 	app.get("window_y", window_y, DEFAULT_Y);
 	app.get("window_w", window_w, DEFAULT_W);
 	app.get("window_h", window_h, DEFAULT_H);
 
-	// Read the radio data
+	// Read radio data
 	Fl_Preferences radio(root, "RADIO");
 	radio.get("freq-1", radio_freq[0], radio_freq[0]);
 	radio.get("freq-2", radio_freq[1], radio_freq[1]);
@@ -156,4 +176,15 @@ void Preferences::restore() {
 	radio.get("filter-1", radio_filter[0], radio_filter[0]);
 	radio.get("filter-2", radio_filter[1], radio_filter[1]);
 	radio.get("filter-3", radio_filter[2], radio_filter[2]);
+	// Audio route data
+	char* temp = 0;
+	radio.get("audio-1", temp, "", 100);
+	strcpy_s(radio_audio_path_1, temp);
+	free(temp);
+	radio.get("audio-2", temp, "", 100);
+	strcpy_s(radio_audio_path_2, temp);
+	free(temp);
+	radio.get("audio-3", temp, "", 100);
+	strcpy_s(radio_audio_path_3, temp);
+	free(temp);
 }

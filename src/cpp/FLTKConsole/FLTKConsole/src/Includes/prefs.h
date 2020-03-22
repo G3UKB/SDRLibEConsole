@@ -65,6 +65,9 @@ public:
 	void set_mode(int radio, int filter);
 	int get_filter(int radio);
 	void set_filter(int radio, int filter);
+	// Audio paths
+	char* get_audio_path(int radio);
+	void set_audio_path(int radio, char* path);
 
 private:
 	//==============================================================================
@@ -84,6 +87,9 @@ private:
 	int radio_freq[3] = { 7100000,7100000,7100000 };
 	int radio_mode[3] = { 0,0,0 };
 	int radio_filter[3] = { 2,2,2 };
+	char radio_audio_path_1[100];
+	char radio_audio_path_2[100];
+	char radio_audio_path_3[100];
 
 	//==============================================================================
 	// Method prototypes
