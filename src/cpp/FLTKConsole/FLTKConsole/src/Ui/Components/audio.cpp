@@ -110,8 +110,10 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 
 	// Retrieve audio path
 	char* p_audio_path = p->get_audio_path(1);
+	//printf("%s\n", p_audio_path);
 	char audio_path[100];
 	strcpy_s(audio_path, 100, p_audio_path);
+	//printf("%s\n", audio_path);
 	if (strlen(audio_path) > 0) {
 		// We have a path to set
 		// Otherwise the default path set in main init applies
@@ -119,33 +121,39 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		char* dev_part;
 		char* api_part;
 		char* ch_part;
+		char* next_token;
 		// Split into tokens
-		sink_part = strtok_s(audio_path, ":", &sink_part);
-		dev_part = strtok_s(audio_path, ":", &dev_part);
-		api_part = strtok_s(audio_path, ":", &api_part);
-		ch_part = strtok_s(audio_path, ":", &ch_part);
-
+		sink_part = strtok_s(audio_path, ":", &next_token);
+		//printf("First: %s,%s\n", sink_part, next_token);
+		dev_part = strtok_s(NULL, ":", &next_token);
+		//printf("Second: %s,%s\n", dev_part, next_token);
+		api_part = strtok_s(NULL, ":", &next_token);
+		ch_part = strtok_s(NULL, ":", &next_token);
+		printf("%s,%s,%s,%s\n", sink_part, dev_part, api_part, ch_part);
 		// Set the widget state
 		// Set sink
-		if (strcmp(sink_part, "Local/AF")) {
-			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("LOCAL_AF"));
+		if (strcmp(sink_part, "Local/AF") == 0) {
+			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
 		}
-		else if (strcmp(sink_part, "Local/IQ")) {
-			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("LOCAL_IQ"));
+		else if (strcmp(sink_part, "Local/IQ") == 0) {
+			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
 		}
-		else if (strcmp(sink_part, "HPSDR")) {
+		else if (strcmp(sink_part, "HPSDR") == 0) {
 			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
 		}
 		// Set device
-		((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(dev_part));
+		strcpy_s(str, 100, dev_part);
+		strcat_s(str, 100, ":");
+		strcat_s(str, 100, api_part);
+		((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(str));
 		// Set channel
-		if (strcmp(ch_part, "LEFT")) {
+		if (strcmp(ch_part, "LEFT") == 0) {
 			((Fl_Radio_Light_Button*)left)->set();
 		}
-		if (strcmp(ch_part, "RIGHT")) {
+		else if (strcmp(ch_part, "RIGHT") == 0) {
 			((Fl_Radio_Light_Button*)right)->set();
 		}
-		if (strcmp(ch_part, "BOTH")) {
+		else if (strcmp(ch_part, "BOTH") == 0) {
 			((Fl_Radio_Light_Button*)both)->set();
 		}
 
@@ -228,7 +236,9 @@ void Audio::handle_apply() {
 	char current_route[100];
 	strcpy_s(current_route, 100, sink_str);
 	strcat_s(current_route, 100, ":");
-	strcat_s(current_route, 100, dev_str);
+	strcat_s(current_route, 100, dev_part);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, api_part);
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, ch_str);
 	p->set_audio_path(1, current_route);
