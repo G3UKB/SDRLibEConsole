@@ -28,6 +28,9 @@ The authors can be reached by email at:
 #include "../../Includes/includes.h"
 
 //==============================================================================
+// PUBLIC
+
+//==============================================================================
 // Main Audio Component Window
 //==============================================================================
 
@@ -110,10 +113,8 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 
 	// Retrieve audio path
 	char* p_audio_path = p->get_audio_path(1);
-	//printf("%s\n", p_audio_path);
 	char audio_path[100];
 	strcpy_s(audio_path, 100, p_audio_path);
-	//printf("%s\n", audio_path);
 	if (strlen(audio_path) > 0) {
 		// We have a path to set
 		// Otherwise the default path set in main init applies
@@ -124,13 +125,15 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		char* next_token;
 		// Split into tokens
 		sink_part = strtok_s(audio_path, ":", &next_token);
-		//printf("First: %s,%s\n", sink_part, next_token);
 		dev_part = strtok_s(NULL, ":", &next_token);
-		//printf("Second: %s,%s\n", dev_part, next_token);
 		api_part = strtok_s(NULL, ":", &next_token);
 		ch_part = strtok_s(NULL, ":", &next_token);
 		printf("%s,%s,%s,%s\n", sink_part, dev_part, api_part, ch_part);
+
 		// Set the widget state
+		set_widget_state(sink_part, api_part, dev_part, ch_part);
+
+		/*
 		// Set sink
 		if (strcmp(sink_part, "Local/AF") == 0) {
 			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
@@ -156,7 +159,9 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		else if (strcmp(ch_part, "BOTH") == 0) {
 			((Fl_Radio_Light_Button*)both)->set();
 		}
+		*/
 
+		/*
 		// Set the new audio path
 		// Now reset the audio path for this receiver 
 		if (!c_server_clear_audio_routes()) {
@@ -174,6 +179,8 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		);
 		// Restart audio
 		c_server_restart_audio_routes();
+		*/
+		set_path(1, sink_part, api_part, dev_part, ch_part);
 	}
 
 	// Finally show window
@@ -215,6 +222,7 @@ void Audio::handle_apply() {
 		strcpy_s(ch_str, 10, "BOTH");
 	}
 
+	/*
 	// Now reset the audio path for this receiver 
 	if (!c_server_clear_audio_routes()) {
 		std::cout << "Failed to clear audio routes!" << std::endl;
@@ -231,7 +239,10 @@ void Audio::handle_apply() {
 	);
 	// Restart audio
 	c_server_restart_audio_routes();
+	*/
+	set_path(1, sink_str, api_part, dev_part, ch_str);
 
+	/*
 	// Save the current route
 	char current_route[100];
 	strcpy_s(current_route, 100, sink_str);
@@ -242,4 +253,75 @@ void Audio::handle_apply() {
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, ch_str);
 	p->set_audio_path(1, current_route);
+	*/
+
+	save_route(1, sink_str, api_part, dev_part, ch_str);
+}
+
+//==============================================================================
+// PRIVATE
+
+//----------------------------------------------------
+// Set a new audio path
+void Audio::set_widget_state(char* sink, char* api, char* dev, char* ch) {
+
+	char str[100];
+
+	// Set sink
+	if (strcmp(sink, "Local/AF") == 0) {
+		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
+	}
+	else if (strcmp(sink, "Local/IQ") == 0) {
+		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
+	}
+	else if (strcmp(sink, "HPSDR") == 0) {
+		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
+	}
+
+	// Set device
+	strcpy_s(str, 100, dev);
+	strcat_s(str, 100, ":");
+	strcat_s(str, 100, api);
+	((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(str));
+
+	// Set channel
+	if (strcmp(ch, "LEFT") == 0) {
+		((Fl_Radio_Light_Button*)left)->set();
+	}
+	else if (strcmp(ch, "RIGHT") == 0) {
+		((Fl_Radio_Light_Button*)right)->set();
+	}
+	else if (strcmp(ch, "BOTH") == 0) {
+		((Fl_Radio_Light_Button*)both)->set();
+	}
+}
+
+//----------------------------------------------------
+// Set a new audio path
+void Audio::set_path(int rx, char* sink, char* api, char* dev, char* ch) {
+
+	// Now reset the audio path for this receiver 
+	if (!c_server_clear_audio_routes()) {
+		std::cout << "Failed to clear audio routes!" << std::endl;
+		return;
+	}
+	// Set the new path
+	c_server_set_audio_route( (int)AudioType::OUTPUT, sink, rx, api, dev, ch );
+	// Restart audio
+	c_server_restart_audio_routes();
+}
+
+//----------------------------------------------------
+// Save the audio route
+void Audio::save_route(int rx, char* sink, char* api, char* dev, char* ch) {
+	// Save the current route
+	char current_route[100];
+	strcpy_s(current_route, 100, sink);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, dev);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, api);
+	strcat_s(current_route, 100, ":");
+	strcat_s(current_route, 100, ch);
+	p->set_audio_path(rx, current_route);
 }
