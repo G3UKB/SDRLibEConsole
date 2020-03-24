@@ -41,12 +41,19 @@ void apply_cb(Fl_Widget* w, void* user_data) {
 
 //----------------------------------------------------
 // Constructor/Destructor
-Audio::Audio(int w, int h) : Fl_Window(w, h) {
+Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
+
+	// Our radio instance
+	r = radio;
 
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
+	// Set up window
+	char label[20];
+	sprintf_s(label, "Audio (radio-%d", r);
+	copy_label(label);
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
@@ -133,7 +140,7 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		set_widget_state(sink_part, api_part, dev_part, ch_part);
 
 		// Set audio path
-		set_path(1, sink_part, api_part, dev_part, ch_part);
+		set_path(r, sink_part, api_part, dev_part, ch_part);
 	}
 	// Finally show window
 	show();
@@ -175,10 +182,10 @@ void Audio::handle_apply() {
 	}
 
 	// Reset the audio path for this receiver 
-	set_path(1, sink_str, api_part, dev_part, ch_str);
+	set_path(r, sink_str, api_part, dev_part, ch_str);
 
 	// Save the new route
-	save_route(1, sink_str, api_part, dev_part, ch_str);
+	save_route(r, sink_str, api_part, dev_part, ch_str);
 }
 
 //==============================================================================
@@ -218,7 +225,7 @@ void Audio::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
 
 //----------------------------------------------------
 // Set a new audio path
-void Audio::set_path(int rx, char* sink, char* api, char* dev, char* ch) {
+void Audio::set_path(int radio, char* sink, char* api, char* dev, char* ch) {
 
 	// Now reset the audio path for this receiver 
 	if (!c_server_clear_audio_routes()) {
@@ -226,14 +233,14 @@ void Audio::set_path(int rx, char* sink, char* api, char* dev, char* ch) {
 		return;
 	}
 	// Set the new path
-	c_server_set_audio_route( (int)AudioType::OUTPUT, sink, rx, api, dev, ch );
+	c_server_set_audio_route( (int)AudioType::OUTPUT, sink, radio, api, dev, ch );
 	// Restart audio
 	c_server_restart_audio_routes();
 }
 
 //----------------------------------------------------
 // Save the audio route
-void Audio::save_route(int rx, char* sink, char* api, char* dev, char* ch) {
+void Audio::save_route(int radio, char* sink, char* api, char* dev, char* ch) {
 	// Save the current route
 	char current_route[100];
 	strcpy_s(current_route, 100, sink);
@@ -243,5 +250,5 @@ void Audio::save_route(int rx, char* sink, char* api, char* dev, char* ch) {
 	strcat_s(current_route, 100, api);
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, ch);
-	p->set_audio_path(rx, current_route);
+	p->set_audio_path(radio, current_route);
 }

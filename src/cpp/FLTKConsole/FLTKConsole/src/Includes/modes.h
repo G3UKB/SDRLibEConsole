@@ -41,7 +41,7 @@ class Modes : public Fl_Window
 {
 public:
 	//==============================================================================
-	Modes(int w, int h);
+	Modes(int radio, int w, int h);
 	~Modes() {};
 
 	//==============================================================================
@@ -50,6 +50,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	// radio instance
+	int r;
 	// Our prefs
 	Preferences* p;
 	// Ref to set radio parameters

@@ -109,12 +109,12 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	// Display main window
 	show();
 
-	// Create the audio panel hidden
-	audio = new Audio(350, 130);
+	// Create the audio panel hidden for radio 1
+	audio = new Audio(1, 350, 130);
 	audio->hide();
 
 	// Create the modes panel hidden
-	modes = new Modes(230, 80);
+	modes = new Modes(1, 230, 80);
 	modes->hide();
 
 	// Create the filters panel hidden

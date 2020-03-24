@@ -45,7 +45,7 @@ class Audio : public Fl_Window
 {
 public:
 	//==============================================================================
-	Audio(int w, int h);
+	Audio(int radio, int w, int h);
 	~Audio() {};
 
 	//==============================================================================
@@ -57,6 +57,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	// Radio instance
+	int r;
 	// Our prefs
 	Preferences* p;
 	// Ref to set radio parameters
@@ -73,7 +75,7 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	void set_path(int rx, char* sink, char* api, char* dev, char* ch);
-	void save_route(int rx, char* sink, char* api, char* dev, char* ch);
+	void set_path(int radio, char* sink, char* api, char* dev, char* ch);
+	void save_route(int radio, char* sink, char* api, char* dev, char* ch);
 	void set_widget_state(char* vsink, char* vapi, char* vdev, char* vch);
 };

@@ -33,7 +33,10 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor/Destructor
-Modes::Modes(int w, int h) : Fl_Window(w, h) {
+Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
+
+	// radio instance
+	r = radio;
 
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
@@ -44,7 +47,7 @@ Modes::Modes(int w, int h) : Fl_Window(w, h) {
 	align(Fl_Align(65));
 
 	// Get the mode
-	int mode = p->get_mode(0);
+	int mode = p->get_mode(r);
 
 	// Add a group box
 	Fl_Group *top_group = new Fl_Group(5, 5, w-10, h-10);
@@ -62,7 +65,7 @@ Modes::Modes(int w, int h) : Fl_Window(w, h) {
 		m_b.items[i].mode = new ModeButton(this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == mode) {
 			m_b.items[i].mode->set();
-			r_i->ri_server_set_rx_mode(0, mode);
+			r_i->ri_server_set_rx_mode(r-1, mode);
 		}
 		if (k++ == 3) {
 			k = 0;
@@ -87,7 +90,7 @@ void Modes::handle_mode_button_state(int id) {
 			// Toggle pressed
 			m_b.items[i].mode->set();
 			// Remember mode
-			p->set_mode(0, id);
+			p->set_mode(r, id);
 		}
 		else {
 			// Toggle released
@@ -112,7 +115,7 @@ int ModeButton::handle(int event) {
 	switch (event) {
 	case FL_LEFT_MOUSE: {
 		// Tell radio to change mode
-		r_i->ri_server_set_rx_mode(0, id);
+		r_i->ri_server_set_rx_mode(r-1, id);
 		// Tell parent to reflect state in buttons
 		t_l->handle_mode_button_state(id);
 		return 1;

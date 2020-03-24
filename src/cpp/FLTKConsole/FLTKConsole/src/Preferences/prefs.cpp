@@ -115,22 +115,22 @@ void Preferences::set_window_h(int h) {
 //----------------------------------------------------
 // RADIO
 int Preferences::get_freq(int radio) {
-	return radio_freq[radio];
+	return radio_freq[radio - 1];
 }
 void Preferences::set_freq(int radio, int freq) {
-	radio_freq[radio] = freq;
+	radio_freq[radio - 1] = freq;
 }
 int Preferences::get_mode(int radio) {
-	return radio_mode[radio];
+	return radio_mode[radio - 1];
 }
 void Preferences::set_mode(int radio, int mode) {
-	radio_mode[radio] = mode;
+	radio_mode[radio - 1] = mode;
 }
 int Preferences::get_filter(int radio) {
-	return radio_filter[radio];
+	return radio_filter[radio - 1];
 }
 void Preferences::set_filter(int radio, int filter) {
-	radio_filter[radio] = filter;
+	radio_filter[radio - 1] = filter;
 }
 char* Preferences::get_audio_path(int radio) {
 	if (radio == 1)
