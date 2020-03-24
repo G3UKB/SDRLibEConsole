@@ -75,5 +75,5 @@ private:
 	// Method prototypes
 	void set_path(int rx, char* sink, char* api, char* dev, char* ch);
 	void save_route(int rx, char* sink, char* api, char* dev, char* ch);
-	void set_widget_state(char* sink, char* api, char* dev, char* ch);
+	void set_widget_state(char* vsink, char* vapi, char* vdev, char* vch);
 };

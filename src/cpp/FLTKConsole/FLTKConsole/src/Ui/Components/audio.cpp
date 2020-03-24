@@ -128,61 +128,13 @@ Audio::Audio(int w, int h) : Fl_Window(w, h) {
 		dev_part = strtok_s(NULL, ":", &next_token);
 		api_part = strtok_s(NULL, ":", &next_token);
 		ch_part = strtok_s(NULL, ":", &next_token);
-		printf("%s,%s,%s,%s\n", sink_part, dev_part, api_part, ch_part);
-
+		
 		// Set the widget state
 		set_widget_state(sink_part, api_part, dev_part, ch_part);
 
-		/*
-		// Set sink
-		if (strcmp(sink_part, "Local/AF") == 0) {
-			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
-		}
-		else if (strcmp(sink_part, "Local/IQ") == 0) {
-			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
-		}
-		else if (strcmp(sink_part, "HPSDR") == 0) {
-			((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
-		}
-		// Set device
-		strcpy_s(str, 100, dev_part);
-		strcat_s(str, 100, ":");
-		strcat_s(str, 100, api_part);
-		((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(str));
-		// Set channel
-		if (strcmp(ch_part, "LEFT") == 0) {
-			((Fl_Radio_Light_Button*)left)->set();
-		}
-		else if (strcmp(ch_part, "RIGHT") == 0) {
-			((Fl_Radio_Light_Button*)right)->set();
-		}
-		else if (strcmp(ch_part, "BOTH") == 0) {
-			((Fl_Radio_Light_Button*)both)->set();
-		}
-		*/
-
-		/*
-		// Set the new audio path
-		// Now reset the audio path for this receiver 
-		if (!c_server_clear_audio_routes()) {
-			std::cout << "Failed to clear audio routes!" << std::endl;
-			return;
-		}
-		// Set the new path
-		c_server_set_audio_route(
-			(int)AudioType::OUTPUT,
-			sink_part,
-			1,
-			api_part,
-			dev_part,
-			ch_part
-		);
-		// Restart audio
-		c_server_restart_audio_routes();
-		*/
+		// Set audio path
 		set_path(1, sink_part, api_part, dev_part, ch_part);
 	}
-
 	// Finally show window
 	show();
 }
@@ -222,39 +174,10 @@ void Audio::handle_apply() {
 		strcpy_s(ch_str, 10, "BOTH");
 	}
 
-	/*
-	// Now reset the audio path for this receiver 
-	if (!c_server_clear_audio_routes()) {
-		std::cout << "Failed to clear audio routes!" << std::endl;
-		return;
-	}
-	// Set the new path
-	c_server_set_audio_route(
-		(int)AudioType::OUTPUT,
-		sink_str,
-		1,
-		api_part,
-		dev_part,
-		ch_str
-	);
-	// Restart audio
-	c_server_restart_audio_routes();
-	*/
+	// Reset the audio path for this receiver 
 	set_path(1, sink_str, api_part, dev_part, ch_str);
 
-	/*
-	// Save the current route
-	char current_route[100];
-	strcpy_s(current_route, 100, sink_str);
-	strcat_s(current_route, 100, ":");
-	strcat_s(current_route, 100, dev_part);
-	strcat_s(current_route, 100, ":");
-	strcat_s(current_route, 100, api_part);
-	strcat_s(current_route, 100, ":");
-	strcat_s(current_route, 100, ch_str);
-	p->set_audio_path(1, current_route);
-	*/
-
+	// Save the new route
 	save_route(1, sink_str, api_part, dev_part, ch_str);
 }
 
@@ -263,35 +186,32 @@ void Audio::handle_apply() {
 
 //----------------------------------------------------
 // Set a new audio path
-void Audio::set_widget_state(char* sink, char* api, char* dev, char* ch) {
-
+void Audio::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
 	char str[100];
 
 	// Set sink
-	if (strcmp(sink, "Local/AF") == 0) {
+	if (strcmp(vsink, "Local/AF") == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
 	}
-	else if (strcmp(sink, "Local/IQ") == 0) {
+	else if (strcmp(vsink, "Local/IQ") == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
 	}
-	else if (strcmp(sink, "HPSDR") == 0) {
+	else if (strcmp(vsink, "HPSDR") == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
 	}
-
 	// Set device
-	strcpy_s(str, 100, dev);
+	strcpy_s(str, 100, vdev);
 	strcat_s(str, 100, ":");
-	strcat_s(str, 100, api);
+	strcat_s(str, 100, vapi);
 	((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(str));
-
 	// Set channel
-	if (strcmp(ch, "LEFT") == 0) {
+	if (strcmp(vch, "LEFT") == 0) {
 		((Fl_Radio_Light_Button*)left)->set();
 	}
-	else if (strcmp(ch, "RIGHT") == 0) {
+	else if (strcmp(vch, "RIGHT") == 0) {
 		((Fl_Radio_Light_Button*)right)->set();
 	}
-	else if (strcmp(ch, "BOTH") == 0) {
+	else if (strcmp(vch, "BOTH") == 0) {
 		((Fl_Radio_Light_Button*)both)->set();
 	}
 }
