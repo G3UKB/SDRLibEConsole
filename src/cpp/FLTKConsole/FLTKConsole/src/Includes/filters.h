@@ -41,7 +41,7 @@ class Filters : public Fl_Window
 {
 public:
 	//==============================================================================
-	Filters(int w, int h);
+	Filters(int radio, int w, int h);
 	~Filters() {};
 
 	//==============================================================================
@@ -50,6 +50,8 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	// Radio inst
+	int r;
 	// Our prefs
 	Preferences* p;
 	// Ref to set radio parameters
@@ -113,7 +115,7 @@ class FilterButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
-	FilterButton(Filters *filters, char* label, int filter_id, metrics m, Fl_Color back_col, Fl_Color label_col);
+	FilterButton(int radio, Filters *filters, char* label, int filter_id, metrics m, Fl_Color back_col, Fl_Color label_col);
 	~FilterButton() {};
 
 	//==============================================================================
@@ -122,6 +124,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	int r;
 	Filters *t_l;
 	RadioInterface* r_i;
 	int id;

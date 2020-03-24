@@ -80,7 +80,7 @@ class VFOComponent : public Fl_Group
 {
 public:
 	//==============================================================================
-	VFOComponent(std::string p_vfo_id, int p_vfo_type, int x, int y, int w, int h);
+	VFOComponent(int radio, int p_vfo_type, int x, int y, int w, int h);
 	~VFOComponent();
 
 	//==============================================================================
@@ -106,7 +106,7 @@ private:
 	Preferences* p;
 	RadioInterface* r_i;
 	int vfo_type = RX;			// RX|TX
-	std::string radio_id = "";	// Radio id of VFO instance
+	int r;						// Radio id of VFO instance
 	int freq_inc = -1;			// Last frequence increment in MHz
 	int current_freq = 7100000;	// Current frequency in MHz
 

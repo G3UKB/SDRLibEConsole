@@ -123,7 +123,7 @@ class ModeButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
-	ModeButton(Modes *modes, char* label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col);
+	ModeButton(int radio, Modes *modes, char* label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col);
 	~ModeButton() {};
 
 	//==============================================================================
@@ -132,6 +132,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	int r;
 	Modes *t_l;
 	RadioInterface* r_i;
 	int id;

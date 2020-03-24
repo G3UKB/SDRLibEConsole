@@ -33,8 +33,9 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Constructor/Destructor
-VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
+VFOComponent::VFOComponent(int radio, int p_vfo_type, int x, int y, int w, int h) : Fl_Group(x, y, w, h)
 {
+	r = radio;
 	x_ord = x;
 	y_ord = y;
 	width = w;
@@ -46,7 +47,6 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 
 	// Local vars
 	vfo_type = p_vfo_type;
-	radio_id = p_radio_id;
 	// Create freq_inc_map
 	freq_inc_map.insert (std::pair <int, int> (1, 100000000));
 	freq_inc_map.insert (std::pair <int, int> (2, 10000000));
@@ -66,7 +66,7 @@ VFOComponent::VFOComponent(std::string p_radio_id, int p_vfo_type, int x, int y,
 	create_digits();
 
 	// Update frequency
-	current_freq = p->get_freq(0);
+	current_freq = p->get_freq(r);
 
 	convertFreq(current_freq);
 	set_display_freq(convertFreq(current_freq));
@@ -92,7 +92,7 @@ void VFOComponent::freq_plus() {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
-			p->set_freq(0, current_freq);
+			p->set_freq(r, current_freq);
 		}
 	}
 }
@@ -104,7 +104,7 @@ void VFOComponent::freq_minus() {
 			current_freq = ifreq;
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
-			p->set_freq(0, current_freq);
+			p->set_freq(r, current_freq);
 		}
 	}
 }
@@ -208,11 +208,11 @@ void VFOComponent::create_digits() {
 }
 
 void VFOComponent::set_radio_freq() {
-	if (radio_id == "radio-1")
+	if (r == 1)
 		r_i->ri_server_cc_out_set_rx_1_freq(current_freq);
-	else if (radio_id == "radio-2")
+	else if (r == 2)
 		r_i->ri_server_cc_out_set_rx_2_freq(current_freq);
-	else if (radio_id == "radio-3")
+	else if (r == 3)
 		r_i->ri_server_cc_out_set_rx_3_freq(current_freq);
 }
 

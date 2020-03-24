@@ -33,7 +33,10 @@ The authors can be reached by email at:
 
 //----------------------------------------------------
 // Constructor/Destructor
-Filters::Filters(int w, int h) : Fl_Window(w, h) {
+Filters::Filters(int radio, int w, int h) : Fl_Window(w, h) {
+
+	// Radio inst
+	r = radio;
 
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
@@ -44,7 +47,7 @@ Filters::Filters(int w, int h) : Fl_Window(w, h) {
 	align(Fl_Align(65));
 
 	// Get the filter
-	int filter = p->get_filter (0);
+	int filter = p->get_filter (r);
 
 	// Add a group box
 	Fl_Group *top_group = new Fl_Group(5, 5, w-10, h-10);
@@ -59,10 +62,10 @@ Filters::Filters(int w, int h) : Fl_Window(w, h) {
 	metrics m;
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		m_b.items[i].filter = new FilterButton(this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
+		m_b.items[i].filter = new FilterButton(r, this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == filter) {
 			m_b.items[i].filter->set();
-			r_i->ri_server_set_rx_filter_freq(0, filter);
+			r_i->ri_server_set_rx_filter_freq(r-1, filter);
 		}
 		if (++k == 3) {
 			k = 0;
@@ -98,7 +101,8 @@ void Filters::handle_filter_button_state(int id) {
 
 //==============================================================================
 // Mode buttons
-FilterButton::FilterButton(Filters *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+FilterButton::FilterButton(int radio, Filters *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+	r = radio;
 	t_l = top_level;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = mode_id;
@@ -112,7 +116,7 @@ int FilterButton::handle(int event) {
 	switch (event) {
 	case FL_LEFT_MOUSE: {
 		// Tell radio to change mode
-		r_i->ri_server_set_rx_filter_freq(0, id);
+		r_i->ri_server_set_rx_filter_freq(r-1, id);
 		// Tell parent to reflect state in buttons
 		t_l->handle_filter_button_state(id);
 		return 1;

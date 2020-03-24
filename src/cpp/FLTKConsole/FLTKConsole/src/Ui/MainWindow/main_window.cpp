@@ -80,7 +80,7 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
 	m = grid->get_cell_metrics(1, 0, 2, 3);
-	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	VFOComponent *c = new VFOComponent(1, 0, m.x, m.y, m.w, m.h);
 
 	// We place the radio buttons into another grid
 	// Get metrics from grid
@@ -118,7 +118,7 @@ MainWindow::MainWindow(int w, int h) : Fl_Double_Window(w, h) {
 	modes->hide();
 
 	// Create the filters panel hidden
-	filters = new Filters(230, 80);
+	filters = new Filters(1, 230, 80);
 	filters->hide();
 
 	// Set an idle timeout

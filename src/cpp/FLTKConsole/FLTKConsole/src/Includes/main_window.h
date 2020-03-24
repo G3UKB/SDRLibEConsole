@@ -64,7 +64,6 @@ private:
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
 	char audio_str[10] = "Audio>>";
-	char radio_id[10] = "radio-1";
 	char mode_str[10] = "Mode>>";
 	char filter_str[10] = "Filter>>";
 

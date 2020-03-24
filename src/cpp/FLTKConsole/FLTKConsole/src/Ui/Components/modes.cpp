@@ -62,7 +62,7 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 	metrics m;
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		m_b.items[i].mode = new ModeButton(this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
+		m_b.items[i].mode = new ModeButton(r, this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == mode) {
 			m_b.items[i].mode->set();
 			r_i->ri_server_set_rx_mode(r-1, mode);
@@ -101,7 +101,8 @@ void Modes::handle_mode_button_state(int id) {
 
 //==============================================================================
 // Mode buttons
-ModeButton::ModeButton(Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+ModeButton::ModeButton(int radio, Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
+	r = radio;
 	t_l = top_level;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	id = mode_id;
