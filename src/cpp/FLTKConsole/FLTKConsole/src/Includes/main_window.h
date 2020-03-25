@@ -38,10 +38,8 @@ The authors can be reached by email at:
 */
 class ControlButton;
 class DiscoverButton;
-class ModeTrigger;
-class FilterTrigger;
-class AudioTrigger;
-class MainWindow : public Fl_Double_Window
+
+class MainWindow : public WindowBase
 {
 public:
 	//==============================================================================
@@ -49,9 +47,6 @@ public:
 	~MainWindow() {};
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
-	void manage_mode_panel(bool show);
-	void manage_filter_panel(bool show);
-	void manage_audio_panel(bool show);
 	void handle_idle_timeout();
 
 	//==============================================================================
@@ -63,10 +58,6 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
-	char audio_str[10] = "Audio>>";
-	char mode_str[10] = "Mode>>";
-	char filter_str[10] = "Filter>>";
-
 
 	// Preferences
 	Preferences* p;
@@ -74,18 +65,9 @@ private:
 	// Ref to set radio parameters
 	RadioInterface* r_i;
 
-	// Widgets
-	Fl_Group *top_group;
-
 	// Components
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
-	AudioTrigger* AudioBtn;
-	Audio* audio;
-	ModeTrigger* ModeBtn;
-	Modes *modes;
-	FilterTrigger* FilterBtn;
-	Filters *filters;
 
 	//==============================================================================
 	// Method prototypes
@@ -121,7 +103,7 @@ private:
 };
 
 //==============================================================================
-// The start/stop button
+// The discover button
 class DiscoverButton : public Fl_Button
 {
 public:
@@ -137,78 +119,6 @@ private:
 	// State variables
 	RadioInterface* r_i;
 	MainWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
-
-};
-
-//==============================================================================
-// The mode button class
-class ModeTrigger : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	ModeTrigger(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
-	~ModeTrigger() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	int id;
-	MainWindow* parent;
-
-	//==============================================================================
-	// Method prototypes
-
-};
-
-//==============================================================================
-// The filter button class
-class FilterTrigger : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	FilterTrigger(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
-	~FilterTrigger() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	int id;
-	MainWindow* parent;
-
-	//==============================================================================
-	// Method prototypes
-
-};
-
-//==============================================================================
-// The audio button class
-class AudioTrigger : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	AudioTrigger(MainWindow* parent_widget, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
-	~AudioTrigger() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	int id;
-	MainWindow* parent;
 
 	//==============================================================================
 	// Method prototypes
