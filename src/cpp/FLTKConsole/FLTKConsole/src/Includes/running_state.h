@@ -37,10 +37,24 @@ The authors can be reached by email at:
 	data and running state.
 */
 
+// Track the audio allocations so we can ensure there are no conflicts
+typedef struct audio_defs {
+	char dev[30];
+	char api[20];
+	char ch[10];
+};
+typedef struct audio_alloc {
+	// Def per radio
+	audio_defs defs[3];
+};
+// Full application state
 typedef struct t_app_state{
 	bool discovered = false;
 	bool server_running = false;
 	bool radio_running = false;
+	int num_radios = 1;
+	bool active_radios[3] = { true, false, false };
+	audio_alloc audio;
 };
 
 class RSt
