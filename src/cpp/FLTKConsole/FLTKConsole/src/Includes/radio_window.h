@@ -1,7 +1,7 @@
 /*
-radio_window.cpp
+radio_window.h
 
-Radio 2/3 window implementation for the FLTK Console
+Radio 2/3 window header for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -25,41 +25,41 @@ The authors can be reached by email at:
 
 */
 
-#include "../../Includes/includes.h"
+#pragma once
+
+#include "includes.h"
 
 //==============================================================================
 // Defines
 
 //==============================================================================
-
 /*
 	The one and only main window
 */
-//----------------------------------------------------
-// Constructor
-RadioWindow::RadioWindow(int radio, int w, int h) : WindowBase(radio, w, h) {
-	// Get dependent objects from the cache
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	p = (Preferences*)RSt::inst().get_obj("PREFS");
+class RadioWindow : public WindowBase
+{
+public:
+	//==============================================================================
+	RadioWindow(int radio, int w, int h);
+	~RadioWindow() {};
+	void resize(int x, int y, int w, int h);
 
-	// Display main window
-	show();
-}
+	//==============================================================================
 
-//===================================================
-// Event handlers
-// Resize event
-void  RadioWindow::resize(int x, int y, int w, int h) {
-	// Tell window to resize all widgets
-	Fl_Double_Window::resize(x, y, w, h);
-	// Save position and size
-	//p->set_window_x(x);
-	//p->set_window_y(y);
-	//p->set_window_w(w);
-	//p->set_window_h(h);
-}
+private:
+	//==============================================================================
+	// State variables
+	// labels must be fixed storage
 
+	// Preferences
+	Preferences* p;
 
-//===================================================
-// Callbacks
-//----------------------------------------------------
+	// Ref to set radio parameters
+	RadioInterface* r_i;
+
+	// Components
+
+	//==============================================================================
+	// Method prototypes
+
+};

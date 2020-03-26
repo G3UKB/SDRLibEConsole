@@ -73,6 +73,6 @@ The authors can be reached by email at:
 #include "filters.h"
 #include "audio.h"
 #include "window_base.h"
-//#include "radio_window.h"
+#include "radio_window.h"
 #include "main_window.h"
 
