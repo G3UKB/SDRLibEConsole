@@ -38,6 +38,7 @@ The authors can be reached by email at:
 */
 class ControlButton;
 class DiscoverButton;
+class RadioChoice;
 
 class MainWindow : public WindowBase
 {
@@ -48,6 +49,7 @@ public:
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
 	void handle_idle_timeout();
+	void handle_radio();
 
 	//==============================================================================
 
@@ -68,6 +70,11 @@ private:
 	// Components
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
+	Fl_Choice* SelectRadio;
+
+	// Radio windows
+	RadioWindow* Radio2_Win;
+	RadioWindow* Radio3_Win;
 
 	//==============================================================================
 	// Method prototypes
@@ -124,3 +131,28 @@ private:
 	// Method prototypes
 
 };
+
+/*
+//==============================================================================
+// Radio choice
+class RadioChoice : public Fl_Choice
+{
+public:
+	//==============================================================================
+	RadioChoice(MainWindow* parent_widget, int x, int y, int w, int h, Fl_Color back_col, Fl_Color text_col);
+	~RadioChoice() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+*/

@@ -40,6 +40,12 @@ void main_window_idle_cb(void* data) {
 	Fl::repeat_timeout(0.2, main_window_idle_cb, data);
 }
 
+// Radio select callback
+void radio_cb(Fl_Widget* w, void* user_data) {
+	// Call down to our Audio instance
+	((MainWindow*)user_data)->handle_radio();
+}
+
 /*
 	The one and only main window
 */
@@ -58,10 +64,21 @@ MainWindow::MainWindow(int w, int h) : WindowBase(1, w, h) {
 	m = grid->get_cell_metrics(0, 1);
 	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(DiscoverBtn);
-	
+	// Add radio choice
+	m = grid->get_cell_metrics(0, 2);
+	SelectRadio = new Fl_Choice(m.x+20, m.y, m.w-20, m.h, "RX:");
+	SelectRadio->add("1");
+	SelectRadio->add("2");
+	SelectRadio->add("3");
+	SelectRadio->color((Fl_Color)33);
+	SelectRadio->labelcolor((Fl_Color)80);
+	SelectRadio->callback((Fl_Callback*)radio_cb, (void*)this);
+	top_group->add(SelectRadio);
+
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
 	DiscoverBtn->deactivate();
+	//SelectRadio->deactivate();
 
 	// Display main window
 	show();
@@ -109,14 +126,21 @@ void MainWindow::handle_idle_timeout() {
 	if (discovered != last_discovered) {
 		if (discovered) {
 			StartBtn->activate();
+			//SelectRadio->activate();
 			DiscoverBtn->deactivate();
 		}
 		else {
 			StartBtn->deactivate();
+			//SelectRadio->deactivate();
 			DiscoverBtn->activate();
 		}
 	}
 	last_discovered = discovered;
+}
+
+// Handle number of radio instances
+void MainWindow::handle_radio() {
+	Radio2_Win = new RadioWindow(2, 331, 124);
 }
 
 //==============================================================================
@@ -195,3 +219,26 @@ int DiscoverButton::handle(int event) {
 		return Fl_Widget::handle(event);
 	}
 }
+
+/*
+//==============================================================================
+// Radio choice
+RadioChoice::RadioChoice(MainWindow* parent_widget, int x, int y, int w, int h, Fl_Color back_col, Fl_Color text_col) : Fl_Choice(x, y, w, h) {
+	myparent = parent_widget;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)text_col);
+}
+
+//----------------------------------------------------
+// Handle click event
+int RadioChoice::handle(int event) {
+	printf("Event %d\n");
+	//switch (event) {
+	
+	//}
+	//default:
+		return Fl_Widget::handle(event);
+	//}
+}
+*/
