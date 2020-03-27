@@ -37,7 +37,9 @@ The authors can be reached by email at:
 */
 //----------------------------------------------------
 // Constructor
-RadioWindow::RadioWindow(int radio, int w, int h) : WindowBase(radio, w, h) {
+RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h) {
+
+	r = radio;
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
@@ -53,10 +55,18 @@ void  RadioWindow::resize(int x, int y, int w, int h) {
 	// Tell window to resize all widgets
 	Fl_Double_Window::resize(x, y, w, h);
 	// Save position and size
-	//p->set_window_x(x);
-	//p->set_window_y(y);
-	//p->set_window_w(w);
-	//p->set_window_h(h);
+	if (r == 2) {
+		p->set_radio2_x(x);
+		p->set_radio2_y(y);
+		p->set_radio2_w(w);
+		p->set_radio2_h(h);
+	}
+	else if (r == 3) {
+		p->set_radio3_x(x);
+		p->set_radio3_y(y);
+		p->set_radio3_w(w);
+		p->set_radio3_h(h);
+	}
 }
 
 

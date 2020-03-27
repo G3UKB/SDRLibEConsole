@@ -40,7 +40,7 @@ class RadioWindow : public WindowBase
 {
 public:
 	//==============================================================================
-	RadioWindow(int radio, int w, int h);
+	RadioWindow(int radio, int x, int y, int w, int h);
 	~RadioWindow() {};
 	void resize(int x, int y, int w, int h);
 
@@ -50,6 +50,8 @@ private:
 	//==============================================================================
 	// State variables
 	// labels must be fixed storage
+	// Radio inst
+	int r;
 
 	// Preferences
 	Preferences* p;

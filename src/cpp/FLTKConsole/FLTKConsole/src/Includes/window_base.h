@@ -44,7 +44,7 @@ class WindowBase : public Fl_Double_Window
 {
 public:
 	//==============================================================================
-	WindowBase(int radio, int w, int h);
+	WindowBase(int radio, int x, int y, int w, int h);
 	~WindowBase() {};
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);

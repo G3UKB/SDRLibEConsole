@@ -45,7 +45,7 @@ void base_idle_cb(void* data) {
 */
 //----------------------------------------------------
 // Constructor
-WindowBase::WindowBase(int radio, int w, int h) : Fl_Double_Window(w, h) {
+WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, h) {
 	// Radio inst
 	r = radio;
 
@@ -58,7 +58,7 @@ WindowBase::WindowBase(int radio, int w, int h) : Fl_Double_Window(w, h) {
 	align(Fl_Align(65));
 
 	// Set window position
-	position(p->get_window_x(), p->get_window_y());
+	position(x, y);
 
 	// Add a group box
 	top_group = new Fl_Group(5, 5, w - 10, h - 10);

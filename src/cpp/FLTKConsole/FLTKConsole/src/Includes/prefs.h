@@ -58,7 +58,27 @@ public:
 	int get_window_h();
 	void set_window_w(int w);
 	void set_window_h(int h);
+	// Radio 2 window position and size
+	int get_radio2_x();
+	int get_radio2_y();
+	void set_radio2_x(int x);
+	void set_radio2_y(int y);
+	int get_radio2_w();
+	int get_radio2_h();
+	void set_radio2_w(int w);
+	void set_radio2_h(int h);
+	// Radio 3 window position and size
+	int get_radio3_x();
+	int get_radio3_y();
+	void set_radio3_x(int x);
+	void set_radio3_y(int y);
+	int get_radio3_w();
+	int get_radio3_h();
+	void set_radio3_w(int w);
+	void set_radio3_h(int h);
 	// Radio mode, filter etc
+	int get_num_radios();
+	void set_num_radios(int num);
 	int get_freq(int radio);
 	void set_freq(int radio, int freq);
 	int get_mode(int radio);
@@ -83,7 +103,16 @@ private:
 	int window_y;
 	int window_w;
 	int window_h;
+	int radio2_x;
+	int radio2_y;
+	int radio2_w;
+	int radio2_h;
+	int radio3_x;
+	int radio3_y;
+	int radio3_w;
+	int radio3_h;
 	// Radio mode, filter etc
+	int num_radios;
 	int radio_freq[3] = { 7100000,7100000,7100000 };
 	int radio_mode[3] = { 0,0,0 };
 	int radio_filter[3] = { 2,2,2 };

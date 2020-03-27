@@ -51,7 +51,7 @@ void radio_cb(Fl_Widget* w, void* user_data) {
 */
 //----------------------------------------------------
 // Constructor
-MainWindow::MainWindow(int w, int h) : WindowBase(1, w, h) {
+MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
@@ -78,7 +78,7 @@ MainWindow::MainWindow(int w, int h) : WindowBase(1, w, h) {
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
 	DiscoverBtn->deactivate();
-	//SelectRadio->deactivate();
+	SelectRadio->deactivate();
 
 	// Display main window
 	show();
@@ -126,21 +126,22 @@ void MainWindow::handle_idle_timeout() {
 	if (discovered != last_discovered) {
 		if (discovered) {
 			StartBtn->activate();
-			//SelectRadio->activate();
+			SelectRadio->activate();
 			DiscoverBtn->deactivate();
 		}
 		else {
 			StartBtn->deactivate();
-			//SelectRadio->deactivate();
+			SelectRadio->deactivate();
 			DiscoverBtn->activate();
 		}
 	}
 	last_discovered = discovered;
 }
 
+//----------------------------------------------------
 // Handle number of radio instances
 void MainWindow::handle_radio() {
-	Radio2_Win = new RadioWindow(2, 331, 124);
+	Radio2_Win = new RadioWindow(2, 10, 10, 331, 124);
 }
 
 //==============================================================================
@@ -219,26 +220,3 @@ int DiscoverButton::handle(int event) {
 		return Fl_Widget::handle(event);
 	}
 }
-
-/*
-//==============================================================================
-// Radio choice
-RadioChoice::RadioChoice(MainWindow* parent_widget, int x, int y, int w, int h, Fl_Color back_col, Fl_Color text_col) : Fl_Choice(x, y, w, h) {
-	myparent = parent_widget;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)text_col);
-}
-
-//----------------------------------------------------
-// Handle click event
-int RadioChoice::handle(int event) {
-	printf("Event %d\n");
-	//switch (event) {
-	
-	//}
-	//default:
-		return Fl_Widget::handle(event);
-	//}
-}
-*/

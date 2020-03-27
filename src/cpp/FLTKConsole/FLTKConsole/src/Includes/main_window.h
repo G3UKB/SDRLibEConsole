@@ -44,7 +44,7 @@ class MainWindow : public WindowBase
 {
 public:
 	//==============================================================================
-	MainWindow(int w, int h);
+	MainWindow(int x, int y, int w, int h);
 	~MainWindow() {};
 	void resize(int x, int y, int w, int h);
 	int handle(int event);
@@ -131,28 +131,3 @@ private:
 	// Method prototypes
 
 };
-
-/*
-//==============================================================================
-// Radio choice
-class RadioChoice : public Fl_Choice
-{
-public:
-	//==============================================================================
-	RadioChoice(MainWindow* parent_widget, int x, int y, int w, int h, Fl_Color back_col, Fl_Color text_col);
-	~RadioChoice() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	MainWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
-
-};
-*/

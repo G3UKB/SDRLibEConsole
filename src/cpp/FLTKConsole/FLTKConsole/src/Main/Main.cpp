@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
 	// Create the main window
-	Fl_Window* main_window = new MainWindow(prefs->get_window_w(), prefs->get_window_h());
+	Fl_Window* main_window = new MainWindow(prefs->get_window_x(), prefs->get_window_y(), prefs->get_window_w(), prefs->get_window_h());
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
 	// Run event loop until quit

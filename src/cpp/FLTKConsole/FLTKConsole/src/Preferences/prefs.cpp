@@ -65,9 +65,18 @@ void Preferences::save() {
 	app.set("window_y", window_y);
 	app.set("window_w", window_w);
 	app.set("window_h", window_h);
+	app.set("radio2_x", radio2_x);
+	app.set("radio2_y", radio2_y);
+	app.set("radio2_w", radio2_w);
+	app.set("radio2_h", radio2_h);
+	app.set("radio3_x", radio3_x);
+	app.set("radio3_y", radio3_y);
+	app.set("radio3_w", radio3_w);
+	app.set("radio3_h", radio3_h);
 
 	// RADIO
 	Fl_Preferences radio(root, "RADIO");
+	radio.set("num_radios", num_radios);
 	radio.set("freq-1", radio_freq[0]);
 	radio.set("freq-2", radio_freq[1]);
 	radio.set("freq-3", radio_freq[2]);
@@ -87,6 +96,7 @@ void Preferences::save() {
 
 //----------------------------------------------------
 // APP
+// Main window
 int Preferences::get_window_x() {
 	return window_x;
 }
@@ -111,9 +121,64 @@ void Preferences::set_window_w(int w) {
 void Preferences::set_window_h(int h) {
 	window_h = h;
 }
-
+// Radio2 window
+int Preferences::get_radio2_x() {
+	return radio2_x;
+}
+int Preferences::get_radio2_y() {
+	return radio2_y;
+}
+void Preferences::set_radio2_x(int x) {
+	radio2_x = x;
+}
+void Preferences::set_radio2_y(int y) {
+	radio2_y = y;
+}
+int Preferences::get_radio2_w() {
+	return radio2_w;
+}
+int Preferences::get_radio2_h() {
+	return radio2_h;
+}
+void Preferences::set_radio2_w(int w) {
+	radio2_w = w;
+}
+void Preferences::set_radio2_h(int h) {
+	radio2_h = h;
+}
+// Radio3 window
+int Preferences::get_radio3_x() {
+	return radio3_x;
+}
+int Preferences::get_radio3_y() {
+	return radio3_y;
+}
+void Preferences::set_radio3_x(int x) {
+	radio3_x = x;
+}
+void Preferences::set_radio3_y(int y) {
+	radio3_y = y;
+}
+int Preferences::get_radio3_w() {
+	return radio3_w;
+}
+int Preferences::get_radio3_h() {
+	return radio3_h;
+}
+void Preferences::set_radio3_w(int w) {
+	radio3_w = w;
+}
+void Preferences::set_radio3_h(int h) {
+	radio3_h = h;
+}
 //----------------------------------------------------
 // RADIO
+int Preferences::get_num_radios() {
+	return num_radios;
+}
+void Preferences::set_num_radios(int num) {
+	num_radios = num;
+}
 int Preferences::get_freq(int radio) {
 	return radio_freq[radio - 1];
 }
@@ -164,9 +229,18 @@ void Preferences::restore() {
 	app.get("window_y", window_y, DEFAULT_Y);
 	app.get("window_w", window_w, DEFAULT_W);
 	app.get("window_h", window_h, DEFAULT_H);
+	app.get("radio2_x", radio2_x, DEFAULT_X);
+	app.get("radio2_y", radio2_y, DEFAULT_Y);
+	app.get("radio2_w", radio2_w, DEFAULT_W);
+	app.get("radio2_h", radio2_h, DEFAULT_H);
+	app.get("radio3_x", radio3_x, DEFAULT_X);
+	app.get("radio3_y", radio3_y, DEFAULT_Y);
+	app.get("radio3_w", radio3_w, DEFAULT_W);
+	app.get("radio3_h", radio3_h, DEFAULT_H);
 
 	// Read radio data
 	Fl_Preferences radio(root, "RADIO");
+	radio.get("num_radios", num_radios, 1);
 	radio.get("freq-1", radio_freq[0], radio_freq[0]);
 	radio.get("freq-2", radio_freq[1], radio_freq[1]);
 	radio.get("freq-3", radio_freq[2], radio_freq[2]);
