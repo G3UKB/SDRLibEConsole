@@ -46,6 +46,7 @@ public:
 	//==============================================================================
 	WindowBase(int radio, int x, int y, int w, int h);
 	~WindowBase() {};
+	void resize(int x, int y, int w, int h);
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
 	void manage_audio_panel(bool show);

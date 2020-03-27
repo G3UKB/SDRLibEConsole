@@ -117,6 +117,33 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 }
 
 //===================================================
+// Event handlers
+// Resize event
+void  WindowBase::resize(int x, int y, int w, int h) {
+	// Tell window to resize all widgets
+	Fl_Double_Window::resize(x, y, w, h);
+	// Save position and size
+	if (r == 1) {
+		p->set_window_x(x);
+		p->set_window_y(y);
+		p->set_window_w(w);
+		p->set_window_h(h);
+	}
+	else if (r == 2) {
+		p->set_radio2_x(x);
+		p->set_radio2_y(y);
+		p->set_radio2_w(w);
+		p->set_radio2_h(h);
+	}
+	else if (r == 3) {
+		p->set_radio3_x(x);
+		p->set_radio3_y(y);
+		p->set_radio3_w(w);
+		p->set_radio3_h(h);
+	}
+}
+
+//===================================================
 // Callbacks
 //----------------------------------------------------
 // Handle idle timeout

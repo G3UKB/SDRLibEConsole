@@ -46,7 +46,6 @@ public:
 	//==============================================================================
 	MainWindow(int x, int y, int w, int h);
 	~MainWindow() {};
-	void resize(int x, int y, int w, int h);
 	int handle(int event);
 	void handle_idle_timeout();
 	void handle_radio();

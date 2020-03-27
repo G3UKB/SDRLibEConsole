@@ -89,16 +89,6 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 
 //===================================================
 // Event handlers
-// Resize event
-void  MainWindow::resize(int x, int y, int w, int h) {
-	// Tell window to resize all widgets
-	Fl_Double_Window::resize(x, y, w, h);
-	// Save position and size
-	p->set_window_x(x);
-	p->set_window_y(y);
-	p->set_window_w(w);
-	p->set_window_h(h);
-}
 
 //----------------------------------------------------
 // General event handler
