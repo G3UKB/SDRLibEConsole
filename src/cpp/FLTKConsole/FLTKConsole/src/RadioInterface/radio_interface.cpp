@@ -33,10 +33,14 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Public
+//----------------------------------------------------
+// Create a repository
 RadioInterface::RadioInterface() {
 	all_state = new AllState;
 }
 
+//----------------------------------------------------
+// Reset server
 void RadioInterface::reset() {
 	audio_set = false;
 	server_running = false;
@@ -45,41 +49,9 @@ void RadioInterface::reset() {
 }
 //==============================================================================
 // Call down methods
-/*
-bool RadioInterface::ri_set_default_audio() {
-	int direction;
-	char* host_api = nullptr;
-	char* dev = nullptr;
 
-	if (!audio_set) {
-		audio_set = true;
-		// Set up a default route for RX1 to Speaker output
-		DeviceEnumList* l = c_server_enum_audio_outputs();
-		for (int i = 0; i < l->entries; i++) {
-			printf("%s,%s\n", l->devices[i].name, l->devices[i].host_api);
-#ifdef linux
-			// This is the standard inbuilt audio port on RPi 
-			if (std::string(l->devices[i].name).find("(hw:0,1)") != std::string::npos) {
-				if (std::string(l->devices[i].host_api) == "ALSA") {
-#else
-			if (std::string(l->devices[i].name).find("Speakers") != std::string::npos) {
-				if (std::string(l->devices[i].host_api) == "MME") {
-#endif
-					direction = l->devices[i].direction;
-					host_api = l->devices[i].host_api;
-					dev = l->devices[i].name;
-					break;
-				}
-			}
-		}
-		if (host_api != nullptr && dev != nullptr) {
-			c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
-			return true;
-		}
-	}
-	return false;
-}
-*/
+//----------------------------------------------------
+// Set the default audio path (used when no configured paths)
 bool RadioInterface::ri_set_default_audio() {
 	int direction;
 	char* host_api = nullptr;
@@ -106,6 +78,8 @@ bool RadioInterface::ri_set_default_audio() {
 	return false;
 }
 
+//----------------------------------------------------
+// Start the inbuilt server
 bool RadioInterface::ri_server_start() {
 
 	if (!server_running) {
@@ -120,10 +94,14 @@ bool RadioInterface::ri_server_start() {
 	return true;
 }
 
+//----------------------------------------------------
+// Terminate the inbuilt server
 bool RadioInterface::ri_server_terminate() {
 
 }
 
+//----------------------------------------------------
+// Try and discover radio hardware
 bool RadioInterface::ri_radio_discover() {
 	if (!radio_discovered) {
 		// Discover radio
@@ -137,6 +115,8 @@ bool RadioInterface::ri_radio_discover() {
 	return true;
 }
 
+//----------------------------------------------------
+// Start the radio hardware
 bool RadioInterface::ri_radio_start(int wbs) {
 	if (!radio_running) {
 		// Start radio
@@ -150,6 +130,8 @@ bool RadioInterface::ri_radio_start(int wbs) {
 	return true;
 }
 
+//----------------------------------------------------
+// Stop the radio hardware
 bool RadioInterface::ri_radio_stop() {
 	if (radio_running) {
 		radio_running = false;
@@ -162,6 +144,8 @@ bool RadioInterface::ri_radio_stop() {
 	return true;
 }
 
+//----------------------------------------------------
+// Set RX mode and adjust filters
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
 	if (server_running) {
 		set_current_mode(channel, mode);
@@ -169,6 +153,8 @@ void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
 	}
 }
 
+//----------------------------------------------------
+// Set a new filter, adjust for the current mode
 void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 
 	int low;
@@ -193,6 +179,8 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 	}
 }
 
+//----------------------------------------------------
+// Set receiver 1/2/3 frequency
 void RadioInterface::ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz) {
 	c_server_cc_out_set_rx_1_freq(freq_in_hz);
 	set_current_freq(0, freq_in_hz);
@@ -209,14 +197,13 @@ void RadioInterface::ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz) {
 }
 
 //==============================================================================
-// Get methods
+// Get methods for current radio(s) state
 bool RadioInterface::is_radio_discovered() {
 	return radio_discovered;
 }
 
 bool RadioInterface::is_server_running() {
 	return server_running;
-
 }
 
 bool RadioInterface::is_radio_running() {
@@ -242,7 +229,10 @@ filter_desc RadioInterface::get_current_rx_filter_desc(int channel) {
 }
 
 //==============================================================================
-// Private
+// PRIVATE
+
+//----------------------------------------------------
+// Mode and filter are interrelated so must be set in unison
 void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int filter_high, bool set_radio) {
 	int low;
 	int high;
@@ -272,7 +262,8 @@ void RadioInterface::set_mode_filter(int channel, int mode, int filter_low, int 
 	}
 }
 
-// Get/Set methods
+//----------------------------------------------------
+// Supporting Get/Set methods
 void RadioInterface::set_current_freq(int channel, int freq) {
 	switch (channel) {
 	case 0: all_state->rx_1.freq = freq; break;

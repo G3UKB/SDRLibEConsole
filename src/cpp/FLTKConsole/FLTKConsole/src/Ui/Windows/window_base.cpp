@@ -31,7 +31,9 @@ The authors can be reached by email at:
 // Defines
 
 //==============================================================================
+// PUBLIC
 
+//----------------------------------------------------
 // Idle time callback
 // We call back to the window to do housekeeping
 void base_idle_cb(void* data) {
@@ -57,7 +59,7 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 	char label[20];
-	sprintf_s(label, "Radio-%d", r);
+	sprintf_s(label, "Receiver-%d", r);
 	copy_label(label);
 
 	// Set window position
@@ -180,11 +182,9 @@ void WindowBase::handle_idle_timeout() {
 //----------------------------------------------------
 // Show or hide the audio panel
 void  WindowBase::manage_audio_panel(bool show) {
-
+	struct struct_w_loc loc = get_location(r);
 	if (show) {
-		int x = p->get_window_x() + p->get_window_w() + 5;
-		int y = p->get_window_y();
-		audio->position(x, y);
+		audio->position(loc.x + loc.w + 5, loc.y);
 		audio->show();
 	}
 	else {
@@ -195,11 +195,9 @@ void  WindowBase::manage_audio_panel(bool show) {
 //----------------------------------------------------
 // Show or hide the modes panel
 void  WindowBase::manage_mode_panel(bool show) {
-
+	struct struct_w_loc loc = get_location(r);
 	if (show) {
-		int x = p->get_window_x() + p->get_window_w() + 5;
-		int y = p->get_window_y();
-		modes->position(x, y);
+		modes->position(loc.x + loc.w + 5, loc.y);
 		modes->show();
 	}
 	else {
@@ -210,17 +208,43 @@ void  WindowBase::manage_mode_panel(bool show) {
 //----------------------------------------------------
 // Show or hide the filter panel
 void  WindowBase::manage_filter_panel(bool show) {
-
+	struct struct_w_loc loc = get_location(r);
 	if (show) {
-		int x = p->get_window_x() + p->get_window_w() + 5;
-		int y = p->get_window_y();
-		filters->position(x, y);
+		filters->position(loc.x + loc.w + 5, loc.y);
 		filters->show();
 	}
 	else {
 		filters->hide();
 	}
 }
+
+//==============================================================================
+// PRIVATE
+
+struct struct_w_loc WindowBase::get_location(int radio) {
+	if (radio == 1) {
+		w_loc.x = p->get_window_x();
+		w_loc.y = p->get_window_y();
+		w_loc.w = p->get_window_w();
+		w_loc.h = p->get_window_h();
+	}
+	else if (radio == 2) {
+		w_loc.x = p->get_radio2_x();
+		w_loc.y = p->get_radio2_y();
+		w_loc.w = p->get_radio2_w();
+		w_loc.h = p->get_radio2_h();
+	}
+	else {
+		w_loc.x = p->get_radio3_x();
+		w_loc.y = p->get_radio3_y();
+		w_loc.w = p->get_radio3_w();
+		w_loc.h = p->get_radio3_h();
+	}
+	return w_loc;
+}
+
+//==============================================================================
+// TRIGGER CLASSES
 
 //==============================================================================
 // Mode button

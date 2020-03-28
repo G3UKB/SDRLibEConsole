@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 #endif
 	// Initialise and run server
 	if (c_server_init()) {
-		c_server_set_num_rx(1);
+		c_server_set_num_rx(prefs->get_num_radios());
 		if (r_i->ri_set_default_audio()) {
 			if (r_i->ri_radio_discover()) {
 				RSt::inst().set_discovered(true);

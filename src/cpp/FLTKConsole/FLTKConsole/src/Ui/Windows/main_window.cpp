@@ -112,9 +112,11 @@ int MainWindow::handle(int event) {
 	case FL_HIDE: {
 			// Save prefs
 			p->save();
-			if (Radio2_Win != NULL) Radio3_Win->close();
+			// Close radio windows if active
+			if (Radio2_Win != NULL) Radio2_Win->close();
 			if (Radio3_Win != NULL) Radio3_Win->close();
-			close();
+			// Close window base
+			WindowBase::close();
 			break;
 		}
 	}
@@ -152,6 +154,7 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 	int value = c->value();
 	if (value + 1 != p->get_num_radios()) {
 		// Number of radios has changed
+		// Bounce the server
 		if (value == 0) {
 			// One radio
 			// Close radios 2/3 if active

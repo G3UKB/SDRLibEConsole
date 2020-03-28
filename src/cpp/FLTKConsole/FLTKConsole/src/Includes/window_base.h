@@ -40,6 +40,14 @@ class ModeTriggerBase;
 class FilterTriggerBase;
 class AudioTriggerBase;
 
+// Return my location
+typedef struct struct_w_loc {
+	int x;
+	int y;
+	int w;
+	int h;
+};
+
 class WindowBase : public Fl_Double_Window
 {
 public:
@@ -66,7 +74,9 @@ private:
 	// State variables
 	// Radio inst
 	int r;
-	// labels must be fixed storage
+	// Structures
+	struct_w_loc w_loc;
+	// Labels must be fixed storage
 	char audio_str[10] = "Audio>>";
 	char mode_str[10] = "Mode>>";
 	char filter_str[10] = "Filter>>";
@@ -87,7 +97,7 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-
+	struct struct_w_loc get_location(int radio);
 };
 
 //==============================================================================
