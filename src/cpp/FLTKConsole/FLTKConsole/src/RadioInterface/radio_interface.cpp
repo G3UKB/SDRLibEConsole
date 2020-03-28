@@ -84,6 +84,44 @@ void RadioInterface::cold_start() {
 }
 
 //----------------------------------------------------
+// Restart the radio server
+void RadioInterface::restart() {
+	// Stop radio if running
+	if (RSt::inst().get_radio_running()) {
+		ri_radio_stop();
+	}
+	// Stop server if running
+	if (RSt::inst().get_server_running()) {
+		ri_server_terminate();
+	}
+
+	// Initialise and run server
+	if (c_server_init()) {
+		c_server_set_num_rx(p->get_num_radios());
+		if (ri_set_default_audio()) {
+			if (ri_radio_discover()) {
+				RSt::inst().set_discovered(true);
+				if (ri_server_start())
+					RSt::inst().set_server_running(true);
+				else
+					std::cout << std::endl << "Failed to start server!" << std::endl;
+			}
+			else
+				std::cout << std::endl << "Failed to discover radio!" << std::endl;
+		}
+		else
+			std::cout << std::endl << "Failed to configure audio!" << std::endl;
+	}
+	else
+		std::cout << std::endl << "Failed to initialise server!" << std::endl;
+
+	// Test result
+	// Now reset all audio, modes and filters
+	// Need a util class that reads the prefs and does the correct thing
+	// reset_radio_state();
+}
+
+//----------------------------------------------------
 // Set the default audio path (used when no configured paths)
 bool RadioInterface::ri_set_default_audio() {
 	int direction;
@@ -95,7 +133,7 @@ bool RadioInterface::ri_set_default_audio() {
 		// Set up a route for RX1 to default output
 		DeviceEnumList* l = c_server_enum_audio_outputs();
 		for (int i = 0; i < l->entries; i++) {
-			printf("%d,%s,%s\n", l->devices[i].default_id, l->devices[i].name, l->devices[i].host_api);
+			//printf("%d,%s,%s\n", l->devices[i].default_id, l->devices[i].name, l->devices[i].host_api);
 			if (l->devices[i].default_id) {
 				direction = l->devices[i].direction;
 				host_api = l->devices[i].host_api;
@@ -130,7 +168,9 @@ bool RadioInterface::ri_server_start() {
 //----------------------------------------------------
 // Terminate the inbuilt server
 bool RadioInterface::ri_server_terminate() {
-
+	if (server_running) {
+		c_server_terminate();
+	}
 }
 
 //----------------------------------------------------

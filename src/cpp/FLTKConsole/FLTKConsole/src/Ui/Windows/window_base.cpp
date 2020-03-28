@@ -33,15 +33,6 @@ The authors can be reached by email at:
 //==============================================================================
 // PUBLIC
 
-//----------------------------------------------------
-// Idle time callback
-// We call back to the window to do housekeeping
-void base_idle_cb(void* data) {
-	MainWindow* w = (MainWindow*)data;
-	w->handle_idle_timeout();
-	Fl::repeat_timeout(0.2, base_idle_cb, data);
-}
-
 /*
 	The base class for main and radio windows.
 */
@@ -116,9 +107,6 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 	// Create the filters panel hidden
 	filters = new Filters(r, 230, 80);
 	filters->hide();
-
-	// Set an idle timeout
-	Fl::add_timeout(0.2, base_idle_cb, (void*)this);
 }
 
 //===================================================

@@ -145,6 +145,8 @@ void MainWindow::handle_idle_timeout() {
 		}
 	}
 	last_discovered = discovered;
+
+	WindowBase::handle_idle_timeout();
 }
 
 //----------------------------------------------------

@@ -68,6 +68,7 @@ public:
 	// Method prototypes
 	void ri_make_wisdom();
 	void cold_start();
+	void restart();
 	bool ri_set_default_audio();
 	bool ri_server_start();
 	bool ri_server_terminate();

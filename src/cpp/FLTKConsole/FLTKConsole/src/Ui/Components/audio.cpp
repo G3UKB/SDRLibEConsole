@@ -119,7 +119,7 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 	border(false);
 
 	// Retrieve audio path
-	char* p_audio_path = p->get_audio_path(1);
+	char* p_audio_path = p->get_audio_path(r);
 	char audio_path[100];
 	strcpy_s(audio_path, 100, p_audio_path);
 	if (strlen(audio_path) > 0) {

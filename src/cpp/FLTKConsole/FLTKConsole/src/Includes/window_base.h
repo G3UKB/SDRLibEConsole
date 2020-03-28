@@ -58,7 +58,7 @@ public:
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
 	void manage_audio_panel(bool show);
-	void handle_idle_timeout();
+	virtual void handle_idle_timeout();
 	void close();
 
 	//Layout

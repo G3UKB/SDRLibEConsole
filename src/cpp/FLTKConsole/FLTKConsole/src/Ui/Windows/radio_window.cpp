@@ -32,6 +32,14 @@ The authors can be reached by email at:
 
 //==============================================================================
 
+// Idle time callback
+// We call back to the window to do housekeeping
+void radio_window_idle_cb(void* data) {
+	RadioWindow* w = (RadioWindow*)data;
+	w->handle_idle_timeout();
+	Fl::repeat_timeout(0.2, radio_window_idle_cb, data);
+}
+
 /*
 	The one and only main window
 */
@@ -46,8 +54,18 @@ RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(rad
 
 	// Display main window
 	show();
+
+	// Set an idle timeout
+	Fl::add_timeout(0.2, radio_window_idle_cb, (void*)this);
 }
 
 //===================================================
 // Callbacks
 //----------------------------------------------------
+
+// Handle idle timeout
+void RadioWindow::handle_idle_timeout() {
+	// Nothing todo here
+	// Just call base class
+	WindowBase::handle_idle_timeout();
+}
