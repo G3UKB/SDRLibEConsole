@@ -117,6 +117,7 @@ void RadioInterface::restart() {
 
 	// Test result
 	// Now reset all audio, modes and filters
+	// New radios will set these but existing ons will not so reset anyway after radio windows started
 	// Need a util class that reads the prefs and does the correct thing
 	// reset_radio_state();
 }
