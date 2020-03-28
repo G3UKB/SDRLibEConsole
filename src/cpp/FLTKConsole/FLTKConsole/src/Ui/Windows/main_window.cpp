@@ -43,7 +43,7 @@ void main_window_idle_cb(void* data) {
 // Radio select callback
 void radio_cb(Fl_Widget* w, void* user_data) {
 	// Call down to our Audio instance
-	((MainWindow*)user_data)->handle_radio();
+	((MainWindow*)user_data)->handle_radio(w);
 }
 
 /*
@@ -82,6 +82,15 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 
 	// Display main window
 	show();
+
+	// Show radio windows as appropriate
+	int num = p->get_num_radios();
+	if (num > 1) {
+		Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+	}
+	if (num > 2) {
+		Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+	}
 
 	// Set an idle timeout
 	Fl::add_timeout(0.2, main_window_idle_cb, (void*)this);
@@ -130,8 +139,31 @@ void MainWindow::handle_idle_timeout() {
 
 //----------------------------------------------------
 // Handle number of radio instances
-void MainWindow::handle_radio() {
-	Radio2_Win = new RadioWindow(2, 10, 10, 331, 124);
+void MainWindow::handle_radio(Fl_Widget* w) {
+	Fl_Choice* c = (Fl_Choice*)w;
+	int value = c->value();
+	if (value + 1 != p->get_num_radios()) {
+		// Number of radios has changed
+		if (value == 0) {
+			// One radio
+			// Close radios 2/3 if active
+			//if (Radio2_Win != NULL ) Radio2_Win->close();
+			//if (Radio3_Win != NULL ) Radio3_Win->close();
+		}
+		else if (value == 1) {
+			// Two radios
+			Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			// Close radio 3 if active
+			//if (Radio3_Win != NULL ) Radio3_Win->close();
+		}
+		else if (value == 2) {
+			// Three radios
+			Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+		}
+		// Update number of radios
+		p->set_num_radios(value + 1);
+	}
 }
 
 //==============================================================================

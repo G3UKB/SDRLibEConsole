@@ -48,7 +48,7 @@ public:
 	~MainWindow() {};
 	int handle(int event);
 	void handle_idle_timeout();
-	void handle_radio();
+	void handle_radio(Fl_Widget* w);
 
 	//==============================================================================
 
@@ -72,8 +72,8 @@ private:
 	Fl_Choice* SelectRadio;
 
 	// Radio windows
-	RadioWindow* Radio2_Win;
-	RadioWindow* Radio3_Win;
+	RadioWindow* Radio2_Win = NULL;
+	RadioWindow* Radio3_Win = NULL;
 
 	//==============================================================================
 	// Method prototypes
