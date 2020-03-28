@@ -37,6 +37,7 @@ The authors can be reached by email at:
 // Create a repository
 RadioInterface::RadioInterface() {
 	all_state = new AllState;
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
 }
 
 //----------------------------------------------------
@@ -47,8 +48,40 @@ void RadioInterface::reset() {
 	radio_discovered = false;
 	radio_running = false;
 }
-//==============================================================================
-// Call down methods
+
+//----------------------------------------------------
+// Make a wisdom file fot FFT if not present
+void RadioInterface::ri_make_wisdom() {
+#ifdef linux
+	c_server_make_wisdom((char *)"./wisdom/");
+#else
+	c_server_make_wisdom((char *)"E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom/");
+#endif
+}
+
+//----------------------------------------------------
+// Cold start the radio server
+void RadioInterface::cold_start() {
+	// Initialise and run server
+	if (c_server_init()) {
+		c_server_set_num_rx(p->get_num_radios());
+		if (ri_set_default_audio()) {
+			if (ri_radio_discover()) {
+				RSt::inst().set_discovered(true);
+				if (ri_server_start())
+					RSt::inst().set_server_running(true);
+				else
+					std::cout << std::endl << "Failed to start server!" << std::endl;
+			}
+			else
+				std::cout << std::endl << "Failed to discover radio!" << std::endl;
+		}
+		else
+			std::cout << std::endl << "Failed to configure audio!" << std::endl;
+	}
+	else
+		std::cout << std::endl << "Failed to initialise server!" << std::endl;
+}
 
 //----------------------------------------------------
 // Set the default audio path (used when no configured paths)

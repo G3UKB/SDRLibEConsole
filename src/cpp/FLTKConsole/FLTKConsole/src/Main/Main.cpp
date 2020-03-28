@@ -43,38 +43,18 @@ int main(int argc, char **argv) {
 	RSt::inst().put_obj("RADIO-IF", (void*)r_i);
 
 	// Make wisdom file if not already made
-#ifdef linux
-	c_server_make_wisdom((char *)"./wisdom/");
-#else
-	c_server_make_wisdom((char *)"E:/Projects/SDRLibEConsole/trunk/src/cpp/wisdom/");
-#endif
-	// Initialise and run server
-	if (c_server_init()) {
-		c_server_set_num_rx(prefs->get_num_radios());
-		if (r_i->ri_set_default_audio()) {
-			if (r_i->ri_radio_discover()) {
-				RSt::inst().set_discovered(true);
-				if (r_i->ri_server_start())
-					RSt::inst().set_server_running(true);
-				else
-					std::cout << std::endl << "Failed to start server!" << std::endl;
-			}
-			else
-				std::cout << std::endl << "Failed to discover radio!" << std::endl;
-		}
-		else
-			std::cout << std::endl << "Failed to configure audio!" << std::endl;
-	}
-	else
-		std::cout << std::endl << "Failed to initialise server!" << std::endl;
+	r_i->ri_make_wisdom();
+
+	// Perform a cold start
+	// State is set in running state for system interrogation
+	r_i->cold_start();
 
 	// Create the main window
 	Fl_Window* main_window = new MainWindow(prefs->get_window_x(), prefs->get_window_y(), prefs->get_window_w(), prefs->get_window_h());
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
-	// Run event loop until quit
+	// Run UI event loop until quit
 	return Fl::run();
-
 }
 
 

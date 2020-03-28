@@ -62,11 +62,12 @@ public:
 	// Construct/destroy
 	//==============================================================================
 	RadioInterface();
-	~RadioInterface();
+	~RadioInterface() {};
 
 	//==============================================================================
 	// Method prototypes
-	// Call down to server
+	void ri_make_wisdom();
+	void cold_start();
 	bool ri_set_default_audio();
 	bool ri_server_start();
 	bool ri_server_terminate();
@@ -93,6 +94,7 @@ public:
 private:
 	//==============================================================================
 	// State variables
+	Preferences* p;
 	bool audio_set = false;
 	bool server_running = false;
 	bool radio_discovered = false;
