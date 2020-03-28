@@ -56,6 +56,9 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
+	char label[20];
+	sprintf_s(label, "Radio-%d", r);
+	copy_label(label);
 
 	// Set window position
 	position(x, y);
@@ -118,6 +121,16 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 
 //===================================================
 // Event handlers
+//----------------------------------------------------
+// Close window
+void WindowBase::close() {
+	Fl::delete_widget(this);
+	Fl::delete_widget(audio);
+	Fl::delete_widget(modes);
+	Fl::delete_widget(filters);
+}
+
+//----------------------------------------------------
 // Resize event
 void  WindowBase::resize(int x, int y, int w, int h) {
 	// Tell window to resize all widgets

@@ -90,7 +90,6 @@ public:
 	void freq_minus();
 	std::string convertFreq(int freq);
 	void set_display_freq(std::string freq);
-	void set_freq_from_hz(int freq);
 
 private:
 	//==============================================================================
@@ -125,6 +124,18 @@ private:
 	VFODigit *d_1Hz;
 	Fl_Box *sep_1;
 	Fl_Box *sep_2;
+
+	// Label storage
+	char c0[2] = { 0,0 };
+	char c1[2] = { 0,0 };
+	char c2[2] = { 0,0 };
+	char c3[2] = { 0,0 };
+	char c4[2] = { 0,0 };
+	char c5[2] = { 0,0 };
+	char c6[2] = { 0,0 };
+	char c7[2] = { 0,0 };
+	char c8[2] = { 0,0 };
+
 
 	//==============================================================================
 	// Method prototypes

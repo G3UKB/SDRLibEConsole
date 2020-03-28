@@ -56,6 +56,9 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
+	// Get num radios
+	int num = p->get_num_radios();
+
 	// Add start/stop buttons to the group
 	m = grid->get_cell_metrics(0, 0);
 	StartBtn = new ControlButton(this, start_str, stop_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
@@ -74,17 +77,17 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 	SelectRadio->labelcolor((Fl_Color)80);
 	SelectRadio->callback((Fl_Callback*)radio_cb, (void*)this);
 	top_group->add(SelectRadio);
+	SelectRadio->value(num - 1);
 
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
 	DiscoverBtn->deactivate();
-	SelectRadio->deactivate();
+	//SelectRadio->deactivate();
 
 	// Display main window
 	show();
 
 	// Show radio windows as appropriate
-	int num = p->get_num_radios();
 	if (num > 1) {
 		Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 	}
@@ -102,11 +105,16 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 //----------------------------------------------------
 // General event handler
 int MainWindow::handle(int event) {
+	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
 	switch (event) {
+	// Window close raises an FL_HIDE event?
 	case FL_HIDE: {
 			// Save prefs
 			p->save();
+			if (Radio2_Win != NULL) Radio3_Win->close();
+			if (Radio3_Win != NULL) Radio3_Win->close();
+			close();
 			break;
 		}
 	}
@@ -125,12 +133,12 @@ void MainWindow::handle_idle_timeout() {
 	if (discovered != last_discovered) {
 		if (discovered) {
 			StartBtn->activate();
-			SelectRadio->activate();
+			//SelectRadio->activate();
 			DiscoverBtn->deactivate();
 		}
 		else {
 			StartBtn->deactivate();
-			SelectRadio->deactivate();
+			//SelectRadio->deactivate();
 			DiscoverBtn->activate();
 		}
 	}
@@ -147,19 +155,28 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		if (value == 0) {
 			// One radio
 			// Close radios 2/3 if active
-			//if (Radio2_Win != NULL ) Radio2_Win->close();
-			//if (Radio3_Win != NULL ) Radio3_Win->close();
+			if (Radio2_Win != NULL) {
+				Radio2_Win->close();
+				Radio2_Win = NULL;
+			}
+			if (Radio3_Win != NULL ) {
+				Radio3_Win->close();
+				Radio3_Win = NULL;
+			}
 		}
 		else if (value == 1) {
 			// Two radios
-			Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 			// Close radio 3 if active
-			//if (Radio3_Win != NULL ) Radio3_Win->close();
+			if (Radio3_Win != NULL ) {
+				Radio3_Win->close();
+				Radio3_Win = NULL;
+			}
 		}
 		else if (value == 2) {
 			// Three radios
-			Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
-			Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			if (Radio3_Win == NULL) Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 		}
 		// Update number of radios
 		p->set_num_radios(value + 1);

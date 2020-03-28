@@ -51,6 +51,7 @@ public:
 	void manage_filter_panel(bool show);
 	void manage_audio_panel(bool show);
 	void handle_idle_timeout();
+	void close();
 
 	//Layout
 	GridLayout *grid;

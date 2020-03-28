@@ -77,14 +77,20 @@ VFOComponent::~VFOComponent()
 {
 }
 
+//----------------------------------------------------
+// As we enter digit we set the appropriate increment for the digit
 void VFOComponent::set_freq_inc(int id) {
 	freq_inc = freq_inc_map.at(id);
 }
 
+//----------------------------------------------------
+//  As we leave digit we reset the increment
 void VFOComponent::reset_freq_inc() {
 	freq_inc = -1;
 }
 
+//----------------------------------------------------
+// On mouse wheel up we increment the frequency by increment value
 void VFOComponent::freq_plus() {
 	if (freq_inc > 0) {
 		int ifreq = current_freq + freq_inc;
@@ -97,6 +103,8 @@ void VFOComponent::freq_plus() {
 	}
 }
 
+//----------------------------------------------------
+// On mouse wheel down we decrement the frequency by increment value
 void VFOComponent::freq_minus() {
 	if (freq_inc > 0) {
 		int ifreq = current_freq - freq_inc;
@@ -109,6 +117,8 @@ void VFOComponent::freq_minus() {
 	}
 }
 
+//----------------------------------------------------
+// Convert integer frequency in Hz to a 9 digit string
 std::string VFOComponent::convertFreq(int freq) {
 	// Convert to a string representation of the frequency in Hz
 	std::string sfreq = std::to_string(freq);
@@ -122,18 +132,9 @@ std::string VFOComponent::convertFreq(int freq) {
 	return (leading_zeros += sfreq);
 }
 
+//----------------------------------------------------
+// Set the display to the 9 digit string
 void VFOComponent::set_display_freq(std::string freq) {
-	// The string passed to label is not copied so it must be
-	// unique and not go out of scope.
-	static char c0[] = "\0\0";
-	static char c1[] = "\0\0";
-	static char c2[] = "\0\0";
-	static char c3[] = "\0\0";
-	static char c4[] = "\0\0";
-	static char c5[] = "\0\0";
-	static char c6[] = "\0\0";
-	static char c7[] = "\0\0";
-	static char c8[] = "\0\0";
 	// Update all the frequency digits
 	c0[0] = freq[0]; d_100MHz->label(c0);
 	c1[0] = freq[1]; d_10MHz->label(c1);
@@ -146,16 +147,14 @@ void VFOComponent::set_display_freq(std::string freq) {
 	c8[0] = freq[8]; d_1Hz->label(c8);
 }
 
-void VFOComponent::set_freq_from_hz(int freq) {
-	set_display_freq(convertFreq(freq));
-}
-
 //==============================================================================
 // GUI Events
 
-
 //==============================================================================
-// Private
+// PRIVATE
+
+//----------------------------------------------------
+// Create and layout the 9 digits and 2 spacers
 void VFOComponent::create_digits() {
 	
 	// Create a grid layout handler
@@ -207,6 +206,8 @@ void VFOComponent::create_digits() {
 	end();
 }
 
+//----------------------------------------------------
+// Tune the radio-n to the current frequency
 void VFOComponent::set_radio_freq() {
 	if (r == 1)
 		r_i->ri_server_cc_out_set_rx_1_freq(current_freq);
@@ -220,6 +221,8 @@ void VFOComponent::set_radio_freq() {
 // A VFO Digit
 //==============================================================================
 
+//----------------------------------------------------
+// Constructor/destructor
 VFODigit::VFODigit(VFOComponent* parent, Fl_Color label_colour, float font_size, int x, int y, int w, int h) : Fl_Box(FL_FLAT_BOX, x, y, w, h, "0") {
 
 	my_parent = parent;
@@ -238,15 +241,21 @@ VFODigit::~VFODigit() {
 
 }
 
+//----------------------------------------------------
+// Draw a single digit
 void VFODigit::draw() {
 	Fl_Box::draw_box();
 	Fl_Widget::draw_label();
-
 }
 
-// Handle all events
+//==============================================================================
+// Event Handlers
+
+//----------------------------------------------------
+// General handler
 int VFODigit::handle(int event) {
 	switch (event) {
+		// Mouse enter digit
 		case FL_ENTER: {
 			// Grow the digit a little
 			if (argument() > 6)
@@ -261,6 +270,7 @@ int VFODigit::handle(int event) {
 			redraw();
 			return 1;
 		}
+		// Mouse leave digit
 		case FL_LEAVE: {
 			// Shrink back to normal size
 			if (argument() > 6)
@@ -275,6 +285,7 @@ int VFODigit::handle(int event) {
 			redraw();
 			return 1;
 		}
+		// Mouse wheel over digit
 		case FL_MOUSEWHEEL: {
 			// Scrolling
 			if (active_digit != -1) {
