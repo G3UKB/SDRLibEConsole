@@ -35,6 +35,14 @@ The authors can be reached by email at:
 	The one and only main window
 */
 
+typedef struct struct_audio_desc {
+	bool valid;
+	char* sink_part;
+	char* dev_part;
+	char* api_part;
+	char* ch_part;
+};
+
 class Preferences
 {
 public:
@@ -88,6 +96,7 @@ public:
 	// Audio paths
 	char* get_audio_path(int radio);
 	void set_audio_path(int radio, char* path);
+	struct struct_audio_desc get_audio_desc(int radio);
 
 private:
 	//==============================================================================
@@ -119,9 +128,11 @@ private:
 	char radio_audio_path_1[100];
 	char radio_audio_path_2[100];
 	char radio_audio_path_3[100];
+	// Audio tokens
+	struct_audio_desc audio_desc;
 
 	//==============================================================================
 	// Method prototypes
 	void restore();
-	
+	struct struct_audio_desc parse_audio_desc(int radio);
 };

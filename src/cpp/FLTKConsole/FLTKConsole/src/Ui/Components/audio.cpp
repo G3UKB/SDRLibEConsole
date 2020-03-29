@@ -118,6 +118,16 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 	end();
 	border(false);
 
+	// Retrieve and reset audio path
+	struct_audio_desc desc = p->get_audio_desc(r);
+	if (desc.valid) {
+		// Set the widget state
+		set_widget_state(desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
+		// Set audio path
+		set_path(r, desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
+	}
+
+	/*
 	// Retrieve audio path
 	char* p_audio_path = p->get_audio_path(r);
 	char audio_path[100];
@@ -142,6 +152,8 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 		// Set audio path
 		set_path(r, sink_part, api_part, dev_part, ch_part);
 	}
+	*/
+
 	// Finally show window
 	show();
 }

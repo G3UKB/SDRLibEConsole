@@ -213,6 +213,10 @@ void Preferences::set_audio_path(int radio, char* path) {
 	else
 		strcpy_s(radio_audio_path_3, path);
 }
+// Audio tokens
+struct struct_audio_desc Preferences::get_audio_desc(int radio) {
+	return parse_audio_desc(radio);
+}
 
 //==============================================================================
 // PRIVATE
@@ -254,4 +258,24 @@ void Preferences::restore() {
 	radio.get("audio-1", radio_audio_path_1, "", 100);
 	radio.get("audio-2", radio_audio_path_2, "", 100);
 	radio.get("audio-3", radio_audio_path_3, "", 100);
+}
+
+//----------------------------------------------------
+// Parse the audio descriptor into tokens
+struct struct_audio_desc Preferences::parse_audio_desc(int radio) {
+	// Retrieve audio path
+	char* p_audio_path = get_audio_path(radio);
+	audio_desc.valid = false;
+	if (strlen(p_audio_path) > 0) {
+		// We have a path
+		// Extract tokens
+		char* next_token;
+		// Split into tokens
+		audio_desc.sink_part = strtok_s(p_audio_path, ":", &next_token);
+		audio_desc.dev_part = strtok_s(NULL, ":", &next_token);
+		audio_desc.api_part = strtok_s(NULL, ":", &next_token);
+		audio_desc.ch_part = strtok_s(NULL, ":", &next_token);
+		audio_desc.valid = true;
+	}
+	return audio_desc;
 }
