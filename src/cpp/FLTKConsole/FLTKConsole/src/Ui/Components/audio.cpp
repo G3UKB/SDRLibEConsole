@@ -143,11 +143,11 @@ void Audio::handle_apply() {
 
 	// Set sink type
 	if (strcmp(((Fl_Choice*)sink)->text(), "LOCAL-AF")) {
-		strcpy_s(sink_str, 9, "Local/AF");
+		strcpy_s(sink_str, 9, LOCAL_AF);
 	} else if (strcmp(((Fl_Choice*)sink)->text(), "LOCAL-IQ")) {
-		strcpy_s(sink_str, 9, "Local/IQ");
+		strcpy_s(sink_str, 9, LOCAL_IQ);
 	} else if (strcmp(((Fl_Choice*)sink)->text(), "HPSDR")) {
-		strcpy_s(sink_str, 9, "HPSDR");
+		strcpy_s(sink_str, 9, HPSDR);
 	}
 
 	// Set dev type
@@ -157,13 +157,13 @@ void Audio::handle_apply() {
 
 	// Set channel type
 	if (((Fl_Radio_Light_Button*)left)->value()) {
-		strcpy_s(ch_str, 10, "LEFT");
+		strcpy_s(ch_str, 10, LEFT);
 	}
 	else if (((Fl_Radio_Light_Button*)right)->value()) {
-		strcpy_s(ch_str, 10, "RIGHT");
+		strcpy_s(ch_str, 10, RIGHT);
 	}
 	else {
-		strcpy_s(ch_str, 10, "BOTH");
+		strcpy_s(ch_str, 10, BOTH);
 	}
 
 	// Reset the audio path for this receiver 
@@ -182,13 +182,13 @@ void Audio::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
 	char str[100];
 
 	// Set sink
-	if (strcmp(vsink, "Local/AF") == 0) {
+	if (strcmp(vsink, LOCAL_AF) == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-AF"));
 	}
-	else if (strcmp(vsink, "Local/IQ") == 0) {
+	else if (strcmp(vsink, LOCAL_IQ) == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
 	}
-	else if (strcmp(vsink, "HPSDR") == 0) {
+	else if (strcmp(vsink, HPSDR) == 0) {
 		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
 	}
 	// Set device
@@ -197,13 +197,13 @@ void Audio::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
 	strcat_s(str, 100, vapi);
 	((Fl_Choice*)device)->value(((Fl_Choice*)device)->find_index(str));
 	// Set channel
-	if (strcmp(vch, "LEFT") == 0) {
+	if (strcmp(vch, LEFT) == 0) {
 		((Fl_Radio_Light_Button*)left)->set();
 	}
-	else if (strcmp(vch, "RIGHT") == 0) {
+	else if (strcmp(vch, RIGHT) == 0) {
 		((Fl_Radio_Light_Button*)right)->set();
 	}
-	else if (strcmp(vch, "BOTH") == 0) {
+	else if (strcmp(vch, BOTH) == 0) {
 		((Fl_Radio_Light_Button*)both)->set();
 	}
 }
