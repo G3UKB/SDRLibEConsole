@@ -43,6 +43,7 @@ public:
 	RadioWindow(int radio, int x, int y, int w, int h);
 	~RadioWindow() {};
 	void handle_idle_timeout();
+	void close();
 
 	//==============================================================================
 

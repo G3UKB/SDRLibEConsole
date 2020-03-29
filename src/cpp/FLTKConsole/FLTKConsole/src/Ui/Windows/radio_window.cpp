@@ -59,6 +59,13 @@ RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(rad
 	Fl::add_timeout(0.2, radio_window_idle_cb, (void*)this);
 }
 
+//----------------------------------------------------
+// Close window
+void RadioWindow::close() {
+	Fl::remove_timeout(radio_window_idle_cb);
+	Fl::delete_widget(this);
+}
+
 //===================================================
 // Callbacks
 //----------------------------------------------------

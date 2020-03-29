@@ -115,8 +115,6 @@ int MainWindow::handle(int event) {
 			// Close radio windows if active
 			if (Radio2_Win != NULL) Radio2_Win->close();
 			if (Radio3_Win != NULL) Radio3_Win->close();
-			// Close window base
-			WindowBase::close();
 			break;
 		}
 	}
@@ -174,7 +172,7 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 				Radio3_Win = NULL;
 			}
 		}
-		else if (value == 1) {
+		else if (value == 1) {;
 			// Two radios
 			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 			// Close radio 3 if active

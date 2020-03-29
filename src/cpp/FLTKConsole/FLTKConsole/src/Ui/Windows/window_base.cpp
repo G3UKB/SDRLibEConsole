@@ -111,14 +111,6 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 
 //===================================================
 // Event handlers
-//----------------------------------------------------
-// Close window
-void WindowBase::close() {
-	Fl::delete_widget(this);
-	Fl::delete_widget(audio);
-	Fl::delete_widget(modes);
-	Fl::delete_widget(filters);
-}
 
 //----------------------------------------------------
 // Resize event
