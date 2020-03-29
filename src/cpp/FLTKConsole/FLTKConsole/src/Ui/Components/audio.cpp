@@ -127,33 +127,6 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 		set_path(r, desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
 	}
 
-	/*
-	// Retrieve audio path
-	char* p_audio_path = p->get_audio_path(r);
-	char audio_path[100];
-	strcpy_s(audio_path, 100, p_audio_path);
-	if (strlen(audio_path) > 0) {
-		// We have a path to set
-		// Otherwise the default path set in main init applies
-		char* sink_part;
-		char* dev_part;
-		char* api_part;
-		char* ch_part;
-		char* next_token;
-		// Split into tokens
-		sink_part = strtok_s(audio_path, ":", &next_token);
-		dev_part = strtok_s(NULL, ":", &next_token);
-		api_part = strtok_s(NULL, ":", &next_token);
-		ch_part = strtok_s(NULL, ":", &next_token);
-		
-		// Set the widget state
-		set_widget_state(sink_part, api_part, dev_part, ch_part);
-
-		// Set audio path
-		set_path(r, sink_part, api_part, dev_part, ch_part);
-	}
-	*/
-
 	// Finally show window
 	show();
 }

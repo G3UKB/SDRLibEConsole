@@ -96,13 +96,16 @@ void RadioInterface::restart() {
 	}
 
 	// Initialise and run server
+	bool success = false;
 	if (c_server_init()) {
 		c_server_set_num_rx(p->get_num_radios());
 		if (ri_set_default_audio()) {
 			if (ri_radio_discover()) {
 				RSt::inst().set_discovered(true);
-				if (ri_server_start())
+				if (ri_server_start()) {
 					RSt::inst().set_server_running(true);
+					success = true;
+				}
 				else
 					std::cout << std::endl << "Failed to start server!" << std::endl;
 			}
@@ -115,11 +118,13 @@ void RadioInterface::restart() {
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
-	// Test result
-	// Now reset all audio, modes and filters
-	// New radios will set these but existing ons will not so reset anyway after radio windows started
-	// Need a util class that reads the prefs and does the correct thing
-	// reset_radio_state();
+	// Re-establish all radio state
+	if (success) {
+		set_audio_paths();
+		set_frequencies();
+		set_modes();
+		set_filters();
+	}
 }
 
 //----------------------------------------------------
@@ -255,19 +260,19 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 
 //----------------------------------------------------
 // Set receiver 1/2/3 frequency
-void RadioInterface::ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz) {
-	c_server_cc_out_set_rx_1_freq(freq_in_hz);
-	set_current_freq(0, freq_in_hz);
-}
-
-void RadioInterface::ri_server_cc_out_set_rx_2_freq(unsigned int freq_in_hz) {
-	c_server_cc_out_set_rx_2_freq(freq_in_hz);
-	set_current_freq(1, freq_in_hz);
-}
-
-void RadioInterface::ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz) {
-	c_server_cc_out_set_rx_3_freq(freq_in_hz);
-	set_current_freq(2, freq_in_hz);
+void RadioInterface::ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_in_hz) {
+	if (radio == 1) {
+		c_server_cc_out_set_rx_1_freq(freq_in_hz);
+		set_current_freq(0, freq_in_hz);
+	} 
+	else if (radio == 2) {
+		c_server_cc_out_set_rx_2_freq(freq_in_hz);
+		set_current_freq(1, freq_in_hz);
+	}
+	else {
+		c_server_cc_out_set_rx_3_freq(freq_in_hz);
+		set_current_freq(2, freq_in_hz);
+	}
 }
 
 //==============================================================================
@@ -420,5 +425,73 @@ int RadioInterface::get_current_filt_freq_high(int channel) {
 	case 0: return all_state->rx_1.filt_freq_upper;
 	case 1: return all_state->rx_2.filt_freq_upper;
 	case 2: return all_state->rx_3.filt_freq_upper;
+	}
+}
+
+//----------------------------------------------------
+// Radio state update methods
+
+//----------------------------------------------------
+// Reset all audio paths after a change in number of receivers
+void RadioInterface::set_audio_paths() {
+	// We don't know what receivers were left alone and which were started so
+	// all paths must be updated.
+	// Clear all routes
+	if (!c_server_clear_audio_routes()) {
+		std::cout << "Failed to clear audio routes!" << std::endl;
+		return;
+	}
+	// Retrieve and set audio routes
+	struct_audio_desc desc;
+	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
+		desc = p->get_audio_desc(radio);
+		if (desc.valid) {
+			// Set audio path
+			c_server_set_audio_route((int)AudioType::OUTPUT, desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+		}
+	}
+	// Restart audio
+	c_server_restart_audio_routes();
+}
+
+//----------------------------------------------------
+// Reset all frequencies after a change in number of receivers
+void RadioInterface::set_frequencies() {
+	// We don't know what receivers were left alone and which were started so
+	// all paths must be updated.
+
+	// Retrieve and set frequency
+	int frequency;
+	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
+		frequency = p->get_freq(radio);
+		ri_server_cc_out_set_rx_freq(radio, frequency);
+	}
+}
+
+//----------------------------------------------------
+// Reset all modes after a change in number of receivers
+void RadioInterface::set_modes() {
+	// We don't know what receivers were left alone and which were started so
+	// all paths must be updated.
+	
+	// Retrieve and set modes
+	int mode;
+	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
+		mode = p->get_mode(radio);
+		ri_server_set_rx_mode(radio, mode);
+	}
+}
+
+//----------------------------------------------------
+// Reset all filters after a change in number of receivers
+void RadioInterface::set_filters() {
+	// We don't know what receivers were left alone and which were started so
+	// all paths must be updated.
+
+	// Retrieve and set filters
+	int filter;
+	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
+		filter = p->get_filter(radio);
+		ri_server_set_rx_filter_freq(radio, filter);
 	}
 }

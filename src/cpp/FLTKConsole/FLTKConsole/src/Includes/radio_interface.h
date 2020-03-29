@@ -77,9 +77,7 @@ public:
 	bool ri_radio_stop();
 	void ri_server_set_rx_mode(int channel, int mode);
 	void ri_server_set_rx_filter_freq(int channel, int filter);
-	void ri_server_cc_out_set_rx_1_freq(unsigned int freq_in_hz);
-	void ri_server_cc_out_set_rx_2_freq(unsigned int freq_in_hz);
-	void ri_server_cc_out_set_rx_3_freq(unsigned int freq_in_hz);
+	void ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_in_hz);
 
 	// Get methods
 	bool is_server_running();
@@ -133,5 +131,9 @@ private:
 	int get_current_filt_high(int channel);
 	int get_current_filt_freq_low(int channel);
 	int get_current_filt_freq_high(int channel);
+	void set_audio_paths();
+	void set_frequencies();
+	void set_modes();
+	void set_filters();
 
 };
