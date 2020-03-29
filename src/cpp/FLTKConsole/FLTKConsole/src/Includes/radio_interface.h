@@ -68,7 +68,8 @@ public:
 	// Method prototypes
 	void ri_make_wisdom();
 	void cold_start();
-	void restart();
+	bool restart();
+	void reset_radio_state();
 	bool ri_set_default_audio();
 	bool ri_server_start();
 	bool ri_server_terminate();
@@ -80,24 +81,14 @@ public:
 	void ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_in_hz);
 
 	// Get methods
-	bool is_server_running();
-	bool is_radio_running();
-	bool is_radio_discovered();
 	int get_current_frequency(int channel);
 	int get_current_rx_mode(int channel);
 	struct filter_desc get_current_rx_filter_desc(int channel);
 
-	// Reset interface
-	void reset();
-	
 private:
 	//==============================================================================
 	// State variables
 	Preferences* p;
-	bool audio_set = false;
-	bool server_running = false;
-	bool radio_discovered = false;
-	bool radio_running = false;
 	
 	typedef struct RxState {
 		int freq = 7100000;
@@ -135,5 +126,4 @@ private:
 	void set_frequencies();
 	void set_modes();
 	void set_filters();
-
 };

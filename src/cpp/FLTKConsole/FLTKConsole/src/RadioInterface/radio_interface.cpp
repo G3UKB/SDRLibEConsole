@@ -41,15 +41,6 @@ RadioInterface::RadioInterface() {
 }
 
 //----------------------------------------------------
-// Reset server
-void RadioInterface::reset() {
-	audio_set = false;
-	server_running = false;
-	radio_discovered = false;
-	radio_running = false;
-}
-
-//----------------------------------------------------
 // Make a wisdom file fot FFT if not present
 void RadioInterface::ri_make_wisdom() {
 #ifdef linux
@@ -85,7 +76,7 @@ void RadioInterface::cold_start() {
 
 //----------------------------------------------------
 // Restart the radio server
-void RadioInterface::restart() {
+bool RadioInterface::restart() {
 	// Stop radio if running
 	if (RSt::inst().get_radio_running()) {
 		ri_radio_stop();
@@ -94,9 +85,10 @@ void RadioInterface::restart() {
 	if (RSt::inst().get_server_running()) {
 		ri_server_terminate();
 	}
-
 	// Initialise and run server
 	bool success = false;
+	RSt::inst().set_discovered(false);
+	RSt::inst().set_server_running(false);
 	if (c_server_init()) {
 		c_server_set_num_rx(p->get_num_radios());
 		if (ri_set_default_audio()) {
@@ -118,8 +110,14 @@ void RadioInterface::restart() {
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
 
+	return success;
+}
+
+//----------------------------------------------------
+// Update the radio server
+void RadioInterface::reset_radio_state() {
 	// Re-establish all radio state
-	if (success) {
+	if (RSt::inst().get_server_running()) {
 		set_audio_paths();
 		set_frequencies();
 		set_modes();
@@ -134,91 +132,86 @@ bool RadioInterface::ri_set_default_audio() {
 	char* host_api = nullptr;
 	char* dev = nullptr;
 
-	if (!audio_set) {
-		audio_set = true;
-		// Set up a route for RX1 to default output
-		DeviceEnumList* l = c_server_enum_audio_outputs();
-		for (int i = 0; i < l->entries; i++) {
-			//printf("%d,%s,%s\n", l->devices[i].default_id, l->devices[i].name, l->devices[i].host_api);
-			if (l->devices[i].default_id) {
-				direction = l->devices[i].direction;
-				host_api = l->devices[i].host_api;
-				dev = l->devices[i].name;
-				break;
-			}
-				}
-		if (host_api != nullptr && dev != nullptr) {
-			c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
-			return true;
+	// Set up a route for RX1 to default output
+	DeviceEnumList* l = c_server_enum_audio_outputs();
+	for (int i = 0; i < l->entries; i++) {
+		//printf("%d,%s,%s\n", l->devices[i].default_id, l->devices[i].name, l->devices[i].host_api);
+		if (l->devices[i].default_id) {
+			direction = l->devices[i].direction;
+			host_api = l->devices[i].host_api;
+			dev = l->devices[i].name;
+			break;
 		}
 	}
-	return false;
+	if (host_api != nullptr && dev != nullptr) {
+		c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
+		return true;
+	}
 }
 
 //----------------------------------------------------
 // Start the inbuilt server
 bool RadioInterface::ri_server_start() {
 
-	if (!server_running) {
-		// Start server
-		if (c_server_start()) {
-			server_running = true;
-		} else {
-			std::cout << "Interface: Failed to start server!" << std::endl;
-			return false;
-		}
+	if (RSt::inst().get_server_running()) {
+		return true;
 	}
-	return true;
+	else {
+		// Start server
+		if (c_server_start())
+			return true;
+		else
+			return false;
+	}
 }
 
 //----------------------------------------------------
 // Terminate the inbuilt server
 bool RadioInterface::ri_server_terminate() {
-	if (server_running) {
-		c_server_terminate();
+	if (RSt::inst().get_server_running()) {
+		if (c_server_terminate())
+			return true;
+		else
+			return false;
 	}
 }
 
 //----------------------------------------------------
 // Try and discover radio hardware
 bool RadioInterface::ri_radio_discover() {
-	if (!radio_discovered) {
+	if (RSt::inst().get_discovered()) {
+		return true;
+	} else {
 		// Discover radio
-		if (c_radio_discover()) {
-			radio_discovered = true;
-		} else {
-			std::cout << "Interface: Radio hardware not found!" << std::endl;
+		if (c_radio_discover())
+			return true;
+		else
 			return false;
-		}
 	}
-	return true;
 }
 
 //----------------------------------------------------
 // Start the radio hardware
 bool RadioInterface::ri_radio_start(int wbs) {
-	if (!radio_running) {
-		// Start radio
-		if (c_radio_start(wbs)) {
-			radio_running = true;
-		} else {
-			std::cout << "Interface: Failed to start radio!" << std::endl;
-			return false;
-		}
+	if (RSt::inst().get_radio_running()) {
+		return true;
 	}
-	return true;
+	else {
+		// Discover radio
+		if (c_radio_start(wbs))
+			return true;
+		else
+			return false;
+	}
 }
 
 //----------------------------------------------------
 // Stop the radio hardware
 bool RadioInterface::ri_radio_stop() {
-	if (radio_running) {
-		radio_running = false;
+	if (RSt::inst().get_radio_running()) {
 		// Stop radio
-		if (!c_radio_stop()) {
-			printf("Interface: Failed to stop radio!");
+		if (!c_radio_stop())
 			return false;
-		}
 	}
 	return true;
 }
@@ -226,7 +219,7 @@ bool RadioInterface::ri_radio_stop() {
 //----------------------------------------------------
 // Set RX mode and adjust filters
 void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
-	if (server_running) {
+	if (RSt::inst().get_server_running()) {
 		set_current_mode(channel, mode);
 		set_mode_filter(channel, mode, get_current_filt_low(channel), get_current_filt_high(channel));
 	}
@@ -239,7 +232,7 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 	int low;
 	int high;
 
-	if (server_running) {
+	if (RSt::inst().get_server_running()) {
 		switch (filter) {
 		case 0: low = 100; high = 6100; break;
 		case 1: low = 100; high = 4100; break;
@@ -277,18 +270,6 @@ void RadioInterface::ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_i
 
 //==============================================================================
 // Get methods for current radio(s) state
-bool RadioInterface::is_radio_discovered() {
-	return radio_discovered;
-}
-
-bool RadioInterface::is_server_running() {
-	return server_running;
-}
-
-bool RadioInterface::is_radio_running() {
-	return radio_running;
-}
-
 int RadioInterface::get_current_frequency(int channel) {
 	return get_current_freq(channel);
 }
@@ -299,7 +280,7 @@ int RadioInterface::get_current_rx_mode(int channel) {
 
 filter_desc RadioInterface::get_current_rx_filter_desc(int channel) {
 	filter_desc filter_desc;
-	if (radio_running) {
+	if (RSt::inst().get_radio_running()) {
 		set_mode_filter(channel , get_current_mode(channel), get_current_filt_low(channel), get_current_filt_high(channel), false);
 	}
 	filter_desc.f_lower = get_current_filt_freq_low(channel);

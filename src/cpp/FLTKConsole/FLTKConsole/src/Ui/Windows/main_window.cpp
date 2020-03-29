@@ -156,7 +156,11 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 	int value = c->value();
 	if (value + 1 != p->get_num_radios()) {
 		// Number of radios has changed
+		// Update number of radios
+		p->set_num_radios(value + 1);
 		// Bounce the server
+		r_i->restart();
+		// Rejig the UI
 		if (value == 0) {
 			// One radio
 			// Close radios 2/3 if active
@@ -183,8 +187,8 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 			if (Radio3_Win == NULL) Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 		}
-		// Update number of radios
-		p->set_num_radios(value + 1);
+		// Reset all radio state
+		r_i->reset_radio_state();
 	}
 }
 
