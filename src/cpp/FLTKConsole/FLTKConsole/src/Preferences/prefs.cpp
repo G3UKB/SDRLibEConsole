@@ -265,13 +265,15 @@ void Preferences::restore() {
 struct struct_audio_desc Preferences::parse_audio_desc(int radio) {
 	// Retrieve audio path
 	char* p_audio_path = get_audio_path(radio);
+	static char audio_path[100];
+	strcpy_s(audio_path, p_audio_path);
 	audio_desc.valid = false;
-	if (strlen(p_audio_path) > 0) {
+	if (strlen(audio_path) > 0) {
 		// We have a path
 		// Extract tokens
 		char* next_token;
 		// Split into tokens
-		audio_desc.sink_part = strtok_s(p_audio_path, ":", &next_token);
+		audio_desc.sink_part = strtok_s(audio_path, ":", &next_token);
 		audio_desc.dev_part = strtok_s(NULL, ":", &next_token);
 		audio_desc.api_part = strtok_s(NULL, ":", &next_token);
 		audio_desc.ch_part = strtok_s(NULL, ":", &next_token);
