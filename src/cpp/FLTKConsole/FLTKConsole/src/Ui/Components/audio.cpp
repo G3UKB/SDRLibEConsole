@@ -81,6 +81,7 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 	sink->add("HPSDR");
 	sink->add("Local-AF");
 	sink->add("Local-IQ");
+	sink->value(0);
 	m = grid->get_cell_metrics(1, 1, 1, 4);
 	// Device selection
 	device = new Fl_Choice(m.x, m.y, m.w, m.h);

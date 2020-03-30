@@ -91,21 +91,17 @@ bool RadioInterface::restart() {
 	RSt::inst().set_server_running(false);
 	if (c_server_init()) {
 		c_server_set_num_rx(p->get_num_radios());
-		if (ri_set_default_audio()) {
-			if (ri_radio_discover()) {
-				RSt::inst().set_discovered(true);
-				if (ri_server_start()) {
-					RSt::inst().set_server_running(true);
-					success = true;
-				}
-				else
-					std::cout << std::endl << "Failed to start server!" << std::endl;
+		if (ri_radio_discover()) {
+			RSt::inst().set_discovered(true);
+			if (ri_server_start()) {
+				RSt::inst().set_server_running(true);
+				success = true;
 			}
 			else
-				std::cout << std::endl << "Failed to discover radio!" << std::endl;
+				std::cout << std::endl << "Failed to start server!" << std::endl;
 		}
 		else
-			std::cout << std::endl << "Failed to configure audio!" << std::endl;
+			std::cout << std::endl << "Failed to discover radio!" << std::endl;
 	}
 	else
 		std::cout << std::endl << "Failed to initialise server!" << std::endl;
@@ -445,7 +441,7 @@ void RadioInterface::set_frequencies() {
 	int frequency;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		frequency = p->get_freq(radio);
-		ri_server_cc_out_set_rx_freq(radio, frequency);
+		ri_server_cc_out_set_rx_freq(radio-1, frequency);
 	}
 }
 
@@ -459,7 +455,7 @@ void RadioInterface::set_modes() {
 	int mode;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		mode = p->get_mode(radio);
-		ri_server_set_rx_mode(radio, mode);
+		ri_server_set_rx_mode(radio-1, mode);
 	}
 }
 
@@ -473,6 +469,6 @@ void RadioInterface::set_filters() {
 	int filter;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		filter = p->get_filter(radio);
-		ri_server_set_rx_filter_freq(radio, filter);
+		ri_server_set_rx_filter_freq(radio-1, filter);
 	}
 }

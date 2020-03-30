@@ -82,7 +82,7 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h) {
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
 	DiscoverBtn->deactivate();
-	//SelectRadio->deactivate();
+	SelectRadio->deactivate();
 
 	// Display main window
 	show();
@@ -133,12 +133,12 @@ void MainWindow::handle_idle_timeout() {
 	if (discovered != last_discovered) {
 		if (discovered) {
 			StartBtn->activate();
-			//SelectRadio->activate();
+			SelectRadio->activate();
 			DiscoverBtn->deactivate();
 		}
 		else {
 			StartBtn->deactivate();
-			//SelectRadio->deactivate();
+			SelectRadio->deactivate();
 			DiscoverBtn->activate();
 		}
 	}
@@ -159,6 +159,7 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		p->set_num_radios(value + 1);
 		// Bounce the server
 		success = r_i->restart();
+		StartBtn->clear();
 		// Rejig the UI
 		if (value == 0) {
 			// One radio
