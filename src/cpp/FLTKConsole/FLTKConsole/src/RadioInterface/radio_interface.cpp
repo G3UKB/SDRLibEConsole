@@ -77,10 +77,6 @@ void RadioInterface::cold_start() {
 //----------------------------------------------------
 // Restart the radio server
 bool RadioInterface::restart() {
-	// Stop radio if running
-	if (RSt::inst().get_radio_running()) {
-		ri_radio_stop();
-	}
 	// Stop server if running
 	if (RSt::inst().get_server_running()) {
 		ri_server_terminate();
@@ -140,7 +136,7 @@ bool RadioInterface::ri_set_default_audio() {
 		}
 	}
 	if (host_api != nullptr && dev != nullptr) {
-		c_server_set_audio_route(direction, (char*)LOCAL, 1, host_api, dev, (char*)BOTH);
+		c_server_set_audio_route(direction, (char*)LOCAL_AF, 1, host_api, dev, (char*)BOTH);
 		return true;
 	}
 }
@@ -285,6 +281,33 @@ filter_desc RadioInterface::get_current_rx_filter_desc(int channel) {
 }
 
 //==============================================================================
+// Set methods for current radio(s) state
+
+//----------------------------------------------------
+// Reset all audio paths on audio init for each rx or after a change in number of rx's
+void RadioInterface::set_audio_paths() {
+	// We don't know what receivers were left alone and which were started so
+	// all paths must be updated.
+	// Clear all routes
+	if (!c_server_clear_audio_routes()) {
+		std::cout << "Failed to clear audio routes!" << std::endl;
+		return;
+	}
+	// Retrieve and set audio routes
+	struct_audio_desc desc;
+	for (int radio = 0; radio < p->get_num_radios(); radio++) {
+		desc = p->get_audio_desc(radio);
+		if (desc.valid) {
+			// Set audio path
+			c_server_set_audio_route((int)AudioType::OUTPUT, desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+			printf("%s,%s,%s,%s\n", desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+		}
+	}
+	// Restart audio
+	c_server_restart_audio_routes();
+}
+
+//==============================================================================
 // PRIVATE
 
 //----------------------------------------------------
@@ -407,29 +430,6 @@ int RadioInterface::get_current_filt_freq_high(int channel) {
 
 //----------------------------------------------------
 // Radio state update methods
-
-//----------------------------------------------------
-// Reset all audio paths after a change in number of receivers
-void RadioInterface::set_audio_paths() {
-	// We don't know what receivers were left alone and which were started so
-	// all paths must be updated.
-	// Clear all routes
-	if (!c_server_clear_audio_routes()) {
-		std::cout << "Failed to clear audio routes!" << std::endl;
-		return;
-	}
-	// Retrieve and set audio routes
-	struct_audio_desc desc;
-	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
-		desc = p->get_audio_desc(radio);
-		if (desc.valid) {
-			// Set audio path
-			c_server_set_audio_route((int)AudioType::OUTPUT, desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
-		}
-	}
-	// Restart audio
-	c_server_restart_audio_routes();
-}
 
 //----------------------------------------------------
 // Reset all frequencies after a change in number of receivers

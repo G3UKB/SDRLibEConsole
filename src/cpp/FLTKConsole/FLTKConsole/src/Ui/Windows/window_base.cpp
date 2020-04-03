@@ -144,19 +144,15 @@ void  WindowBase::resize(int x, int y, int w, int h) {
 // Handle idle timeout
 void WindowBase::handle_idle_timeout() {
 	// Handle enable/disable of controls here
-	static int last_discovered = -1;
 	bool discovered = RSt::inst().get_discovered();
-	if (discovered != last_discovered) {
-		if (discovered) {
-			ModeBtn->activate();
-			FilterBtn->activate();
-		}
-		else {
-			ModeBtn->deactivate();
-			FilterBtn->deactivate();
-		}
+	if (discovered) {
+		ModeBtn->activate();
+		FilterBtn->activate();
 	}
-	last_discovered = discovered;
+	else {
+		ModeBtn->deactivate();
+		FilterBtn->deactivate();
+	}
 }
 
 //----------------------------------------------------

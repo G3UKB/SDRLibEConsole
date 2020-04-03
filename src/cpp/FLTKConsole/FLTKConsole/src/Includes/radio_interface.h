@@ -84,6 +84,8 @@ public:
 	int get_current_frequency(int channel);
 	int get_current_rx_mode(int channel);
 	struct filter_desc get_current_rx_filter_desc(int channel);
+	// Set methods
+	void set_audio_paths();
 
 private:
 	//==============================================================================
@@ -122,7 +124,6 @@ private:
 	int get_current_filt_high(int channel);
 	int get_current_filt_freq_low(int channel);
 	int get_current_filt_freq_high(int channel);
-	void set_audio_paths();
 	void set_frequencies();
 	void set_modes();
 	void set_filters();

@@ -159,7 +159,14 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		p->set_num_radios(value + 1);
 		// Bounce the server
 		success = r_i->restart();
-		StartBtn->clear();
+		// Reset the radio, state and start/stop button if radio is running
+		if (RSt::inst().get_radio_running()) {
+			r_i->ri_radio_stop();
+			RSt::inst().set_radio_running(false);
+			StartBtn->clear();
+			StartBtn->label(start_str);
+			StartBtn->labelcolor((Fl_Color)80);
+		}
 		// Rejig the UI
 		if (value == 0) {
 			// One radio

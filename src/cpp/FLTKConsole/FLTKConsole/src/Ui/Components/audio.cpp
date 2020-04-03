@@ -125,7 +125,7 @@ Audio::Audio(int radio, int w, int h) : Fl_Window(w, h) {
 		// Set the widget state
 		set_widget_state(desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
 		// Set audio path
-		set_path(r, desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
+		r_i->set_audio_paths();
 	}
 
 	// Finally show window
@@ -167,11 +167,11 @@ void Audio::handle_apply() {
 		strcpy_s(ch_str, 10, BOTH);
 	}
 
-	// Reset the audio path for this receiver 
-	set_path(r, sink_str, api_part, dev_part, ch_str);
-
 	// Save the new route
 	save_route(r, sink_str, api_part, dev_part, ch_str);
+
+	// Reset the audio path for all receivers 
+	r_i->set_audio_paths();
 }
 
 //==============================================================================
@@ -207,21 +207,6 @@ void Audio::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
 	else if (strcmp(vch, BOTH) == 0) {
 		((Fl_Radio_Light_Button*)both)->set();
 	}
-}
-
-//----------------------------------------------------
-// Set a new audio path
-void Audio::set_path(int radio, char* sink, char* api, char* dev, char* ch) {
-
-	// Now reset the audio path for this receiver 
-	if (!c_server_clear_audio_routes()) {
-		std::cout << "Failed to clear audio routes!" << std::endl;
-		return;
-	}
-	// Set the new path
-	c_server_set_audio_route( (int)AudioType::OUTPUT, sink, radio, api, dev, ch );
-	// Restart audio
-	c_server_restart_audio_routes();
 }
 
 //----------------------------------------------------
