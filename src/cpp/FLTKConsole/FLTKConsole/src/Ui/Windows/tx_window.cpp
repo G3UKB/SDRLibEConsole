@@ -45,8 +45,7 @@ void tx_window_idle_cb(void* data) {
 */
 //----------------------------------------------------
 // Constructor
-TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h) {
-
+TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h, 3, 4, 0) {
 	r = radio;
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");

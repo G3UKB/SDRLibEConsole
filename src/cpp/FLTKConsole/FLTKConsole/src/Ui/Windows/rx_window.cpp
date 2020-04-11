@@ -45,9 +45,9 @@ void radio_window_idle_cb(void* data) {
 */
 //----------------------------------------------------
 // Constructor
-RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h) {
-
+RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h, 3, 4, 0) {
 	r = radio;
+
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");

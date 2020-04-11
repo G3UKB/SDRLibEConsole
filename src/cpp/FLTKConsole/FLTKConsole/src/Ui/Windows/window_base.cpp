@@ -38,9 +38,12 @@ The authors can be reached by email at:
 */
 //----------------------------------------------------
 // Constructor
-WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, h) {
+WindowBase::WindowBase(int radio, int x, int y, int w, int h, int rows, int cols, int start_row) : Fl_Double_Window(w, h) {
 	// Radio inst
+	// Receivers are 1,2,3 and TX 4
 	r = radio;
+	width = w;
+	height = h;
 
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
@@ -50,47 +53,17 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 	char label[20];
-	sprintf_s(label, "Receiver-%d", r);
+	if (radio == 4)
+		sprintf_s(label, "Transmitter");
+	else
+		sprintf_s(label, "Receiver-%d", r);
 	copy_label(label);
 
 	// Set window position
 	position(x, y);
 
-	// Add a group box
-	top_group = new Fl_Group(5, 5, w - 10, h - 10);
-	top_group->box(FL_GTK_THIN_UP_BOX);
-	top_group->color((Fl_Color)24);
-
-	// Create a grid layout handler
-	grid = new GridLayout(5, 5, w - 10, h - 10, 3, 4, 5);
-
-	// Add audio buton
-	m = grid->get_cell_metrics(0, 3);
-	AudioBtn = new AudioTriggerBase(this, audio_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
-
-	// Add the VFO component
-	// This extends Fl_Group so we place the group below the buttons
-	m = grid->get_cell_metrics(1, 0, 2, 3);
-	VFOComponent *c = new VFOComponent(r, 0, m.x, m.y, m.w, m.h);
-
-	// We place the radio buttons into another grid
-	// Get metrics from grid
-	m = grid->get_cell_metrics(1, 3, 2, 1);
-	// Create grid_1 with the new metrics
-	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
-
-	// Add mode trigger in grid_1
-	m = grid_1->get_cell_metrics(0, 0);
-	ModeBtn = new ModeTriggerBase(this, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
-
-	// Add filter trigger in grid_1
-	m = grid_1->get_cell_metrics(1, 0);
-	FilterBtn = new FilterTriggerBase(this, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
-
-	// Close up and display
-	top_group->end();
-	// Finish up
-	end();
+	// Populate
+	do_layout(rows, cols, start_row);
 
 	// Initially deactivate all buttons
 	ModeBtn->deactivate();
@@ -107,6 +80,46 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h) : Fl_Double_Window
 	// Create the filters panel hidden
 	filters = new Filters(r, 230, 80);
 	filters->hide();
+}
+
+//----------------------------------------------------
+// Layout give the grid dims and start row for our components
+void WindowBase::do_layout(int rows, int cols, int start_row) {
+	// Add a group box
+	top_group = new Fl_Group(5, 5, width - 10, height - 10);
+	top_group->box(FL_GTK_THIN_UP_BOX);
+	top_group->color((Fl_Color)24);
+
+	// Create a grid layout handler
+	grid = new GridLayout(5, 5, width - 10, height - 10, rows, cols, 5);
+
+	// Add audio buton
+	m = grid->get_cell_metrics(start_row, 3);
+	AudioBtn = new AudioTriggerBase(this, audio_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+
+	// Add the VFO component
+	// This extends Fl_Group so we place the group below the buttons
+	m = grid->get_cell_metrics(start_row, 0, 2, 3);
+	VFOComponent *c = new VFOComponent(r, 0, m.x, m.y, m.w, m.h);
+
+	// We place the radio buttons into another grid
+	// Get metrics from grid
+	m = grid->get_cell_metrics(start_row + 1, 3, 2, 1);
+	// Create grid_1 with the new metrics
+	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
+
+	// Add mode trigger in grid_1
+	m = grid_1->get_cell_metrics(0, 0);
+	ModeBtn = new ModeTriggerBase(this, mode_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+
+	// Add filter trigger in grid_1
+	m = grid_1->get_cell_metrics(1, 0);
+	FilterBtn = new FilterTriggerBase(this, filter_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67);
+
+	// Close up and display
+	top_group->end();
+	// Finish up
+	end();
 }
 
 //===================================================

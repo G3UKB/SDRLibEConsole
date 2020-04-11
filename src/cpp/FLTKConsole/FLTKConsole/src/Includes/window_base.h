@@ -52,8 +52,9 @@ class WindowBase : public Fl_Double_Window
 {
 public:
 	//==============================================================================
-	WindowBase(int radio, int x, int y, int w, int h);
+	WindowBase(int radio, int x, int y, int w, int h, int rows, int cols, int start_row);
 	~WindowBase() {};
+	void do_layout(int rows, int cols, int start_row);
 	void resize(int x, int y, int w, int h);
 	void manage_mode_panel(bool show);
 	void manage_filter_panel(bool show);
@@ -73,6 +74,9 @@ private:
 	// State variables
 	// Radio inst
 	int r;
+	// Metrics
+	int width;
+	int height;
 	// Structures
 	struct_w_loc w_loc;
 	// Labels must be fixed storage

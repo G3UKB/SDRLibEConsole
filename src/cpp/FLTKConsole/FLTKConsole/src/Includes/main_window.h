@@ -39,6 +39,8 @@ The authors can be reached by email at:
 class ControlButton;
 class DiscoverButton;
 class RadioChoice;
+class TXButton;
+class ExitButton;
 
 class MainWindow : public WindowBase
 {
@@ -59,6 +61,9 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
+	char tx_str_on[12] = "Enable TX";
+	char tx_str_off[12] = "Disable TX";
+	char exit_str[10] = "EXIT";
 
 	// Preferences
 	Preferences* p;
@@ -70,10 +75,15 @@ private:
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
 	Fl_Choice* SelectRadio;
+	TXButton* TXBtn;
+	ExitButton* ExitBtn;
 
-	// Radio windows
+	// RX windows
 	RadioWindow* Radio2_Win = NULL;
 	RadioWindow* Radio3_Win = NULL;
+
+	// TX Window
+	TxWindow* TX_Win = NULL;
 
 	//==============================================================================
 	// Method prototypes
@@ -116,6 +126,57 @@ public:
 	//==============================================================================
 	DiscoverButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_col);
 	~DiscoverButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+//==============================================================================
+// The TX button
+class TXButton : public Fl_Toggle_Button
+{
+public:
+	//==============================================================================
+	TXButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
+	~TXButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	char* up_label;
+	char* down_label;
+	Fl_Color up_col;
+	Fl_Color down_col;
+	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+};
+
+//==============================================================================
+// Exit button
+class ExitButton : public Fl_Button
+{
+public:
+	//==============================================================================
+	ExitButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_col);
+	~ExitButton() {};
 	int handle(int event);
 
 	//==============================================================================
