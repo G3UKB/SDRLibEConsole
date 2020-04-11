@@ -1,7 +1,7 @@
 /*
-rx_window.h
+tx_window.h
 
-Radio 2/3 window header for the FLTK Console
+Single TX window header for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -36,12 +36,12 @@ The authors can be reached by email at:
 /*
 	The one and only main window
 */
-class RadioWindow : public WindowBase
+class TxWindow : public WindowBase
 {
 public:
 	//==============================================================================
-	RadioWindow(int radio, int x, int y, int w, int h);
-	~RadioWindow() {};
+	TxWindow(int radio, int x, int y, int w, int h);
+	~TxWindow() {};
 	void handle_idle_timeout();
 	void close();
 

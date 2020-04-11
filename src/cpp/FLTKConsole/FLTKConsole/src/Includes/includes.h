@@ -74,5 +74,6 @@ The authors can be reached by email at:
 #include "audio.h"
 #include "window_base.h"
 #include "rx_window.h"
+#include "tx_window.h"
 #include "main_window.h"
 

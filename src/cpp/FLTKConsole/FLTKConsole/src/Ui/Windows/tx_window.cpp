@@ -1,7 +1,7 @@
 /*
-rx_window.cpp
+tx_window.cpp
 
-Radio 2/3 window implementation for the FLTK Console
+Single TX window implementation for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -34,10 +34,10 @@ The authors can be reached by email at:
 
 // Idle time callback
 // We call back to the window to do housekeeping
-void radio_window_idle_cb(void* data) {
-	RadioWindow* w = (RadioWindow*)data;
+void tx_window_idle_cb(void* data) {
+	TxWindow* w = (TxWindow*)data;
 	w->handle_idle_timeout();
-	Fl::repeat_timeout(0.2, radio_window_idle_cb, data);
+	Fl::repeat_timeout(0.2, tx_window_idle_cb, data);
 }
 
 /*
@@ -45,7 +45,7 @@ void radio_window_idle_cb(void* data) {
 */
 //----------------------------------------------------
 // Constructor
-RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h) {
+TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x, y, w, h) {
 
 	r = radio;
 	// Get dependent objects from the cache
@@ -56,13 +56,13 @@ RadioWindow::RadioWindow(int radio, int x, int y, int w, int h) : WindowBase(rad
 	show();
 
 	// Set an idle timeout
-	Fl::add_timeout(0.2, radio_window_idle_cb, (void*)this);
+	Fl::add_timeout(0.2, tx_window_idle_cb, (void*)this);
 }
 
 //----------------------------------------------------
 // Close window
-void RadioWindow::close() {
-	Fl::remove_timeout(radio_window_idle_cb);
+void TxWindow::close() {
+	Fl::remove_timeout(tx_window_idle_cb);
 	Fl::delete_widget(this);
 }
 
@@ -71,7 +71,7 @@ void RadioWindow::close() {
 //----------------------------------------------------
 
 // Handle idle timeout
-void RadioWindow::handle_idle_timeout() {
+void TxWindow::handle_idle_timeout() {
 	// Nothing todo here
 	// Just call base class
 	WindowBase::handle_idle_timeout();
