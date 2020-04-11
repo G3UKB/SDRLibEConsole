@@ -84,6 +84,15 @@ public:
 	int get_radio3_h();
 	void set_radio3_w(int w);
 	void set_radio3_h(int h);
+	// TX window position and size
+	int get_tx_x();
+	int get_tx_y();
+	void set_tx_x(int x);
+	void set_tx_y(int y);
+	int get_tx_w();
+	int get_tx_h();
+	void set_tx_w(int w);
+	void set_tx_h(int h);
 	// Radio mode, filter etc
 	int get_num_radios();
 	void set_num_radios(int num);
@@ -120,6 +129,10 @@ private:
 	int radio3_y;
 	int radio3_w;
 	int radio3_h;
+	int tx_x;
+	int tx_y;
+	int tx_w;
+	int tx_h;
 	// Radio mode, filter etc
 	int num_radios;
 	int radio_freq[3] = { 7100000,7100000,7100000 };

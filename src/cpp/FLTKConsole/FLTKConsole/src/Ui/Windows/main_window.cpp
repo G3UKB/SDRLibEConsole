@@ -293,6 +293,7 @@ TXButton::TXButton(MainWindow* parent_widget, char* button_up_label, char* butto
 	up_col = button_up_col;
 	down_col = button_down_col;
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
 	color((Fl_Color)back_col);
 	labelcolor((Fl_Color)button_up_col);
 	id = button_id;
@@ -303,6 +304,7 @@ TXButton::TXButton(MainWindow* parent_widget, char* button_up_label, char* butto
 int TXButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
+		win = new TxWindow(4, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
 		return 1;
 	}
 	default:
@@ -324,6 +326,7 @@ ExitButton::ExitButton(MainWindow* parent_widget, char* button_label, int x, int
 int ExitButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
+		myparent->hide();
 		return 1;
 	}
 	default:

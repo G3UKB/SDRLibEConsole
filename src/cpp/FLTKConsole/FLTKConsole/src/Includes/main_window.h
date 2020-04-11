@@ -157,6 +157,8 @@ private:
 	//==============================================================================
 	// State variables
 	RadioInterface* r_i;
+	Preferences* p;
+	TxWindow* win;
 	int id;
 	char* up_label;
 	char* down_label;

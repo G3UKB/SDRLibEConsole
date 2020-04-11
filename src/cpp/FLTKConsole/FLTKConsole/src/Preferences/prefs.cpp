@@ -73,6 +73,10 @@ void Preferences::save() {
 	app.set("radio3_y", radio3_y);
 	app.set("radio3_w", radio3_w);
 	app.set("radio3_h", radio3_h);
+	app.set("tx_x", tx_x);
+	app.set("tx_y", tx_y);
+	app.set("tx_w", tx_w);
+	app.set("tx_h", tx_h);
 
 	// RADIO
 	Fl_Preferences radio(root, "RADIO");
@@ -171,6 +175,31 @@ void Preferences::set_radio3_w(int w) {
 void Preferences::set_radio3_h(int h) {
 	radio3_h = h;
 }
+// TX window
+int Preferences::get_tx_x() {
+	return tx_x;
+}
+int Preferences::get_tx_y() {
+	return tx_y;
+}
+void Preferences::set_tx_x(int x) {
+	tx_x = x;
+}
+void Preferences::set_tx_y(int y) {
+	tx_y = y;
+}
+int Preferences::get_tx_w() {
+	return tx_w;
+}
+int Preferences::get_tx_h() {
+	return tx_h;
+}
+void Preferences::set_tx_w(int w) {
+	tx_w = w;
+}
+void Preferences::set_tx_h(int h) {
+	tx_h = h;
+}
 //----------------------------------------------------
 // RADIO
 int Preferences::get_num_radios() {
@@ -241,6 +270,10 @@ void Preferences::restore() {
 	app.get("radio3_y", radio3_y, DEFAULT_Y);
 	app.get("radio3_w", radio3_w, DEFAULT_W);
 	app.get("radio3_h", radio3_h, DEFAULT_H);
+	app.get("tx_x", tx_x, DEFAULT_X);
+	app.get("tx_y", tx_y, DEFAULT_Y);
+	app.get("tx_w", tx_w, DEFAULT_W);
+	app.get("tx_h", tx_h, DEFAULT_H);
 
 	// Read radio data
 	Fl_Preferences radio(root, "RADIO");
