@@ -306,8 +306,14 @@ void RadioInterface::set_mode_filter(int channel, int mode, int filter_id, bool 
 
 	// Set new filter and/or mode
 	if (set_radio) {
-		c_server_set_rx_mode(channel, mode);
-		c_server_set_rx_filter_freq(channel, low, high);
+		if (channel == 4) {
+			c_server_set_tx_mode(channel, mode);
+			c_server_set_tx_filter_freq(channel, low, high);
+		}
+		else {
+			c_server_set_rx_mode(channel, mode);
+			c_server_set_rx_filter_freq(channel, low, high);
+		}
 	}
 }
 
