@@ -103,7 +103,7 @@ public:
 	int get_filter(int radio);
 	void set_filter(int radio, int filter);
 	// Audio paths
-	char* get_audio_path(int radio);
+	void get_audio_path(int radio, char* audio_path);
 	void set_audio_path(int radio, char* path);
 	struct struct_audio_desc get_audio_desc(int radio);
 
@@ -136,11 +136,15 @@ private:
 	// Radio mode, filter etc
 	int num_radios;
 	int radio_freq[3] = { 7100000,7100000,7100000 };
+	int tx_freq;
 	int radio_mode[3] = { 0,0,0 };
+	int tx_mode;
 	int radio_filter[3] = { 2,2,2 };
+	int tx_filter;
 	char radio_audio_path_1[100];
 	char radio_audio_path_2[100];
 	char radio_audio_path_3[100];
+	char tx_audio_path[100];
 	// Audio tokens
 	struct_audio_desc audio_desc;
 

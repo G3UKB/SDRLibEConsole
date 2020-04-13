@@ -87,12 +87,15 @@ void Preferences::save() {
 	radio.set("mode-1", radio_mode[0]);
 	radio.set("mode-2", radio_mode[1]);
 	radio.set("mode-3", radio_mode[2]);
+	radio.set("mode-tx", tx_mode);
 	radio.set("filter-1", radio_filter[0]);
 	radio.set("filter-2", radio_filter[1]);
 	radio.set("filter-3", radio_filter[2]);
+	radio.set("filter-tx", tx_filter);
 	radio.set("audio-1", radio_audio_path_1);
 	radio.set("audio-2", radio_audio_path_2);
 	radio.set("audio-3", radio_audio_path_3);
+	radio.set("audio-tx", tx_audio_path);
 }
 
 //==============================================================================
@@ -209,38 +212,62 @@ void Preferences::set_num_radios(int num) {
 	num_radios = num;
 }
 int Preferences::get_freq(int radio) {
-	return radio_freq[radio - 1];
+	if (radio == 4)
+		return tx_freq;
+	else
+		return radio_freq[radio - 1];
 }
 void Preferences::set_freq(int radio, int freq) {
-	radio_freq[radio - 1] = freq;
+	if (radio == 4)
+		tx_freq = freq;
+	else
+		radio_freq[radio - 1] = freq;
 }
 int Preferences::get_mode(int radio) {
-	return radio_mode[radio - 1];
+	if (radio == 4)
+		return tx_mode;
+	else
+		return radio_mode[radio - 1];
 }
 void Preferences::set_mode(int radio, int mode) {
-	radio_mode[radio - 1] = mode;
+	if (radio == 4)
+		tx_mode = mode;
+	else
+		radio_mode[radio - 1] = mode;
 }
 int Preferences::get_filter(int radio) {
-	return radio_filter[radio - 1];
+	if (radio == 4)
+		return tx_filter;
+	else
+		return radio_filter[radio - 1];
 }
 void Preferences::set_filter(int radio, int filter) {
 	radio_filter[radio - 1] = filter;
-}
-char* Preferences::get_audio_path(int radio) {
-	if (radio == 1)
-		return radio_audio_path_1;
-	else if (radio == 2)
-		return radio_audio_path_2;
+
+	if (radio == 4)
+		tx_filter = filter;
 	else
-		return radio_audio_path_3;
+		radio_filter[radio - 1] = filter;
+}
+void Preferences::get_audio_path(int radio, char* audio_path) {
+	if (radio == 1)
+		strcpy_s(audio_path, 100, radio_audio_path_1);
+	else if (radio == 2)
+		strcpy_s(audio_path, 100, radio_audio_path_2);
+	else if (radio == 3)
+		strcpy_s(audio_path, 100, radio_audio_path_3);
+	else if (radio == 4)
+		strcpy_s(audio_path, 100, tx_audio_path);
 }
 void Preferences::set_audio_path(int radio, char* path) {
 	if (radio == 1)
 		strcpy_s(radio_audio_path_1, path);
 	else if (radio == 2)
 		strcpy_s(radio_audio_path_2, path);
-	else
+	else if (radio == 3)
 		strcpy_s(radio_audio_path_3, path);
+	else if (radio == 4)
+		strcpy_s(tx_audio_path, path);
 }
 // Audio tokens
 struct struct_audio_desc Preferences::get_audio_desc(int radio) {
@@ -281,25 +308,28 @@ void Preferences::restore() {
 	radio.get("freq-1", radio_freq[0], radio_freq[0]);
 	radio.get("freq-2", radio_freq[1], radio_freq[1]);
 	radio.get("freq-3", radio_freq[2], radio_freq[2]);
+	radio.get("freq-tx", tx_freq, tx_freq);
 	radio.get("mode-1", radio_mode[0], radio_mode[0]);
 	radio.get("mode-2", radio_mode[1], radio_mode[1]);
 	radio.get("mode-3", radio_mode[2], radio_mode[2]);
+	radio.get("mode-tx", tx_mode, tx_mode);
 	radio.get("filter-1", radio_filter[0], radio_filter[0]);
 	radio.get("filter-2", radio_filter[1], radio_filter[1]);
 	radio.get("filter-3", radio_filter[2], radio_filter[2]);
+	radio.get("filter-tx", tx_filter, tx_filter);
 	// Audio route data
 	radio.get("audio-1", radio_audio_path_1, "", 100);
 	radio.get("audio-2", radio_audio_path_2, "", 100);
 	radio.get("audio-3", radio_audio_path_3, "", 100);
+	radio.get("audio-tx", tx_audio_path, "", 100);
 }
 
 //----------------------------------------------------
 // Parse the audio descriptor into tokens
 struct struct_audio_desc Preferences::parse_audio_desc(int radio) {
 	// Retrieve audio path
-	char* p_audio_path = get_audio_path(radio);
-	static char audio_path[100];
-	strcpy_s(audio_path, p_audio_path);
+	char audio_path[100];
+	get_audio_path(radio, audio_path);
 	audio_desc.valid = false;
 	if (strlen(audio_path) > 0) {
 		// We have a path
