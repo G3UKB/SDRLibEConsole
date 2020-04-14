@@ -68,9 +68,9 @@ public:
 	bool ri_radio_discover();
 	bool ri_radio_start(int wbs);
 	bool ri_radio_stop();
-	void ri_server_set_rx_mode(int channel, int mode);
-	void ri_server_set_rx_filter_freq(int channel, int filter);
-	void ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_in_hz);
+	void ri_server_set_mode(int channel, int mode);
+	void ri_server_set_filter_freq(int channel, int filter);
+	void ri_server_cc_out_set_freq(int radio, unsigned int freq_in_hz);
 
 private:
 	//==============================================================================

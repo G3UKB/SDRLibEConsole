@@ -209,7 +209,7 @@ void VFOComponent::create_digits() {
 //----------------------------------------------------
 // Tune the radio-n to the current frequency
 void VFOComponent::set_radio_freq() {
-	r_i->ri_server_cc_out_set_rx_freq(r, current_freq);
+	r_i->ri_server_cc_out_set_freq(r, current_freq);
 }
 
 //==============================================================================

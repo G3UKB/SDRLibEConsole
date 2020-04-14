@@ -209,16 +209,15 @@ bool RadioInterface::ri_radio_stop() {
 
 //----------------------------------------------------
 // Set RX mode and adjust filters
-void RadioInterface::ri_server_set_rx_mode(int channel, int mode) {
+void RadioInterface::ri_server_set_mode(int channel, int mode) {
 	if (RSt::inst().get_server_running()) {
-		//set_current_mode(channel, mode);
 		set_mode_filter(channel, mode, p->get_filter(channel), true);
 	}
 }
 
 //----------------------------------------------------
 // Set a new filter, adjust for the current mode
-void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
+void RadioInterface::ri_server_set_filter_freq(int channel, int filter) {
 
 	if (RSt::inst().get_server_running()) {
 		set_mode_filter(channel, p->get_mode(channel), filter, true);
@@ -227,15 +226,19 @@ void RadioInterface::ri_server_set_rx_filter_freq(int channel, int filter) {
 
 //----------------------------------------------------
 // Set receiver 1/2/3 frequency
-void RadioInterface::ri_server_cc_out_set_rx_freq(int radio, unsigned int freq_in_hz) {
+void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_hz) {
 	if (radio == 1) {
-		c_server_cc_out_set_rx_1_freq(freq_in_hz);
+		c_server_cc_out_set_rx_tx_freq(freq_in_hz);
 	} 
 	else if (radio == 2) {
 		c_server_cc_out_set_rx_2_freq(freq_in_hz);
 	}
-	else {
+	else if (radio == 3) {
 		c_server_cc_out_set_rx_3_freq(freq_in_hz);
+	}
+	// TBD take note of duplex setting and only set TX if duplex
+	else if (radio == 4) {
+		c_server_cc_out_set_rx_tx_freq(freq_in_hz);
 	}
 }
 
@@ -327,7 +330,7 @@ void RadioInterface::set_frequencies() {
 	int frequency;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		frequency = p->get_freq(radio);
-		ri_server_cc_out_set_rx_freq(radio-1, frequency);
+		ri_server_cc_out_set_freq(radio-1, frequency);
 	}
 }
 
@@ -341,7 +344,7 @@ void RadioInterface::set_modes() {
 	int mode;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		mode = p->get_mode(radio);
-		ri_server_set_rx_mode(radio-1, mode);
+		ri_server_set_mode(radio-1, mode);
 	}
 }
 
@@ -355,6 +358,6 @@ void RadioInterface::set_filters() {
 	int filter;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
 		filter = p->get_filter(radio);
-		ri_server_set_rx_filter_freq(radio-1, filter);
+		ri_server_set_filter_freq(radio-1, filter);
 	}
 }

@@ -65,7 +65,7 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 		m_b.items[i].mode = new ModeButton(r, this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == mode) {
 			m_b.items[i].mode->set();
-			r_i->ri_server_set_rx_mode(r-1, mode);
+			r_i->ri_server_set_mode(r-1, mode);
 		}
 		if (k++ == 3) {
 			k = 0;
@@ -116,7 +116,7 @@ int ModeButton::handle(int event) {
 	switch (event) {
 	case FL_LEFT_MOUSE: {
 		// Tell radio to change mode
-		r_i->ri_server_set_rx_mode(r-1, id);
+		r_i->ri_server_set_mode(r-1, id);
 		// Tell parent to reflect state in buttons
 		t_l->handle_mode_button_state(id);
 		return 1;
