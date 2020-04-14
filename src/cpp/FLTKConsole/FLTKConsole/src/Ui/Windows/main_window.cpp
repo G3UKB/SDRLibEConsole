@@ -317,8 +317,14 @@ TXButton::TXButton(MainWindow* parent_widget, char* button_up_label, char* butto
 int TXButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
-		myparent->show_tx(true);
-		set();
+		if (value()) {
+			myparent->show_tx(false);
+			clear();
+		}
+		else {
+			myparent->show_tx(true);
+			set();
+		}
 		return 1;
 	}
 	default:
