@@ -44,6 +44,10 @@ VFOComponent::VFOComponent(int radio, int p_vfo_type, int x, int y, int w, int h
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
+	// Put our object id
+	char id[10];
+	sprintf_s(id, 10, "RADIO-%d", radio);
+	RSt::inst().put_obj(id, (void*)this);
 
 	// Local vars
 	vfo_type = p_vfo_type;
@@ -67,14 +71,20 @@ VFOComponent::VFOComponent(int radio, int p_vfo_type, int x, int y, int w, int h
 
 	// Update frequency
 	current_freq = p->get_freq(r);
-
-	convertFreq(current_freq);
 	set_display_freq(convertFreq(current_freq));
 	set_radio_freq();
 }
 
 VFOComponent::~VFOComponent()
 {
+}
+
+//----------------------------------------------------
+// External set frequency
+void VFOComponent::external_set_display(int freq) {
+	current_freq = freq;
+	set_display_freq(convertFreq(current_freq));
+	p->set_freq(r, current_freq);
 }
 
 //----------------------------------------------------
@@ -99,6 +109,7 @@ void VFOComponent::freq_plus() {
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
 			p->set_freq(r, current_freq);
+			sync_radios();
 		}
 	}
 }
@@ -113,38 +124,9 @@ void VFOComponent::freq_minus() {
 			set_display_freq(convertFreq(current_freq));
 			set_radio_freq();
 			p->set_freq(r, current_freq);
+			sync_radios();
 		}
 	}
-}
-
-//----------------------------------------------------
-// Convert integer frequency in Hz to a 9 digit string
-std::string VFOComponent::convertFreq(int freq) {
-	// Convert to a string representation of the frequency in Hz
-	std::string sfreq = std::to_string(freq);
-	// Add leading zeros to make it a 9 digit string
-	// Number of leading zeros to add
-	int l = 9 - sfreq.length();
-	std::string leading_zeros("");
-	for (int i = 0; i < l; i++) {
-		leading_zeros += "0";
-	}
-	return (leading_zeros += sfreq);
-}
-
-//----------------------------------------------------
-// Set the display to the 9 digit string
-void VFOComponent::set_display_freq(std::string freq) {
-	// Update all the frequency digits
-	c0[0] = freq[0]; d_100MHz->label(c0);
-	c1[0] = freq[1]; d_10MHz->label(c1);
-	c2[0] = freq[2]; d_1MHz->label(c2);
-	c3[0] = freq[3]; d_100KHz->label(c3);
-	c4[0] = freq[4]; d_10KHz->label(c4);
-	c5[0] = freq[5]; d_1KHz->label(c5);
-	c6[0] = freq[6]; d_100Hz->label(c6);
-	c7[0] = freq[7]; d_10Hz->label(c7);
-	c8[0] = freq[8]; d_1Hz->label(c8);
 }
 
 //==============================================================================
@@ -156,9 +138,9 @@ void VFOComponent::set_display_freq(std::string freq) {
 //----------------------------------------------------
 // Create and layout the 9 digits and 2 spacers
 void VFOComponent::create_digits() {
-	
+
 	// Create a grid layout handler
-	GridLayout *grid = new GridLayout(x_ord+5, y_ord+5, width - 10, height - 10, 1, 11);
+	GridLayout *grid = new GridLayout(x_ord + 5, y_ord + 5, width - 10, height - 10, 1, 11);
 	metrics m;
 
 	// Create digits
@@ -207,9 +189,52 @@ void VFOComponent::create_digits() {
 }
 
 //----------------------------------------------------
+// Convert integer frequency in Hz to a 9 digit string
+std::string VFOComponent::convertFreq(int freq) {
+	// Convert to a string representation of the frequency in Hz
+	std::string sfreq = std::to_string(freq);
+	// Add leading zeros to make it a 9 digit string
+	// Number of leading zeros to add
+	int l = 9 - sfreq.length();
+	std::string leading_zeros("");
+	for (int i = 0; i < l; i++) {
+		leading_zeros += "0";
+	}
+	return (leading_zeros += sfreq);
+}
+
+//----------------------------------------------------
+// Set the display to the 9 digit string
+void VFOComponent::set_display_freq(std::string freq) {
+	// Update all the frequency digits
+	c0[0] = freq[0]; d_100MHz->label(c0);
+	c1[0] = freq[1]; d_10MHz->label(c1);
+	c2[0] = freq[2]; d_1MHz->label(c2);
+	c3[0] = freq[3]; d_100KHz->label(c3);
+	c4[0] = freq[4]; d_10KHz->label(c4);
+	c5[0] = freq[5]; d_1KHz->label(c5);
+	c6[0] = freq[6]; d_100Hz->label(c6);
+	c7[0] = freq[7]; d_10Hz->label(c7);
+	c8[0] = freq[8]; d_1Hz->label(c8);
+}
+
+//----------------------------------------------------
 // Tune the radio-n to the current frequency
 void VFOComponent::set_radio_freq() {
 	r_i->ri_server_cc_out_set_freq(r, current_freq);
+}
+
+//----------------------------------------------------
+// Sync TX and RX simplex freq
+void VFOComponent::sync_radios() {
+	// ToDo account for duplex
+	if (r == 1) {
+		// We are radio 1 so sync to radio 4
+		((VFOComponent*)RSt::inst().get_obj("RADIO-4"))->external_set_display(current_freq);
+	} else if (r == 4) {
+		// We are radio 4 (TX) so sync to radio 1
+		((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(current_freq);
+	}
 }
 
 //==============================================================================

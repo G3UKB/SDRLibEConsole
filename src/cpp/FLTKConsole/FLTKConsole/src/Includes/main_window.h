@@ -51,6 +51,7 @@ public:
 	int handle(int event);
 	void handle_idle_timeout();
 	void handle_radio(Fl_Widget* w);
+	void show_tx(bool show);
 
 	//==============================================================================
 
@@ -81,7 +82,6 @@ private:
 	// RX windows
 	RadioWindow* Radio2_Win = NULL;
 	RadioWindow* Radio3_Win = NULL;
-
 	// TX Window
 	TxWindow* TX_Win = NULL;
 
@@ -158,7 +158,6 @@ private:
 	// State variables
 	RadioInterface* r_i;
 	Preferences* p;
-	TxWindow* win;
 	int id;
 	char* up_label;
 	char* down_label;

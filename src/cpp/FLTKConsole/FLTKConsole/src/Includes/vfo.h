@@ -84,12 +84,11 @@ public:
 	~VFOComponent();
 
 	//==============================================================================
+	void external_set_display(int freq);
 	void set_freq_inc(int inc);
 	void reset_freq_inc();
 	void freq_plus();
 	void freq_minus();
-	std::string convertFreq(int freq);
-	void set_display_freq(std::string freq);
 
 private:
 	//==============================================================================
@@ -140,6 +139,9 @@ private:
 	//==============================================================================
 	// Method prototypes
 	void create_digits();
+	std::string convertFreq(int freq);
+	void set_display_freq(std::string freq);
 	void set_radio_freq();
+	void sync_radios();
 };
 

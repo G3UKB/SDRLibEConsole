@@ -103,6 +103,10 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 		Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 	}
 
+	// Create and hide TX window
+	TX_Win = new TxWindow(4, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
+	TX_Win->hide();
+
 	// Set an idle timeout
 	Fl::add_timeout(0.2, main_window_idle_cb, (void*)this);
 }
@@ -207,6 +211,15 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 	}
 }
 
+//----------------------------------------------------
+// Show/hide TX window
+void MainWindow::show_tx(bool show) {
+	if (show)
+		TX_Win->show();
+	else
+		TX_Win->hide();
+}
+
 //==============================================================================
 // Control button (start/stop)
 ControlButton::ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
@@ -304,7 +317,8 @@ TXButton::TXButton(MainWindow* parent_widget, char* button_up_label, char* butto
 int TXButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
-		win = new TxWindow(4, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
+		myparent->show_tx(true);
+		set();
 		return 1;
 	}
 	default:
