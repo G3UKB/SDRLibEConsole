@@ -208,7 +208,7 @@ bool RadioInterface::ri_radio_stop() {
 }
 
 //----------------------------------------------------
-// Set RX mode and adjust filters
+// Set mode and adjust filters
 void RadioInterface::ri_server_set_mode(int channel, int mode) {
 	if (RSt::inst().get_server_running()) {
 		set_mode_filter(channel, mode, p->get_filter(channel), true);
@@ -225,7 +225,7 @@ void RadioInterface::ri_server_set_filter_freq(int channel, int filter) {
 }
 
 //----------------------------------------------------
-// Set receiver 1/2/3 frequency
+// Set receiver 1/2/3/TX frequency
 void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_hz) {
 	if (radio == 1) {
 		c_server_cc_out_set_rx_tx_freq(freq_in_hz);
@@ -236,10 +236,24 @@ void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_h
 	else if (radio == 3) {
 		c_server_cc_out_set_rx_3_freq(freq_in_hz);
 	}
-	// TBD take note of duplex setting and only set TX if duplex
+	// If duplex we set the TX freq independent of RX1
 	else if (radio == 4) {
-		c_server_cc_out_set_rx_tx_freq(freq_in_hz);
+		if (RSt::inst().get_duplex()) {
+			c_server_cc_out_set_rx_tx_freq(freq_in_hz);
+		}
 	}
+}
+
+//----------------------------------------------------
+// Set duplex/simplex
+void ri_server_cc_out_set_duplex(bool state) {
+	c_server_cc_out_duplex(state);
+}
+
+//----------------------------------------------------
+// Set TX/RX
+void ri_server_cc_out_set_mox(bool state) {
+	c_server_mox(state);
 }
 
 //----------------------------------------------------

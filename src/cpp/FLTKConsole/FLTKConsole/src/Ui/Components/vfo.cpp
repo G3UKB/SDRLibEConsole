@@ -227,13 +227,16 @@ void VFOComponent::set_radio_freq() {
 //----------------------------------------------------
 // Sync TX and RX simplex freq
 void VFOComponent::sync_radios() {
-	// ToDo account for duplex
-	if (r == 1) {
-		// We are radio 1 so sync to radio 4
-		((VFOComponent*)RSt::inst().get_obj("RADIO-4"))->external_set_display(current_freq);
-	} else if (r == 4) {
-		// We are radio 4 (TX) so sync to radio 1
-		((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(current_freq);
+	// Sync RX1 with TX if we are simplex
+	if (!RSt::inst().get_duplex()) {
+		if (r == 1) {
+			// We are radio 1 so sync to radio 4
+			((VFOComponent*)RSt::inst().get_obj("RADIO-4"))->external_set_display(current_freq);
+		}
+		else if (r == 4) {
+			// We are radio 4 (TX) so sync to radio 1
+			((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(current_freq);
+		}
 	}
 }
 

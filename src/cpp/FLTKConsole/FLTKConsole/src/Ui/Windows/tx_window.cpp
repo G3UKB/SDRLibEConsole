@@ -107,16 +107,18 @@ int DuplexButton::handle(int event) {
 		if (RSt::inst().get_duplex()) {
 			// Was duplex
 			clear();
-			RSt::inst().set_duplex(false);
 			label(up_label);
 			labelcolor(up_col);
+			RSt::inst().set_duplex(false);
+			r_i->ri_server_cc_out_set_duplex(0);
 		}
 		else {
 			// Was simplex
 			set();
-			RSt::inst().set_duplex(true);
 			label(down_label);
 			labelcolor(down_col);
+			RSt::inst().set_duplex(true);
+			r_i->ri_server_cc_out_set_duplex(1);
 		}
 		return 1;
 		}
@@ -146,18 +148,20 @@ int MOXButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
 		if (RSt::inst().get_mox()) {
-			// Was duplex
+			// Was TX, goint to RX
 			clear();
-			RSt::inst().set_mox(false);
 			label(up_label);
 			labelcolor(up_col);
+			RSt::inst().set_mox(false);
+			r_i->ri_server_cc_out_set_mox(0);
 		}
 		else {
-			// Was simplex
+			// Was RX, going to TX
 			set();
-			RSt::inst().set_mox(true);
 			label(down_label);
 			labelcolor(down_col);
+			RSt::inst().set_mox(true);
+			r_i->ri_server_cc_out_set_mox(1);
 		}
 		return 1;
 	}

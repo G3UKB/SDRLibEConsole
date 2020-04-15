@@ -71,6 +71,8 @@ public:
 	void ri_server_set_mode(int channel, int mode);
 	void ri_server_set_filter_freq(int channel, int filter);
 	void ri_server_cc_out_set_freq(int radio, unsigned int freq_in_hz);
+	void ri_server_cc_out_set_duplex(bool state);
+	void ri_server_cc_out_set_mox(bool state);
 
 private:
 	//==============================================================================
