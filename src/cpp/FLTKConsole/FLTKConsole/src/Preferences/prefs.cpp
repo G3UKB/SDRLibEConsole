@@ -84,6 +84,7 @@ void Preferences::save() {
 	radio.set("freq-1", radio_freq[0]);
 	radio.set("freq-2", radio_freq[1]);
 	radio.set("freq-3", radio_freq[2]);
+	radio.set("freq-tx", tx_freq);
 	radio.set("mode-1", radio_mode[0]);
 	radio.set("mode-2", radio_mode[1]);
 	radio.set("mode-3", radio_mode[2]);

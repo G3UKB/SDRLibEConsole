@@ -136,7 +136,7 @@ private:
 	// Radio mode, filter etc
 	int num_radios;
 	int radio_freq[3] = { 7100000,7100000,7100000 };
-	int tx_freq;
+	int tx_freq = 7100000;
 	int radio_mode[3] = { 0,0,0 };
 	int tx_mode;
 	int radio_filter[3] = { 2,2,2 };
