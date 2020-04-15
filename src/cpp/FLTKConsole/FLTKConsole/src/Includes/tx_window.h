@@ -36,6 +36,8 @@ The authors can be reached by email at:
 /*
 	The one and only main window
 */
+class DuplexButton;
+class MOXButton;
 class TxWindow : public WindowBase
 {
 public:
@@ -53,16 +55,78 @@ private:
 	// labels must be fixed storage
 	// Radio inst
 	int r;
-
+	// Buttons
+	char duplex_str_on[10] = "Duplex";
+	char duplex_str_off[10] = "Simplex";
+	char mox_str_on[5] = "TX";
+	char mox_str_off[5] = "RX";
+	
 	// Preferences
 	Preferences* p;
 
 	// Ref to set radio parameters
 	RadioInterface* r_i;
+	// Additional TX only buttons
+	DuplexButton* DuplexBtn;
+	MOXButton* MOXBtn;
 
 	// Components
 
 	//==============================================================================
 	// Method prototypes
 
+};
+
+//==============================================================================
+// The duplex button
+class DuplexButton : public Fl_Toggle_Button
+{
+public:
+	//==============================================================================
+	DuplexButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
+	~DuplexButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	char* up_label;
+	char* down_label;
+	Fl_Color up_col;
+	Fl_Color down_col;
+	TxWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+};
+
+//==============================================================================
+// The MOX button
+class MOXButton : public Fl_Toggle_Button
+{
+public:
+	//==============================================================================
+	MOXButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
+	~MOXButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	int id;
+	char* up_label;
+	char* down_label;
+	Fl_Color up_col;
+	Fl_Color down_col;
+	TxWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
 };

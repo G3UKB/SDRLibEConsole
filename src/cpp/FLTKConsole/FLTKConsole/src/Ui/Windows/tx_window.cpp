@@ -51,6 +51,15 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x,
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
+	// Add Duplex button to the group
+	m = grid->get_cell_metrics(0, 2);
+	DuplexBtn = new DuplexButton(this, duplex_str_on, duplex_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	top_group->add(DuplexBtn);
+	// Add MOX button to the group
+	m = grid->get_cell_metrics(0, 3);
+	MOXBtn = new MOXButton(this, mox_str_on, mox_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	top_group->add(MOXBtn);
+
 	// Display main window
 	show();
 
@@ -67,11 +76,93 @@ void TxWindow::close() {
 
 //===================================================
 // Callbacks
-//----------------------------------------------------
 
+//----------------------------------------------------
 // Handle idle timeout
 void TxWindow::handle_idle_timeout() {
 	// Nothing todo here
 	// Just call base class
 	WindowBase::handle_idle_timeout();
+}
+
+//==============================================================================
+// Duplex button
+DuplexButton::DuplexButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
+	myparent = parent_widget;
+	up_label = button_up_label;
+	down_label = button_down_label;
+	up_col = button_up_col;
+	down_col = button_down_col;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)button_up_col);
+	id = button_id;
+}
+
+//----------------------------------------------------
+// Handle click event
+int DuplexButton::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		if (RSt::inst().get_duplex()) {
+			// Was duplex
+			clear();
+			RSt::inst().set_duplex(false);
+			label(up_label);
+			labelcolor(up_col);
+		}
+		else {
+			// Was simplex
+			set();
+			RSt::inst().set_duplex(true);
+			label(down_label);
+			labelcolor(down_col);
+		}
+		return 1;
+		}
+		
+	default:
+		return Fl_Widget::handle(event);
+	}
+}
+
+//==============================================================================
+// MOX button
+MOXButton::MOXButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
+	myparent = parent_widget;
+	up_label = button_up_label;
+	down_label = button_down_label;
+	up_col = button_up_col;
+	down_col = button_down_col;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)button_up_col);
+	id = button_id;
+}
+
+//----------------------------------------------------
+// Handle click event
+int MOXButton::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		if (RSt::inst().get_mox()) {
+			// Was duplex
+			clear();
+			RSt::inst().set_mox(false);
+			label(up_label);
+			labelcolor(up_col);
+		}
+		else {
+			// Was simplex
+			set();
+			RSt::inst().set_mox(true);
+			label(down_label);
+			labelcolor(down_col);
+		}
+		return 1;
+	}
+
+	default:
+		return Fl_Widget::handle(event);
+	}
 }

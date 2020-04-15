@@ -55,6 +55,8 @@ typedef struct t_app_state{
 	int num_radios = 1;
 	bool active_radios[3] = { true, false, false };
 	audio_alloc audio;
+	bool duplex = false;
+	bool mox = false;
 };
 
 class RSt
@@ -89,4 +91,9 @@ public:
 	bool get_server_running();
 	void set_radio_running(bool running);
 	bool get_radio_running();
+	void set_duplex(bool state);
+	bool get_duplex();
+	void set_mox(bool state);
+	bool get_mox();
+
 };

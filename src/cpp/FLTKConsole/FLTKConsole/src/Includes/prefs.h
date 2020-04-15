@@ -116,19 +116,23 @@ private:
 
 	//------------------------------------
 	// Prefs items
-	// Main window position and size
+	// Windows position and size
+	// Main
 	int window_x;
 	int window_y;
 	int window_w;
 	int window_h;
+	// Radio 2
 	int radio2_x;
 	int radio2_y;
 	int radio2_w;
 	int radio2_h;
+	// Radio 3
 	int radio3_x;
 	int radio3_y;
 	int radio3_w;
 	int radio3_h;
+	// TX
 	int tx_x;
 	int tx_y;
 	int tx_w;

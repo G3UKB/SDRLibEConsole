@@ -79,3 +79,19 @@ void RSt::set_radio_running(bool running) {
 bool RSt::get_radio_running() {
 	return app_state.radio_running;
 }
+
+void RSt::set_duplex(bool state) {
+	app_state.duplex = state;
+}
+
+bool RSt::get_duplex() {
+	return app_state.duplex;
+}
+
+void RSt::set_mox(bool state) {
+	app_state.mox = state;
+}
+
+bool RSt::get_mox() {
+	return app_state.mox;
+}
