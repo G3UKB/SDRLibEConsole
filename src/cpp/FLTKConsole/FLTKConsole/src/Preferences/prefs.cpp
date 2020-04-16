@@ -337,7 +337,7 @@ struct struct_audio_desc Preferences::parse_audio_desc(int radio) {
 		// Extract tokens
 		char* next_token;
 		// Split into tokens
-		audio_desc.sink_part = strtok_s(audio_path, ":", &next_token);
+		audio_desc.loc_part = strtok_s(audio_path, ":", &next_token);
 		audio_desc.dev_part = strtok_s(NULL, ":", &next_token);
 		audio_desc.api_part = strtok_s(NULL, ":", &next_token);
 		audio_desc.ch_part = strtok_s(NULL, ":", &next_token);

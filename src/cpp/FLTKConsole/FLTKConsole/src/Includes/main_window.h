@@ -62,8 +62,8 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
-	char tx_str_on[12] = "Enable TX";
-	char tx_str_off[12] = "Disable TX";
+	char tx_str_on[12] = "Show TX";
+	char tx_str_off[12] = "Hide TX";
 	char exit_str[10] = "EXIT";
 
 	// Preferences

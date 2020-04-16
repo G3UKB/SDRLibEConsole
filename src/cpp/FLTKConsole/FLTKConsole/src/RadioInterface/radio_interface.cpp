@@ -269,11 +269,21 @@ void RadioInterface::set_audio_paths() {
 	// Retrieve and set audio routes
 	struct_audio_desc desc;
 	for (int radio = 1; radio <= p->get_num_radios(); radio++) {
+		// ToDo change for TX
 		desc = p->get_audio_desc(radio);
 		if (desc.valid) {
 			// Set audio path
-			c_server_set_audio_route((int)AudioType::OUTPUT, desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
-			//printf("%s,%d,%s,%s,%s\n", desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+			if (radio == 4) {
+				// TX
+				// ToDo add to server
+				c_server_set_audio_route((int)AudioType::INPUT, desc.loc_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+				//printf("%s,%d,%s,%s,%s\n", desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+			}
+			else {
+				// RX
+				c_server_set_audio_route((int)AudioType::OUTPUT, desc.loc_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+				//printf("%s,%d,%s,%s,%s\n", desc.sink_part, radio, desc.api_part, desc.dev_part, desc.ch_part);
+			}
 		}
 	}
 	// Restart audio

@@ -106,17 +106,13 @@ private:
 	// Ref to set radio parameters
 	RadioInterface* r_i;
 
-	Fl_Choice* sink;
+	Fl_Choice* source;
 	Fl_Choice* device;
-	Fl_Radio_Light_Button* left;
-	Fl_Radio_Light_Button* right;
-	Fl_Radio_Light_Button* both;
-	Fl_Radio_Light_Button* none;
 	Fl_Button* apply;
 	Fl_Button* cancel;
 
 	//==============================================================================
 	// Method prototypes
-	void save_route(int radio, char* sink, char* api, char* de);
-	void set_widget_state(char* vsink, char* vapi, char* vdev, char* vch);
+	void save_route(int radio, char* source, char* api, char* dev);
+	void set_widget_state(char* vsource, char* vapi, char* vdev);
 };

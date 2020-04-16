@@ -320,10 +320,14 @@ int TXButton::handle(int event) {
 		if (value()) {
 			myparent->show_tx(false);
 			clear();
+			label(up_label);
+			labelcolor(up_col);
 		}
 		else {
 			myparent->show_tx(true);
 			set();
+			label(down_label);
+			labelcolor(down_col);
 		}
 		return 1;
 	}

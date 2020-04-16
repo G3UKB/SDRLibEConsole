@@ -155,6 +155,12 @@ void  WindowBase::resize(int x, int y, int w, int h) {
 		p->set_radio3_w(w);
 		p->set_radio3_h(h);
 	}
+	else if (r == 4) {
+		p->set_tx_x(x);
+		p->set_tx_y(y);
+		p->set_tx_w(w);
+		p->set_tx_h(h);
+	}
 }
 
 //===================================================
@@ -242,11 +248,17 @@ struct struct_w_loc WindowBase::get_location(int radio) {
 		w_loc.w = p->get_radio2_w();
 		w_loc.h = p->get_radio2_h();
 	}
-	else {
+	else if (radio == 3) {
 		w_loc.x = p->get_radio3_x();
 		w_loc.y = p->get_radio3_y();
 		w_loc.w = p->get_radio3_w();
 		w_loc.h = p->get_radio3_h();
+	}
+	else {
+		w_loc.x = p->get_tx_x();
+		w_loc.y = p->get_tx_y();
+		w_loc.w = p->get_tx_w();
+		w_loc.h = p->get_tx_h();
 	}
 	return w_loc;
 }

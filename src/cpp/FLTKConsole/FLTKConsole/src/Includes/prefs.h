@@ -37,7 +37,7 @@ The authors can be reached by email at:
 
 typedef struct struct_audio_desc {
 	bool valid;
-	char* sink_part;
+	char* loc_part;
 	char* dev_part;
 	char* api_part;
 	char* ch_part;

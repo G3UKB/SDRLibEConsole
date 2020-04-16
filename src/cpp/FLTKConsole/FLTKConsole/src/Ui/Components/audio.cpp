@@ -49,9 +49,9 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
-
+	
 	// Set up window
-	char label[20];
+	char label[30];
 	sprintf_s(label, "Audio Output (radio-%d", r);
 	copy_label(label);
 	resizable(this);
@@ -62,7 +62,7 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 	Fl_Group *top_group = new Fl_Group(5, 5, w - 10, h - 10);
 	top_group->box(FL_GTK_THIN_UP_BOX);
 	top_group->color((Fl_Color)24);
-
+	
 	// Create a grid layout handler
 	GridLayout *grid = new GridLayout(5, 5, w - 10, h - 10, 4, 5, 5);
 	metrics m;
@@ -95,7 +95,7 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 		strcat_s(str, 100, audio_outputs->devices[i].host_api);
 		device->add(str);
 	}
-
+	
 	// Add channel selection
 	m = grid->get_cell_metrics(2, 1, 1, 4);
 	Fl_Group *ch_group = new Fl_Group(m.x, m.y, m.w, m.h);
@@ -108,22 +108,22 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 	m = grid->get_cell_metrics(2, 4);
 	none = new Fl_Radio_Light_Button(m.x, m.y, m.w, m.h, "None");
 	ch_group->end();
-
+	
 	// Add apply button
 	m = grid->get_cell_metrics(3, 4);
 	apply = new Fl_Button(m.x, m.y, m.w, m.h, "Apply");
 	apply->callback((Fl_Callback*)apply_output_cb, (void*)this);
-
+	
 	// Close up and display
 	top_group->end();
 	end();
 	border(false);
-
+	
 	// Retrieve and reset audio path
 	struct_audio_desc desc = p->get_audio_desc(r);
 	if (desc.valid) {
 		// Set the widget state
-		set_widget_state(desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
+		set_widget_state(desc.loc_part, desc.api_part, desc.dev_part, desc.ch_part);
 		// Set audio path
 		r_i->set_audio_paths();
 	}
@@ -267,10 +267,10 @@ AudioInput::AudioInput(int radio, int w, int h) : Fl_Window(w, h) {
 	// Add choices
 	m = grid->get_cell_metrics(0, 1, 1, 4);
 	// Source selection
-	sink = new Fl_Choice(m.x, m.y, m.w, m.h);
-	sink->add("HPSDR");
-	sink->add("Local");
-	sink->value(0);
+	source = new Fl_Choice(m.x, m.y, m.w, m.h);
+	source->add("HPSDR");
+	source->add("Local");
+	source->value(0);
 	m = grid->get_cell_metrics(1, 1, 1, 4);
 	// Device selection
 	device = new Fl_Choice(m.x, m.y, m.w, m.h);
@@ -299,7 +299,7 @@ AudioInput::AudioInput(int radio, int w, int h) : Fl_Window(w, h) {
 	struct_audio_desc desc = p->get_audio_desc(r);
 	if (desc.valid) {
 		// Set the widget state
-		set_widget_state(desc.sink_part, desc.api_part, desc.dev_part, desc.ch_part);
+		set_widget_state(desc.loc_part, desc.api_part, desc.dev_part);
 		// Set audio path
 		r_i->set_audio_paths();
 	}
@@ -318,10 +318,10 @@ void AudioInput::handle_apply() {
 	char *api_part;
 
 	// Set source type
-	if (strcmp(((Fl_Choice*)sink)->text(), "LOCAL")) {
+	if (strcmp(((Fl_Choice*)source)->text(), "LOCAL")) {
 		strcpy_s(source_str, 9, LOCAL_AF);
 	}
-	else if (strcmp(((Fl_Choice*)sink)->text(), "HPSDR")) {
+	else if (strcmp(((Fl_Choice*)source)->text(), "HPSDR")) {
 		strcpy_s(source_str, 9, HPSDR);
 	}
 
@@ -342,15 +342,15 @@ void AudioInput::handle_apply() {
 
 //----------------------------------------------------
 // Set a new audio path
-void AudioInput::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch) {
+void AudioInput::set_widget_state(char* vsource, char* vapi, char* vdev) {
 	char str[100];
 
 	// Set source
-	if (strcmp(vsink, LOCAL) == 0) {
-		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("Local-IQ"));
+	if (strcmp(vsource, LOCAL) == 0) {
+		((Fl_Choice*)source)->value(((Fl_Choice*)source)->find_index("Local-IQ"));
 	}
-	else if (strcmp(vsink, HPSDR) == 0) {
-		((Fl_Choice*)sink)->value(((Fl_Choice*)sink)->find_index("HPSDR"));
+	else if (strcmp(vsource, HPSDR) == 0) {
+		((Fl_Choice*)source)->value(((Fl_Choice*)source)->find_index("HPSDR"));
 	}
 	// Set device
 	strcpy_s(str, 100, vdev);
@@ -361,13 +361,14 @@ void AudioInput::set_widget_state(char* vsink, char* vapi, char* vdev, char* vch
 
 //----------------------------------------------------
 // Save the audio route
-void AudioInput::save_route(int radio, char* sink, char* api, char* dev) {
+void AudioInput::save_route(int radio, char* source, char* api, char* dev) {
 	// Save the current route
 	char current_route[100];
-	strcpy_s(current_route, 100, sink);
+	strcpy_s(current_route, 100, source);
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, dev);
 	strcat_s(current_route, 100, ":");
 	strcat_s(current_route, 100, api);
+	strcat_s(current_route, 100, ":BOTH");
 	p->set_audio_path(radio, current_route);
 }
