@@ -41,12 +41,14 @@ enum class AudioType {
 	OUTPUT
 };
 
-class Audio : public Fl_Window
+//==============================================================================
+// Audio output management
+class AudioOutput : public Fl_Window
 {
 public:
 	//==============================================================================
-	Audio(int radio, int w, int h);
-	~Audio() {};
+	AudioOutput(int radio, int w, int h);
+	~AudioOutput() {};
 
 	//==============================================================================
 	// Method prototypes
@@ -76,5 +78,45 @@ private:
 	//==============================================================================
 	// Method prototypes
 	void save_route(int radio, char* sink, char* api, char* dev, char* ch);
+	void set_widget_state(char* vsink, char* vapi, char* vdev, char* vch);
+};
+
+//==============================================================================
+// Audio input management
+class AudioInput : public Fl_Window
+{
+public:
+	//==============================================================================
+	AudioInput(int radio, int w, int h);
+	~AudioInput() {};
+
+	//==============================================================================
+	// Method prototypes
+	void handle_apply();
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	// Radio instance
+	int r;
+	// Our prefs
+	Preferences* p;
+	// Ref to set radio parameters
+	RadioInterface* r_i;
+
+	Fl_Choice* sink;
+	Fl_Choice* device;
+	Fl_Radio_Light_Button* left;
+	Fl_Radio_Light_Button* right;
+	Fl_Radio_Light_Button* both;
+	Fl_Radio_Light_Button* none;
+	Fl_Button* apply;
+	Fl_Button* cancel;
+
+	//==============================================================================
+	// Method prototypes
+	void save_route(int radio, char* sink, char* api, char* de);
 	void set_widget_state(char* vsink, char* vapi, char* vdev, char* vch);
 };

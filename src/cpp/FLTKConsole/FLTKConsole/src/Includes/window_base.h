@@ -92,7 +92,8 @@ private:
 
 	// Components
 	AudioTriggerBase* AudioBtn;
-	Audio* audio;
+	AudioOutput* audio_out;
+	AudioInput* audio_in;
 	ModeTriggerBase* ModeBtn;
 	Modes *modes;
 	FilterTriggerBase* FilterBtn;

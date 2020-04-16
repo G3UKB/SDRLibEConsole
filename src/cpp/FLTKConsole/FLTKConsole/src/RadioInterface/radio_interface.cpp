@@ -246,13 +246,13 @@ void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_h
 
 //----------------------------------------------------
 // Set duplex/simplex
-void ri_server_cc_out_set_duplex(bool state) {
+void RadioInterface::ri_server_cc_out_set_duplex(bool state) {
 	c_server_cc_out_duplex(state);
 }
 
 //----------------------------------------------------
 // Set TX/RX
-void ri_server_cc_out_set_mox(bool state) {
+void RadioInterface::ri_server_cc_out_set_mox(bool state) {
 	c_server_mox(state);
 }
 

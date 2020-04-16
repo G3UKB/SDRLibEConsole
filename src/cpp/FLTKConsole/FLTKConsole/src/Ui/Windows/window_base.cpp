@@ -69,9 +69,15 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h, int rows, int cols
 	ModeBtn->deactivate();
 	FilterBtn->deactivate();
 
-	// Create the audio panel hidden for radio 1
-	audio = new Audio(r, 350, 130);
-	audio->hide();
+	// Create the audio panel hidden for radio
+	if (r == 4) {
+		audio_in = new AudioInput(r, 350, 130);
+		audio_in->hide();
+	}
+	else {
+		audio_out = new AudioOutput(r, 350, 130);
+		audio_out->hide();
+	}
 
 	// Create the modes panel hidden
 	modes = new Modes(r, 230, 80);
@@ -172,12 +178,25 @@ void WindowBase::handle_idle_timeout() {
 // Show or hide the audio panel
 void  WindowBase::manage_audio_panel(bool show) {
 	struct struct_w_loc loc = get_location(r);
-	if (show) {
-		audio->position(loc.x + loc.w + 5, loc.y);
-		audio->show();
+	if (r == 4) {
+		// TX
+		if (show) {
+			audio_in->position(loc.x + loc.w + 5, loc.y);
+			audio_in->show();
+		}
+		else {
+			audio_in->hide();
+		}
 	}
 	else {
-		audio->hide();
+		// RX
+		if (show) {
+			audio_out->position(loc.x + loc.w + 5, loc.y);
+			audio_out->show();
+		}
+		else {
+			audio_out->hide();
+		}
 	}
 }
 
