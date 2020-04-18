@@ -76,4 +76,5 @@ The authors can be reached by email at:
 #include "rx_window.h"
 #include "tx_window.h"
 #include "main_window.h"
-
+#include "../SerialDriver/serial.h"
+#include "cat.h"
