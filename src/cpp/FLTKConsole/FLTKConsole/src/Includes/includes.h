@@ -31,6 +31,7 @@ The authors can be reached by email at:
 #include <iostream>
 #include <string>
 #include <map>
+#include <thread>
 
 // FLTK includes
 #ifdef linux

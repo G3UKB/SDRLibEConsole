@@ -34,3 +34,14 @@ The authors can be reached by email at:
 /*
 	CAT control class
 */
+
+// A callable object 
+class thread_obj {
+public:
+	void operator()(int x)
+	{
+		for (int i = 0; i < x; i++)
+			printf( "Thread using function"
+			" object as  callable\n");
+	}
+};

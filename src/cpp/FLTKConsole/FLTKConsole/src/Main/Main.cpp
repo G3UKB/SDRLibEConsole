@@ -53,6 +53,9 @@ int main(int argc, char **argv) {
 	Fl_Window* main_window = new MainWindow(prefs->get_window_x(), prefs->get_window_y(), prefs->get_window_w(), prefs->get_window_h());
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
+	// Create CAT thread
+	std::thread th2(thread_obj(), 3);
+
 	// Run UI event loop until quit
 	return Fl::run();
 }
