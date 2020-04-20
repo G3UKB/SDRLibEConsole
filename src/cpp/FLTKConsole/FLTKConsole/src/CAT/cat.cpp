@@ -34,3 +34,12 @@ The authors can be reached by email at:
 /*
 	CAT control class
 */
+
+void CATStart(int x) {
+	CATThrd th;
+	th.run(x);
+}
+void CATThrd::run(int x)
+{
+	printf("Thread using class method as  callable %d\n", x);
+}

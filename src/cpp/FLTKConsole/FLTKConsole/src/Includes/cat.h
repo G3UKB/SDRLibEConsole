@@ -27,21 +27,61 @@ The authors can be reached by email at:
 
 #pragma once
 
+#include "../Includes/includes.h"
+
 //==============================================================================
 // Defines
 
 //==============================================================================
+
+// Descriptor for CAT FT817 emulation
+// This is the simplest CAT interface so suits our minimal rquirement
+
+// Serial interface parameters
+typedef struct CATSerial {
+	serial::parity_t PARITY = serial::parity_t::parity_none;
+	serial::stopbits_t STOP_BITS = serial::stopbits_t::stopbits_one;
+	int TIMEOUT = 2;
+	int READ_SZ = 5;
+};
+
+// Minimal set of required commands
+typedef struct CATCommands {
+	unsigned char LOCK_ON = 0x00;
+	unsigned char LOCK_OFF = 0x80;
+	unsigned char PTT_ON = 0x08;
+	unsigned char PTT_OFF = 0x88;
+	unsigned char SET_FREQ = 0x01;
+	unsigned char SET_MODE = 0x07;
+	unsigned char FREQ_MODE_GET = 0x03;
+};
+// Modes setting
+typedef struct CATModes {
+	unsigned char MODE_LSB = 0x00;
+	unsigned char MODE_USB = 0x01;
+	unsigned char MODE_CW = 0x02;
+	unsigned char MODE_CWR = 0x03;
+	unsigned char MODE_AM = 0x04;
+	unsigned char MODE_FM = 0x08;
+	unsigned char MODE_DIG = 0x0A;
+	unsigned char MODE_PKT = 0x0C;
+};
+
+typedef struct CAT_FT817_EM {
+	CATSerial serial;
+	CATCommands cmds;
+	CATModes modes;
+};
+
 /*
 	CAT control class
 */
 
 // A callable object 
-class thread_obj {
+void CATStart(int x);
+
+class CATThrd {
 public:
-	void operator()(int x)
-	{
-		for (int i = 0; i < x; i++)
-			printf( "Thread using function"
-			" object as  callable\n");
-	}
+	
+	void run(int x);
 };

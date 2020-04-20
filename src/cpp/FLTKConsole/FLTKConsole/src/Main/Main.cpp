@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
 	// Create CAT thread
-	std::thread th2(thread_obj(), 3);
+	std::thread th(CATStart, 3);
 
 	// Run UI event loop until quit
 	return Fl::run();
