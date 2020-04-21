@@ -35,11 +35,23 @@ The authors can be reached by email at:
 	CAT control class
 */
 
+// Run the CAT thread
+CATThrd* cat_thrd = new CATThrd();
+
 void CATStart(int x) {
-	CATThrd th;
-	th.run(x);
+	RSt::inst().put_obj("CAT", (void*)cat_thrd);
+	cat_thrd->run();
 }
-void CATThrd::run(int x)
+
+void CATThrd::terminate() {
+	term = true;
+}
+
+// Thread entry pont
+void CATThrd::run()
 {
-	printf("Thread using class method as  callable %d\n", x);
+	while (!term) {
+		Sleep(1000);
+	}
+	printf("Thread exiting\n");
 }

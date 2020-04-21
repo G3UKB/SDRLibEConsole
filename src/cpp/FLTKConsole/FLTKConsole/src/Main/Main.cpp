@@ -29,6 +29,7 @@ The authors can be reached by email at:
 
 RadioInterface* r_i;
 Preferences* prefs;
+std::thread* cat;
 
 //==============================================================================
 // FLTKConsole entry point
@@ -53,11 +54,18 @@ int main(int argc, char **argv) {
 	Fl_Window* main_window = new MainWindow(prefs->get_window_x(), prefs->get_window_y(), prefs->get_window_w(), prefs->get_window_h());
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
-	// Create CAT thread
-	std::thread th(CATStart, 3);
+	// Start the CAT thread
+	cat = new std::thread(CATStart, 0);
 
 	// Run UI event loop until quit
-	return Fl::run();
+	Fl::run();
+
+	// Wait for threads to exit
+	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
+	t->terminate();
+	cat->join();
+	Sleep(1000);
+	return 0;
 }
 
 

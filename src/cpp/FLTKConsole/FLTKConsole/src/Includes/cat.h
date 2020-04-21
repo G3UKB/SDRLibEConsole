@@ -83,5 +83,10 @@ void CATStart(int x);
 class CATThrd {
 public:
 	
-	void run(int x);
+	void run();
+	void terminate();
+
+private:
+	int term;
+
 };

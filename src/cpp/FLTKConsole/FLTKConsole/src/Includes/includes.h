@@ -32,6 +32,12 @@ The authors can be reached by email at:
 #include <string>
 #include <map>
 #include <thread>
+#include <time.h>
+#ifdef linux
+	#include <unistd>
+#else
+	#include <Windows.h>
+#endif
 
 // FLTK includes
 #ifdef linux
