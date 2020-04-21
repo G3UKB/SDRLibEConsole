@@ -85,8 +85,10 @@ public:
 	
 	void run();
 	void terminate();
+	void enable(bool enable);
 
 private:
-	int term;
+	bool cat_term = false;
+	bool cat_enable = false;
 
 };

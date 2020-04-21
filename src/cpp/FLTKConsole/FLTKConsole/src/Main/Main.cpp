@@ -56,12 +56,13 @@ int main(int argc, char **argv) {
 
 	// Start the CAT thread
 	cat = new std::thread(CATStart, 0);
+	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
+	t->enable(true);
 
 	// Run UI event loop until quit
 	Fl::run();
 
 	// Wait for threads to exit
-	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
 	t->terminate();
 	cat->join();
 	Sleep(1000);

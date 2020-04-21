@@ -43,15 +43,26 @@ void CATStart(int x) {
 	cat_thrd->run();
 }
 
+void CATThrd::enable(bool enable) {
+	cat_enable = enable;
+}
+
 void CATThrd::terminate() {
-	term = true;
+	cat_term = true;
 }
 
 // Thread entry pont
 void CATThrd::run()
 {
-	while (!term) {
-		Sleep(1000);
+	while (!cat_term) {
+		if (cat_enable) {
+			printf("Working\n");
+			Sleep(1000);
+		}
+		else {
+			printf("Sleeping\n");
+			Sleep(1000);
+		}
 	}
 	printf("Thread exiting\n");
 }
