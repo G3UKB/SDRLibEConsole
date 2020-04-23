@@ -74,6 +74,7 @@ void CATThrd::run(std::string port)
 			// Process requests
 			while (cat_enable && !cat_term) {
 				process();
+				Sleep(100);
 			}
 		}
 		else {
@@ -109,6 +110,7 @@ bool CATThrd::open()
 		cat_serial = new serial::Serial(serial_port, desc.serial.baud, serial::Timeout::simpleTimeout(1000));
 		if (cat_serial->isOpen()) {
 			std::cout << " Opened CAT port" << std::endl;
+			cat_serial->setTimeout(serial::Timeout::max(), 250, 0, 250, 0);
 			port_open = true;
 			return true;
 		}
@@ -134,6 +136,9 @@ void CATThrd::close()
 void CATThrd::process()
 {
 	if (port_open) {
-
+		// Commands consist of 5 bytes, 4 parameters and the command byte
+		std::string data;
+		data = cat_serial->read(5);
+		printf("Data %s\n", data.c_str());
 	}
 }
