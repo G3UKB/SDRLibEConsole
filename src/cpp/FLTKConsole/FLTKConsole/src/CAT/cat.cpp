@@ -67,15 +67,21 @@ void CATThrd::run(std::string port)
 	enumerate_ports();
 	while (!cat_term) {
 		if (cat_enable) {
-			printf("Working\n");
-			Sleep(1000);
+			// Open port
+			if (!open()) {
+				break;
+			}
+			// Process requests
+			while (cat_enable && !cat_term) {
+				process();
+			}
 		}
 		else {
-			printf("Sleeping\n");
-			Sleep(1000);
+			Sleep(100);
 		}
 	}
-	printf("Thread exiting\n");
+	close();
+	printf("CAT thread exiting...\n");
 }
 
 //==============================================================================
@@ -90,7 +96,6 @@ void CATThrd::enumerate_ports()
 	while (iter != devices_found.end())
 	{
 		serial::PortInfo device = *iter++;
-
 		printf("(%s, %s, %s)\n", device.port.c_str(), device.description.c_str(),
 			device.hardware_id.c_str());
 	}
@@ -98,26 +103,37 @@ void CATThrd::enumerate_ports()
 
 //----------------------------------------------------
 // Open COM/dev port
-void CATThrd::open()
+bool CATThrd::open()
 {
-	// port, baudrate, timeout in milliseconds
-	//serial::Serial cat_serial(serial_port, baud, serial::Timeout::simpleTimeout(1000));
-	cat_serial = new serial::Serial(serial_port, desc.serial.baud, serial::Timeout::simpleTimeout(1000));
-
-	if (cat_serial->isOpen())
-		std::cout << " Opened CAT port" << std::endl;
-	else
-		std::cout << " Failed to open CAT port!" << std::endl;
+	if (!port_open) {
+		cat_serial = new serial::Serial(serial_port, desc.serial.baud, serial::Timeout::simpleTimeout(1000));
+		if (cat_serial->isOpen()) {
+			std::cout << " Opened CAT port" << std::endl;
+			port_open = true;
+			return true;
+		}
+		else {
+			std::cout << " Failed to open CAT port!" << std::endl;
+			return false;
+		}
+	}
+	return true;
 }
 
 //----------------------------------------------------
 // Close COM/dev port
 void CATThrd::close()
 {
+	if (port_open) {
+		cat_serial->close();
+	}
 }
 
 //----------------------------------------------------
 // Process CAT commands
 void CATThrd::process()
 {
+	if (port_open) {
+
+	}
 }

@@ -97,14 +97,15 @@ private:
 	// State variables
 	CAT_FT817_EM desc;
 	std::string serial_port;
-	serial::Serial* cat_serial;
+	serial::Serial* cat_serial = NULL;
 	bool cat_term = false;
 	bool cat_enable = false;
+	bool port_open = false;
 
 	//==============================================================================
 	// Method prototypes
 	void enumerate_ports();
-	void open();
+	bool open();
 	void close();
 	void process();
 };
