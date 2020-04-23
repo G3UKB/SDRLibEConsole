@@ -25,9 +25,8 @@ The authors can be reached by email at:
 
 */
 
-#pragma once
-
 #include "../Includes/includes.h"
+#pragma once
 
 //==============================================================================
 // Defines
@@ -41,6 +40,7 @@ The authors can be reached by email at:
 typedef struct CATSerial {
 	serial::parity_t PARITY = serial::parity_t::parity_none;
 	serial::stopbits_t STOP_BITS = serial::stopbits_t::stopbits_one;
+	int baud = 9600;
 	int TIMEOUT = 2;
 	int READ_SZ = 5;
 };
@@ -73,22 +73,38 @@ typedef struct CAT_FT817_EM {
 	CATModes modes;
 };
 
-/*
-	CAT control class
-*/
+// CATthrd startup function
+void CATStart(std::string port);
 
-// A callable object 
-void CATStart(int x);
-
+//==============================================================================
+// CAT controller class
 class CATThrd {
 public:
 	
-	void run();
+	// Construct/destroy
+	//==============================================================================
+	CATThrd() {};
+	~CATThrd() {};
+
+	//==============================================================================
+	// Method prototypes
+	void run(std::string port);
 	void terminate();
 	void enable(bool enable);
-
+	
 private:
+	//==============================================================================
+	// State variables
+	CAT_FT817_EM desc;
+	std::string serial_port;
+	serial::Serial* cat_serial;
 	bool cat_term = false;
 	bool cat_enable = false;
 
+	//==============================================================================
+	// Method prototypes
+	void enumerate_ports();
+	void open();
+	void close();
+	void process();
 };

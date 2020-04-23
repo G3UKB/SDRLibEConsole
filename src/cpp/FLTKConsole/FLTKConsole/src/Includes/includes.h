@@ -29,6 +29,7 @@ The authors can be reached by email at:
 
 // System includes
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <map>
 #include <thread>
