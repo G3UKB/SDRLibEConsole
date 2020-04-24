@@ -30,6 +30,13 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Defines
+#define LOCK_ON 0x00
+#define LOCK_OFF 0x80
+#define PTT_ON 0x08
+#define PTT_OFF 0x88
+#define SET_FREQ 0x01
+#define SET_MODE 0x07
+#define FREQ_MODE_GET 0x03
 
 //==============================================================================
 
@@ -44,7 +51,7 @@ typedef struct CATSerial {
 	int TIMEOUT = 2;
 	int READ_SZ = 5;
 };
-
+/*
 // Minimal set of required commands
 typedef struct CATCommands {
 	unsigned char LOCK_ON = 0x00;
@@ -55,6 +62,7 @@ typedef struct CATCommands {
 	unsigned char SET_MODE = 0x07;
 	unsigned char FREQ_MODE_GET = 0x03;
 };
+*/
 // Modes setting
 typedef struct CATModes {
 	unsigned char MODE_LSB = 0x00;
@@ -69,7 +77,7 @@ typedef struct CATModes {
 
 typedef struct CAT_FT817_EM {
 	CATSerial serial;
-	CATCommands cmds;
+	//CATCommands cmds;
 	CATModes modes;
 };
 
@@ -96,6 +104,7 @@ private:
 	//==============================================================================
 	// State variables
 	CAT_FT817_EM desc;
+	char const *bytes;
 	std::string serial_port;
 	serial::Serial* cat_serial = NULL;
 	bool cat_term = false;
@@ -108,4 +117,5 @@ private:
 	bool open();
 	void close();
 	void process();
+	void freq_mode_get(const char* bytes);
 };

@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
 	// Start the CAT thread
-	cat = new std::thread(CATStart, "COM1");
+	cat = new std::thread(CATStart, "COM3");
 	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
 	t->enable(true);
 

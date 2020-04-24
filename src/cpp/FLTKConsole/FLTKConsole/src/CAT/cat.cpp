@@ -109,13 +109,13 @@ bool CATThrd::open()
 	if (!port_open) {
 		cat_serial = new serial::Serial(serial_port, desc.serial.baud, serial::Timeout::simpleTimeout(1000));
 		if (cat_serial->isOpen()) {
-			std::cout << " Opened CAT port" << std::endl;
+			std::cout << "Opened CAT port" << std::endl;
 			cat_serial->setTimeout(serial::Timeout::max(), 250, 0, 250, 0);
 			port_open = true;
 			return true;
 		}
 		else {
-			std::cout << " Failed to open CAT port!" << std::endl;
+			std::cout << "Failed to open CAT port!" << std::endl;
 			return false;
 		}
 	}
@@ -139,6 +139,32 @@ void CATThrd::process()
 		// Commands consist of 5 bytes, 4 parameters and the command byte
 		std::string data;
 		data = cat_serial->read(5);
-		printf("Data %s\n", data.c_str());
+		bytes = data.c_str();
+		if (data.length() > 0) {
+			// Valid data
+			switch (bytes[4]) {
+			case LOCK_ON:
+				break;
+			case LOCK_OFF:
+				break;
+			case PTT_ON:
+				break;
+			case PTT_OFF:
+				break;
+			case SET_FREQ:
+				break;
+			case SET_MODE:
+				break;
+			case FREQ_MODE_GET:
+				freq_mode_get(bytes);
+				break;
+			}
+		}
 	}
+}
+
+//----------------------------------------------------
+// Return current freq and mode
+void CATThrd::freq_mode_get(const char* bytes) {
+
 }
