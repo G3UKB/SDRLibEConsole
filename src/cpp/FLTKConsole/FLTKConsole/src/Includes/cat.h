@@ -46,7 +46,7 @@ The authors can be reached by email at:
 // Serial interface parameters
 typedef struct CATSerial {
 	serial::parity_t PARITY = serial::parity_t::parity_none;
-	serial::stopbits_t STOP_BITS = serial::stopbits_t::stopbits_one;
+	serial::stopbits_t STOP_BITS = serial::stopbits_t::stopbits_two;
 	int baud = 9600;
 	int TIMEOUT = 2;
 	int READ_SZ = 5;

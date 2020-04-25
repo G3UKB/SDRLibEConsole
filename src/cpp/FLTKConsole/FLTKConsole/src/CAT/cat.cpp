@@ -108,7 +108,7 @@ void CATThrd::enumerate_ports()
 bool CATThrd::open()
 {
 	if (!port_open) {
-		cat_serial = new serial::Serial(serial_port, desc.serial.baud, serial::Timeout::simpleTimeout(1000));
+		cat_serial = new serial::Serial(serial_port, 9600, serial::Timeout::simpleTimeout(1000),serial::bytesize_t::eightbits,serial::parity_t::parity_none,serial::stopbits_t::stopbits_two);
 		if (cat_serial->isOpen()) {
 			std::cout << "Opened CAT port" << std::endl;
 			cat_serial->setTimeout(serial::Timeout::max(), 250, 0, 250, 0);
@@ -188,7 +188,7 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	response[2] = (int)strtol(val, (char **)NULL, 10);
 	strncpy_s(val, fc+6, 2);
 	response[3] = (int)strtol(val, (char **)NULL, 10);
-	response[4] = 0;
+	response[4] = 01;
 	printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
 	cat_serial->write(response, 5);
 }
