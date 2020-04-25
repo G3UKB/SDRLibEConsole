@@ -170,40 +170,27 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	// Construct a frequency and mode response
 	// Return the radio 1 frequency and mode as a 5 byte packet
 	int f = p->get_freq(1);
-	int w = false;
 	printf("fi: %d\n", f);
-	if (f > 10000000) {
-		// > 10MHz the resolution of the result is 100Hz
-		f = f / 100;
-		w = true;
-	}
-	else {
-		// resolution is 10Hz
-		f = f / 10;
-	}
+	
 	// 0-3 is frequency MSB first, 4 is the current mode
 	// e.g. 01, 42, 34, 56, [ 01 ] = 14.23456 MHz, mode 1 (USB)
 	// Frequency is in Hz
 	std::string fs = zero_pad_number(f);
+	printf("%d, %s\n", fs.length(),fs.c_str());
 	const char* fc = fs.c_str();
 	// Extract values
-	if (w) {
-		// MHz value is top 3 digits
-		char mhz[4];
-		strncpy_s(mhz, fc, 3);
-		int imhz = (int)strtol(mhz, (char **)NULL, 10);
-		printf("MHz: %d\n", imhz);
-	}
-	else {
-		// MHz value is top 2 digits
-		char mhz[3];
-		strncpy_s(mhz, fc, 2);
-		int imhz = (int)strtol(mhz, (char **)NULL, 10);
-		printf("MHz: %d\n", imhz);
-	}
-	//printf("fs: %s\n", fs.c_str());
-	//std::string hx = string_to_hex(fs);
-	//printf("hx: %s\n", hx.c_str());
+	char val[4];
+	strncpy_s(val, fc, 2);
+	response[0] = (byte)strtol(val, (char **)NULL, 10);
+	strncpy_s(val, fc+2, 2);
+	response[1] = (int)strtol(val, (char **)NULL, 10);
+	strncpy_s(val, fc+4, 2);
+	response[2] = (int)strtol(val, (char **)NULL, 10);
+	strncpy_s(val, fc+6, 2);
+	response[3] = (int)strtol(val, (char **)NULL, 10);
+	response[4] = 0;
+	printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
+	cat_serial->write(response, 5);
 }
 
 //----------------------------------------------------
@@ -211,7 +198,7 @@ void CATThrd::freq_mode_get(const char* bytes) {
 std::string CATThrd::zero_pad_number(int num)
 {
 	std::ostringstream ss;
-	ss << std::setw(7) << std::setfill('0') << num;
+	ss << std::setw(8) << std::setfill('0') << num;
 	return ss.str();
 }
 

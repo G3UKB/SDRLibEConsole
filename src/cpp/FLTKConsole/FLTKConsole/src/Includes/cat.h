@@ -122,4 +122,5 @@ private:
 	void freq_mode_get(const char* bytes);
 	std::string zero_pad_number(int num);
 	std::string string_to_hex(const std::string& in);
+	int get_value(char* s, int w);
 };
