@@ -170,11 +170,40 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	// Construct a frequency and mode response
 	// Return the radio 1 frequency and mode as a 5 byte packet
 	int f = p->get_freq(1);
+	int w = false;
+	printf("fi: %d\n", f);
+	if (f > 10000000) {
+		// > 10MHz the resolution of the result is 100Hz
+		f = f / 100;
+		w = true;
+	}
+	else {
+		// resolution is 10Hz
+		f = f / 10;
+	}
 	// 0-3 is frequency MSB first, 4 is the current mode
 	// e.g. 01, 42, 34, 56, [ 01 ] = 14.23456 MHz, mode 1 (USB)
 	// Frequency is in Hz
 	std::string fs = zero_pad_number(f);
-	printf("%s\n", fs.c_str());
+	const char* fc = fs.c_str();
+	// Extract values
+	if (w) {
+		// MHz value is top 3 digits
+		char mhz[4];
+		strncpy_s(mhz, fc, 3);
+		int imhz = (int)strtol(mhz, (char **)NULL, 10);
+		printf("MHz: %d\n", imhz);
+	}
+	else {
+		// MHz value is top 2 digits
+		char mhz[3];
+		strncpy_s(mhz, fc, 2);
+		int imhz = (int)strtol(mhz, (char **)NULL, 10);
+		printf("MHz: %d\n", imhz);
+	}
+	//printf("fs: %s\n", fs.c_str());
+	//std::string hx = string_to_hex(fs);
+	//printf("hx: %s\n", hx.c_str());
 }
 
 //----------------------------------------------------
@@ -182,6 +211,17 @@ void CATThrd::freq_mode_get(const char* bytes) {
 std::string CATThrd::zero_pad_number(int num)
 {
 	std::ostringstream ss;
-	ss << std::setw(9) << std::setfill('0') << num;
+	ss << std::setw(7) << std::setfill('0') << num;
+	return ss.str();
+}
+
+std::string CATThrd::string_to_hex(const std::string& in) {
+	std::stringstream ss;
+
+	ss << std::hex << std::setfill('0');
+	for (size_t i = 0; in.length() > i; ++i) {
+		ss << std::setw(2) << static_cast<unsigned int>(static_cast<unsigned char>(in[i]));
+	}
+
 	return ss.str();
 }

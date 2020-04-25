@@ -111,7 +111,7 @@ private:
 	bool cat_term = false;
 	bool cat_enable = false;
 	bool port_open = false;
-	byte resp[5];
+	byte response[5];
 
 	//==============================================================================
 	// Method prototypes
@@ -121,4 +121,5 @@ private:
 	void process();
 	void freq_mode_get(const char* bytes);
 	std::string zero_pad_number(int num);
+	std::string string_to_hex(const std::string& in);
 };
