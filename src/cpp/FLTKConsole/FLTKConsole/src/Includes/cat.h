@@ -82,7 +82,7 @@ typedef struct CAT_FT817_EM {
 };
 
 // CATthrd startup function
-void CATStart(std::string port);
+void CATStart(Preferences* prefs, std::string port);
 
 //==============================================================================
 // CAT controller class
@@ -96,13 +96,14 @@ public:
 
 	//==============================================================================
 	// Method prototypes
-	void run(std::string port);
+	void run(Preferences* prefs, std::string port);
 	void terminate();
 	void enable(bool enable);
 	
 private:
 	//==============================================================================
 	// State variables
+	Preferences* p;
 	CAT_FT817_EM desc;
 	char const *bytes;
 	std::string serial_port;
@@ -110,6 +111,7 @@ private:
 	bool cat_term = false;
 	bool cat_enable = false;
 	bool port_open = false;
+	byte resp[5];
 
 	//==============================================================================
 	// Method prototypes
@@ -118,4 +120,5 @@ private:
 	void close();
 	void process();
 	void freq_mode_get(const char* bytes);
+	std::string zero_pad_number(int num);
 };

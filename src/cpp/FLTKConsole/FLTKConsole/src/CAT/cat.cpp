@@ -36,11 +36,11 @@ CATThrd* cat_thrd = new CATThrd();
 
 //==============================================================================
 // Thread start callable function
-void CATStart(std::string port) {
+void CATStart(Preferences* prefs, std::string port) {
 	// Put ref in the repos
 	RSt::inst().put_obj("CAT", (void*)cat_thrd);
 	// Run the thread
-	cat_thrd->run(port);
+	cat_thrd->run(prefs, port);
 }
 
 //==============================================================================
@@ -60,9 +60,10 @@ void CATThrd::terminate() {
 
 //----------------------------------------------------
 // Thread entry pont
-void CATThrd::run(std::string port)
+void CATThrd::run(Preferences* prefs, std::string port)
 {
 	serial_port = port;
+	p = prefs;
 
 	enumerate_ports();
 	while (!cat_term) {
@@ -166,5 +167,21 @@ void CATThrd::process()
 //----------------------------------------------------
 // Return current freq and mode
 void CATThrd::freq_mode_get(const char* bytes) {
+	// Construct a frequency and mode response
+	// Return the radio 1 frequency and mode as a 5 byte packet
+	int f = p->get_freq(1);
+	// 0-3 is frequency MSB first, 4 is the current mode
+	// e.g. 01, 42, 34, 56, [ 01 ] = 14.23456 MHz, mode 1 (USB)
+	// Frequency is in Hz
+	std::string fs = zero_pad_number(f);
+	printf("%s\n", fs.c_str());
+}
 
+//----------------------------------------------------
+// Convert int Hz into 9 digit zero filled string
+std::string CATThrd::zero_pad_number(int num)
+{
+	std::ostringstream ss;
+	ss << std::setw(9) << std::setfill('0') << num;
+	return ss.str();
 }

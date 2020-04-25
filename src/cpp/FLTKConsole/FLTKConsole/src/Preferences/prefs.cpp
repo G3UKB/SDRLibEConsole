@@ -31,6 +31,9 @@ The authors can be reached by email at:
 
 */
 
+//***************************
+// ToDo: Must have mutex around at least some calls that are called from multiple threads.
+
 #include "../Includes/includes.h"
 
 //==============================================================================

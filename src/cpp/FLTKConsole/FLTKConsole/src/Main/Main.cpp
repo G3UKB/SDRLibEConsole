@@ -34,7 +34,6 @@ std::thread* cat;
 //==============================================================================
 // FLTKConsole entry point
 int main(int argc, char **argv) {
-
 	// Create preferences
 	prefs = new Preferences();
 	RSt::inst().put_obj("PREFS", (void*)prefs);
@@ -55,7 +54,7 @@ int main(int argc, char **argv) {
 	RSt::inst().put_obj("MAIN_W", (void*)main_window);
 
 	// Start the CAT thread
-	cat = new std::thread(CATStart, "COM3");
+	cat = new std::thread(CATStart, prefs, "COM3");
 	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
 	t->enable(true);
 

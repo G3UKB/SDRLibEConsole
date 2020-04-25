@@ -34,6 +34,9 @@ The authors can be reached by email at:
 #include <map>
 #include <thread>
 #include <time.h>
+#include <iomanip>
+#include <sstream>
+
 #ifdef linux
 	#include <unistd>
 #else
