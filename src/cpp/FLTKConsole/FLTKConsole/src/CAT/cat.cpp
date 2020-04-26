@@ -140,17 +140,22 @@ void CATThrd::process()
 		// Commands consist of 5 bytes, 4 parameters and the command byte
 		std::string data;
 		data = cat_serial->read(5);
-		if (data.length() > 0) {
-			for (int i=0; i < 5; i++) {
-				printf("R: %d, %x\n", i, data.c_str()[i]);
-			}
-		}
+		//if (data.length() > 0) {
+		//	for (int i=0; i < 5; i++) {
+		//		printf("R: %d, %x\n", i, data.c_str()[i] & 0x000000ff);
+		//	}
+		//}
 		bytes = data.c_str();
 		if (data.length() > 0) {
 			// Valid data
-			switch (bytes[4]) {
+			switch (bytes[4] & 0x000000ff) {
 			case READ_EEPROM_DATA:
+				printf("READ_EEPROM_DATA\n");
 				read_eeprom(bytes);
+				break;
+			case READ_TX_STATUS:
+				printf("READ_TX_STATUS\n");
+				read_tx_status(bytes);
 				break;
 			case LOCK_ON:
 				break;
@@ -159,12 +164,19 @@ void CATThrd::process()
 			case PTT_ON:
 				break;
 			case PTT_OFF:
+				printf("PTT_OFF\n");
+				ptt_off(bytes);
 				break;
 			case SET_FREQ:
 				break;
 			case SET_MODE:
 				break;
+			case TOGGLE_VFO:
+				printf("TOGGLE_VFO\n");
+				toggle_vfo(bytes);
+				break;
 			case FREQ_MODE_GET:
+				printf("FREQ_MODE_GET\n");
 				freq_mode_get(bytes);
 				break;
 			}
@@ -175,6 +187,13 @@ void CATThrd::process()
 //----------------------------------------------------
 // Return EEPROM data
 void CATThrd::read_eeprom(const char* bytes) {
+	if (bytes[1] == 0x64) {
+		// Request for CAT baud rate == 9600
+		uint8_t const b1 = 0x40;
+		// Returns 2 bytes of data
+		cat_serial->write(&b1, 1);
+		cat_serial->write(&b1, 1);
+	}
 }
 
 //----------------------------------------------------
@@ -206,7 +225,7 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
 	cat_serial->write(response, 5);
 	*/
-	Sleep(10);
+	Sleep(100);
 	uint8_t const b1 = 0x01;
 	uint8_t const b2 = 0x42;
 	uint8_t const b3 = 0x34;
@@ -214,15 +233,38 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	uint8_t const b5 = 0x01;
 
 	cat_serial->write(&b1, 1);
-	Sleep(10);
 	cat_serial->write(&b2, 1);
-	Sleep(10);
 	cat_serial->write(&b3, 1);
-	Sleep(10);
 	cat_serial->write(&b4, 1);
-	Sleep(10);
 	cat_serial->write(&b5, 1);
-	Sleep(10);
+}
+
+//----------------------------------------------------
+// Toggle VFO
+void CATThrd::toggle_vfo(const char* bytes) {
+	// No response required
+}
+
+//----------------------------------------------------
+// PTT off
+void CATThrd::ptt_off(const char* bytes) {
+	// Report unkeyed
+	// Unkeyed
+	uint8_t const b = 0xF0;
+	// Was keyed
+	uint8_t const b1 = 0x00;
+	Sleep(100);
+	cat_serial->write(&b, 1);
+}
+
+//----------------------------------------------------
+// Read TX status
+void CATThrd::read_tx_status(const char* bytes) {
+	// Returns 1 status byte
+	// Split mode on
+	uint8_t const b = 0x00;
+	Sleep(100);
+	cat_serial->write(&b, 1);
 }
 
 //----------------------------------------------------

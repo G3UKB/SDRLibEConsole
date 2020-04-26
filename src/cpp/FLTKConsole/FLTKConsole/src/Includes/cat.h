@@ -38,6 +38,8 @@ The authors can be reached by email at:
 #define SET_MODE 0x07
 #define FREQ_MODE_GET 0x03
 #define READ_EEPROM_DATA 0xbb
+#define READ_TX_STATUS 0xf7
+#define TOGGLE_VFO 0x81
 
 //==============================================================================
 
@@ -122,7 +124,11 @@ private:
 	void process();
 
 	void read_eeprom(const char* bytes);
+	void toggle_vfo(const char* bytes);
+	void ptt_off(const char* bytes);
 	void freq_mode_get(const char* bytes);
+	void read_tx_status(const char* bytes);
+
 	std::string zero_pad_number(int num);
 	std::string string_to_hex(const std::string& in);
 	int get_value(char* s, int w);
