@@ -140,10 +140,18 @@ void CATThrd::process()
 		// Commands consist of 5 bytes, 4 parameters and the command byte
 		std::string data;
 		data = cat_serial->read(5);
+		if (data.length() > 0) {
+			for (int i=0; i < 5; i++) {
+				printf("R: %d, %x\n", i, data.c_str()[i]);
+			}
+		}
 		bytes = data.c_str();
 		if (data.length() > 0) {
 			// Valid data
 			switch (bytes[4]) {
+			case READ_EEPROM_DATA:
+				read_eeprom(bytes);
+				break;
 			case LOCK_ON:
 				break;
 			case LOCK_OFF:
@@ -165,10 +173,16 @@ void CATThrd::process()
 }
 
 //----------------------------------------------------
+// Return EEPROM data
+void CATThrd::read_eeprom(const char* bytes) {
+}
+
+//----------------------------------------------------
 // Return current freq and mode
 void CATThrd::freq_mode_get(const char* bytes) {
 	// Construct a frequency and mode response
 	// Return the radio 1 frequency and mode as a 5 byte packet
+	/*
 	int f = p->get_freq(1);
 	printf("fi: %d\n", f);
 	
@@ -191,6 +205,24 @@ void CATThrd::freq_mode_get(const char* bytes) {
 	response[4] = 01;
 	printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
 	cat_serial->write(response, 5);
+	*/
+	Sleep(10);
+	uint8_t const b1 = 0x01;
+	uint8_t const b2 = 0x42;
+	uint8_t const b3 = 0x34;
+	uint8_t const b4 = 0x56;
+	uint8_t const b5 = 0x01;
+
+	cat_serial->write(&b1, 1);
+	Sleep(10);
+	cat_serial->write(&b2, 1);
+	Sleep(10);
+	cat_serial->write(&b3, 1);
+	Sleep(10);
+	cat_serial->write(&b4, 1);
+	Sleep(10);
+	cat_serial->write(&b5, 1);
+	Sleep(10);
 }
 
 //----------------------------------------------------

@@ -37,6 +37,7 @@ The authors can be reached by email at:
 #define SET_FREQ 0x01
 #define SET_MODE 0x07
 #define FREQ_MODE_GET 0x03
+#define READ_EEPROM_DATA 0xbb
 
 //==============================================================================
 
@@ -119,6 +120,8 @@ private:
 	bool open();
 	void close();
 	void process();
+
+	void read_eeprom(const char* bytes);
 	void freq_mode_get(const char* bytes);
 	std::string zero_pad_number(int num);
 	std::string string_to_hex(const std::string& in);
