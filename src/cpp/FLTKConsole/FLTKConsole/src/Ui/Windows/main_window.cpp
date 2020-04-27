@@ -82,6 +82,10 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	m = grid->get_cell_metrics(1, 3);
 	TXBtn = new TXButton(this, tx_str_on, tx_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	top_group->add(TXBtn);
+	// Add CAT button to the group
+	m = grid->get_cell_metrics(1, 2);
+	CATBtn = new CATButton(this, cat_str_on, cat_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	top_group->add(CATBtn);
 	// Add Exit button to the group
 	m = grid->get_cell_metrics(0, 3);
 	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
@@ -292,6 +296,48 @@ int DiscoverButton::handle(int event) {
 			std::cout << std::endl << "Failed to discover radio!" << std::endl;
 		return 1;	
 		}
+	default:
+		return Fl_Widget::handle(event);
+	}
+}
+
+//==============================================================================
+// CAT button
+CATButton::CATButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
+	myparent = parent_widget;
+	up_label = button_up_label;
+	down_label = button_down_label;
+	up_col = button_up_col;
+	down_col = button_down_col;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	p = (Preferences*)RSt::inst().get_obj("PREFS");
+	color((Fl_Color)back_col);
+	labelcolor((Fl_Color)button_up_col);
+	id = button_id;
+}
+
+//----------------------------------------------------
+// Handle click event
+int CATButton::handle(int event) {
+	switch (event) {
+	case FL_PUSH: {
+		t = (CATThrd*)RSt::inst().get_obj("CAT");
+		if (value()) {
+			// Enable the CAT thread
+			t->enable(false);
+			clear();
+			label(up_label);
+			labelcolor(up_col);
+		}
+		else {
+			// Disable the CAT thread
+			t->enable(true);
+			set();
+			label(down_label);
+			labelcolor(down_col);
+		}
+		return 1;
+	}
 	default:
 		return Fl_Widget::handle(event);
 	}

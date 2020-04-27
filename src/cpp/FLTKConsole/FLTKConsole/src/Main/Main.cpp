@@ -56,8 +56,7 @@ int main(int argc, char **argv) {
 	// Start the CAT thread
 	cat = new std::thread(CATStart, prefs, "COM2");
 	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
-	t->enable(true);
-
+	
 	// Run UI event loop until quit
 	Fl::run();
 

@@ -39,8 +39,10 @@ The authors can be reached by email at:
 class ControlButton;
 class DiscoverButton;
 class RadioChoice;
+class CATButton;
 class TXButton;
 class ExitButton;
+class CATThrd;
 
 class MainWindow : public WindowBase
 {
@@ -62,6 +64,8 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
+	char cat_str_on[12] = "CAT ON";
+	char cat_str_off[12] = "CAT OFF";
 	char tx_str_on[12] = "Show TX";
 	char tx_str_off[12] = "Hide TX";
 	char exit_str[10] = "EXIT";
@@ -76,6 +80,7 @@ private:
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
 	Fl_Choice* SelectRadio;
+	CATButton* CATBtn;
 	TXButton* TXBtn;
 	ExitButton* ExitBtn;
 
@@ -141,6 +146,37 @@ private:
 
 };
 
+//==============================================================================
+// The CAT enable button
+class CATButton : public Fl_Toggle_Button
+{
+public:
+	//==============================================================================
+	CATButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
+	~CATButton() {};
+	int handle(int event);
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
+	Preferences* p;
+	std::thread* cat;
+	CATThrd* t;
+	int id;
+	char* up_label;
+	char* down_label;
+	Fl_Color up_col;
+	Fl_Color down_col;
+	MainWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+
+
+};
 //==============================================================================
 // The TX button
 class TXButton : public Fl_Toggle_Button
