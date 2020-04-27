@@ -160,6 +160,7 @@ void CATThrd::process()
 			case LOCK_OFF:
 				break;
 			case PTT_ON:
+				ptt_on(bytes);
 				break;
 			case PTT_OFF:
 				ptt_off(bytes);
@@ -261,10 +262,26 @@ void CATThrd::toggle_vfo(const char* bytes) {
 }
 
 //----------------------------------------------------
+// PTT on
+void CATThrd::ptt_on(const char* bytes) {
+	// ToDo - go into TX mode
+	// and respond with approprtiate code
+	// For testing
+	mox = true;
+	// Was keyed
+	uint8_t const b = 0xF0;
+	// Unkeyed
+	uint8_t const b1 = 0x00;
+	cat_serial->write(&b1, 1);
+}
+
+//----------------------------------------------------
 // PTT off
 void CATThrd::ptt_off(const char* bytes) {
 	// ToDo - go into RX modei.e. turn TX off if on
 	// and respond with approprtiate code
+	// For testing
+	mox = false;
 	// Unkeyed
 	uint8_t const b = 0xF0;
 	// Was keyed
@@ -279,7 +296,11 @@ void CATThrd::read_tx_status(const char* bytes) {
 	// ToDo return actual TX status if we are in TX mode
 	// else return 0 as this is invalid in RX mode.
 	uint8_t const b = 0x00;
-	cat_serial->write(&b, 1);
+	uint8_t const b1 = 0x80;
+	if (mox)
+		cat_serial->write(&b1, 1);
+	else
+		cat_serial->write(&b, 1);
 }
 
 //----------------------------------------------------

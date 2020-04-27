@@ -86,6 +86,7 @@ private:
 	bool cat_enable = false;
 	bool port_open = false;
 	byte response[5];
+	bool mox;
 
 	//==============================================================================
 	// Method prototypes
@@ -96,6 +97,7 @@ private:
 
 	void read_eeprom(const char* bytes);
 	void toggle_vfo(const char* bytes);
+	void ptt_on(const char* bytes);
 	void ptt_off(const char* bytes);
 	void freq_mode_get(const char* bytes);
 	void read_tx_status(const char* bytes);
