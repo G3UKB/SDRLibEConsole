@@ -150,11 +150,11 @@ void CATThrd::process()
 			// Valid data
 			switch (bytes[4] & 0x000000ff) {
 			case READ_EEPROM_DATA:
-				printf("READ_EEPROM_DATA\n");
+				//printf("READ_EEPROM_DATA\n");
 				read_eeprom(bytes);
 				break;
 			case READ_TX_STATUS:
-				printf("READ_TX_STATUS\n");
+				//printf("READ_TX_STATUS\n");
 				read_tx_status(bytes);
 				break;
 			case LOCK_ON:
@@ -164,21 +164,27 @@ void CATThrd::process()
 			case PTT_ON:
 				break;
 			case PTT_OFF:
-				printf("PTT_OFF\n");
+				//printf("PTT_OFF\n");
 				ptt_off(bytes);
 				break;
 			case SET_FREQ:
+				//printf("SET_FREQ\n");
+				set_freq(bytes);
 				break;
 			case SET_MODE:
 				break;
 			case TOGGLE_VFO:
-				printf("TOGGLE_VFO\n");
+				//printf("TOGGLE_VFO\n");
 				toggle_vfo(bytes);
 				break;
 			case FREQ_MODE_GET:
-				printf("FREQ_MODE_GET\n");
+				//printf("FREQ_MODE_GET\n");
 				freq_mode_get(bytes);
 				break;
+			default:
+				printf("Unknown command: %x\n", bytes[4] & 0x000000ff);
+				uint8_t const b = 0x00;
+				cat_serial->write(&b, 1);
 			}
 		}
 	}
@@ -243,6 +249,9 @@ void CATThrd::freq_mode_get(const char* bytes) {
 // Toggle VFO
 void CATThrd::toggle_vfo(const char* bytes) {
 	// No response required
+	uint8_t const b = 0x00;
+	Sleep(100);
+	cat_serial->write(&b, 1);
 }
 
 //----------------------------------------------------
@@ -260,6 +269,16 @@ void CATThrd::ptt_off(const char* bytes) {
 //----------------------------------------------------
 // Read TX status
 void CATThrd::read_tx_status(const char* bytes) {
+	// Returns 1 status byte
+	// Split mode on
+	uint8_t const b = 0x00;
+	Sleep(100);
+	cat_serial->write(&b, 1);
+}
+
+//----------------------------------------------------
+// Set freq
+void CATThrd::set_freq(const char* bytes) {
 	// Returns 1 status byte
 	// Split mode on
 	uint8_t const b = 0x00;

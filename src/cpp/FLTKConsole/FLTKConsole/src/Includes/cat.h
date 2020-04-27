@@ -128,6 +128,7 @@ private:
 	void ptt_off(const char* bytes);
 	void freq_mode_get(const char* bytes);
 	void read_tx_status(const char* bytes);
+	void set_freq(const char* bytes);
 
 	std::string zero_pad_number(int num);
 	std::string string_to_hex(const std::string& in);
