@@ -132,7 +132,7 @@ void CATThrd::close()
 	}
 }
 
-//----------------------------------------------------
+//==============================================================================
 // Process CAT commands
 void CATThrd::process()
 {
@@ -150,11 +150,9 @@ void CATThrd::process()
 			// Valid data
 			switch (bytes[4] & 0x000000ff) {
 			case READ_EEPROM_DATA:
-				//printf("READ_EEPROM_DATA\n");
 				read_eeprom(bytes);
 				break;
 			case READ_TX_STATUS:
-				//printf("READ_TX_STATUS\n");
 				read_tx_status(bytes);
 				break;
 			case LOCK_ON:
@@ -164,25 +162,23 @@ void CATThrd::process()
 			case PTT_ON:
 				break;
 			case PTT_OFF:
-				//printf("PTT_OFF\n");
 				ptt_off(bytes);
 				break;
 			case SET_FREQ:
-				//printf("SET_FREQ\n");
 				set_freq(bytes);
 				break;
 			case SET_MODE:
 				break;
 			case TOGGLE_VFO:
-				//printf("TOGGLE_VFO\n");
 				toggle_vfo(bytes);
 				break;
 			case FREQ_MODE_GET:
-				//printf("FREQ_MODE_GET\n");
 				freq_mode_get(bytes);
 				break;
 			default:
 				printf("Unknown command: %x\n", bytes[4] & 0x000000ff);
+				// Send a response so we don't stop processing
+				// Unless it needs a multi-byte response
 				uint8_t const b = 0x00;
 				cat_serial->write(&b, 1);
 			}
@@ -190,9 +186,15 @@ void CATThrd::process()
 	}
 }
 
+//==============================================================================
+// Command execution
+
 //----------------------------------------------------
 // Return EEPROM data
 void CATThrd::read_eeprom(const char* bytes) {
+	// Of course we don't actually have an EEPROM
+	// Just return what we think it asked for
+	// http://www.ka7oei.com/ft817_meow.html has info not in manual
 	if (bytes[1] == 0x64) {
 		// Request for CAT baud rate == 9600
 		uint8_t const b1 = 0x40;
@@ -207,42 +209,47 @@ void CATThrd::read_eeprom(const char* bytes) {
 void CATThrd::freq_mode_get(const char* bytes) {
 	// Construct a frequency and mode response
 	// Return the radio 1 frequency and mode as a 5 byte packet
-	/*
+	// Get radio 1 frequency
 	int f = p->get_freq(1);
-	printf("fi: %d\n", f);
 	
 	// 0-3 is frequency MSB first, 4 is the current mode
 	// e.g. 01, 42, 34, 56, [ 01 ] = 14.23456 MHz, mode 1 (USB)
 	// Frequency is in Hz
+	// Convert to string and zero pad to 8 characters
 	std::string fs = zero_pad_number(f);
-	printf("%d, %s\n", fs.length(),fs.c_str());
+	// Convert to a C string
 	const char* fc = fs.c_str();
-	// Extract values
-	char val[4];
-	strncpy_s(val, fc, 2);
-	response[0] = (byte)strtol(val, (char **)NULL, 10);
-	strncpy_s(val, fc+2, 2);
-	response[1] = (int)strtol(val, (char **)NULL, 10);
-	strncpy_s(val, fc+4, 2);
-	response[2] = (int)strtol(val, (char **)NULL, 10);
-	strncpy_s(val, fc+6, 2);
-	response[3] = (int)strtol(val, (char **)NULL, 10);
-	response[4] = 01;
-	printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
+	// Construct response
+	if (f < 100000000) {
+		// < 100MHz
+		char val[4];
+		strncpy_s(val, fc, 1);
+		response[0] = (byte)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 1, 2);
+		response[1] = (int)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 3, 2);
+		response[2] = (int)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 5, 2);
+		response[3] = (int)strtol(val, (char **)NULL, 16);
+		response[4] = 01;
+		//printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
+	}
+	else {
+		// >= 100MHz
+		char val[4];
+		strncpy_s(val, fc, 2);
+		response[0] = (byte)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 2, 2);
+		response[1] = (int)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 4, 2);
+		response[2] = (int)strtol(val, (char **)NULL, 16);
+		strncpy_s(val, fc + 6, 2);
+		response[3] = (int)strtol(val, (char **)NULL, 16);
+		response[4] = 01;
+		//printf("%d%d%d%d %d\n", response[0], response[1], response[2], response[3], response[4]);
+	}
+	// Return frequency
 	cat_serial->write(response, 5);
-	*/
-	Sleep(100);
-	uint8_t const b1 = 0x01;
-	uint8_t const b2 = 0x42;
-	uint8_t const b3 = 0x34;
-	uint8_t const b4 = 0x56;
-	uint8_t const b5 = 0x01;
-
-	cat_serial->write(&b1, 1);
-	cat_serial->write(&b2, 1);
-	cat_serial->write(&b3, 1);
-	cat_serial->write(&b4, 1);
-	cat_serial->write(&b5, 1);
 }
 
 //----------------------------------------------------
@@ -250,19 +257,18 @@ void CATThrd::freq_mode_get(const char* bytes) {
 void CATThrd::toggle_vfo(const char* bytes) {
 	// No response required
 	uint8_t const b = 0x00;
-	Sleep(100);
 	cat_serial->write(&b, 1);
 }
 
 //----------------------------------------------------
 // PTT off
 void CATThrd::ptt_off(const char* bytes) {
-	// Report unkeyed
+	// ToDo - go into RX modei.e. turn TX off if on
+	// and respond with approprtiate code
 	// Unkeyed
 	uint8_t const b = 0xF0;
 	// Was keyed
 	uint8_t const b1 = 0x00;
-	Sleep(100);
 	cat_serial->write(&b, 1);
 }
 
@@ -270,21 +276,38 @@ void CATThrd::ptt_off(const char* bytes) {
 // Read TX status
 void CATThrd::read_tx_status(const char* bytes) {
 	// Returns 1 status byte
-	// Split mode on
+	// ToDo return actual TX status if we are in TX mode
+	// else return 0 as this is invalid in RX mode.
 	uint8_t const b = 0x00;
-	Sleep(100);
 	cat_serial->write(&b, 1);
 }
 
 //----------------------------------------------------
 // Set freq
 void CATThrd::set_freq(const char* bytes) {
-	// Returns 1 status byte
-	// Split mode on
+	// For now set radio 1 freq but this may change
+	// and in split mode might be difficult to handle
+	// Presumably the RX/TX frequencies are set as and when in simplex mode.
+	int MHz_100, MHz_10, MHz_1, KHz_100, KHz_10, KHz_1, Hz_100, Hz_10, Hz;
+	MHz_100 = ((bytes[0] & 0xF0) >> 4) * 100000000;
+	MHz_10 = (bytes[0] & 0x0F) * 10000000;
+	MHz_1 = ((bytes[1] & 0xF0) >> 4) * 1000000;
+	KHz_100 = (bytes[1] & 0x0F) * 100000;
+	KHz_10 = ((bytes[2] & 0xF0) >> 4) * 10000;
+	KHz_1 = (bytes[2] & 0x0F) * 1000;
+	Hz_100 = ((bytes[3] & 0xF0) >> 4) * 100;
+	Hz_10 = (bytes[3] & 0x0F) * 10;
+	Hz = MHz_100 + MHz_10 + MHz_1 + KHz_100 + KHz_10 + KHz_1 + Hz_100 + Hz_10;
+	// Set VFO for radio 1
+	((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(Hz);
+	// Return an Ack. This is not documented anywhere but hamlib seems to
+	// expect some resoponse and 0x00 works.
 	uint8_t const b = 0x00;
-	Sleep(100);
 	cat_serial->write(&b, 1);
 }
+
+//==============================================================================
+// Helpers
 
 //----------------------------------------------------
 // Convert int Hz into 9 digit zero filled string
@@ -295,13 +318,3 @@ std::string CATThrd::zero_pad_number(int num)
 	return ss.str();
 }
 
-std::string CATThrd::string_to_hex(const std::string& in) {
-	std::stringstream ss;
-
-	ss << std::hex << std::setfill('0');
-	for (size_t i = 0; in.length() > i; ++i) {
-		ss << std::setw(2) << static_cast<unsigned int>(static_cast<unsigned char>(in[i]));
-	}
-
-	return ss.str();
-}

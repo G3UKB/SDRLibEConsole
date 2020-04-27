@@ -30,6 +30,8 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Defines
+
+// Request types
 #define LOCK_ON 0x00
 #define LOCK_OFF 0x80
 #define PTT_ON 0x08
@@ -42,30 +44,6 @@ The authors can be reached by email at:
 #define TOGGLE_VFO 0x81
 
 //==============================================================================
-
-// Descriptor for CAT FT817 emulation
-// This is the simplest CAT interface so suits our minimal rquirement
-
-// Serial interface parameters
-typedef struct CATSerial {
-	serial::parity_t PARITY = serial::parity_t::parity_none;
-	serial::stopbits_t STOP_BITS = serial::stopbits_t::stopbits_two;
-	int baud = 9600;
-	int TIMEOUT = 2;
-	int READ_SZ = 5;
-};
-/*
-// Minimal set of required commands
-typedef struct CATCommands {
-	unsigned char LOCK_ON = 0x00;
-	unsigned char LOCK_OFF = 0x80;
-	unsigned char PTT_ON = 0x08;
-	unsigned char PTT_OFF = 0x88;
-	unsigned char SET_FREQ = 0x01;
-	unsigned char SET_MODE = 0x07;
-	unsigned char FREQ_MODE_GET = 0x03;
-};
-*/
 // Modes setting
 typedef struct CATModes {
 	unsigned char MODE_LSB = 0x00;
@@ -76,12 +54,6 @@ typedef struct CATModes {
 	unsigned char MODE_FM = 0x08;
 	unsigned char MODE_DIG = 0x0A;
 	unsigned char MODE_PKT = 0x0C;
-};
-
-typedef struct CAT_FT817_EM {
-	CATSerial serial;
-	//CATCommands cmds;
-	CATModes modes;
 };
 
 // CATthrd startup function
@@ -107,7 +79,6 @@ private:
 	//==============================================================================
 	// State variables
 	Preferences* p;
-	CAT_FT817_EM desc;
 	char const *bytes;
 	std::string serial_port;
 	serial::Serial* cat_serial = NULL;
@@ -131,6 +102,4 @@ private:
 	void set_freq(const char* bytes);
 
 	std::string zero_pad_number(int num);
-	std::string string_to_hex(const std::string& in);
-	int get_value(char* s, int w);
 };

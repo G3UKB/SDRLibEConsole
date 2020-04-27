@@ -84,7 +84,9 @@ VFOComponent::~VFOComponent()
 void VFOComponent::external_set_display(int freq) {
 	current_freq = freq;
 	set_display_freq(convertFreq(current_freq));
+	set_radio_freq();
 	p->set_freq(r, current_freq);
+	//sync_radios();
 }
 
 //----------------------------------------------------
