@@ -38,6 +38,7 @@ The authors can be reached by email at:
 */
 class DuplexButton;
 class MOXButton;
+class RFSlider;
 class TxWindow : public WindowBase
 {
 public:
@@ -60,6 +61,7 @@ private:
 	char duplex_str_off[10] = "Simplex";
 	char mox_str_on[5] = "TX";
 	char mox_str_off[5] = "RX";
+	char rf_gain_str[5] = "Gain";
 	
 	// Preferences
 	Preferences* p;
@@ -69,6 +71,7 @@ private:
 	// Additional TX only buttons
 	DuplexButton* DuplexBtn;
 	MOXButton* MOXBtn;
+	RFSlider* RFGain;
 
 	// Components
 
@@ -125,6 +128,28 @@ private:
 	char* down_label;
 	Fl_Color up_col;
 	Fl_Color down_col;
+	TxWindow* myparent;
+
+	//==============================================================================
+	// Method prototypes
+};
+
+//==============================================================================
+// The RF gain slider
+class RFSlider : public Fl_Value_Slider
+{
+public:
+	//==============================================================================
+	RFSlider(TxWindow* parent_widget, char* label, int x, int y, int w, int h, Fl_Color back_col);
+	~RFSlider() {};
+	void handle_event();
+
+	//==============================================================================
+
+private:
+	//==============================================================================
+	// State variables
+	RadioInterface* r_i;
 	TxWindow* myparent;
 
 	//==============================================================================

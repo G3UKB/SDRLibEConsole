@@ -32,12 +32,20 @@ The authors can be reached by email at:
 
 //==============================================================================
 
+//----------------------------------------------------
 // Idle time callback
 // We call back to the window to do housekeeping
 void tx_window_idle_cb(void* data) {
 	TxWindow* w = (TxWindow*)data;
 	w->handle_idle_timeout();
 	Fl::repeat_timeout(0.2, tx_window_idle_cb, data);
+}
+
+//----------------------------------------------------
+// Callback to set RF gain
+static void rf_gain_cb(Fl_Widget* o, void* data) {
+	RFSlider* s = (RFSlider*)data;
+	s->handle_event();
 }
 
 /*
@@ -59,7 +67,10 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x,
 	m = grid->get_cell_metrics(0, 3);
 	MOXBtn = new MOXButton(this, mox_str_on, mox_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	top_group->add(MOXBtn);
-
+	// Add RF drive to the group
+	m = grid->get_cell_metrics(3, 0, 1, 3);
+	RFGain = new RFSlider(this, rf_gain_str, m.x, m.y, m.w, (2*m.h)/3, (Fl_Color)10);
+	top_group->add(RFGain);
 	// Display main window
 	show();
 
@@ -170,3 +181,23 @@ int MOXButton::handle(int event) {
 		return Fl_Widget::handle(event);
 	}
 }
+
+//==============================================================================
+// RF Gain
+RFSlider::RFSlider(TxWindow* parent_widget, char* label, int x, int y, int w, int h, Fl_Color back_col) : Fl_Value_Slider(x, y, w, h, label) {
+	myparent = parent_widget;
+	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
+	type(5);
+	labelsize(10);
+	color((Fl_Color)back_col);
+	selection_color((Fl_Color)1);
+	//callback((Fl_Callback*)rf_gain_cb, (void*)this);
+}
+
+//----------------------------------------------------
+// Handle events
+void RFSlider::handle_event() {
+	// Set R drive value 0.0-1.0
+	c_server_set_rf_drive(value());
+}
+
