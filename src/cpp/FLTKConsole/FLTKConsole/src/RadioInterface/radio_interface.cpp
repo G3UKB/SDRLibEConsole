@@ -247,13 +247,17 @@ void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_h
 //----------------------------------------------------
 // Set duplex/simplex
 void RadioInterface::ri_server_cc_out_set_duplex(bool state) {
-	c_server_cc_out_duplex(state);
+	if (RSt::inst().get_server_running()) {
+		c_server_cc_out_duplex(state);
+	}
 }
 
 //----------------------------------------------------
 // Set TX/RX
 void RadioInterface::ri_server_cc_out_set_mox(bool state) {
-	c_server_mox(state);
+	if (RSt::inst().get_server_running()) {
+		c_server_mox(state);
+	}
 }
 
 //----------------------------------------------------

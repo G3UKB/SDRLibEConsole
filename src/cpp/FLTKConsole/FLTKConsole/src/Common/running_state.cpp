@@ -51,7 +51,10 @@ void RSt::put_obj(std::string name, void* obj) {
 }
 
 void* RSt::get_obj(std::string name) {
-	return obj_map.at(name);
+	if (obj_map.find(name) == obj_map.end())
+		return NULL;
+	else
+		return obj_map.at(name);
 }
 
 //----------------------------------------------------

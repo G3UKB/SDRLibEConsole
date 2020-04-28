@@ -47,6 +47,9 @@ public:
 	~TxWindow() {};
 	void handle_idle_timeout();
 	void close();
+	void do_mox();
+	void mox_off();
+	void mox_on();
 
 	//==============================================================================
 

@@ -140,6 +140,7 @@ void CATThrd::process()
 		// Commands consist of 5 bytes, 4 parameters and the command byte
 		std::string data;
 		data = cat_serial->read(5);
+		//printf("R: %x\n", data.c_str()[4] & 0x000000ff);
 		//if (data.length() > 0) {
 		//	for (int i=0; i < 5; i++) {
 		//		printf("R: %d, %x\n", i, data.c_str()[i] & 0x000000ff);
@@ -155,10 +156,10 @@ void CATThrd::process()
 			case READ_TX_STATUS:
 				read_tx_status(bytes);
 				break;
-			case LOCK_ON:
-				break;
-			case LOCK_OFF:
-				break;
+			//case LOCK_ON:
+			//	break;
+			//case LOCK_OFF:
+			//	break;
 			case PTT_ON:
 				ptt_on(bytes);
 				break;
@@ -168,8 +169,8 @@ void CATThrd::process()
 			case SET_FREQ:
 				set_freq(bytes);
 				break;
-			case SET_MODE:
-				break;
+			//case SET_MODE:
+			//	break;
 			case TOGGLE_VFO:
 				toggle_vfo(bytes);
 				break;
@@ -177,7 +178,7 @@ void CATThrd::process()
 				freq_mode_get(bytes);
 				break;
 			default:
-				printf("Unknown command: %x\n", bytes[4] & 0x000000ff);
+				printf("Unexpected command: %x\n", bytes[4] & 0x000000ff);
 				// Send a response so we don't stop processing
 				// Unless it needs a multi-byte response
 				uint8_t const b = 0x00;
@@ -264,43 +265,57 @@ void CATThrd::toggle_vfo(const char* bytes) {
 //----------------------------------------------------
 // PTT on
 void CATThrd::ptt_on(const char* bytes) {
-	// ToDo - go into TX mode
-	// and respond with approprtiate code
-	// For testing
-	mox = true;
-	// Was keyed
-	uint8_t const b = 0xF0;
-	// Unkeyed
-	uint8_t const b1 = 0x00;
-	cat_serial->write(&b1, 1);
+	if (RSt::inst().get_mox()) {
+		// Was keyed
+		uint8_t const b = 0xF0;
+		cat_serial->write(&b, 1);
+	}
+	else {
+		// Unkeyed
+		uint8_t const b = 0x00;
+		cat_serial->write(&b, 1);
+	}
+	// Manages all switching
+	TxWindow* tx_window = (TxWindow*)RSt::inst().get_obj("TX-WINDOW");
+	if (tx_window != NULL) {
+		tx_window->mox_on();
+	}
 }
 
 //----------------------------------------------------
 // PTT off
 void CATThrd::ptt_off(const char* bytes) {
-	// ToDo - go into RX modei.e. turn TX off if on
-	// and respond with approprtiate code
-	// For testing
-	mox = false;
-	// Unkeyed
-	uint8_t const b = 0xF0;
-	// Was keyed
-	uint8_t const b1 = 0x00;
-	cat_serial->write(&b, 1);
+	if (RSt::inst().get_mox()) {
+		// Was keyed
+		uint8_t const b = 0x00;
+		cat_serial->write(&b, 1);
+	}
+	else {
+		// Unkeyed
+		uint8_t const b = 0xF0;
+		cat_serial->write(&b, 1);
+	}
+	// Manages all switching
+	TxWindow* tx_window = (TxWindow*)RSt::inst().get_obj("TX-WINDOW");
+	if (tx_window != NULL)
+		tx_window->mox_off();
 }
 
 //----------------------------------------------------
 // Read TX status
 void CATThrd::read_tx_status(const char* bytes) {
 	// Returns 1 status byte
-	// ToDo return actual TX status if we are in TX mode
-	// else return 0 as this is invalid in RX mode.
-	uint8_t const b = 0x00;
-	uint8_t const b1 = 0x80;
-	if (mox)
-		cat_serial->write(&b1, 1);
-	else
+	if (RSt::inst().get_mox()) {
+		// MOX on
+		// May need to return other data as well such as power
+		uint8_t const b = 0x80;
 		cat_serial->write(&b, 1);
+	}
+	else {
+		// MOX off so data invalid anyway
+		uint8_t const b = 0x00;
+		cat_serial->write(&b, 1);
+	}
 }
 
 //----------------------------------------------------
@@ -319,8 +334,9 @@ void CATThrd::set_freq(const char* bytes) {
 	Hz_100 = ((bytes[3] & 0xF0) >> 4) * 100;
 	Hz_10 = (bytes[3] & 0x0F) * 10;
 	Hz = MHz_100 + MHz_10 + MHz_1 + KHz_100 + KHz_10 + KHz_1 + Hz_100 + Hz_10;
-	// Set VFO for radio 1
+	// Set VFO for radio 1 & TX
 	((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(Hz);
+	((VFOComponent*)RSt::inst().get_obj("RADIO-4"))->external_set_display(Hz);
 	// Return an Ack. This is not documented anywhere but hamlib seems to
 	// expect some resoponse and 0x00 works.
 	uint8_t const b = 0x00;

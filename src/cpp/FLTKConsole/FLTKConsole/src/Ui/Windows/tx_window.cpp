@@ -58,6 +58,8 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x,
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
+	// Register ourselves
+	RSt::inst().put_obj("TX-WINDOW", (void*)this);
 
 	// Add Duplex button to the group
 	m = grid->get_cell_metrics(0, 2);
@@ -94,6 +96,33 @@ void TxWindow::handle_idle_timeout() {
 	// Nothing todo here
 	// Just call base class
 	WindowBase::handle_idle_timeout();
+}
+
+//----------------------------------------------------
+// Handle MOX
+void TxWindow::mox_off() {
+	// Go to RX
+	MOXBtn->clear();
+	MOXBtn->label(mox_str_on);
+	MOXBtn->labelcolor((Fl_Color)80);
+	RSt::inst().set_mox(false);
+	r_i->ri_server_cc_out_set_mox(0);
+}
+void TxWindow::mox_on() {
+	// Go to TX
+	MOXBtn->set();
+	MOXBtn->label(mox_str_off);
+	MOXBtn->labelcolor((Fl_Color)67);
+	RSt::inst().set_mox(true);
+	r_i->ri_server_cc_out_set_mox(1);
+}
+void TxWindow::do_mox() {
+	if (RSt::inst().get_mox()) {
+		mox_off();
+	}
+	else {
+		mox_on();
+	}
 }
 
 //==============================================================================
@@ -158,6 +187,8 @@ MOXButton::MOXButton(TxWindow* parent_widget, char* button_up_label, char* butto
 int MOXButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
+		myparent->do_mox();
+		/*
 		if (RSt::inst().get_mox()) {
 			// Was TX, goint to RX
 			clear();
@@ -174,6 +205,7 @@ int MOXButton::handle(int event) {
 			RSt::inst().set_mox(true);
 			r_i->ri_server_cc_out_set_mox(1);
 		}
+		*/
 		return 1;
 	}
 
