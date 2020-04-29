@@ -102,7 +102,6 @@ void TxWindow::handle_idle_timeout() {
 // Handle MOX
 void TxWindow::mox_off() {
 	// Go to RX
-	printf("mox_off\n");
 	MOXBtn->clear();
 	MOXBtn->label(mox_str_on);
 	MOXBtn->labelcolor((Fl_Color)80);
@@ -111,7 +110,6 @@ void TxWindow::mox_off() {
 }
 void TxWindow::mox_on() {
 	// Go to TX
-	printf("mox_on\n");
 	MOXBtn->set();
 	MOXBtn->label(mox_str_off);
 	MOXBtn->labelcolor((Fl_Color)67);
