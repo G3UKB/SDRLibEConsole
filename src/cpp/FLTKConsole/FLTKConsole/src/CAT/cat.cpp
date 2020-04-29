@@ -148,6 +148,7 @@ void CATThrd::process()
 		//}
 		bytes = data.c_str();
 		if (data.length() > 0) {
+			//printf("R: %x\n", bytes[4] & 0x000000ff);
 			// Valid data
 			switch (bytes[4] & 0x000000ff) {
 			case READ_EEPROM_DATA:
@@ -156,10 +157,6 @@ void CATThrd::process()
 			case READ_TX_STATUS:
 				read_tx_status(bytes);
 				break;
-			//case LOCK_ON:
-			//	break;
-			//case LOCK_OFF:
-			//	break;
 			case PTT_ON:
 				ptt_on(bytes);
 				break;
@@ -169,8 +166,9 @@ void CATThrd::process()
 			case SET_FREQ:
 				set_freq(bytes);
 				break;
-			//case SET_MODE:
-			//	break;
+			case SET_MODE:
+				set_mode(bytes);
+				break;
 			case TOGGLE_VFO:
 				toggle_vfo(bytes);
 				break;
@@ -199,10 +197,28 @@ void CATThrd::read_eeprom(const char* bytes) {
 	// http://www.ka7oei.com/ft817_meow.html has info not in manual
 	if (bytes[1] == 0x64) {
 		// Request for CAT baud rate == 9600
+		uint8_t const b = 0x00;
 		uint8_t const b1 = 0x40;
 		// Returns 2 bytes of data
 		cat_serial->write(&b1, 1);
-		cat_serial->write(&b1, 1);
+		cat_serial->write(&b, 1);
+	}
+	else if (bytes[1] == 0x7a) {
+		// Antenna/split arrangement request
+		// 7a: 7 - split on/off
+		// 7a: 0-5 - front/rear ant for each band
+		// 7b: 4 :charge enable
+		uint8_t const b = 0x00;
+		// All zeros will do us as it's not relevent
+		cat_serial->write(&b, 1);
+		cat_serial->write(&b, 1);
+	} 
+	else {
+		printf("Unexpected EEPROM location: %x\n", bytes[1]);
+		uint8_t const b = 0x00;
+		// Returns 2 bytes of dummy data
+		cat_serial->write(&b, 1);
+		cat_serial->write(&b, 1);
 	}
 }
 
@@ -287,11 +303,13 @@ void CATThrd::ptt_on(const char* bytes) {
 void CATThrd::ptt_off(const char* bytes) {
 	if (RSt::inst().get_mox()) {
 		// Was keyed
+		Sleep(100);
 		uint8_t const b = 0x00;
 		cat_serial->write(&b, 1);
 	}
 	else {
 		// Unkeyed
+		Sleep(100);
 		uint8_t const b = 0xF0;
 		cat_serial->write(&b, 1);
 	}
@@ -305,15 +323,20 @@ void CATThrd::ptt_off(const char* bytes) {
 // Read TX status
 void CATThrd::read_tx_status(const char* bytes) {
 	// Returns 1 status byte
+	// NOTE: the PTT bit 7 in the status seems to be inverted
+	// 0 = keyed, 1 = not keyed
+	// This may be a Hamlib bug or a documentation error
 	if (RSt::inst().get_mox()) {
+		Sleep(100);
 		// MOX on
 		// May need to return other data as well such as power
-		uint8_t const b = 0x80;
+		uint8_t const b = 0x00;
 		cat_serial->write(&b, 1);
 	}
 	else {
 		// MOX off so data invalid anyway
-		uint8_t const b = 0x00;
+		Sleep(100);
+		uint8_t const b = 0x80;
 		cat_serial->write(&b, 1);
 	}
 }
@@ -338,6 +361,14 @@ void CATThrd::set_freq(const char* bytes) {
 	((VFOComponent*)RSt::inst().get_obj("RADIO-1"))->external_set_display(Hz);
 	((VFOComponent*)RSt::inst().get_obj("RADIO-4"))->external_set_display(Hz);
 	// Return an Ack. This is not documented anywhere but hamlib seems to
+	// expect some resoponse and 0x00 works.
+	uint8_t const b = 0x00;
+	cat_serial->write(&b, 1);
+}
+
+//----------------------------------------------------
+// Set mode
+void CATThrd::set_mode(const char* bytes) {
 	// expect some resoponse and 0x00 works.
 	uint8_t const b = 0x00;
 	cat_serial->write(&b, 1);

@@ -32,8 +32,6 @@ The authors can be reached by email at:
 // Defines
 
 // Request types
-#define LOCK_ON 0x00
-#define LOCK_OFF 0x80
 #define PTT_ON 0x08
 #define PTT_OFF 0x88
 #define SET_FREQ 0x01
@@ -102,6 +100,7 @@ private:
 	void freq_mode_get(const char* bytes);
 	void read_tx_status(const char* bytes);
 	void set_freq(const char* bytes);
+	void set_mode(const char* bytes);
 
 	std::string zero_pad_number(int num);
 };
