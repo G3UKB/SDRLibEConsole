@@ -34,6 +34,11 @@ std::thread* cat;
 //==============================================================================
 // FLTKConsole entry point
 int main(int argc, char **argv) {
+
+	// Test hamlib
+	RIG *my_rig;
+
+
 	// Create preferences
 	prefs = new Preferences();
 	RSt::inst().put_obj("PREFS", (void*)prefs);

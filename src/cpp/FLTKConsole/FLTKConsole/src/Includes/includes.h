@@ -69,15 +69,16 @@ The authors can be reached by email at:
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Box.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Button.H"
 	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Toggle_Button.H"
-	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Choice.H";
-	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Check_Button.H";
-	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Round_Button.H";
-	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Light_Button.H";
-	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Value_Slider.H";
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Choice.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Check_Button.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Round_Button.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Radio_Light_Button.H"
+	#include "E:/DevelopmentResources/FLTK/fltk-1.3.5/FL/Fl_Value_Slider.H"
 #endif
 
 // Application includes
 #include "extern.h"
+#include "hamlib/rig.h"
 #include "running_state.h"
 #include "prefs.h"
 #include "radio_interface.h"
