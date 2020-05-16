@@ -35,7 +35,7 @@ std::thread* cat;
 // FLTKConsole entry point
 int main(int argc, char **argv) {
 
-	HamlibClient *hamlib = new HamlibClient((char*)"COM3", 120);
+	HamlibClient *hamlib = new HamlibClient((char*)"COM2", 120);
 	hamlib->init();
 	hamlib->open();
 	hamlib->set_mode();
