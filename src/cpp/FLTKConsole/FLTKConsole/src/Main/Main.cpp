@@ -31,13 +31,14 @@ RadioInterface* r_i;
 Preferences* prefs;
 std::thread* cat;
 
+
+void test_hamlib();
+
 //==============================================================================
 // FLTKConsole entry point
 int main(int argc, char **argv) {
 
-	// Test hamlib
-	RIG *my_rig;
-
+	test_hamlib();
 
 	// Create preferences
 	prefs = new Preferences();
