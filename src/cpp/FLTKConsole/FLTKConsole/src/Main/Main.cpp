@@ -31,14 +31,16 @@ RadioInterface* r_i;
 Preferences* prefs;
 std::thread* cat;
 
-
-void test_hamlib();
-
 //==============================================================================
 // FLTKConsole entry point
 int main(int argc, char **argv) {
 
-	test_hamlib();
+	HamlibClient *hamlib = new HamlibClient((char*)"COM3", 120);
+	hamlib->init();
+	hamlib->open();
+	hamlib->set_mode();
+	hamlib->set_freq(7111111);
+
 
 	// Create preferences
 	prefs = new Preferences();

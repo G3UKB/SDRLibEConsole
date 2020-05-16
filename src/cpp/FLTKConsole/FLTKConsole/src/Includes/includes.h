@@ -78,7 +78,6 @@ The authors can be reached by email at:
 
 // Application includes
 #include "extern.h"
-#include "hamlib/rig.h"
 #include "running_state.h"
 #include "prefs.h"
 #include "radio_interface.h"
@@ -93,3 +92,6 @@ The authors can be reached by email at:
 #include "main_window.h"
 #include "../SerialDriver/serial.h"
 #include "cat.h"
+#include "hamlib/rig.h"
+#include "hamlib_client.h"
+
