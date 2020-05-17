@@ -55,6 +55,8 @@ public:
 	void handle_radio(Fl_Widget* w);
 	void show_tx(bool show);
 
+	void handle_event(char* e);
+
 	//==============================================================================
 
 private:
@@ -83,6 +85,8 @@ private:
 	CATButton* CATBtn;
 	TXButton* TXBtn;
 	ExitButton* ExitBtn;
+
+	C_ToggleButton *TestBtn;
 
 	// RX windows
 	RadioWindow* Radio2_Win = NULL;

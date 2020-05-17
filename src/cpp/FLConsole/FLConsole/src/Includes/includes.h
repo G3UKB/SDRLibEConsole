@@ -81,6 +81,7 @@ The authors can be reached by email at:
 #include "running_state.h"
 #include "prefs.h"
 #include "radio_interface.h"
+#include "toggle.h"
 #include "vfo.h"
 #include "layout_manager.h"
 #include "modes.h"

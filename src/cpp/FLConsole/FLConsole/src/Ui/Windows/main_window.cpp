@@ -117,6 +117,9 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 
 //===================================================
 // Event handlers
+void MainWindow::handle_event(char* e) {
+	printf("handle_event called %s\n", e);
+}
 
 //----------------------------------------------------
 // General event handler
