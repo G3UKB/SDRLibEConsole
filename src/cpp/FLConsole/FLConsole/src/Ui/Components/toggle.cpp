@@ -35,39 +35,52 @@ The authors can be reached by email at:
 
 //==============================================================================
 // Audio button
-C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(x, y, w, h, button_label) {
-	// Retrieve our callback function
+C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color button_back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
+	
+	// Stash button attributes
+	up_label = button_up_label;
+	down_label = button_down_label;
+	back_col = button_back_col;
+	up_col = button_up_col;
+	down_col = button_down_col;
+
+	// Retrieve our callback function from the callback cache
 	key = cb_key;
 	cb = RSt::inst().get_cb(key);
-	// Radio interface ref
+
+	// Set Radio interface ref
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	// Set button attributes
-	id = button_id;
+
+	// Set relevent button attributes
 	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)label_col);
+	labelcolor((Fl_Color)button_up_col);
+	id = button_id;
 }
 
 //----------------------------------------------------
 // Handle click event
 int C_ToggleButton::handle(int event) {
-	//std::function< void(void) > cb = RSt::inst().get_cb(key);
 	switch (event) {
 	case FL_PUSH: {
 		if (value()) {
-			// Hide 
-			cb();
-			// Button release
+			// Callback to enable the CAT thread
+			cb(true);
 			clear();
+			label(up_label);
+			labelcolor(up_col);
 		}
 		else {
-			// Show
-			cb();
-			// Button depressed
+			// Callback to disable the CAT thread
+			cb(false);
 			set();
+			label(down_label);
+			labelcolor(down_col);
 		}
+		// Handled
 		return 1;
 	}
 	default:
+		// Not handled
 		return Fl_Widget::handle(event);
 	}
 }

@@ -55,7 +55,7 @@ public:
 	void handle_radio(Fl_Widget* w);
 	void show_tx(bool show);
 
-	void handle_event();
+	int cat_handle_event(int e);
 
 	//==============================================================================
 
@@ -66,8 +66,8 @@ private:
 	char start_str[10] = "Start";
 	char stop_str[10] = "Stop";
 	char discover_str[12] = "Discover>>";
-	char cat_str_on[12] = "CAT ON";
-	char cat_str_off[12] = "CAT OFF";
+	char cat_str_up[12] = "CAT OFF";
+	char cat_str_dwn[12] = "CAT ON";
 	char tx_str_on[12] = "Show TX";
 	char tx_str_off[12] = "Hide TX";
 	char exit_str[10] = "EXIT";
@@ -82,11 +82,12 @@ private:
 	ControlButton* StartBtn;
 	DiscoverButton* DiscoverBtn;
 	Fl_Choice* SelectRadio;
-	CATButton* CATBtn;
+	//CATButton* CATBtn;
 	TXButton* TXBtn;
 	ExitButton* ExitBtn;
 
-	C_ToggleButton *TestBtn;
+	//C_ToggleButton *TestBtn;
+	C_ToggleButton* CATBtn;
 
 	// RX windows
 	RadioWindow* Radio2_Win = NULL;

@@ -35,7 +35,7 @@ class C_ToggleButton : public Fl_Toggle_Button
 {
 public:
 	//==============================================================================
-	C_ToggleButton(std::string cb_key, char* label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col);
+	C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
 	~C_ToggleButton() {};
 	int handle(int event);
 
@@ -46,12 +46,21 @@ private:
 	// State variables
 	// Ref to radio interface
 	RadioInterface* r_i;
+
 	// Our button id if required
 	int id;
+
+	// Button attributes
+	char* up_label;
+	char* down_label;
+	Fl_Color back_col;
+	Fl_Color up_col;
+	Fl_Color down_col;
+
 	// Key to callback cache
 	std::string key;
 	// The callback function retrieved from the cache
-	std::function< void(void) > cb;
+	std::function< int(int) > cb;
 
 	//==============================================================================
 	// Method prototypes

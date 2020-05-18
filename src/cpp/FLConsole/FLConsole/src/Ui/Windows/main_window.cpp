@@ -78,25 +78,23 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	SelectRadio->callback((Fl_Callback*)radio_cb, (void*)this);
 	top_group->add(SelectRadio);
 	SelectRadio->value(num - 1);
+
 	// Add TX button to the group
 	m = grid->get_cell_metrics(1, 3);
 	TXBtn = new TXButton(this, tx_str_on, tx_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	top_group->add(TXBtn);
+
 	// Add CAT button to the group
+	std::function< int(int) > f = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("CAT_CB", f);
 	m = grid->get_cell_metrics(1, 2);
-	CATBtn = new CATButton(this, cat_str_on, cat_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
+
 	// Add Exit button to the group
 	m = grid->get_cell_metrics(0, 3);
 	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(ExitBtn);
-
-	// Add Test button to the group
-	std::function< void(void) > f = std::bind(&MainWindow::handle_event, this);
-	RSt::inst().put_cb("FUNC", f);
-	m = grid->get_cell_metrics(1, 0);
-	TestBtn = new C_ToggleButton(std::string("FUNC"), exit_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
-	top_group->add(TestBtn);
 
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
@@ -124,12 +122,26 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 
 //===================================================
 // Event handlers
-void MainWindow::handle_event() {
-	printf("handle_event called\n");
+// These are callbacks from widgets in this container
+
+//----------------------------------------------------
+// CAT handler
+int MainWindow::cat_handle_event(int state) {
+	// Retrieve CAT object
+	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
+	if (state) {
+		// Enable the CAT thread
+		t->enable(false);
+	}
+	else {
+		// Disable the CAT thread
+		t->enable(true);
+	}
+	return true;
 }
 
 //----------------------------------------------------
-// General event handler
+// Window event handler
 int MainWindow::handle(int event) {
 	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
