@@ -55,6 +55,7 @@ public:
 	int cat_handle_event(int e);
 	int tx_handle_event(int e);
 	int ctrl_handle_event(int e);
+	int audio_handle_event(int e);
 
 	//==============================================================================
 
@@ -67,8 +68,10 @@ private:
 	char discover_str[12] = "Discover>>";
 	char cat_str_up[12] = "CAT OFF";
 	char cat_str_dwn[12] = "CAT ON";
-	char tx_str_up[12] = "Show TX";
-	char tx_str_dwn[12] = "Hide TX";
+	char tx_str_up[12] = "TX>>";
+	char tx_str_dwn[12] = "<<TX";
+	char audio_str_up[12] = "Audio>>";
+	char audio_str_dwn[12] = "<<Audio";
 	char exit_str[10] = "EXIT";
 
 	// Preferences
@@ -83,6 +86,8 @@ private:
 	C_ToggleButton* CtrlBtn;
 	C_ToggleButton* CATBtn;
 	C_ToggleButton* TXBtn;
+	C_ToggleButton* AudioBtn;
+	//AudioOutput* audio_out;
 	ExitButton* ExitBtn;
 
 	// RX windows

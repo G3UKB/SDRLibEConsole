@@ -179,6 +179,7 @@ void WindowBase::handle_idle_timeout() {
 	}
 }
 
+
 //----------------------------------------------------
 // Show or hide the audio panel
 void  WindowBase::manage_audio_panel(bool show) {

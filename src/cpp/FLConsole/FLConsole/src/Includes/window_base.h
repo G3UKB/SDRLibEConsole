@@ -67,18 +67,23 @@ public:
 	// Widgets
 	Fl_Group *top_group;
 
+	// Structures
+	struct_w_loc w_loc;
+	AudioOutput * audio_out;
+	int r;
+
+	struct struct_w_loc get_location(int radio);
 	//==============================================================================
 
 private:
 	//==============================================================================
 	// State variables
 	// Radio inst
-	int r;
+	
 	// Metrics
 	int width;
 	int height;
-	// Structures
-	struct_w_loc w_loc;
+	
 	// Labels must be fixed storage
 	char audio_str[10] = "Audio>>";
 	char mode_str[10] = "Mode>>";
@@ -92,7 +97,6 @@ private:
 
 	// Components
 	AudioTriggerBase* AudioBtn;
-	AudioOutput* audio_out;
 	AudioInput* audio_in;
 	ModeTriggerBase* ModeBtn;
 	Modes *modes;
@@ -101,7 +105,7 @@ private:
 
 	//==============================================================================
 	// Method prototypes
-	struct struct_w_loc get_location(int radio);
+	
 };
 
 //==============================================================================

@@ -57,6 +57,10 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	// Get num radios
 	int num = p->get_num_radios();
 
+	// Create the audio panel hidden for radio 1
+	audio_out = new AudioOutput(1, 350, 130);
+	audio_out->hide();
+
 	// Add discover button
 	m = grid->get_cell_metrics(0, 1);
 	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
@@ -93,6 +97,16 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	m = grid->get_cell_metrics(1, 2);
 	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
+
+	// Add audio buton
+	//m = grid->get_cell_metrics(2, 3);
+	//AudioBtn = new AudioTriggerBase(this, audio_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+
+	std::function< int(int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("AUDIO_CB", f3);
+	m = grid->get_cell_metrics(2, 3);
+	AudioBtn = new C_ToggleButton(std::string("AUDIO_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	top_group->add(AudioBtn);
 
 	// Add Exit button to the group
 	m = grid->get_cell_metrics(0, 3);
@@ -243,6 +257,20 @@ int MainWindow::tx_handle_event(int state) {
 		TX_Win->show();
 	else
 		TX_Win->hide();
+	return true;
+}
+
+//----------------------------------------------------
+// Audio handler
+int MainWindow::audio_handle_event(int state) {
+	struct struct_w_loc loc = get_location(r);
+	if (state) {
+		audio_out->position(loc.x + loc.w + 5, loc.y);
+		audio_out->show();
+	}
+	else {
+		audio_out->hide();
+	}
 	return true;
 }
 
