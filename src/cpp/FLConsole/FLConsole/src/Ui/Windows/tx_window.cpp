@@ -60,22 +60,25 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : WindowBase(radio, x,
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 	// Register ourselves
 	RSt::inst().put_obj("TX-WINDOW", (void*)this);
-
+	
 	// Add Duplex button to the group
 	m = grid->get_cell_metrics(0, 2);
 	DuplexBtn = new DuplexButton(this, duplex_str_on, duplex_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	top_group->add(DuplexBtn);
+	
 	// Add MOX button to the group
 	m = grid->get_cell_metrics(0, 3);
 	MOXBtn = new MOXButton(this, mox_str_on, mox_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
 	top_group->add(MOXBtn);
+	
 	// Add RF drive to the group
 	m = grid->get_cell_metrics(3, 0, 1, 3);
 	RFGain = new RFSlider(this, rf_gain_str, m.x, m.y, m.w, (2*m.h)/3, (Fl_Color)10);
 	top_group->add(RFGain);
+	
 	// Display main window
 	show();
-
+	
 	// Set an idle timeout
 	Fl::add_timeout(0.2, tx_window_idle_cb, (void*)this);
 }

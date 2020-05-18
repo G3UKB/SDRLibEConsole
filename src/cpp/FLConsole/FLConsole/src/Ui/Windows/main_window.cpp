@@ -107,7 +107,7 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 
 	// Display main window
 	show();
-
+	
 	// Show radio windows as appropriate
 	if (num > 1) {
 		Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
@@ -115,11 +115,11 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	if (num > 2) {
 		Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 	}
-
+	
 	// Create and hide TX window
 	TX_Win = new TxWindow(4, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
 	TX_Win->hide();
-
+	
 	// Set an idle timeout
 	Fl::add_timeout(0.2, main_window_idle_cb, (void*)this);
 }

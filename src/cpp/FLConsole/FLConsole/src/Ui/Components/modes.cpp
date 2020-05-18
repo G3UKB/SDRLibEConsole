@@ -65,7 +65,8 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 		m_b.items[i].mode = new ModeButton(r, this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
 		if (i == mode) {
 			m_b.items[i].mode->set();
-			r_i->ri_server_set_mode(r-1, mode);
+			// Crashes!!
+			//r_i->ri_server_set_mode(r-1, mode);
 		}
 		if (k++ == 3) {
 			k = 0;

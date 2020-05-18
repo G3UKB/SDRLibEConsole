@@ -48,7 +48,6 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h, int rows, int cols
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
-
 	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
@@ -58,17 +57,17 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h, int rows, int cols
 	else
 		sprintf_s(label, "Receiver-%d", r);
 	copy_label(label);
-
+	
 	// Set window position
 	position(x, y);
-
+	
 	// Populate
 	do_layout(rows, cols, start_row);
-
+	
 	// Initially deactivate all buttons
 	ModeBtn->deactivate();
 	FilterBtn->deactivate();
-
+	
 	// Create the audio panel hidden for radio
 	if (r == 4) {
 		audio_in = new AudioInput(r, 350, 130);
@@ -78,11 +77,11 @@ WindowBase::WindowBase(int radio, int x, int y, int w, int h, int rows, int cols
 		audio_out = new AudioOutput(r, 350, 130);
 		audio_out->hide();
 	}
-
+	
 	// Create the modes panel hidden
 	modes = new Modes(r, 230, 80);
 	modes->hide();
-
+	
 	// Create the filters panel hidden
 	filters = new Filters(r, 230, 80);
 	filters->hide();
