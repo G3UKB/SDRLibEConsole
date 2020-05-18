@@ -36,6 +36,7 @@ The authors can be reached by email at:
 #include <time.h>
 #include <iomanip>
 #include <sstream>
+#include <functional>
 
 #ifdef linux
 	#include <unistd>

@@ -91,6 +91,13 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(ExitBtn);
 
+	// Add Test button to the group
+	std::function< void(void) > f = std::bind(&MainWindow::handle_event, this);
+	RSt::inst().put_cb("FUNC", f);
+	m = grid->get_cell_metrics(1, 0);
+	TestBtn = new C_ToggleButton(std::string("FUNC"), exit_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	top_group->add(TestBtn);
+
 	// Initially deactivate all buttons
 	StartBtn->deactivate();
 	DiscoverBtn->deactivate();
@@ -117,8 +124,8 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 
 //===================================================
 // Event handlers
-void MainWindow::handle_event(char* e) {
-	printf("handle_event called %s\n", e);
+void MainWindow::handle_event() {
+	printf("handle_event called\n");
 }
 
 //----------------------------------------------------

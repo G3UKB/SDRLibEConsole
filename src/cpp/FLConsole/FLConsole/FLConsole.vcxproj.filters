@@ -72,6 +72,9 @@
     <ClInclude Include="src\SerialDriver\win.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Includes\toggle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CAT\cat.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Ui\Windows\window_base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ui\Components\toggle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

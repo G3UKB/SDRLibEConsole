@@ -55,7 +55,7 @@ public:
 	void handle_radio(Fl_Widget* w);
 	void show_tx(bool show);
 
-	void handle_event(char* e);
+	void handle_event();
 
 	//==============================================================================
 

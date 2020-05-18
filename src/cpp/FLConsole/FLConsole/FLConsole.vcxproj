@@ -130,6 +130,7 @@
     <ClInclude Include="src\Includes\radio_interface.h" />
     <ClInclude Include="src\Includes\running_state.h" />
     <ClInclude Include="src\Includes\rx_window.h" />
+    <ClInclude Include="src\Includes\toggle.h" />
     <ClInclude Include="src\Includes\tx_window.h" />
     <ClInclude Include="src\Includes\vfo.h" />
     <ClInclude Include="src\Includes\window_base.h" />
@@ -151,6 +152,7 @@
     <ClCompile Include="src\Ui\Components\audio.cpp" />
     <ClCompile Include="src\Ui\Components\filters.cpp" />
     <ClCompile Include="src\Ui\Components\modes.cpp" />
+    <ClCompile Include="src\Ui\Components\toggle.cpp" />
     <ClCompile Include="src\Ui\Components\vfo.cpp" />
     <ClCompile Include="src\Ui\LayoutManager\layout_manager.cpp" />
     <ClCompile Include="src\Ui\Windows\main_window.cpp" />

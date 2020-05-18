@@ -72,6 +72,8 @@ private:
 	RSt() {}                    // Constructor? (the {} brackets) are needed here.
 	// Map for cache of objects
 	std::map < std::string, void* > obj_map;
+	// Map for cache of callback methods
+	std::map < std::string, std::function< void(void) > > cb_map;
 	// Repository for state
 	t_app_state app_state;
 
@@ -83,6 +85,9 @@ public:
 	// Object cache
 	void put_obj(std::string name, void* obj);
 	void* get_obj(std::string name);
+	// Callback cache
+	void put_cb(std::string name, std::function< void(void) > f);
+	std::function< void(void) > get_cb(std::string name);
 
 	// State
 	void set_discovered(bool found);

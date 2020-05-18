@@ -58,6 +58,19 @@ void* RSt::get_obj(std::string name) {
 }
 
 //----------------------------------------------------
+// Callback cache
+void RSt::put_cb(std::string name, std::function< void(void) > f) {
+	cb_map.insert(std::pair<std::string, std::function< void(void) >>(name, f));
+}
+
+std::function< void(void) > RSt::get_cb(std::string name) {
+	if (cb_map.find(name) == cb_map.end())
+		return NULL;
+	else
+		return cb_map.at(name);
+}
+
+//----------------------------------------------------
 // Application state
 void RSt::set_discovered(bool found) {
 	app_state.discovered = found;
