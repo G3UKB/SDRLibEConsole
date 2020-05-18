@@ -31,6 +31,7 @@ The authors can be reached by email at:
 // Defines
 
 //==============================================================================
+// Main Window
 
 // Idle time callback
 // We call back to the window to do housekeeping
@@ -46,9 +47,6 @@ void radio_cb(Fl_Widget* w, void* user_data) {
 	((MainWindow*)user_data)->handle_radio(w);
 }
 
-/*
-	The one and only main window
-*/
 //----------------------------------------------------
 // Constructor
 MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5, 4, 2) {
@@ -59,10 +57,6 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	// Get num radios
 	int num = p->get_num_radios();
 
-	// Add start/stop buttons to the group
-	m = grid->get_cell_metrics(0, 0);
-	StartBtn = new ControlButton(this, start_str, stop_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
-	top_group->add(StartBtn);
 	// Add discover button
 	m = grid->get_cell_metrics(0, 1);
 	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
@@ -79,14 +73,23 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	top_group->add(SelectRadio);
 	SelectRadio->value(num - 1);
 
+	// Add start/stop buttons to the group
+	std::function< int(int) > f = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("CTRL_CB", f);
+	m = grid->get_cell_metrics(0, 0);
+	CtrlBtn = new C_ToggleButton(std::string("CTRL_CB"), ctrl_str_up, ctrl_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	top_group->add(CtrlBtn);
+
 	// Add TX button to the group
+	std::function< int(int) > f1 = std::bind(&MainWindow::tx_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("TX_CB", f1);
 	m = grid->get_cell_metrics(1, 3);
-	TXBtn = new TXButton(this, tx_str_on, tx_str_off, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80, (Fl_Color)67);
+	TXBtn = new C_ToggleButton(std::string("TX_CB"), tx_str_up, tx_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(TXBtn);
 
 	// Add CAT button to the group
-	std::function< int(int) > f = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("CAT_CB", f);
+	std::function< int(int) > f2 = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("CAT_CB", f2);
 	m = grid->get_cell_metrics(1, 2);
 	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
@@ -96,8 +99,9 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(ExitBtn);
 
-	// Initially deactivate all buttons
-	StartBtn->deactivate();
+	// Deactivate buttons
+	// Get re-activated as required in idle processing
+	CtrlBtn->deactivate();
 	DiscoverBtn->deactivate();
 	SelectRadio->deactivate();
 
@@ -122,23 +126,6 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 
 //===================================================
 // Event handlers
-// These are callbacks from widgets in this container
-
-//----------------------------------------------------
-// CAT handler
-int MainWindow::cat_handle_event(int state) {
-	// Retrieve CAT object
-	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
-	if (state) {
-		// Enable the CAT thread
-		t->enable(false);
-	}
-	else {
-		// Disable the CAT thread
-		t->enable(true);
-	}
-	return true;
-}
 
 //----------------------------------------------------
 // Window event handler
@@ -146,43 +133,18 @@ int MainWindow::handle(int event) {
 	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
 	switch (event) {
-	// Window close raises an FL_HIDE event?
+		// Window close raises an FL_HIDE event?
 	case FL_HIDE: {
-			// Save prefs
-			p->save();
-			// Close radio windows if active
-			if (Radio2_Win != NULL) Radio2_Win->close();
-			if (Radio3_Win != NULL) Radio3_Win->close();
-			break;
-		}
+		// Save prefs
+		p->save();
+		// Close radio windows if active
+		if (Radio2_Win != NULL) Radio2_Win->close();
+		if (Radio3_Win != NULL) Radio3_Win->close();
+		break;
+	}
 	}
 	// Pass all events down
 	return Fl_Window::handle(event);
-}
-
-//===================================================
-// Callbacks
-//----------------------------------------------------
-// Handle idle timeout
-void MainWindow::handle_idle_timeout() {
-	// Handle enable/disable of controls here
-	static int last_discovered = -1;
-	bool discovered = RSt::inst().get_discovered();
-	if (discovered != last_discovered) {
-		if (discovered) {
-			StartBtn->activate();
-			SelectRadio->activate();
-			DiscoverBtn->deactivate();
-		}
-		else {
-			StartBtn->deactivate();
-			SelectRadio->deactivate();
-			DiscoverBtn->activate();
-		}
-	}
-	last_discovered = discovered;
-
-	WindowBase::handle_idle_timeout();
 }
 
 //----------------------------------------------------
@@ -201,9 +163,9 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		if (RSt::inst().get_radio_running()) {
 			r_i->ri_radio_stop();
 			RSt::inst().set_radio_running(false);
-			StartBtn->clear();
-			StartBtn->label(start_str);
-			StartBtn->labelcolor((Fl_Color)80);
+			CtrlBtn->clear();
+			CtrlBtn->label(ctrl_str_up);
+			CtrlBtn->labelcolor((Fl_Color)80);
 		}
 		// Rejig the UI
 		if (value == 0) {
@@ -213,16 +175,17 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 				Radio2_Win->close();
 				Radio2_Win = NULL;
 			}
-			if (Radio3_Win != NULL ) {
+			if (Radio3_Win != NULL) {
 				Radio3_Win->close();
 				Radio3_Win = NULL;
 			}
 		}
-		else if (value == 1) {;
+		else if (value == 1) {
+			;
 			// Two radios
 			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 			// Close radio 3 if active
-			if (Radio3_Win != NULL ) {
+			if (Radio3_Win != NULL) {
 				Radio3_Win->close();
 				Radio3_Win = NULL;
 			}
@@ -238,58 +201,72 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 }
 
 //----------------------------------------------------
-// Show/hide TX window
-void MainWindow::show_tx(bool show) {
-	if (show)
-		TX_Win->show();
-	else
-		TX_Win->hide();
-}
+// Callbacks from widget event handlers
 
-//==============================================================================
-// Control button (start/stop)
-ControlButton::ControlButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
-	myparent = parent_widget;
-	up_label = button_up_label;
-	down_label = button_down_label;
-	up_col = button_up_col;
-	down_col = button_down_col;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)button_up_col);
-	id = button_id;
+//----------------------------------------------------
+// Ctrl handler
+int MainWindow::ctrl_handle_event(int state) {
+	bool running = RSt::inst().get_radio_running();
+	if (running) {
+		// Stop event
+		r_i->ri_radio_stop();
+		RSt::inst().set_radio_running(false);
+	}
+	else {
+		// Start event
+		r_i->ri_radio_start(0);
+		RSt::inst().set_radio_running(true);
+	}
+	return true;
 }
 
 //----------------------------------------------------
-// Handle click event
-int ControlButton::handle(int event) {
-	switch (event) {
-	case FL_PUSH: {
-		if (id == 0) {
-			// Start/stop events
-			bool running = RSt::inst().get_radio_running();
-			if (running) {
-				// Stop event
-				r_i->ri_radio_stop();
-				RSt::inst().set_radio_running(false);
-				clear();
-				label(up_label);
-				labelcolor(up_col);
-			}
-			else {
-				// Start event
-				r_i->ri_radio_start(0);
-				RSt::inst().set_radio_running(true);
-				set();
-				label(down_label);
-				labelcolor(down_col);
-			}
+// CAT handler
+int MainWindow::cat_handle_event(int state) {
+	// Retrieve CAT object
+	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
+	if (state) {
+		// Enable the CAT thread
+		t->enable(true);
+	}
+	else {
+		// Disable the CAT thread
+		t->enable(false);
+	}
+	return true;
+}
+
+//----------------------------------------------------
+// TX handler
+int MainWindow::tx_handle_event(int state) {
+	if (state)
+		TX_Win->show();
+	else
+		TX_Win->hide();
+	return true;
+}
+
+//===================================================
+// Idle timeout callback
+void MainWindow::handle_idle_timeout() {
+	// Handle enable/disable of controls here
+	static int last_discovered = -1;
+	bool discovered = RSt::inst().get_discovered();
+	if (discovered != last_discovered) {
+		if (discovered) {
+			CtrlBtn->activate();
+			SelectRadio->activate();
+			DiscoverBtn->deactivate();
 		}
-		return 1;
+		else {
+			CtrlBtn->deactivate();
+			SelectRadio->deactivate();
+			DiscoverBtn->activate();
+		}
 	}
-	default:
-		return Fl_Widget::handle(event);
-	}
+	last_discovered = discovered;
+
+	WindowBase::handle_idle_timeout();
 }
 
 //==============================================================================
@@ -318,87 +295,6 @@ int DiscoverButton::handle(int event) {
 			std::cout << std::endl << "Failed to discover radio!" << std::endl;
 		return 1;	
 		}
-	default:
-		return Fl_Widget::handle(event);
-	}
-}
-
-//==============================================================================
-// CAT button
-CATButton::CATButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
-	myparent = parent_widget;
-	up_label = button_up_label;
-	down_label = button_down_label;
-	up_col = button_up_col;
-	down_col = button_down_col;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	p = (Preferences*)RSt::inst().get_obj("PREFS");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)button_up_col);
-	id = button_id;
-}
-
-//----------------------------------------------------
-// Handle click event
-int CATButton::handle(int event) {
-	switch (event) {
-	case FL_PUSH: {
-		t = (CATThrd*)RSt::inst().get_obj("CAT");
-		if (value()) {
-			// Enable the CAT thread
-			t->enable(false);
-			clear();
-			label(up_label);
-			labelcolor(up_col);
-		}
-		else {
-			// Disable the CAT thread
-			t->enable(true);
-			set();
-			label(down_label);
-			labelcolor(down_col);
-		}
-		return 1;
-	}
-	default:
-		return Fl_Widget::handle(event);
-	}
-}
-
-//==============================================================================
-// TX button
-TXButton::TXButton(MainWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
-	myparent = parent_widget;
-	up_label = button_up_label;
-	down_label = button_down_label;
-	up_col = button_up_col;
-	down_col = button_down_col;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	p = (Preferences*)RSt::inst().get_obj("PREFS");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)button_up_col);
-	id = button_id;
-}
-
-//----------------------------------------------------
-// Handle click event
-int TXButton::handle(int event) {
-	switch (event) {
-	case FL_PUSH: {
-		if (value()) {
-			myparent->show_tx(false);
-			clear();
-			label(up_label);
-			labelcolor(up_col);
-		}
-		else {
-			myparent->show_tx(true);
-			set();
-			label(down_label);
-			labelcolor(down_col);
-		}
-		return 1;
-	}
 	default:
 		return Fl_Widget::handle(event);
 	}

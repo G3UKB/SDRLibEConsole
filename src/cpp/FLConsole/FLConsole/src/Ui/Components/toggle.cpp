@@ -63,15 +63,15 @@ int C_ToggleButton::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
 		if (value()) {
-			// Callback to enable the CAT thread
-			cb(true);
+			// Callback for button down
+			cb(false);
 			clear();
 			label(up_label);
 			labelcolor(up_col);
 		}
 		else {
-			// Callback to disable the CAT thread
-			cb(false);
+			// Callback for button up
+			cb(true);
 			set();
 			label(down_label);
 			labelcolor(down_col);
