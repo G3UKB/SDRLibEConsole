@@ -123,13 +123,20 @@ MainWindow::MainWindow(int x, int y, int w, int h) : Fl_Double_Window(w, h) {
 // Populate window
 void MainWindow::do_layout() {
 
+	// Layout params
+	int rows = 5;
+	int cols = 4;
+	int grid_margin = 5;
+	int group_margin = 10;
+	int x = 5, y = 5;
+
 	// Add a group box
-	top_group = new Fl_Group(5, 5, width - 10, height - 10);
+	top_group = new Fl_Group(x, y, width - group_margin, height - group_margin);
 	top_group->box(FL_GTK_THIN_UP_BOX);
 	top_group->color((Fl_Color)24);
 
 	// Create a grid layout handler
-	grid = new GridLayout(5, 5, width - 10, height - 10, 5, 4, 5);
+	grid = new GridLayout(x, y, width - group_margin, height - group_margin, rows, cols, grid_margin);
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
@@ -140,6 +147,7 @@ void MainWindow::do_layout() {
 	m = grid->get_cell_metrics(0, 1);
 	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(DiscoverBtn);
+
 	// Add radio choice
 	m = grid->get_cell_metrics(0, 2);
 	SelectRadio = new Fl_Choice(m.x + 20, m.y, m.w - 20, m.h, "RX:");
