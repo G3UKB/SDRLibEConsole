@@ -49,17 +49,92 @@ void radio_cb(Fl_Widget* w, void* user_data) {
 
 //----------------------------------------------------
 // Constructor
-MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5, 4, 2) {
+MainWindow::MainWindow(int x, int y, int w, int h) : Fl_Double_Window(w, h) {
+
+	// Stash paramaters
+	width = w;
+	height = h;
+
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
-	// Get num radios
-	int num = p->get_num_radios();
+	// Set window attributes
+	resizable(this);
+	color((Fl_Color)24);
+	align(Fl_Align(65));
+	char label[20];
+	sprintf_s(label, "Control - RX-1");
+	copy_label(label);
 
-	// Create the audio panel hidden for radio 1
-	audio_out = new AudioOutput(1, 350, 130);
+	// Set window position
+	position(x, y);
+
+	// Get num radios
+	num_radios = p->get_num_radios();
+	radio_id = 1;
+	radio2_id = 2;
+	radio3_id = 3;
+	tx_id = 4;
+
+	// Populate
+	do_layout();
+
+	// Create the audio panel hidden
+	audio_out = new AudioOutput(radio_id, 350, 130);
 	audio_out->hide();
+
+	// Create the modes panel hidden
+	modes = new Modes(radio_id, 230, 80);
+	modes->hide();
+
+	// Create the filters panel hidden
+	filters = new Filters(radio_id, 230, 80);
+	filters->hide();
+
+	// Deactivate buttons
+	// Get re-activated as required in idle processing
+	CtrlBtn->deactivate();
+	DiscoverBtn->deactivate();
+	SelectRadio->deactivate();
+	ModeBtn->deactivate();
+	FilterBtn->deactivate();
+
+	// Display main window
+	show();
+	
+	// Show radio windows as appropriate
+	if (num_radios > 1) {
+		Radio2_Win = new RadioWindow(radio2_id, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+	}
+	if (num_radios > 2) {
+		Radio3_Win = new RadioWindow(radio3_id, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+	}
+	
+	// Create and hide TX window
+	TX_Win = new TxWindow(tx_id, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
+	TX_Win->hide();
+	
+	// Start the idle timeout
+	Fl::add_timeout(0.2, main_window_idle_cb, (void*)this);
+}
+
+//----------------------------------------------------
+// Populate window
+void MainWindow::do_layout() {
+
+	// Add a group box
+	top_group = new Fl_Group(5, 5, width - 10, height - 10);
+	top_group->box(FL_GTK_THIN_UP_BOX);
+	top_group->color((Fl_Color)24);
+
+	// Create a grid layout handler
+	grid = new GridLayout(5, 5, width - 10, height - 10, 5, 4, 5);
+
+	// Add the VFO component
+	// This extends Fl_Group so we place the group below the buttons
+	m = grid->get_cell_metrics(2, 0, 2, 3);
+	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
 
 	// Add discover button
 	m = grid->get_cell_metrics(0, 1);
@@ -67,7 +142,7 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	top_group->add(DiscoverBtn);
 	// Add radio choice
 	m = grid->get_cell_metrics(0, 2);
-	SelectRadio = new Fl_Choice(m.x+20, m.y, m.w-20, m.h, "RX:");
+	SelectRadio = new Fl_Choice(m.x + 20, m.y, m.w - 20, m.h, "RX:");
 	SelectRadio->add("1");
 	SelectRadio->add("2");
 	SelectRadio->add("3");
@@ -75,7 +150,7 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	SelectRadio->labelcolor((Fl_Color)80);
 	SelectRadio->callback((Fl_Callback*)radio_cb, (void*)this);
 	top_group->add(SelectRadio);
-	SelectRadio->value(num - 1);
+	SelectRadio->value(num_radios - 1);
 
 	// Add start/stop buttons to the group
 	std::function< int(int) > f = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1);
@@ -98,10 +173,7 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
 
-	// Add audio buton
-	//m = grid->get_cell_metrics(2, 3);
-	//AudioBtn = new AudioTriggerBase(this, audio_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
-
+	// Add audio button
 	std::function< int(int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1);
 	RSt::inst().put_cb("AUDIO_CB", f3);
 	m = grid->get_cell_metrics(2, 3);
@@ -113,29 +185,28 @@ MainWindow::MainWindow(int x, int y, int w, int h) : WindowBase(1, x, y, w, h, 5
 	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(ExitBtn);
 
-	// Deactivate buttons
-	// Get re-activated as required in idle processing
-	CtrlBtn->deactivate();
-	DiscoverBtn->deactivate();
-	SelectRadio->deactivate();
+	// We place the radio buttons into another grid
+	// Get metrics from grid
+	m = grid->get_cell_metrics(3, 3, 2, 1);
+	// Create grid_1 with the new metrics
+	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
-	// Display main window
-	show();
-	
-	// Show radio windows as appropriate
-	if (num > 1) {
-		Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
-	}
-	if (num > 2) {
-		Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
-	}
-	
-	// Create and hide TX window
-	TX_Win = new TxWindow(4, p->get_tx_x(), p->get_tx_y(), p->get_tx_w(), p->get_tx_h());
-	TX_Win->hide();
-	
-	// Set an idle timeout
-	Fl::add_timeout(0.2, main_window_idle_cb, (void*)this);
+	// Add mode trigger in grid_1
+	std::function< int(int) > f4 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("MODE_CB", f4);
+	m = grid_1->get_cell_metrics(0, 0);
+	ModeBtn = new C_ToggleButton(std::string("AUDIO_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+
+	// Add filter trigger in grid_1
+	std::function< int(int) > f5 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1);
+	RSt::inst().put_cb("FILT_CB", f5);
+	m = grid_1->get_cell_metrics(1, 0);
+	FilterBtn = new C_ToggleButton(std::string("FILT_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+
+	// Close up and display
+	top_group->end();
+	// Finish up
+	end();
 }
 
 //===================================================
@@ -263,13 +334,41 @@ int MainWindow::tx_handle_event(int state) {
 //----------------------------------------------------
 // Audio handler
 int MainWindow::audio_handle_event(int state) {
-	struct struct_w_loc loc = get_location(r);
+	set_location();
 	if (state) {
-		audio_out->position(loc.x + loc.w + 5, loc.y);
+		audio_out->position(w_loc.x + w_loc.w + 5, w_loc.y);
 		audio_out->show();
 	}
 	else {
 		audio_out->hide();
+	}
+	return true;
+}
+
+//----------------------------------------------------
+// Mode handler
+int MainWindow::mode_handle_event(int state) {
+	set_location();
+	if (state) {
+		modes->position(w_loc.x + w_loc.w + 5, w_loc.y);
+		modes->show();
+	}
+	else {
+		modes->hide();
+	}
+	return true;
+}
+
+//----------------------------------------------------
+// Audio handler
+int MainWindow::filt_handle_event(int state) {
+	set_location();
+	if (state) {
+		filters->position(w_loc.x + w_loc.w + 5, w_loc.y);
+		filters->show();
+	}
+	else {
+		filters->hide();
 	}
 	return true;
 }
@@ -293,8 +392,15 @@ void MainWindow::handle_idle_timeout() {
 		}
 	}
 	last_discovered = discovered;
+}
 
-	WindowBase::handle_idle_timeout();
+//==============================================================================
+// Helpers
+void MainWindow::set_location() {
+	w_loc.x = p->get_window_x();
+	w_loc.y = p->get_window_y();
+	w_loc.w = p->get_window_w();
+	w_loc.h = p->get_window_h();
 }
 
 //==============================================================================

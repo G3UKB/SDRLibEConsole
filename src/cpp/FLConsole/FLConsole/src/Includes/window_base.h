@@ -41,7 +41,7 @@ class FilterTriggerBase;
 class AudioTriggerBase;
 
 // Return my location
-typedef struct struct_w_loc {
+typedef struct struct_w_loc_1 {
 	int x;
 	int y;
 	int w;
@@ -68,11 +68,11 @@ public:
 	Fl_Group *top_group;
 
 	// Structures
-	struct_w_loc w_loc;
+	struct_w_loc_1 w_loc;
 	AudioOutput * audio_out;
 	int r;
 
-	struct struct_w_loc get_location(int radio);
+	struct struct_w_loc_1 get_location(int radio);
 	//==============================================================================
 
 private:

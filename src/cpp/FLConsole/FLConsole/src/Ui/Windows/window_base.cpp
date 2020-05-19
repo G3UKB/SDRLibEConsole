@@ -183,7 +183,7 @@ void WindowBase::handle_idle_timeout() {
 //----------------------------------------------------
 // Show or hide the audio panel
 void  WindowBase::manage_audio_panel(bool show) {
-	struct struct_w_loc loc = get_location(r);
+	struct struct_w_loc_1 loc = get_location(r);
 	if (r == 4) {
 		// TX
 		if (show) {
@@ -209,7 +209,7 @@ void  WindowBase::manage_audio_panel(bool show) {
 //----------------------------------------------------
 // Show or hide the modes panel
 void  WindowBase::manage_mode_panel(bool show) {
-	struct struct_w_loc loc = get_location(r);
+	struct struct_w_loc_1 loc = get_location(r);
 	if (show) {
 		modes->position(loc.x + loc.w + 5, loc.y);
 		modes->show();
@@ -222,7 +222,7 @@ void  WindowBase::manage_mode_panel(bool show) {
 //----------------------------------------------------
 // Show or hide the filter panel
 void  WindowBase::manage_filter_panel(bool show) {
-	struct struct_w_loc loc = get_location(r);
+	struct struct_w_loc_1 loc = get_location(r);
 	if (show) {
 		filters->position(loc.x + loc.w + 5, loc.y);
 		filters->show();
@@ -235,7 +235,7 @@ void  WindowBase::manage_filter_panel(bool show) {
 //==============================================================================
 // PRIVATE
 
-struct struct_w_loc WindowBase::get_location(int radio) {
+struct struct_w_loc_1 WindowBase::get_location(int radio) {
 	if (radio == 1) {
 		w_loc.x = p->get_window_x();
 		w_loc.y = p->get_window_y();

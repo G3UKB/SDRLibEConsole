@@ -41,7 +41,7 @@ class CATThrd;
 //==============================================================================
 // The one and only Main Window
 
-class MainWindow : public WindowBase
+class MainWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
@@ -56,13 +56,34 @@ public:
 	int tx_handle_event(int e);
 	int ctrl_handle_event(int e);
 	int audio_handle_event(int e);
+	int mode_handle_event(int e);
+	int filt_handle_event(int e);
 
 	//==============================================================================
 
 private:
 	//==============================================================================
 	// State variables
-	// labels must be fixed storage
+
+	// Params
+	int width;
+	int height;
+
+	// State
+	int num_radios;
+	int radio_id;
+	int radio2_id;
+	int radio3_id;
+	int tx_id;
+
+	//Layout
+	GridLayout *grid;
+	metrics m;
+
+	// Widget main group
+	Fl_Group *top_group;
+
+	// Labels - must be fixed storage
 	char ctrl_str_up[10] = "Start";
 	char ctrl_str_dwn[10] = "Stop";
 	char discover_str[12] = "Discover>>";
@@ -72,6 +93,10 @@ private:
 	char tx_str_dwn[12] = "<<TX";
 	char audio_str_up[12] = "Audio>>";
 	char audio_str_dwn[12] = "<<Audio";
+	char mode_str_up[12] = "Mode>>";
+	char mode_str_dwn[12] = "<<Mode";
+	char filt_str_up[12] = "Filter>>";
+	char filt_str_dwn[12] = "<<Filter";
 	char exit_str[10] = "EXIT";
 
 	// Preferences
@@ -87,18 +112,33 @@ private:
 	C_ToggleButton* CATBtn;
 	C_ToggleButton* TXBtn;
 	C_ToggleButton* AudioBtn;
-	//AudioOutput* audio_out;
+	C_ToggleButton* ModeBtn;
+	C_ToggleButton* FilterBtn;
 	ExitButton* ExitBtn;
+	AudioOutput* audio_out;
+	Modes *modes;
+	Filters *filters;
 
 	// RX windows
 	RadioWindow* Radio2_Win = NULL;
 	RadioWindow* Radio3_Win = NULL;
+
 	// TX Window
 	TxWindow* TX_Win = NULL;
 
+	// Structures
+	struct struct_w_loc {
+		int x;
+		int y;
+		int w;
+		int h;
+	};
+	struct_w_loc w_loc;
+
 	//==============================================================================
 	// Method prototypes
-
+	void do_layout();
+	void set_location();
 };
 
 //==============================================================================
