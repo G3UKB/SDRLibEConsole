@@ -52,12 +52,12 @@ public:
 	void mox_off();
 
 	// Widget callbacks
-	int duplex_handle_event(int state);
-	int mox_handle_event(int state);
-	int rf_gain_handle_event(int state);
-	int audio_handle_event(int e);
-	int mode_handle_event(int e);
-	int filt_handle_event(int e);
+	int duplex_handle_event(int state, int id);
+	int mox_handle_event(int state, int id);
+	int rf_gain_handle_event(int state, int id);
+	int audio_handle_event(int state, int id);
+	int mode_handle_event(int state, int id);
+	int filt_handle_event(int state, int id);
 
 	//==============================================================================
 
@@ -145,7 +145,7 @@ private:
 	// Key to callback cache
 	std::string key;
 	// The callback function retrieved from the cache
-	std::function< int(int) > cb;
+	std::function< int(int, int) > cb;
 
 	//==============================================================================
 	// Method prototypes

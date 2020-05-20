@@ -46,13 +46,13 @@ public:
 	void close();
 
 	//==============================================================================
-	void handle_mode_button_state(int id);
+	int mode_handle_event(int state, int id);
 
 private:
 	//==============================================================================
 	// State variables
 	// radio instance
-	int r;
+	int radio_id;
 	// Our prefs
 	Preferences* p;
 	// Ref to set radio parameters
@@ -73,22 +73,22 @@ private:
 	char sam[10] = "SAM";
 	char drm[10] = "DRM";
 	// Button references
-	ModeButton* mode_0_btn;
-	ModeButton* mode_1_btn;
-	ModeButton* mode_2_btn;
-	ModeButton* mode_3_btn;
-	ModeButton* mode_4_btn;
-	ModeButton* mode_5_btn;
-	ModeButton* mode_6_btn;
-	ModeButton* mode_7_btn;
-	ModeButton* mode_8_btn;
-	ModeButton* mode_9_btn;
-	ModeButton* mode_10_btn;
-	ModeButton* mode_11_btn;
+	C_ToggleButton* mode_0_btn;
+	C_ToggleButton* mode_1_btn;
+	C_ToggleButton* mode_2_btn;
+	C_ToggleButton* mode_3_btn;
+	C_ToggleButton* mode_4_btn;
+	C_ToggleButton* mode_5_btn;
+	C_ToggleButton* mode_6_btn;
+	C_ToggleButton* mode_7_btn;
+	C_ToggleButton* mode_8_btn;
+	C_ToggleButton* mode_9_btn;
+	C_ToggleButton* mode_10_btn;
+	C_ToggleButton* mode_11_btn;
 
 	// Structures to drive generation and updating
 	struct mode_button {
-		ModeButton* mode;
+		C_ToggleButton* mode;
 		char *label;
 		int id;
 	};
@@ -113,11 +113,14 @@ private:
 		}
 	};
 
+	// Key to callback cache
+	char key[20];
+
 	//==============================================================================
 	// Method prototypes
-
 };
 
+/*
 //==============================================================================
 // A mode button
 class ModeButton : public Fl_Toggle_Button
@@ -142,3 +145,4 @@ private:
 	// Method prototypes
 
 };
+*/

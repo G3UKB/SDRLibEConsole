@@ -162,28 +162,28 @@ void MainWindow::do_layout() {
 	SelectRadio->value(num_radios - 1);
 
 	// Add start/stop buttons to the group
-	std::function< int(int) > f = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("CTRL_CB", f);
 	m = grid->get_cell_metrics(0, 0);
 	CtrlBtn = new C_ToggleButton(std::string("CTRL_CB"), ctrl_str_up, ctrl_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CtrlBtn);
 
 	// Add TX button to the group
-	std::function< int(int) > f1 = std::bind(&MainWindow::tx_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f1 = std::bind(&MainWindow::tx_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("TX_CB", f1);
 	m = grid->get_cell_metrics(1, 3);
 	TXBtn = new C_ToggleButton(std::string("TX_CB"), tx_str_up, tx_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(TXBtn);
 
 	// Add CAT button to the group
-	std::function< int(int) > f2 = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f2 = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("CAT_CB", f2);
 	m = grid->get_cell_metrics(1, 2);
 	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
 
 	// Add audio button
-	std::function< int(int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("AUDIO_R1_CB", f3);
 	m = grid->get_cell_metrics(2, 3);
 	AudioBtn = new C_ToggleButton(std::string("AUDIO_R1_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -201,13 +201,13 @@ void MainWindow::do_layout() {
 	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
 	// Add mode trigger in grid_1
-	std::function< int(int) > f4 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f4 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("MODE_R1_CB", f4);
 	m = grid_1->get_cell_metrics(0, 0);
 	ModeBtn = new C_ToggleButton(std::string("MODE_R1_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Add filter trigger in grid_1
-	std::function< int(int) > f5 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f5 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("FILT_R1_CB", f5);
 	m = grid_1->get_cell_metrics(1, 0);
 	FilterBtn = new C_ToggleButton(std::string("FILT_R1_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -317,7 +317,7 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 
 //----------------------------------------------------
 // Ctrl handler
-int MainWindow::ctrl_handle_event(int state) {
+int MainWindow::ctrl_handle_event(int state, int id) {
 	bool running = RSt::inst().get_radio_running();
 	if (running) {
 		// Stop event
@@ -334,7 +334,7 @@ int MainWindow::ctrl_handle_event(int state) {
 
 //----------------------------------------------------
 // CAT handler
-int MainWindow::cat_handle_event(int state) {
+int MainWindow::cat_handle_event(int state, int id) {
 	// Retrieve CAT object
 	CATThrd* t = (CATThrd*)RSt::inst().get_obj("CAT");
 	if (state) {
@@ -350,7 +350,7 @@ int MainWindow::cat_handle_event(int state) {
 
 //----------------------------------------------------
 // TX handler
-int MainWindow::tx_handle_event(int state) {
+int MainWindow::tx_handle_event(int state, int id) {
 	if (state)
 		TX_Win->show();
 	else
@@ -360,7 +360,7 @@ int MainWindow::tx_handle_event(int state) {
 
 //----------------------------------------------------
 // Audio handler
-int MainWindow::audio_handle_event(int state) {
+int MainWindow::audio_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		audio_out->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -374,7 +374,7 @@ int MainWindow::audio_handle_event(int state) {
 
 //----------------------------------------------------
 // Mode handler
-int MainWindow::mode_handle_event(int state) {
+int MainWindow::mode_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		modes->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -388,7 +388,7 @@ int MainWindow::mode_handle_event(int state) {
 
 //----------------------------------------------------
 // Filter handler
-int MainWindow::filt_handle_event(int state) {
+int MainWindow::filt_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		filters->position(w_loc.x + w_loc.w + 5, w_loc.y);

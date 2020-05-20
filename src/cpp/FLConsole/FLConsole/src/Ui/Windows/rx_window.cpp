@@ -118,7 +118,7 @@ void RxWindow::do_layout() {
 
 	// Add audio button
 	m = grid->get_cell_metrics(0, 3);
-	std::function< int(int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	if (radio_id == 2) {
 		RSt::inst().put_cb("AUDIO_R2_CB", f3);
 		AudioBtn = new C_ToggleButton(std::string("AUDIO_R2_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -137,7 +137,7 @@ void RxWindow::do_layout() {
 
 	// Add mode trigger in grid_1
 	m = grid_1->get_cell_metrics(0, 0);
-	std::function< int(int) > f4 = std::bind(&RxWindow::mode_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f4 = std::bind(&RxWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	if (radio_id == 2) {
 		RSt::inst().put_cb("MODE_R2_CB", f4);
 		ModeBtn = new C_ToggleButton(std::string("MODE_R2_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -150,7 +150,7 @@ void RxWindow::do_layout() {
 
 	// Add filter trigger in grid_1
 	m = grid_1->get_cell_metrics(1, 0);
-	std::function< int(int) > f5 = std::bind(&RxWindow::filt_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f5 = std::bind(&RxWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	if (radio_id == 2) {
 		RSt::inst().put_cb("FILT_R2_CB", f5);
 		FilterBtn = new C_ToggleButton(std::string("FILT_R2_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -224,7 +224,7 @@ int RxWindow::handle(int event) {
 
 //----------------------------------------------------
 // Audio handler
-int RxWindow::audio_handle_event(int state) {
+int RxWindow::audio_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		audio_out->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -238,7 +238,7 @@ int RxWindow::audio_handle_event(int state) {
 
 //----------------------------------------------------
 // Mode handler
-int RxWindow::mode_handle_event(int state) {
+int RxWindow::mode_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		modes->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -252,7 +252,7 @@ int RxWindow::mode_handle_event(int state) {
 
 //----------------------------------------------------
 // Filter handler
-int RxWindow::filt_handle_event(int state) {
+int RxWindow::filt_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		filters->position(w_loc.x + w_loc.w + 5, w_loc.y);

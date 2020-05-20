@@ -50,9 +50,9 @@ public:
 	void close();
 
 	// Widget callbacks
-	int audio_handle_event(int e);
-	int mode_handle_event(int e);
-	int filt_handle_event(int e);
+	int audio_handle_event(int state, int id);
+	int mode_handle_event(int state, int id);
+	int filt_handle_event(int state, int id);
 
 	//==============================================================================
 

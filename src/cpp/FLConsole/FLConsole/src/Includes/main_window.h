@@ -53,12 +53,12 @@ public:
 	void handle_radio(Fl_Widget* w);
 
 	// Widget callbacks
-	int cat_handle_event(int e);
-	int tx_handle_event(int e);
-	int ctrl_handle_event(int e);
-	int audio_handle_event(int e);
-	int mode_handle_event(int e);
-	int filt_handle_event(int e);
+	int cat_handle_event(int state, int id);
+	int tx_handle_event(int state, int id);
+	int ctrl_handle_event(int state, int id);
+	int audio_handle_event(int state, int id);
+	int mode_handle_event(int state, int id);
+	int filt_handle_event(int state, int id);
 
 	//==============================================================================
 

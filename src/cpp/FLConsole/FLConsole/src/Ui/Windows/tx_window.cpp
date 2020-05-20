@@ -114,14 +114,14 @@ void TxWindow::do_layout() {
 	grid = new GridLayout(x, y, width - group_margin, height - group_margin, rows, cols, grid_margin);
 
 	// Add Duplex button to the group
-	std::function< int(int) > f1 = std::bind(&TxWindow::duplex_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f1 = std::bind(&TxWindow::duplex_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("DUPLEX_CB", f1);
 	m = grid->get_cell_metrics(0, 2);
 	DuplexBtn = new C_ToggleButton(std::string("DUPLEX_CB"), duplex_str_up, duplex_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(DuplexBtn);
 
 	// Add MOX button to the group
-	std::function< int(int) > f2 = std::bind(&TxWindow::mox_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f2 = std::bind(&TxWindow::mox_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("MOX_CB", f2);
 	m = grid->get_cell_metrics(0, 3);
 	MOXBtn = new C_ToggleButton(std::string("MOX_CB"), mox_str_up, mox_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -133,14 +133,14 @@ void TxWindow::do_layout() {
 	top_group->add(vfo);
 
 	// Add RF drive to the group
-	std::function< int(int) > f3 = std::bind(&TxWindow::rf_gain_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f3 = std::bind(&TxWindow::rf_gain_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("GAIN_CB", f3);
 	m = grid->get_cell_metrics(3, 0, 1, 3);
 	RFGain = new RFSlider(std::string("GAIN_CB"), rf_gain_str, m.x, m.y, m.w, (2 * m.h) / 3, (Fl_Color)10);
 	top_group->add(RFGain);
 
 	// Add audio button
-	std::function< int(int) > f4 = std::bind(&TxWindow::audio_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f4 = std::bind(&TxWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("AUDIO_TX_CB", f4);
 	m = grid->get_cell_metrics(1, 3);
 	AudioBtn = new C_ToggleButton(std::string("AUDIO_TX_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -153,13 +153,13 @@ void TxWindow::do_layout() {
 	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
 	// Add mode trigger in grid_1
-	std::function< int(int) > f5 = std::bind(&TxWindow::mode_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f5 = std::bind(&TxWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("MODE_TX_CB", f5);
 	m = grid_1->get_cell_metrics(0, 0);
 	ModeBtn = new C_ToggleButton(std::string("MODE_TX_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Add filter trigger in grid_1
-	std::function< int(int) > f6 = std::bind(&TxWindow::filt_handle_event, this, std::placeholders::_1);
+	std::function< int(int, int) > f6 = std::bind(&TxWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
 	RSt::inst().put_cb("FILT_TX_CB", f6);
 	m = grid_1->get_cell_metrics(1, 0);
 	FilterBtn = new C_ToggleButton(std::string("FILT_TX_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
@@ -218,7 +218,7 @@ int TxWindow::handle(int event) {
 
 //----------------------------------------------------
 // Duplex handler
-int TxWindow::duplex_handle_event(int state) {
+int TxWindow::duplex_handle_event(int state, int id) {
 	if (RSt::inst().get_duplex()) {
 		// Was duplex
 		RSt::inst().set_duplex(false);
@@ -234,7 +234,7 @@ int TxWindow::duplex_handle_event(int state) {
 
 //----------------------------------------------------
 // MOX handler
-int TxWindow::mox_handle_event(int state) {
+int TxWindow::mox_handle_event(int state, int id) {
 	if (RSt::inst().get_mox()) {
 		// Was TX
 		RSt::inst().set_mox(false);
@@ -262,14 +262,14 @@ void TxWindow::mox_off() {
 
 //----------------------------------------------------
 // RF gain handler
-int TxWindow::rf_gain_handle_event(int value) {
+int TxWindow::rf_gain_handle_event(int value, int id) {
 	c_server_set_rf_drive(value);
 	return true;
 }
 
 //----------------------------------------------------
 // Audio handler
-int TxWindow::audio_handle_event(int state) {
+int TxWindow::audio_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		audio_in->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -283,7 +283,7 @@ int TxWindow::audio_handle_event(int state) {
 
 //----------------------------------------------------
 // Mode handler
-int TxWindow::mode_handle_event(int state) {
+int TxWindow::mode_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		modes->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -297,7 +297,7 @@ int TxWindow::mode_handle_event(int state) {
 
 //----------------------------------------------------
 // Filter handler
-int TxWindow::filt_handle_event(int state) {
+int TxWindow::filt_handle_event(int state, int id) {
 	set_location();
 	if (state) {
 		filters->position(w_loc.x + w_loc.w + 5, w_loc.y);
@@ -358,5 +358,5 @@ RFSlider::RFSlider(std::string cb_key, char* label, int x, int y, int w, int h, 
 void RFSlider::handle_event() {
 	// Set R drive value 0.0-1.0
 	c_server_set_rf_drive(value());
-	cb(value());
+	cb(value(), 0);
 }

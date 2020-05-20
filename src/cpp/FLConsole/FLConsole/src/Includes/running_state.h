@@ -73,7 +73,7 @@ private:
 	// Map for cache of objects
 	std::map < std::string, void* > obj_map;
 	// Map for cache of callback methods
-	std::map < std::string, std::function< int(int) > > cb_map;
+	std::map < std::string, std::function< int(int, int) > > cb_map;
 	// Repository for state
 	t_app_state app_state;
 
@@ -86,8 +86,8 @@ public:
 	void put_obj(std::string name, void* obj);
 	void* get_obj(std::string name);
 	// Callback cache
-	void put_cb(std::string name, std::function< int(int) > f);
-	std::function< int(int) > get_cb(std::string name);
+	void put_cb(std::string name, std::function< int(int, int) > f);
+	std::function< int(int, int) > get_cb(std::string name);
 
 	// State
 	void set_discovered(bool found);

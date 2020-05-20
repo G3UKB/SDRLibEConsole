@@ -62,7 +62,7 @@ private:
 	// Key to callback cache
 	std::string key;
 	// The callback function retrieved from the cache
-	std::function< int(int) > cb;
+	std::function< int(int, int) > cb;
 
 	//==============================================================================
 	// Method prototypes

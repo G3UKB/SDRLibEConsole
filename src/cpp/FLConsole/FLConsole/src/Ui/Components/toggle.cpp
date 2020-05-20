@@ -38,6 +38,7 @@ The authors can be reached by email at:
 C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color button_back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
 	
 	// Stash button attributes
+	id = button_id;
 	up_label = button_up_label;
 	down_label = button_down_label;
 	back_col = button_back_col;
@@ -54,7 +55,6 @@ C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_up_label, char* 
 	// Set relevent button attributes
 	color((Fl_Color)back_col);
 	labelcolor((Fl_Color)button_up_col);
-	id = button_id;
 }
 
 //----------------------------------------------------
@@ -64,14 +64,14 @@ int C_ToggleButton::handle(int event) {
 	case FL_PUSH: {
 		if (value()) {
 			// Callback for button down
-			cb(false);
+			cb(false, id);
 			clear();
 			label(up_label);
 			labelcolor(up_col);
 		}
 		else {
 			// Callback for button up
-			cb(true);
+			cb(true, id);
 			set();
 			label(down_label);
 			labelcolor(down_col);

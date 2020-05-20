@@ -36,7 +36,7 @@ The authors can be reached by email at:
 Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 
 	// radio instance
-	r = radio;
+	radio_id = radio;
 
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
@@ -46,7 +46,7 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 	align(Fl_Align(65));
 
 	// Get the mode
-	int mode = p->get_mode(r);
+	int mode = p->get_mode(radio_id);
 
 	// Add a group box
 	Fl_Group *top_group = new Fl_Group(5, 5, w-10, h-10);
@@ -59,9 +59,14 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 	// Add the mode buttons to the group
 	int i, j, k;
 	metrics m;
+	// Create a single callback for all mode buttons for this radio
+	sprintf_s(key, "MODE%d_CB", radio_id);
+	std::function< int(int, int) > f2 = std::bind(&Modes::mode_handle_event, this, std::placeholders::_1, std::placeholders::_2);
+	RSt::inst().put_cb(key, f2);
+
 	for (i=0, j=0, k=0 ; i<m_b.n; i++) {
 		m = grid->get_cell_metrics(j, k);
-		m_b.items[i].mode = new ModeButton(r, this, m_b.items[i].label, m_b.items[i].id, m, (Fl_Color)33, (Fl_Color)67);
+		m_b.items[i].mode = new C_ToggleButton(key, m_b.items[i].label, m_b.items[i].label, m_b.items[i].id, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 		if (i == mode) {
 			m_b.items[i].mode->set();
 			// Crashes!!
@@ -88,46 +93,22 @@ void Modes::close() {
 
 //----------------------------------------------------
 // Handle button state
-void Modes::handle_mode_button_state(int id) {
+int Modes::mode_handle_event(int state, int id) {
 	int i;
-
 	for (i = 0 ; i < m_b.n; i++) {
 		if (m_b.items[i].id == id) {
 			// Toggle pressed
-			m_b.items[i].mode->set();
+			m_b.items[i].mode->button_up();
 			// Remember mode
-			p->set_mode(r, id);
+			p->set_mode(radio_id, id);
 		}
 		else {
 			// Toggle released
-			m_b.items[i].mode->clear();
+			m_b.items[i].mode->button_down();
 		}
 	}
-}
+	// Tell radio to change mode
+	r_i->ri_server_set_mode(radio_id - 1, id);
 
-//==============================================================================
-// Mode buttons
-ModeButton::ModeButton(int radio, Modes *top_level, char* button_label, int mode_id, metrics m, Fl_Color back_col, Fl_Color label_col) : Fl_Toggle_Button(m.x, m.y, m.w, m.h, button_label) {
-	r = radio;
-	t_l = top_level;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	id = mode_id;
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)label_col);
-}
-
-//----------------------------------------------------
-// Handle click event
-int ModeButton::handle(int event) {
-	switch (event) {
-	case FL_LEFT_MOUSE: {
-		// Tell radio to change mode
-		r_i->ri_server_set_mode(r-1, id);
-		// Tell parent to reflect state in buttons
-		t_l->handle_mode_button_state(id);
-		return 1;
-	}
-	default:
-		return Fl_Widget::handle(event);
-	}
+	return true;
 }
