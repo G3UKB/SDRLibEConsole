@@ -368,7 +368,7 @@ int MainWindow::mode_handle_event(int state) {
 }
 
 //----------------------------------------------------
-// Audio handler
+// Filter handler
 int MainWindow::filt_handle_event(int state) {
 	set_location();
 	if (state) {
@@ -392,11 +392,15 @@ void MainWindow::handle_idle_timeout() {
 			CtrlBtn->activate();
 			SelectRadio->activate();
 			DiscoverBtn->deactivate();
+			ModeBtn->activate();
+			FilterBtn->activate();
 		}
 		else {
 			CtrlBtn->deactivate();
 			SelectRadio->deactivate();
 			DiscoverBtn->activate();
+			ModeBtn->deactivate();
+			FilterBtn->deactivate();
 		}
 	}
 	last_discovered = discovered;

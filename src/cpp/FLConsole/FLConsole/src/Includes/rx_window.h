@@ -1,7 +1,7 @@
 /*
 rx_window.h
 
-Radio 2/3 window header for the FLTK Console
+Auxiliary receivers window header for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -32,27 +32,53 @@ The authors can be reached by email at:
 //==============================================================================
 // Defines
 
+// Forward refs
+
+
 //==============================================================================
-/*
-	The one and only main window
-*/
-class RadioWindow : public WindowBase
+// The one and only Main Window
+
+class RxWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
-	RadioWindow(int radio, int x, int y, int w, int h);
-	~RadioWindow() {};
+	RxWindow(int radio, int x, int y, int w, int h);
+	~RxWindow() {};
+	int handle(int event);
 	void handle_idle_timeout();
-	void close();
+
+	// Widget callbacks
+	int audio_handle_event(int e);
+	int mode_handle_event(int e);
+	int filt_handle_event(int e);
 
 	//==============================================================================
 
 private:
 	//==============================================================================
 	// State variables
-	// labels must be fixed storage
-	// Radio inst
-	int r;
+
+	// Params
+	int width;
+	int height;
+
+	// State
+	int radio_id;
+
+	//Layout
+	GridLayout *grid;
+	metrics m;
+
+	// Widget main group
+	Fl_Group *top_group;
+
+	// Labels - must be fixed storage
+	char audio_str_up[12] = "Audio>>";
+	char audio_str_dwn[12] = "<<Audio";
+	char mode_str_up[12] = "Mode>>";
+	char mode_str_dwn[12] = "<<Mode";
+	char filt_str_up[12] = "Filter>>";
+	char filt_str_dwn[12] = "<<Filter";
 
 	// Preferences
 	Preferences* p;
@@ -61,8 +87,25 @@ private:
 	RadioInterface* r_i;
 
 	// Components
+	C_ToggleButton* AudioBtn;
+	C_ToggleButton* ModeBtn;
+	C_ToggleButton* FilterBtn;
+	AudioOutput* audio_out;
+	Modes *modes;
+	Filters *filters;
+
+	// Structures
+	struct struct_w_loc {
+		int x;
+		int y;
+		int w;
+		int h;
+	};
+	struct_w_loc w_loc;
 
 	//==============================================================================
 	// Method prototypes
-
+	void do_layout();
+	void set_location();
 };
+
