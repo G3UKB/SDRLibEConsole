@@ -45,6 +45,7 @@ public:
 	RxWindow(int radio, int x, int y, int w, int h);
 	~RxWindow() {};
 	int handle(int event);
+	void  resize(int x, int y, int w, int h);
 	void handle_idle_timeout();
 	void close();
 

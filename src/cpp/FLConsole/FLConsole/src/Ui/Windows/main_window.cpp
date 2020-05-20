@@ -184,9 +184,9 @@ void MainWindow::do_layout() {
 
 	// Add audio button
 	std::function< int(int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("AUDIO_CB", f3);
+	RSt::inst().put_cb("AUDIO_R1_CB", f3);
 	m = grid->get_cell_metrics(2, 3);
-	AudioBtn = new C_ToggleButton(std::string("AUDIO_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	AudioBtn = new C_ToggleButton(std::string("AUDIO_R1_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(AudioBtn);
 
 	// Add Exit button to the group
@@ -202,15 +202,15 @@ void MainWindow::do_layout() {
 
 	// Add mode trigger in grid_1
 	std::function< int(int) > f4 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("MODE_CB", f4);
+	RSt::inst().put_cb("MODE_R1_CB", f4);
 	m = grid_1->get_cell_metrics(0, 0);
-	ModeBtn = new C_ToggleButton(std::string("AUDIO_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	ModeBtn = new C_ToggleButton(std::string("MODE_R1_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Add filter trigger in grid_1
 	std::function< int(int) > f5 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("FILT_CB", f5);
+	RSt::inst().put_cb("FILT_R1_CB", f5);
 	m = grid_1->get_cell_metrics(1, 0);
-	FilterBtn = new C_ToggleButton(std::string("FILT_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	FilterBtn = new C_ToggleButton(std::string("FILT_R1_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Close up and display
 	top_group->end();
@@ -222,20 +222,38 @@ void MainWindow::do_layout() {
 // Event handlers
 
 //----------------------------------------------------
-// Window event handler
+// Window event handlers
+//----------------------------------------------------
+// Resize event
+void  MainWindow::resize(int x, int y, int w, int h) {
+	// Tell window to resize all widgets
+	Fl_Double_Window::resize(x, y, w, h);
+	// Save position and size
+	p->set_window_x(x);
+	p->set_window_y(y);
+	p->set_window_w(w);
+	p->set_window_h(h);
+}
+
+//----------------------------------------------------
+// General event handler
 int MainWindow::handle(int event) {
 	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
 	switch (event) {
-		// Window close raises an FL_HIDE event?
+	// Window close raises an FL_HIDE event?
 	case FL_HIDE: {
 		// Save prefs
 		p->save();
+		// Close tool windows
+		modes->close();
+		filters->close();
 		// Close radio windows if active
 		if (Radio2_Win != NULL) Radio2_Win->close();
 		if (Radio3_Win != NULL) Radio3_Win->close();
+		if (TX_Win != NULL) TX_Win->close();
 		break;
-	}
+		}
 	}
 	// Pass all events down
 	return Fl_Window::handle(event);

@@ -82,6 +82,12 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 }
 
 //----------------------------------------------------
+// Close window
+void Modes::close() {
+	Fl::delete_widget(this);
+}
+
+//----------------------------------------------------
 // Handle button state
 void Modes::handle_mode_button_state(int id) {
 	int i;

@@ -81,6 +81,12 @@ Filters::Filters(int radio, int w, int h) : Fl_Window(w, h) {
 }
 
 //----------------------------------------------------
+// Close window
+void Filters::close() {
+	Fl::delete_widget(this);
+}
+
+//----------------------------------------------------
 // Handle button state
 void Filters::handle_filter_button_state(int id) {
 	int i;

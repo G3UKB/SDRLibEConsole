@@ -118,10 +118,16 @@ void RxWindow::do_layout() {
 	top_group->add(vfo);
 
 	// Add audio button
-	std::function< int(int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("AUDIO_CB", f3);
 	m = grid->get_cell_metrics(0, 3);
-	AudioBtn = new C_ToggleButton(std::string("AUDIO_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	std::function< int(int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1);
+	if (radio_id == 2) {
+		RSt::inst().put_cb("AUDIO_R2_CB", f3);
+		AudioBtn = new C_ToggleButton(std::string("AUDIO_R2_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
+	else {
+		RSt::inst().put_cb("AUDIO_R3_CB", f3);
+		AudioBtn = new C_ToggleButton(std::string("AUDIO_R3_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
 	top_group->add(AudioBtn);
 
 	// We place the radio buttons into another grid
@@ -131,16 +137,30 @@ void RxWindow::do_layout() {
 	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
 	// Add mode trigger in grid_1
-	std::function< int(int) > f4 = std::bind(&RxWindow::mode_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("MODE_CB", f4);
 	m = grid_1->get_cell_metrics(0, 0);
-	ModeBtn = new C_ToggleButton(std::string("AUDIO_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	std::function< int(int) > f4 = std::bind(&RxWindow::mode_handle_event, this, std::placeholders::_1);
+	if (radio_id == 2) {
+		RSt::inst().put_cb("MODE_R2_CB", f4);
+		ModeBtn = new C_ToggleButton(std::string("MODE_R2_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
+	else {
+		RSt::inst().put_cb("MODE_R3_CB", f4);
+		ModeBtn = new C_ToggleButton(std::string("MODE_R3_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
+	top_group->add(ModeBtn);
 
 	// Add filter trigger in grid_1
-	std::function< int(int) > f5 = std::bind(&RxWindow::filt_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("FILT_CB", f5);
 	m = grid_1->get_cell_metrics(1, 0);
-	FilterBtn = new C_ToggleButton(std::string("FILT_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	std::function< int(int) > f5 = std::bind(&RxWindow::filt_handle_event, this, std::placeholders::_1);
+	if (radio_id == 2) {
+		RSt::inst().put_cb("FILT_R2_CB", f5);
+		FilterBtn = new C_ToggleButton(std::string("FILT_R2_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
+	else {
+		RSt::inst().put_cb("FILT_R3_CB", f5);
+		FilterBtn = new C_ToggleButton(std::string("FILT_R3_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	}
+	top_group->add(FilterBtn);
 
 	// Close up and display
 	top_group->end();
@@ -151,6 +171,8 @@ void RxWindow::do_layout() {
 //----------------------------------------------------
 // Close window
 void RxWindow::close() {
+	modes->close();
+	filters->close();
 	Fl::remove_timeout(rx_window_idle_cb);
 	Fl::delete_widget(this);
 }
@@ -160,6 +182,29 @@ void RxWindow::close() {
 
 //----------------------------------------------------
 // Window event handler
+
+//----------------------------------------------------
+// Resize event
+void  RxWindow::resize(int x, int y, int w, int h) {
+	// Tell window to resize all widgets
+	Fl_Double_Window::resize(x, y, w, h);
+	// Save position and size
+	if (radio_id == 2) {
+		p->set_radio2_x(x);
+		p->set_radio2_y(y);
+		p->set_radio2_w(w);
+		p->set_radio2_h(h);
+	}
+	else if (radio_id == 3) {
+		p->set_radio3_x(x);
+		p->set_radio3_y(y);
+		p->set_radio3_w(w);
+		p->set_radio3_h(h);
+	}
+}
+
+//----------------------------------------------------
+// General event handler
 int RxWindow::handle(int event) {
 	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);

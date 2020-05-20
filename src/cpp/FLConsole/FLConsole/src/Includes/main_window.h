@@ -48,6 +48,7 @@ public:
 	MainWindow(int x, int y, int w, int h);
 	~MainWindow() {};
 	int handle(int event);
+	void  resize(int x, int y, int w, int h);
 	void handle_idle_timeout();
 	void handle_radio(Fl_Widget* w);
 

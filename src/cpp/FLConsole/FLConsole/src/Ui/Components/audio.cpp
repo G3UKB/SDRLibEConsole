@@ -133,6 +133,12 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 }
 
 //----------------------------------------------------
+// Close window
+void AudioOutput::close() {
+	Fl::delete_widget(this);
+}
+
+//----------------------------------------------------
 // Apply current state as a new audio path
 void AudioOutput::handle_apply() {
 	// Gather all the required information
@@ -306,6 +312,12 @@ AudioInput::AudioInput(int radio, int w, int h) : Fl_Window(w, h) {
 
 	// Finally show window
 	show();
+}
+
+//----------------------------------------------------
+// Close window
+void AudioInput::close() {
+	Fl::delete_widget(this);
 }
 
 //----------------------------------------------------

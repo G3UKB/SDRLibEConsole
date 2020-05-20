@@ -137,14 +137,14 @@ void TxWindow::do_layout() {
 	std::function< int(int) > f3 = std::bind(&TxWindow::rf_gain_handle_event, this, std::placeholders::_1);
 	RSt::inst().put_cb("GAIN_CB", f3);
 	m = grid->get_cell_metrics(3, 0, 1, 3);
-	RFGain = new RFSlider(std::string("DUPLEX_CB"), rf_gain_str, m.x, m.y, m.w, (2 * m.h) / 3, (Fl_Color)10);
+	RFGain = new RFSlider(std::string("GAIN_CB"), rf_gain_str, m.x, m.y, m.w, (2 * m.h) / 3, (Fl_Color)10);
 	top_group->add(RFGain);
 
 	// Add audio button
 	std::function< int(int) > f4 = std::bind(&TxWindow::audio_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("AUDIO_CB", f4);
+	RSt::inst().put_cb("AUDIO_TX_CB", f4);
 	m = grid->get_cell_metrics(1, 3);
-	AudioBtn = new C_ToggleButton(std::string("AUDIO_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	AudioBtn = new C_ToggleButton(std::string("AUDIO_TX_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(AudioBtn);
 
 	// We place the radio buttons into another grid
@@ -155,15 +155,15 @@ void TxWindow::do_layout() {
 
 	// Add mode trigger in grid_1
 	std::function< int(int) > f5 = std::bind(&TxWindow::mode_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("MODE_CB", f5);
+	RSt::inst().put_cb("MODE_TX_CB", f5);
 	m = grid_1->get_cell_metrics(0, 0);
-	ModeBtn = new C_ToggleButton(std::string("AUDIO_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	ModeBtn = new C_ToggleButton(std::string("MODE_TX_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Add filter trigger in grid_1
 	std::function< int(int) > f6 = std::bind(&TxWindow::filt_handle_event, this, std::placeholders::_1);
-	RSt::inst().put_cb("FILT_CB", f6);
+	RSt::inst().put_cb("FILT_TX_CB", f6);
 	m = grid_1->get_cell_metrics(1, 0);
-	FilterBtn = new C_ToggleButton(std::string("FILT_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
+	FilterBtn = new C_ToggleButton(std::string("FILT_TX_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Close up and display
 	top_group->end();
@@ -174,6 +174,8 @@ void TxWindow::do_layout() {
 //----------------------------------------------------
 // Close window
 void TxWindow::close() {
+	modes->close();
+	filters->close();
 	Fl::remove_timeout(tx_window_idle_cb);
 	Fl::delete_widget(this);
 }
@@ -182,7 +184,21 @@ void TxWindow::close() {
 // Event handlers
 
 //----------------------------------------------------
-// Window event handler
+// Window event handlers
+//----------------------------------------------------
+// Resize event
+void  TxWindow::resize(int x, int y, int w, int h) {
+	// Tell window to resize all widgets
+	Fl_Double_Window::resize(x, y, w, h);
+	// Save position and size
+	p->set_tx_x(x);
+	p->set_tx_y(y);
+	p->set_tx_w(w);
+	p->set_tx_h(h);
+}
+
+//----------------------------------------------------
+// General event handler
 int TxWindow::handle(int event) {
 	// Use this to print readable form of event
 	//printf("Event was %s (%d)\n", fl_eventnames[event], event);
