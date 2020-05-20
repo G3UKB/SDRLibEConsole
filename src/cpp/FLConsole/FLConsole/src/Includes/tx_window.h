@@ -105,7 +105,7 @@ private:
 	C_ToggleButton* AudioBtn;
 	C_ToggleButton* ModeBtn;
 	C_ToggleButton* FilterBtn;
-	AudioOutput* audio_out;
+	AudioInput* audio_in;
 	Modes *modes;
 	Filters *filters;
 

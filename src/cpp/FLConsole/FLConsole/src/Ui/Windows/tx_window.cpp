@@ -58,7 +58,6 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, 
 	RSt::inst().put_obj("TX-WINDOW", (void*)this);
 
 	// Set window attributes
-	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 	char label[20];
@@ -72,8 +71,8 @@ TxWindow::TxWindow(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, 
 	do_layout();
 
 	// Create the audio panel hidden
-	audio_out = new AudioOutput(radio_id, 350, 130);
-	audio_out->hide();
+	audio_in = new AudioInput(radio_id, 350, 130);
+	audio_in->hide();
 
 	// Create the modes panel hidden
 	modes = new Modes(radio_id, 230, 80);
@@ -273,11 +272,11 @@ int TxWindow::rf_gain_handle_event(int value) {
 int TxWindow::audio_handle_event(int state) {
 	set_location();
 	if (state) {
-		audio_out->position(w_loc.x + w_loc.w + 5, w_loc.y);
-		audio_out->show();
+		audio_in->position(w_loc.x + w_loc.w + 5, w_loc.y);
+		audio_in->show();
 	}
 	else {
-		audio_out->hide();
+		audio_in->hide();
 	}
 	return true;
 }

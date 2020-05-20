@@ -54,7 +54,6 @@ AudioOutput::AudioOutput(int radio, int w, int h) : Fl_Window(w, h) {
 	char label[30];
 	sprintf_s(label, "Audio Output (radio-%d", r);
 	copy_label(label);
-	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 	

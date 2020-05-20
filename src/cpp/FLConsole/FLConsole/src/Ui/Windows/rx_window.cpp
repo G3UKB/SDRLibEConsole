@@ -55,11 +55,10 @@ RxWindow::RxWindow(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, 
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
 	// Set window attributes
-	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 	char label[20];
-	sprintf_s(label, "Receiver - %d", radio_id);
+	sprintf_s(label, "RX - %d", radio_id);
 	copy_label(label);
 
 	// Set window position

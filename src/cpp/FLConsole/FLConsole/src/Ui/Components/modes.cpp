@@ -42,7 +42,6 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
 
-	resizable(this);
 	color((Fl_Color)24);
 	align(Fl_Align(65));
 
