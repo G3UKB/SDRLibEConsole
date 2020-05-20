@@ -105,10 +105,10 @@ MainWindow::MainWindow(int x, int y, int w, int h) : Fl_Double_Window(w, h) {
 	
 	// Show radio windows as appropriate
 	if (num_radios > 1) {
-		Radio2_Win = new RadioWindow(radio2_id, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+		Radio2_Win = new RxWindow(radio2_id, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 	}
 	if (num_radios > 2) {
-		Radio3_Win = new RadioWindow(radio3_id, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+		Radio3_Win = new RxWindow(radio3_id, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 	}
 	
 	// Create and hide TX window
@@ -141,7 +141,8 @@ void MainWindow::do_layout() {
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
 	m = grid->get_cell_metrics(2, 0, 2, 3);
-	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	VFOComponent *vfo = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	top_group->add(vfo);
 
 	// Add discover button
 	m = grid->get_cell_metrics(0, 1);
@@ -276,7 +277,7 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		else if (value == 1) {
 			;
 			// Two radios
-			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			if (Radio2_Win == NULL) Radio2_Win = new RxWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
 			// Close radio 3 if active
 			if (Radio3_Win != NULL) {
 				Radio3_Win->close();
@@ -285,8 +286,8 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 		}
 		else if (value == 2) {
 			// Three radios
-			if (Radio2_Win == NULL) Radio2_Win = new RadioWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
-			if (Radio3_Win == NULL) Radio3_Win = new RadioWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
+			if (Radio2_Win == NULL) Radio2_Win = new RxWindow(2, p->get_radio2_x(), p->get_radio2_y(), p->get_radio2_w(), p->get_radio2_h());
+			if (Radio3_Win == NULL) Radio3_Win = new RxWindow(3, p->get_radio3_x(), p->get_radio3_y(), p->get_radio3_w(), p->get_radio3_h());
 		}
 		// Reset all radio state
 		if (success) r_i->reset_radio_state();

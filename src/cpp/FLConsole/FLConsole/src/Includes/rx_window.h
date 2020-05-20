@@ -46,6 +46,7 @@ public:
 	~RxWindow() {};
 	int handle(int event);
 	void handle_idle_timeout();
+	void close();
 
 	// Widget callbacks
 	int audio_handle_event(int e);

@@ -120,8 +120,8 @@ private:
 	Filters *filters;
 
 	// RX windows
-	RadioWindow* Radio2_Win = NULL;
-	RadioWindow* Radio3_Win = NULL;
+	RxWindow* Radio2_Win = NULL;
+	RxWindow* Radio3_Win = NULL;
 
 	// TX Window
 	TxWindow* TX_Win = NULL;

@@ -84,3 +84,16 @@ int C_ToggleButton::handle(int event) {
 		return Fl_Widget::handle(event);
 	}
 }
+
+//----------------------------------------------------
+// External activation
+void C_ToggleButton::button_up() {
+	set();
+	label(down_label);
+	labelcolor(down_col);
+}
+void C_ToggleButton::button_down() {
+	clear();
+	label(up_label);
+	labelcolor(up_col);
+}

@@ -38,6 +38,8 @@ public:
 	C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
 	~C_ToggleButton() {};
 	int handle(int event);
+	void button_up();
+	void button_down();
 
 	//==============================================================================
 

@@ -1,7 +1,7 @@
 /*
 tx_window.h
 
-Single TX window header for the FLTK Console
+Transmit window header for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -32,109 +32,95 @@ The authors can be reached by email at:
 //==============================================================================
 // Defines
 
-//==============================================================================
-/*
-	The one and only main window
-*/
-class DuplexButton;
-class MOXButton;
+// Forward refs
 class RFSlider;
-class TxWindow : public WindowBase
+
+//==============================================================================
+// The one and only Main Window
+
+class TxWindow : public Fl_Double_Window
 {
 public:
 	//==============================================================================
 	TxWindow(int radio, int x, int y, int w, int h);
 	~TxWindow() {};
+	int handle(int event);
 	void handle_idle_timeout();
 	void close();
-	void do_mox();
-	void mox_off();
 	void mox_on();
+	void mox_off();
+
+	// Widget callbacks
+	int duplex_handle_event(int state);
+	int mox_handle_event(int state);
+	int rf_gain_handle_event(int state);
+	int audio_handle_event(int e);
+	int mode_handle_event(int e);
+	int filt_handle_event(int e);
 
 	//==============================================================================
 
 private:
 	//==============================================================================
 	// State variables
-	// labels must be fixed storage
-	// Radio inst
-	int r;
-	// Buttons
-	char duplex_str_on[10] = "Duplex";
-	char duplex_str_off[10] = "Simplex";
-	char mox_str_on[5] = "TX";
-	char mox_str_off[5] = "RX";
+
+	// Params
+	int width;
+	int height;
+
+	// State
+	int radio_id;
+
+	//Layout
+	GridLayout *grid;
+	metrics m;
+
+	// Widget main group
+	Fl_Group *top_group;
+
+	// Labels - must be fixed storage
+	char duplex_str_up[8] = "Simplex";
+	char duplex_str_dwn[8] = "Duplex";
+	char mox_str_up[3] = "RX";
+	char mox_str_dwn[3] = "TX";
 	char rf_gain_str[5] = "Gain";
-	
+	char audio_str_up[12] = "Audio>>";
+	char audio_str_dwn[12] = "<<Audio";
+	char mode_str_up[12] = "Mode>>";
+	char mode_str_dwn[12] = "<<Mode";
+	char filt_str_up[12] = "Filter>>";
+	char filt_str_dwn[12] = "<<Filter";
+
 	// Preferences
 	Preferences* p;
 
 	// Ref to set radio parameters
 	RadioInterface* r_i;
-	// Additional TX only buttons
-	DuplexButton* DuplexBtn;
-	MOXButton* MOXBtn;
-	RFSlider* RFGain;
 
 	// Components
+	C_ToggleButton* DuplexBtn;
+	C_ToggleButton* MOXBtn;
+	RFSlider* RFGain;
+	C_ToggleButton* AudioBtn;
+	C_ToggleButton* ModeBtn;
+	C_ToggleButton* FilterBtn;
+	AudioOutput* audio_out;
+	Modes *modes;
+	Filters *filters;
+
+	// Structures
+	struct struct_w_loc {
+		int x;
+		int y;
+		int w;
+		int h;
+	};
+	struct_w_loc w_loc;
 
 	//==============================================================================
 	// Method prototypes
-
-};
-
-//==============================================================================
-// The duplex button
-class DuplexButton : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	DuplexButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
-	~DuplexButton() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	int id;
-	char* up_label;
-	char* down_label;
-	Fl_Color up_col;
-	Fl_Color down_col;
-	TxWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
-};
-
-//==============================================================================
-// The MOX button
-class MOXButton : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	MOXButton(TxWindow* parent_widget, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
-	~MOXButton() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	int id;
-	char* up_label;
-	char* down_label;
-	Fl_Color up_col;
-	Fl_Color down_col;
-	TxWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
+	void do_layout();
+	void set_location();
 };
 
 //==============================================================================
@@ -143,7 +129,7 @@ class RFSlider : public Fl_Value_Slider
 {
 public:
 	//==============================================================================
-	RFSlider(TxWindow* parent_widget, char* label, int x, int y, int w, int h, Fl_Color back_col);
+	RFSlider(std::string cb_key, char* label, int x, int y, int w, int h, Fl_Color back_col);
 	~RFSlider() {};
 	void handle_event();
 
@@ -154,6 +140,11 @@ private:
 	// State variables
 	RadioInterface* r_i;
 	TxWindow* myparent;
+
+	// Key to callback cache
+	std::string key;
+	// The callback function retrieved from the cache
+	std::function< int(int) > cb;
 
 	//==============================================================================
 	// Method prototypes

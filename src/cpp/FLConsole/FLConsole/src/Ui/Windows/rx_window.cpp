@@ -97,7 +97,7 @@ RxWindow::RxWindow(int radio, int x, int y, int w, int h) : Fl_Double_Window(w, 
 void RxWindow::do_layout() {
 
 	// Layout params
-	int rows = 5;
+	int rows = 3;
 	int cols = 4;
 	int grid_margin = 5;
 	int group_margin = 10;
@@ -113,19 +113,20 @@ void RxWindow::do_layout() {
 
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
-	m = grid->get_cell_metrics(2, 0, 2, 3);
-	VFOComponent *c = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	m = grid->get_cell_metrics(0, 0, 2, 3);
+	VFOComponent *vfo = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	top_group->add(vfo);
 
 	// Add audio button
 	std::function< int(int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1);
 	RSt::inst().put_cb("AUDIO_CB", f3);
-	m = grid->get_cell_metrics(2, 3);
+	m = grid->get_cell_metrics(0, 3);
 	AudioBtn = new C_ToggleButton(std::string("AUDIO_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(AudioBtn);
 
 	// We place the radio buttons into another grid
 	// Get metrics from grid
-	m = grid->get_cell_metrics(3, 3, 2, 1);
+	m = grid->get_cell_metrics(1, 3, 2, 1);
 	// Create grid_1 with the new metrics
 	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
@@ -145,6 +146,13 @@ void RxWindow::do_layout() {
 	top_group->end();
 	// Finish up
 	end();
+}
+
+//----------------------------------------------------
+// Close window
+void RxWindow::close() {
+	Fl::remove_timeout(rx_window_idle_cb);
+	Fl::delete_widget(this);
 }
 
 //===================================================
