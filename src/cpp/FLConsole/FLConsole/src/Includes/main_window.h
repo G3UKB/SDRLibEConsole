@@ -48,9 +48,10 @@ public:
 	MainWindow(int x, int y, int w, int h);
 	~MainWindow() {};
 	int handle(int event);
-	void  resize(int x, int y, int w, int h);
+	void resize(int x, int y, int w, int h);
 	void handle_idle_timeout();
 	void handle_radio(Fl_Widget* w);
+	void handle_type(Fl_Widget* w);
 
 	// Widget callbacks
 	int exit_handle_event(int state, int id);
@@ -117,6 +118,7 @@ private:
 	C_ToggleButton* AudioBtn;
 	C_ToggleButton* ModeBtn;
 	C_ToggleButton* FilterBtn;
+	Fl_Choice* RadioType;
 	Fl_Choice* SelectRadio;
 	AudioOutput* audio_out;
 	Modes *modes;

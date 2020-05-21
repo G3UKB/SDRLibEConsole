@@ -47,6 +47,12 @@ void radio_cb(Fl_Widget* w, void* user_data) {
 	((MainWindow*)user_data)->handle_radio(w);
 }
 
+// Type select callback
+void type_cb(Fl_Widget* w, void* user_data) {
+	// Call down to our Audio instance
+	((MainWindow*)user_data)->handle_type(w);
+}
+
 //----------------------------------------------------
 // Constructor
 MainWindow::MainWindow(int x, int y, int w, int h) : Fl_Double_Window(w, h) {
@@ -164,6 +170,19 @@ void MainWindow::do_layout() {
 	top_group->add(SelectRadio);
 	SelectRadio->value(num_radios - 1);
 
+	// Add radio type
+	m = grid->get_cell_metrics(1, 0, 1, 2);
+	RadioType = new Fl_Choice(m.x + 40, m.y, m.w - 40, m.h, "TYPE:");
+	RadioType->add("HPSDR");
+	RadioType->add("FCDPro+");
+	RadioType->add("FT817ND");
+	RadioType->add("IC7100");
+	RadioType->color((Fl_Color)33);
+	RadioType->labelcolor((Fl_Color)80);
+	RadioType->callback((Fl_Callback*)type_cb, (void*)this);
+	top_group->add(RadioType);
+	RadioType->value(0);
+
 	// Add the VFO component
 	// This extends Fl_Group so we place the group below the buttons
 	m = grid->get_cell_metrics(2, 0, 2, 3);
@@ -261,6 +280,15 @@ int MainWindow::handle(int event) {
 	}
 	// Pass all events down
 	return Fl_Window::handle(event);
+}
+
+//----------------------------------------------------
+// Handle radio type
+void MainWindow::handle_type(Fl_Widget* w) {
+	Fl_Choice* c = (Fl_Choice*)w;
+	int value = c->value();
+	bool success = false;
+	printf("Val: %d", value);
 }
 
 //----------------------------------------------------
