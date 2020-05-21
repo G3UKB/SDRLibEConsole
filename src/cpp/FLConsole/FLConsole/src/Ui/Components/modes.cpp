@@ -60,7 +60,7 @@ Modes::Modes(int radio, int w, int h) : Fl_Window(w, h) {
 	int i, j, k;
 	metrics m;
 	// Create a single callback for all mode buttons for this radio
-	sprintf_s(key, "MODE%d_CB", radio_id);
+	sprintf_s(key, "MODE_%d_CB", radio_id);
 	std::function< int(int, int) > f2 = std::bind(&Modes::mode_handle_event, this, std::placeholders::_1, std::placeholders::_2);
 	RSt::inst().put_cb(key, f2);
 

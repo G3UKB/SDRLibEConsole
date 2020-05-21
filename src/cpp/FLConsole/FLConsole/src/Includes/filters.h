@@ -46,13 +46,13 @@ public:
 	void close();
 
 	//==============================================================================
-	void handle_filter_button_state(int id);
+	int filter_handle_event(int state, int id);
 
 private:
 	//==============================================================================
 	// State variables
 	// Radio inst
-	int r;
+	int radio_id;
 	// Our prefs
 	Preferences* p;
 	// Ref to set radio parameters
@@ -71,19 +71,19 @@ private:
 	char f100[10] = "100Hz";
 	
 	// Button references
-	FilterButton* filter_0_btn;
-	FilterButton* filter_1_btn;
-	FilterButton* filter_2_btn;
-	FilterButton* filter_3_btn;
-	FilterButton* filter_4_btn;
-	FilterButton* filter_5_btn;
-	FilterButton* filter_6_btn;
-	FilterButton* filter_7_btn;
-	FilterButton* filter_8_btn;
+	C_ToggleButton* filter_0_btn;
+	C_ToggleButton* filter_1_btn;
+	C_ToggleButton* filter_2_btn;
+	C_ToggleButton* filter_3_btn;
+	C_ToggleButton* filter_4_btn;
+	C_ToggleButton* filter_5_btn;
+	C_ToggleButton* filter_6_btn;
+	C_ToggleButton* filter_7_btn;
+	C_ToggleButton* filter_8_btn;
 
 	// Structures to drive generation and updating
 	struct filter_button {
-		FilterButton* filter;
+		C_ToggleButton* filter;
 		char *label;
 		int id;
 	};
@@ -105,32 +105,11 @@ private:
 		}
 	};
 
-	//==============================================================================
-	// Method prototypes
-
-};
-
-//==============================================================================
-// A filters button
-class FilterButton : public Fl_Toggle_Button
-{
-public:
-	//==============================================================================
-	FilterButton(int radio, Filters *filters, char* label, int filter_id, metrics m, Fl_Color back_col, Fl_Color label_col);
-	~FilterButton() {};
-
-	//==============================================================================
-	int handle(int event);
-
-private:
-	//==============================================================================
-	// State variables
-	int r;
-	Filters *t_l;
-	RadioInterface* r_i;
-	int id;
+	// Key to callback cache
+	char key[20];
 
 	//==============================================================================
 	// Method prototypes
 
 };
+
