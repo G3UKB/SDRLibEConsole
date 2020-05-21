@@ -119,14 +119,9 @@ void RxWindow::do_layout() {
 	// Add audio button
 	m = grid->get_cell_metrics(0, 3);
 	std::function< int(int, int) > f3 = std::bind(&RxWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	if (radio_id == 2) {
-		RSt::inst().put_cb("AUDIO_R2_CB", f3);
-		AudioBtn = new C_ToggleButton(std::string("AUDIO_R2_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
-	else {
-		RSt::inst().put_cb("AUDIO_R3_CB", f3);
-		AudioBtn = new C_ToggleButton(std::string("AUDIO_R3_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
+	sprintf_s(key, "AUDIO_R%d_CB", radio_id);
+	RSt::inst().put_cb(key, f3);
+	AudioBtn = new C_ToggleButton(key, audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(AudioBtn);
 
 	// We place the radio buttons into another grid
@@ -138,27 +133,17 @@ void RxWindow::do_layout() {
 	// Add mode trigger in grid_1
 	m = grid_1->get_cell_metrics(0, 0);
 	std::function< int(int, int) > f4 = std::bind(&RxWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	if (radio_id == 2) {
-		RSt::inst().put_cb("MODE_R2_CB", f4);
-		ModeBtn = new C_ToggleButton(std::string("MODE_R2_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
-	else {
-		RSt::inst().put_cb("MODE_R3_CB", f4);
-		ModeBtn = new C_ToggleButton(std::string("MODE_R3_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
+	sprintf_s(key, "MODE_R%d_CB", radio_id);
+	RSt::inst().put_cb(key, f4);
+	ModeBtn = new C_ToggleButton(key, mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(ModeBtn);
 
 	// Add filter trigger in grid_1
 	m = grid_1->get_cell_metrics(1, 0);
 	std::function< int(int, int) > f5 = std::bind(&RxWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	if (radio_id == 2) {
-		RSt::inst().put_cb("FILT_R2_CB", f5);
-		FilterBtn = new C_ToggleButton(std::string("FILT_R2_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
-	else {
-		RSt::inst().put_cb("FILT_R3_CB", f5);
-		FilterBtn = new C_ToggleButton(std::string("FILT_R3_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
-	}
+	sprintf_s(key, "FILT_R%d_CB", radio_id);
+	RSt::inst().put_cb(key, f5);
+	FilterBtn = new C_ToggleButton(key, filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(FilterBtn);
 
 	// Close up and display

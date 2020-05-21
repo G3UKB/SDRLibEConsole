@@ -105,6 +105,9 @@ private:
 	};
 	struct_w_loc w_loc;
 
+	// Key to callback cache
+	char key[20];
+
 	//==============================================================================
 	// Method prototypes
 	void do_layout();
