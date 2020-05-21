@@ -44,6 +44,10 @@ The authors can be reached by email at:
 
 //==============================================================================
 // PUBLIC
+
+//==============================================================================
+// Cache
+
 //----------------------------------------------------
 // Object cache
 void RSt::put_obj(std::string name, void* obj) {
@@ -70,44 +74,83 @@ std::function< int(int, int) > RSt::get_cb(std::string name) {
 		return cb_map.at(name);
 }
 
-//----------------------------------------------------
+//==============================================================================
 // Application state
+
+//----------------------------------------------------
+// SDR type radio state
+void RSt::set_type(int radio_type) {
+	app_state.radio_type = radio_type;
+}
+
+int RSt::get_type() {
+	return app_state.radio_type;
+}
+
+//----------------------------------------------------
+// SDR type radio state
 void RSt::set_discovered(bool found) {
-	app_state.discovered = found;
+	app_state.sdr_state.discovered = found;
 }
 
 bool RSt::get_discovered() {
-	return app_state.discovered;
+	return app_state.sdr_state.discovered;
 }
 
 void RSt::set_server_running(bool running) {
-	app_state.server_running = running;
+	app_state.sdr_state.server_running = running;
 }
 
 bool RSt::get_server_running() {
-	return app_state.server_running;
+	return app_state.sdr_state.server_running;
 }
 
 void RSt::set_radio_running(bool running) {
-	app_state.radio_running = running;
+	app_state.sdr_state.radio_running = running;
 }
 
 bool RSt::get_radio_running() {
-	return app_state.radio_running;
+	return app_state.sdr_state.radio_running;
 }
 
 void RSt::set_duplex(bool state) {
-	app_state.duplex = state;
+	app_state.sdr_state.duplex = state;
 }
 
 bool RSt::get_duplex() {
-	return app_state.duplex;
+	return app_state.sdr_state.duplex;
 }
 
 void RSt::set_mox(bool state) {
-	app_state.mox = state;
+	app_state.sdr_state.mox = state;
 }
 
 bool RSt::get_mox() {
-	return app_state.mox;
+	return app_state.sdr_state.mox;
+}
+
+//----------------------------------------------------
+// Analog type radio state
+void RSt::set_analog_radio_running(bool running) {
+	app_state.analog_state.radio_running = running;
+}
+
+bool RSt::get_analog_radio_running() {
+	return app_state.analog_state.radio_running;
+}
+
+void RSt::set_analog_duplex(bool state) {
+	app_state.analog_state.duplex = state;
+}
+
+bool RSt::get_analog_duplex() {
+	return app_state.analog_state.duplex;
+}
+
+void RSt::set_analog_mox(bool state) {
+	app_state.analog_state.mox = state;
+}
+
+bool RSt::get_analog_mox() {
+	return app_state.analog_state.mox;
 }

@@ -75,6 +75,8 @@ private:
 
 	// State
 	int num_radios;
+	int radio_type = 0;
+	int FT817 = 120;
 	int radio_id;
 	int radio2_id;
 	int radio3_id;
@@ -121,8 +123,8 @@ private:
 	Fl_Choice* RadioType;
 	Fl_Choice* SelectRadio;
 	AudioOutput* audio_out;
-	Modes *modes;
-	Filters *filters;
+	Modes* modes;
+	Filters* filters;
 
 	// RX windows
 	RxWindow* Radio2_Win = NULL;
@@ -139,6 +141,9 @@ private:
 		int h;
 	};
 	struct_w_loc w_loc;
+
+	// Current hamlib client
+	HamlibClient *hamlib = NULL;
 
 	//==============================================================================
 	// Method prototypes

@@ -287,8 +287,34 @@ int MainWindow::handle(int event) {
 void MainWindow::handle_type(Fl_Widget* w) {
 	Fl_Choice* c = (Fl_Choice*)w;
 	int value = c->value();
-	bool success = false;
-	printf("Val: %d", value);
+	switch (value) {
+		case 0: {
+			// HPSDR
+			if (hamlib != NULL) {
+				hamlib->close();
+				delete (hamlib);
+			}
+		}
+		case 1: {
+			// FCDPro+
+		}
+		case 2: {
+			// FT817ND
+			if (hamlib != NULL) {
+				hamlib->close();
+				delete (hamlib);
+			}
+			hamlib = new HamlibClient((char*)"COM2", FT817);
+			RSt::inst().put_obj("HAMLIB", (void*)hamlib);
+			hamlib->init();
+			hamlib->open();
+		}
+		case 3: {
+			// IC7100
+
+		}
+	}
+	RSt::inst().set_type(value);
 }
 
 //----------------------------------------------------

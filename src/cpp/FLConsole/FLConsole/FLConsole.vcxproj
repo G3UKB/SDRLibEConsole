@@ -134,7 +134,6 @@
     <ClInclude Include="src\Includes\toggle.h" />
     <ClInclude Include="src\Includes\tx_window.h" />
     <ClInclude Include="src\Includes\vfo.h" />
-    <ClInclude Include="src\Includes\window_base.h" />
     <ClInclude Include="src\SerialDriver\serial.h" />
     <ClInclude Include="src\SerialDriver\v8stdint.h" />
     <ClInclude Include="src\SerialDriver\win.h" />
@@ -160,7 +159,6 @@
     <ClCompile Include="src\Ui\Windows\main_window.cpp" />
     <ClCompile Include="src\Ui\Windows\rx_window.cpp" />
     <ClCompile Include="src\Ui\Windows\tx_window.cpp" />
-    <ClCompile Include="src\Ui\Windows\window_base.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -79,6 +79,12 @@ bool HamlibClient::open() {
 }
 
 //----------------------------------------------------
+// Open comms to rig
+void HamlibClient::close() {
+	rig_close(current_rig);
+}
+
+//----------------------------------------------------
 // Set rig mode
 bool HamlibClient::set_mode() {
 	retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);

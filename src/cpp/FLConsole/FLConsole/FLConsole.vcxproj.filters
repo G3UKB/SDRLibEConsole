@@ -60,9 +60,6 @@
     <ClInclude Include="src\Includes\vfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Includes\window_base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SerialDriver\serial.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -132,9 +129,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Ui\Windows\tx_window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Ui\Windows\window_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Ui\Components\toggle.cpp">

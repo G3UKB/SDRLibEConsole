@@ -89,12 +89,12 @@ The authors can be reached by email at:
 #include "modes.h"
 #include "filters.h"
 #include "audio.h"
-#include "window_base.h"
 #include "rx_window.h"
 #include "tx_window.h"
+#include "hamlib/rig.h"
+#include "hamlib_client.h"
 #include "main_window.h"
 #include "../SerialDriver/serial.h"
 #include "cat.h"
-#include "hamlib/rig.h"
-#include "hamlib_client.h"
+
 

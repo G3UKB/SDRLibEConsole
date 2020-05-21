@@ -35,13 +35,6 @@ std::thread* cat;
 // FLTKConsole entry point
 int main(int argc, char **argv) {
 
-	HamlibClient *hamlib = new HamlibClient((char*)"COM2", 120);
-	hamlib->init();
-	hamlib->open();
-	hamlib->set_mode();
-	hamlib->set_freq(7111111);
-
-
 	// Create preferences
 	prefs = new Preferences();
 	RSt::inst().put_obj("PREFS", (void*)prefs);

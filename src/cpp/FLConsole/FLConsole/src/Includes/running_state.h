@@ -47,8 +47,8 @@ typedef struct audio_alloc {
 	// Def per radio
 	audio_defs defs[3];
 };
-// Full application state
-typedef struct t_app_state{
+// State for SDR type radio
+typedef struct t_sdr_state{
 	bool discovered = false;
 	bool server_running = false;
 	bool radio_running = false;
@@ -57,6 +57,20 @@ typedef struct t_app_state{
 	audio_alloc audio;
 	bool duplex = false;
 	bool mox = false;
+};
+
+// State for analog type radio
+typedef struct t_analog_state {
+	bool radio_running = false;
+	bool duplex = false;
+	bool mox = false;
+};
+
+// Full application state
+typedef struct t_app_state {
+	int radio_type = 0;
+	t_sdr_state sdr_state;
+	t_analog_state analog_state;
 };
 
 class RSt
@@ -90,6 +104,9 @@ public:
 	std::function< int(int, int) > get_cb(std::string name);
 
 	// State
+	void set_type(int radio_type);
+	int get_type();
+	// SDR type
 	void set_discovered(bool found);
 	bool get_discovered();
 	void set_server_running(bool running);
@@ -100,5 +117,12 @@ public:
 	bool get_duplex();
 	void set_mox(bool state);
 	bool get_mox();
+	// Analog type
+	void set_analog_radio_running(bool running);
+	bool get_analog_radio_running();
+	void set_analog_duplex(bool state);
+	bool get_analog_duplex();
+	void set_analog_mox(bool state);
+	bool get_analog_mox();
 
 };

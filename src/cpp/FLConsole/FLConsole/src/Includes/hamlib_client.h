@@ -42,6 +42,7 @@ public:
 	~HamlibClient() {};
 	bool init();
 	bool open();
+	void close();
 	bool set_mode();
 	bool set_freq(int freq);
 
