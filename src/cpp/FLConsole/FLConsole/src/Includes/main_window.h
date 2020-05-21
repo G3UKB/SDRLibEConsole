@@ -53,6 +53,8 @@ public:
 	void handle_radio(Fl_Widget* w);
 
 	// Widget callbacks
+	int exit_handle_event(int state, int id);
+	int discover_handle_event(int state, int id);
 	int cat_handle_event(int state, int id);
 	int tx_handle_event(int state, int id);
 	int ctrl_handle_event(int state, int id);
@@ -107,15 +109,15 @@ private:
 	RadioInterface* r_i;
 
 	// Components
-	DiscoverButton* DiscoverBtn;
-	Fl_Choice* SelectRadio;
+	C_Button* DiscoverBtn;
+	C_Button* ExitBtn;
 	C_ToggleButton* CtrlBtn;
 	C_ToggleButton* CATBtn;
 	C_ToggleButton* TXBtn;
 	C_ToggleButton* AudioBtn;
 	C_ToggleButton* ModeBtn;
 	C_ToggleButton* FilterBtn;
-	ExitButton* ExitBtn;
+	Fl_Choice* SelectRadio;
 	AudioOutput* audio_out;
 	Modes *modes;
 	Filters *filters;
@@ -140,50 +142,4 @@ private:
 	// Method prototypes
 	void do_layout();
 	void set_location();
-};
-
-//==============================================================================
-// The discover button
-class DiscoverButton : public Fl_Button
-{
-public:
-	//==============================================================================
-	DiscoverButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_col);
-	~DiscoverButton() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	MainWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
-
-};
-
-//==============================================================================
-// Exit button
-class ExitButton : public Fl_Button
-{
-public:
-	//==============================================================================
-	ExitButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_col);
-	~ExitButton() {};
-	int handle(int event);
-
-	//==============================================================================
-
-private:
-	//==============================================================================
-	// State variables
-	RadioInterface* r_i;
-	MainWindow* myparent;
-
-	//==============================================================================
-	// Method prototypes
-
 };

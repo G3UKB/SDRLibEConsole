@@ -118,6 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Includes\audio.h" />
+    <ClInclude Include="src\Includes\button.h" />
     <ClInclude Include="src\Includes\cat.h" />
     <ClInclude Include="src\Includes\extern.h" />
     <ClInclude Include="src\Includes\filters.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="src\SerialDriver\serial.cc" />
     <ClCompile Include="src\SerialDriver\win.cc" />
     <ClCompile Include="src\Ui\Components\audio.cpp" />
+    <ClCompile Include="src\Ui\Components\button.cpp" />
     <ClCompile Include="src\Ui\Components\filters.cpp" />
     <ClCompile Include="src\Ui\Components\modes.cpp" />
     <ClCompile Include="src\Ui\Components\toggle.cpp" />

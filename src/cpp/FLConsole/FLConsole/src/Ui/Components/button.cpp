@@ -1,7 +1,7 @@
 /*
-toggle.cpp
+button.cpp
 
-Toggle button component for the FLTK Console
+Button component for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -34,16 +34,14 @@ The authors can be reached by email at:
 // PUBLIC
 
 //==============================================================================
-// Generic toggle button class
-C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color button_back_col, Fl_Color button_up_col, Fl_Color button_down_col) : Fl_Toggle_Button(x, y, w, h, button_up_label) {
+// Generic button
+C_Button::C_Button(std::string cb_key, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color button_back_col, Fl_Color button_label_col) : Fl_Button(x, y, w, h, button_label) {
 	
 	// Stash button attributes
 	id = button_id;
-	up_label = button_up_label;
-	down_label = button_down_label;
+	label = button_label;
 	back_col = button_back_col;
-	up_col = button_up_col;
-	down_col = button_down_col;
+	label_col = button_label_col;
 
 	// Retrieve our callback function from the callback cache
 	key = cb_key;
@@ -54,28 +52,15 @@ C_ToggleButton::C_ToggleButton(std::string cb_key, char* button_up_label, char* 
 
 	// Set relevent button attributes
 	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)button_up_col);
+	labelcolor((Fl_Color)button_label_col);
 }
 
 //----------------------------------------------------
 // Handle click event
-int C_ToggleButton::handle(int event) {
+int C_Button::handle(int event) {
 	switch (event) {
 	case FL_PUSH: {
-		if (value()) {
-			// Callback for button down
-			cb(false, id);
-			clear();
-			label(up_label);
-			labelcolor(up_col);
-		}
-		else {
-			// Callback for button up
-			cb(true, id);
-			set();
-			label(down_label);
-			labelcolor(down_col);
-		}
+		cb(true, id);
 		// Handled
 		return 1;
 	}
@@ -87,13 +72,9 @@ int C_ToggleButton::handle(int event) {
 
 //----------------------------------------------------
 // External activation
-void C_ToggleButton::button_up() {
+void C_Button::button_up() {
 	set();
-	label(down_label);
-	labelcolor(down_col);
 }
-void C_ToggleButton::button_down() {
+void C_Button::button_down() {
 	clear();
-	label(up_label);
-	labelcolor(up_col);
 }

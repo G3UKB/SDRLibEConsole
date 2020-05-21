@@ -138,15 +138,18 @@ void MainWindow::do_layout() {
 	// Create a grid layout handler
 	grid = new GridLayout(x, y, width - group_margin, height - group_margin, rows, cols, grid_margin);
 
-	// Add the VFO component
-	// This extends Fl_Group so we place the group below the buttons
-	m = grid->get_cell_metrics(2, 0, 2, 3);
-	VFOComponent *vfo = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
-	top_group->add(vfo);
+	// Add Exit button
+	std::function< int(int, int) > f = std::bind(&MainWindow::exit_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("EXIT_CB", f);
+	m = grid->get_cell_metrics(0, 3);
+	ExitBtn = new C_Button(std::string("EXIT_CB"), exit_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	top_group->add(ExitBtn);
 
 	// Add discover button
+	std::function< int(int, int) > f1 = std::bind(&MainWindow::discover_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("DISCOVER_CB", f1);
 	m = grid->get_cell_metrics(0, 1);
-	DiscoverBtn = new DiscoverButton(this, discover_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
+	DiscoverBtn = new C_Button(std::string("DISCOVER_CB"), discover_str, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
 	top_group->add(DiscoverBtn);
 
 	// Add radio choice
@@ -161,38 +164,39 @@ void MainWindow::do_layout() {
 	top_group->add(SelectRadio);
 	SelectRadio->value(num_radios - 1);
 
-	// Add start/stop buttons to the group
-	std::function< int(int, int) > f = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("CTRL_CB", f);
+	// Add the VFO component
+	// This extends Fl_Group so we place the group below the buttons
+	m = grid->get_cell_metrics(2, 0, 2, 3);
+	VFOComponent *vfo = new VFOComponent(radio_id, 0, m.x, m.y, m.w, m.h);
+	top_group->add(vfo);
+
+	// Add start/stop button
+	std::function< int(int, int) > f2 = std::bind(&MainWindow::ctrl_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("CTRL_CB", f2);
 	m = grid->get_cell_metrics(0, 0);
 	CtrlBtn = new C_ToggleButton(std::string("CTRL_CB"), ctrl_str_up, ctrl_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CtrlBtn);
 
-	// Add TX button to the group
-	std::function< int(int, int) > f1 = std::bind(&MainWindow::tx_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("TX_CB", f1);
+	// Add TX button
+	std::function< int(int, int) > f3 = std::bind(&MainWindow::tx_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("TX_CB", f3);
 	m = grid->get_cell_metrics(1, 3);
 	TXBtn = new C_ToggleButton(std::string("TX_CB"), tx_str_up, tx_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(TXBtn);
 
-	// Add CAT button to the group
-	std::function< int(int, int) > f2 = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("CAT_CB", f2);
+	// Add CAT button
+	std::function< int(int, int) > f4 = std::bind(&MainWindow::cat_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("CAT_CB", f4);
 	m = grid->get_cell_metrics(1, 2);
 	CATBtn = new C_ToggleButton(std::string("CAT_CB"), cat_str_up, cat_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(CATBtn);
 
 	// Add audio button
-	std::function< int(int, int) > f3 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("AUDIO_R1_CB", f3);
+	std::function< int(int, int) > f5 = std::bind(&MainWindow::audio_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("AUDIO_R1_CB", f5);
 	m = grid->get_cell_metrics(2, 3);
 	AudioBtn = new C_ToggleButton(std::string("AUDIO_R1_CB"), audio_str_up, audio_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 	top_group->add(AudioBtn);
-
-	// Add Exit button to the group
-	m = grid->get_cell_metrics(0, 3);
-	ExitBtn = new ExitButton(this, exit_str, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)80);
-	top_group->add(ExitBtn);
 
 	// We place the radio buttons into another grid
 	// Get metrics from grid
@@ -201,14 +205,14 @@ void MainWindow::do_layout() {
 	GridLayout *grid_1 = new GridLayout(m.x, m.y, m.w, m.h, 2, 1, 2);
 
 	// Add mode trigger in grid_1
-	std::function< int(int, int) > f4 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("MODE_R1_CB", f4);
+	std::function< int(int, int) > f6 = std::bind(&MainWindow::mode_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("MODE_R1_CB", f6);
 	m = grid_1->get_cell_metrics(0, 0);
 	ModeBtn = new C_ToggleButton(std::string("MODE_R1_CB"), mode_str_up, mode_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
 	// Add filter trigger in grid_1
-	std::function< int(int, int) > f5 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
-	RSt::inst().put_cb("FILT_R1_CB", f5);
+	std::function< int(int, int) > f7 = std::bind(&MainWindow::filt_handle_event, this, std::placeholders::_1, std::placeholders::_1);
+	RSt::inst().put_cb("FILT_R1_CB", f7);
 	m = grid_1->get_cell_metrics(1, 0);
 	FilterBtn = new C_ToggleButton(std::string("FILT_R1_CB"), filt_str_up, filt_str_dwn, 0, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 
@@ -314,6 +318,30 @@ void MainWindow::handle_radio(Fl_Widget* w) {
 
 //----------------------------------------------------
 // Callbacks from widget event handlers
+
+//----------------------------------------------------
+// Exit handler
+int MainWindow::exit_handle_event(int state, int id) {
+	hide();
+	return true;
+}
+
+//----------------------------------------------------
+// Discover handler
+int MainWindow::discover_handle_event(int state, int id) {
+	// Discover event
+	if (r_i->ri_radio_discover()) {
+		RSt::inst().set_discovered(true);
+		if (r_i->ri_server_start())
+			RSt::inst().set_server_running(true);
+		else
+			std::cout << std::endl << "Failed to start server!" << std::endl;
+	}
+	else
+		std::cout << std::endl << "Failed to discover radio!" << std::endl;
+
+	return true;
+}
 
 //----------------------------------------------------
 // Ctrl handler
@@ -432,57 +460,4 @@ void MainWindow::set_location() {
 	w_loc.y = p->get_window_y();
 	w_loc.w = p->get_window_w();
 	w_loc.h = p->get_window_h();
-}
-
-//==============================================================================
-// Discover button
-DiscoverButton::DiscoverButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Button(x, y, w, h, button_label) {
-	myparent = parent_widget;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)label_col);
-}
-
-//----------------------------------------------------
-// Handle click event
-int DiscoverButton::handle(int event) {
-	switch (event) {
-	case FL_PUSH: {
-		// Discover event
-		if (r_i->ri_radio_discover()) {
-			RSt::inst().set_discovered(true);
-			if (r_i->ri_server_start())
-				RSt::inst().set_server_running(true);
-			else
-				std::cout << std::endl << "Failed to start server!" << std::endl;
-		}
-		else
-			std::cout << std::endl << "Failed to discover radio!" << std::endl;
-		return 1;	
-		}
-	default:
-		return Fl_Widget::handle(event);
-	}
-}
-
-//==============================================================================
-// Exit button
-ExitButton::ExitButton(MainWindow* parent_widget, char* button_label, int x, int y, int w, int h, Fl_Color back_col, Fl_Color label_col) : Fl_Button(x, y, w, h, button_label) {
-	myparent = parent_widget;
-	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
-	color((Fl_Color)back_col);
-	labelcolor((Fl_Color)label_col);
-}
-
-//----------------------------------------------------
-// Handle click event
-int ExitButton::handle(int event) {
-	switch (event) {
-	case FL_PUSH: {
-		myparent->hide();
-		return 1;
-	}
-	default:
-		return Fl_Widget::handle(event);
-	}
 }

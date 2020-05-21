@@ -83,6 +83,7 @@ The authors can be reached by email at:
 #include "prefs.h"
 #include "radio_interface.h"
 #include "toggle.h"
+#include "button.h"
 #include "vfo.h"
 #include "layout_manager.h"
 #include "modes.h"

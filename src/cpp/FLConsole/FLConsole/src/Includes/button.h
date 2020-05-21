@@ -1,7 +1,7 @@
 /*
-toggle.h
+button.h
 
-Toggle button component for the FLTK Console
+Button component for the FLTK Console
 
 Copyright (C) 2020 by G3UKB Bob Cowdery
 
@@ -30,13 +30,13 @@ The authors can be reached by email at:
 #include "includes.h"
 
 //==============================================================================
-// The generic toggle button class
-class C_ToggleButton : public Fl_Toggle_Button
+// The generic button class
+class C_Button : public Fl_Button
 {
 public:
 	//==============================================================================
-	C_ToggleButton(std::string cb_key, char* button_up_label, char* button_down_label, int button_id, int x, int y, int w, int h, Fl_Color back_col, Fl_Color button_up_col, Fl_Color button_down_col);
-	~C_ToggleButton() {};
+	C_Button(std::string cb_key, char* button_label, int button_id, int x, int y, int w, int h, Fl_Color button_back_col, Fl_Color button_label_col);
+	~C_Button() {};
 	int handle(int event);
 	void button_up();
 	void button_down();
@@ -53,11 +53,9 @@ private:
 	int id;
 
 	// Button attributes
-	char* up_label;
-	char* down_label;
+	char* label;
 	Fl_Color back_col;
-	Fl_Color up_col;
-	Fl_Color down_col;
+	Fl_Color label_col;
 
 	// Key to callback cache
 	std::string key;

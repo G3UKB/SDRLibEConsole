@@ -68,7 +68,7 @@ Filters::Filters(int radio, int w, int h) : Fl_Window(w, h) {
 		m_b.items[i].filter = new C_ToggleButton(key, m_b.items[i].label, m_b.items[i].label, m_b.items[i].id, m.x, m.y, m.w, m.h, (Fl_Color)33, (Fl_Color)67, (Fl_Color)80);
 		if (i == filter) {
 			m_b.items[i].filter->set();
-			r_i->ri_server_set_filter_freq(r-1, filter);
+			r_i->ri_server_set_filter_freq(radio_id-1, filter);
 		}
 		if (++k == 3) {
 			k = 0;
@@ -108,4 +108,6 @@ int Filters::filter_handle_event(int state, int id) {
 	}
 	// Tell radio to change filter
 	r_i->ri_server_set_filter_freq(radio_id - 1, id);
+
+	return true;
 }
