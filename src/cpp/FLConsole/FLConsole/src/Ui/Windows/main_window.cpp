@@ -294,12 +294,17 @@ void MainWindow::handle_type(Fl_Widget* w) {
 				hamlib->close();
 				delete (hamlib);
 			}
+			break;
 		}
 		case 1: {
 			// FCDPro+
+			break;
 		}
 		case 2: {
 			// FT817ND
+			if (Radio2_Win != NULL) Radio2_Win->close();
+			if (Radio3_Win != NULL) Radio3_Win->close();
+			if (TX_Win != NULL) TX_Win->close();
 			if (hamlib != NULL) {
 				hamlib->close();
 				delete (hamlib);
@@ -308,11 +313,25 @@ void MainWindow::handle_type(Fl_Widget* w) {
 			RSt::inst().put_obj("HAMLIB", (void*)hamlib);
 			hamlib->init();
 			hamlib->open();
+			break;
 		}
 		case 3: {
 			// IC7100
-
+			if (Radio2_Win != NULL) Radio2_Win->close();
+			if (Radio3_Win != NULL) Radio3_Win->close();
+			if (TX_Win != NULL) TX_Win->close();
+			if (hamlib != NULL) {
+				hamlib->close();
+				delete (hamlib);
+			}
+			hamlib = new HamlibClient((char*)"COM2", IC7100);
+			RSt::inst().put_obj("HAMLIB", (void*)hamlib);
+			hamlib->init();
+			hamlib->open();
+			break;
 		}
+		default:
+			printf("Unknown radio type %d\n", value);
 	}
 	RSt::inst().set_type(value);
 }

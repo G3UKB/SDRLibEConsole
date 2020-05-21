@@ -77,6 +77,7 @@ private:
 	int num_radios;
 	int radio_type = 0;
 	int FT817 = 120;
+	int IC7100 = 341;
 	int radio_id;
 	int radio2_id;
 	int radio3_id;
