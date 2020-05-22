@@ -288,7 +288,7 @@ void MainWindow::handle_type(Fl_Widget* w) {
 	Fl_Choice* c = (Fl_Choice*)w;
 	int value = c->value();
 	switch (value) {
-		case 0: {
+		case (int)RadioType::HP_SDR : {
 			// HPSDR
 			if (hamlib != NULL) {
 				hamlib->close();
@@ -296,11 +296,11 @@ void MainWindow::handle_type(Fl_Widget* w) {
 			}
 			break;
 		}
-		case 1: {
+		case (int)RadioType::FCDPro: {
 			// FCDPro+
 			break;
 		}
-		case 2: {
+		case (int)RadioType::FT817: {
 			// FT817ND
 			if (Radio2_Win != NULL) Radio2_Win->close();
 			if (Radio3_Win != NULL) Radio3_Win->close();
@@ -309,13 +309,13 @@ void MainWindow::handle_type(Fl_Widget* w) {
 				hamlib->close();
 				delete (hamlib);
 			}
-			hamlib = new HamlibClient((char*)"COM2", FT817);
+			hamlib = new HamlibClient((char*)"COM2", (rig_model_t)HamlibID::FT817);
 			RSt::inst().put_obj("HAMLIB", (void*)hamlib);
 			hamlib->init();
 			hamlib->open();
 			break;
 		}
-		case 3: {
+		case (int)RadioType::IC7100: {
 			// IC7100
 			if (Radio2_Win != NULL) Radio2_Win->close();
 			if (Radio3_Win != NULL) Radio3_Win->close();
@@ -324,7 +324,7 @@ void MainWindow::handle_type(Fl_Widget* w) {
 				hamlib->close();
 				delete (hamlib);
 			}
-			hamlib = new HamlibClient((char*)"COM2", IC7100);
+			hamlib = new HamlibClient((char*)"COM2", (rig_model_t)HamlibID::IC7100);
 			RSt::inst().put_obj("HAMLIB", (void*)hamlib);
 			hamlib->init();
 			hamlib->open();
@@ -505,25 +505,47 @@ int MainWindow::filt_handle_event(int state, int id) {
 // Idle timeout callback
 void MainWindow::handle_idle_timeout() {
 	// Handle enable/disable of controls here
-	static int last_discovered = -1;
-	bool discovered = RSt::inst().get_discovered();
-	if (discovered != last_discovered) {
-		if (discovered) {
-			CtrlBtn->activate();
-			SelectRadio->activate();
-			DiscoverBtn->deactivate();
-			ModeBtn->activate();
-			FilterBtn->activate();
+	int radio_type = RSt::inst().get_type();
+	char label[20];
+	if ((radio_type == (int)RadioType::HP_SDR) || (radio_type == (int)RadioType::FCDPro)) {
+		// SDR type radio
+		static int last_discovered = -1;
+		bool discovered = RSt::inst().get_discovered();
+		if (discovered != last_discovered) {
+			if (discovered) {
+				CtrlBtn->activate();
+				SelectRadio->activate();
+				DiscoverBtn->deactivate();
+				ModeBtn->activate();
+				FilterBtn->activate();
+			}
+			else {
+				CtrlBtn->deactivate();
+				SelectRadio->deactivate();
+				DiscoverBtn->activate();
+				ModeBtn->deactivate();
+				FilterBtn->deactivate();
+			}
 		}
-		else {
-			CtrlBtn->deactivate();
-			SelectRadio->deactivate();
-			DiscoverBtn->activate();
-			ModeBtn->deactivate();
-			FilterBtn->deactivate();
-		}
+		last_discovered = discovered;
+		sprintf_s(label, "Control - RX-1");
+		copy_label(label);
 	}
-	last_discovered = discovered;
+	else {
+		// Analog type radio
+		CtrlBtn->activate();
+		SelectRadio->deactivate();
+		DiscoverBtn->deactivate();
+		CATBtn->deactivate();
+		AudioBtn->deactivate();
+		ModeBtn->activate();
+		FilterBtn->deactivate();
+		if (radio_type == (int)RadioType::FT817)
+			sprintf_s(label, "Control - FT817");
+		else if (radio_type == (int)RadioType::IC7100)
+			sprintf_s(label, "Control - IC7100");
+		copy_label(label);
+	}
 }
 
 //==============================================================================
