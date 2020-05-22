@@ -54,7 +54,7 @@ public:
 	bool init();
 	bool open();
 	void close();
-	bool set_mode();
+	bool set_mode(int mode);
 	bool set_freq(int freq);
 
 	//==============================================================================

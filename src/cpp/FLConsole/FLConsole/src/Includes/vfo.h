@@ -103,7 +103,6 @@ private:
 
 	Preferences* p;
 	RadioInterface* r_i;
-	int radio_type;				// 0-3 HPSDR, FCD, FT817, IC7100
 	int vfo_type = RX;			// RX|TX
 	int r;						// Radio id of VFO instance
 	int freq_inc = -1;			// Last frequence increment in MHz

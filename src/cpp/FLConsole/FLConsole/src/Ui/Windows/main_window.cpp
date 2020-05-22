@@ -419,16 +419,31 @@ int MainWindow::discover_handle_event(int state, int id) {
 //----------------------------------------------------
 // Ctrl handler
 int MainWindow::ctrl_handle_event(int state, int id) {
-	bool running = RSt::inst().get_radio_running();
-	if (running) {
-		// Stop event
-		r_i->ri_radio_stop();
-		RSt::inst().set_radio_running(false);
+
+	int radio_type = RSt::inst().get_type();
+	if (radio_type == (int)RadioType::FT817 || radio_type == (int)RadioType::IC7100) {
+		// Analog
+		bool running = RSt::inst().get_analog_radio_running();
+		if (running) {
+			RSt::inst().set_analog_radio_running(false);
+		}
+		else {
+			RSt::inst().set_analog_radio_running(true);
+		}
 	}
 	else {
-		// Start event
-		r_i->ri_radio_start(0);
-		RSt::inst().set_radio_running(true);
+		// SDR
+		bool running = RSt::inst().get_radio_running();
+		if (running) {
+			// Stop event
+			r_i->ri_radio_stop();
+			RSt::inst().set_radio_running(false);
+		}
+		else {
+			// Start event
+			r_i->ri_radio_start(0);
+			RSt::inst().set_radio_running(true);
+		}
 	}
 	return true;
 }

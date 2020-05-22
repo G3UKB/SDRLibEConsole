@@ -108,7 +108,16 @@ int Modes::mode_handle_event(int state, int id) {
 		}
 	}
 	// Tell radio to change mode
-	r_i->ri_server_set_mode(radio_id - 1, id);
+	int radio_type = RSt::inst().get_type();
+	if (radio_type == (int)RadioType::FT817 || radio_type == (int)RadioType::IC7100) {
+		// Analog type
+		HamlibClient *hamlib = (HamlibClient*)RSt::inst().get_obj("HAMLIB");
+		hamlib->set_mode(id);
+	}
+	else {
+		// SDR type
+		r_i->ri_server_set_mode(radio_id - 1, id);
+	}
 
 	return true;
 }

@@ -44,7 +44,6 @@ VFOComponent::VFOComponent(int radio, int p_vfo_type, int x, int y, int w, int h
 	// Get dependent objects from the cache
 	r_i = (RadioInterface*)RSt::inst().get_obj("RADIO-IF");
 	p = (Preferences*)RSt::inst().get_obj("PREFS");
-	radio_type = RSt::inst().get_type();
 
 	// Put our object id
 	char id[10];
@@ -225,7 +224,8 @@ void VFOComponent::set_display_freq(std::string freq) {
 //----------------------------------------------------
 // Tune the radio-n to the current frequency
 void VFOComponent::set_radio_freq() {
-	if (radio_type == 2 || radio_type == 3) {
+	int radio_type = RSt::inst().get_type();
+	if (radio_type == (int)RadioType::FT817 || radio_type == (int)RadioType::IC7100) {
 		// Analog type
 		HamlibClient *hamlib = (HamlibClient*)RSt::inst().get_obj("HAMLIB");
 		hamlib->set_freq(current_freq);
