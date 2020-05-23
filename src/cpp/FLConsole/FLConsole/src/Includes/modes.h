@@ -59,7 +59,7 @@ private:
 	RadioInterface* r_i;
 	// Fixed labels (labels are not copied and must remain in scope
 	// Note: dont use std:string as std:string.cstr() creates a new
-	// cstr in a fixed overwritten area and all labels will be the last label..
+	// cstr in a fixed overwritten area and all labels will be the last label.
 	char lsb[10] = "LSB";
 	char usb[10] = "USB";
 	char dsb[10] = "DSB";

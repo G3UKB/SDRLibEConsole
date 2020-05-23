@@ -88,11 +88,27 @@ void HamlibClient::close() {
 // Set rig mode
 bool HamlibClient::set_mode(int mode) {
 	if (RSt::inst().get_analog_radio_running()) {
-		retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
-		if (retcode != RIG_OK) {
-			printf("Hamlib: rig_set_mode- error = %s \n", rigerror(retcode));
-			return false;
+		switch (mode) {
+		case 0:
+			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
+			break;
+		case 1:
+			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_USB, 2700);
+			break;
+		case 5:
+			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_FM, 6000);
+			break;
+		case 6:
+			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_AM, 6000);
+			break;
+		default:
+			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
+			break;
 		}
+	}
+	if (retcode != RIG_OK) {
+		printf("Hamlib: rig_set_mode- error = %s \n", rigerror(retcode));
+		return false;
 	}
 	return true;
 }
