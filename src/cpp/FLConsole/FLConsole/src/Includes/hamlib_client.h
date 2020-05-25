@@ -54,8 +54,8 @@ public:
 	bool init();
 	bool open();
 	void close();
-	bool set_mode(int mode);
-	bool set_freq(int freq);
+	bool set_mode(int radio, int mode);
+	bool set_freq(int radio, int freq);
 
 	//==============================================================================
 

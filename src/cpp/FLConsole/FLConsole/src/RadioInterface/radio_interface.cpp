@@ -227,19 +227,21 @@ void RadioInterface::ri_server_set_filter_freq(int channel, int filter) {
 //----------------------------------------------------
 // Set receiver 1/2/3/TX frequency
 void RadioInterface::ri_server_cc_out_set_freq(int radio, unsigned int freq_in_hz) {
-	if (radio == 1) {
-		c_server_cc_out_set_rx_tx_freq(freq_in_hz);
-	} 
-	else if (radio == 2) {
-		c_server_cc_out_set_rx_2_freq(freq_in_hz);
-	}
-	else if (radio == 3) {
-		c_server_cc_out_set_rx_3_freq(freq_in_hz);
-	}
-	// If duplex we set the TX freq independent of RX1
-	else if (radio == 4) {
-		if (RSt::inst().get_duplex()) {
+	if (RSt::inst().get_radio_running()) {
+		if (radio == 1) {
 			c_server_cc_out_set_rx_tx_freq(freq_in_hz);
+		}
+		else if (radio == 2) {
+			c_server_cc_out_set_rx_2_freq(freq_in_hz);
+		}
+		else if (radio == 3) {
+			c_server_cc_out_set_rx_3_freq(freq_in_hz);
+		}
+		// If duplex we set the TX freq independent of RX1
+		else if (radio == 4) {
+			if (RSt::inst().get_duplex()) {
+				c_server_cc_out_set_rx_tx_freq(freq_in_hz);
+			}
 		}
 	}
 }

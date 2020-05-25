@@ -86,24 +86,31 @@ void HamlibClient::close() {
 
 //----------------------------------------------------
 // Set rig mode
-bool HamlibClient::set_mode(int mode) {
-	if (RSt::inst().get_analog_radio_running()) {
-		switch (mode) {
-		case 0:
-			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
-			break;
-		case 1:
-			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_USB, 2700);
-			break;
-		case 5:
-			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_FM, 6000);
-			break;
-		case 6:
-			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_AM, 6000);
-			break;
-		default:
-			retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
-			break;
+bool HamlibClient::set_mode(int radio, int mode) {
+	if (radio == 1) {
+		// This deals with the single RX
+		if (RSt::inst().get_analog_radio_running()) {
+			switch (mode) {
+			case 0:
+				retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
+				break;
+			case 1:
+				retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_USB, 2700);
+				break;
+			case 5:
+				retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_FM, 6000);
+				break;
+			case 6:
+				retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_AM, 6000);
+				break;
+			default:
+				retcode = rig_set_mode(current_rig, RIG_VFO_CURR, RIG_MODE_LSB, 2700);
+				break;
+			}
+		}
+		else if (radio == 4) {
+			// Deal with TX here
+			return true;
 		}
 	}
 	if (retcode != RIG_OK) {
@@ -115,13 +122,20 @@ bool HamlibClient::set_mode(int mode) {
 
 //----------------------------------------------------
 // Set rig frequency
-bool HamlibClient::set_freq(int freq) {
-	if (RSt::inst().get_analog_radio_running()) {
-		retcode = rig_set_freq(current_rig, RIG_VFO_CURR, freq);
-		if (retcode != RIG_OK) {
-			printf("Hamlib: rig_set_freq- error = %s \n", rigerror(retcode));
-			return false;
+bool HamlibClient::set_freq(int radio, int freq) {
+	if (radio == 1) {
+		// This deals with the single RX
+		if (RSt::inst().get_analog_radio_running()) {
+			retcode = rig_set_freq(current_rig, RIG_VFO_CURR, freq);
+			if (retcode != RIG_OK) {
+				printf("Hamlib: rig_set_freq- error = %s \n", rigerror(retcode));
+				return false;
+			}
 		}
+	}
+	else if (radio == 4) {
+		// Deal with TX here
+		return true;
 	}
 	return true;
 }

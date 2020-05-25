@@ -228,7 +228,7 @@ void VFOComponent::set_radio_freq() {
 	if (radio_type == (int)RadioType::FT817 || radio_type == (int)RadioType::IC7100) {
 		// Analog type
 		HamlibClient *hamlib = (HamlibClient*)RSt::inst().get_obj("HAMLIB");
-		hamlib->set_freq(current_freq);
+		hamlib->set_freq(r, current_freq);
 	}
 	else {
 		// SDR type

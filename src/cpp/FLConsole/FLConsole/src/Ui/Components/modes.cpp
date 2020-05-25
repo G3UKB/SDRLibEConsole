@@ -112,7 +112,7 @@ int Modes::mode_handle_event(int state, int id) {
 	if (radio_type == (int)RadioType::FT817 || radio_type == (int)RadioType::IC7100) {
 		// Analog type
 		HamlibClient *hamlib = (HamlibClient*)RSt::inst().get_obj("HAMLIB");
-		hamlib->set_mode(id);
+		hamlib->set_mode(radio_id, id);
 	}
 	else {
 		// SDR type
