@@ -26,6 +26,7 @@
 #=====================================================
 # System imports
 import os,sys
+sys.path.append('..')
 import traceback
 import socket
 import json
@@ -54,7 +55,7 @@ from framework.instance_cache import *
 # Model
 from model.model import *
 # Bindings
-from binding.server import *
+from binding.server_api import *
 # Connector
 from connector.connector import *
 # UI

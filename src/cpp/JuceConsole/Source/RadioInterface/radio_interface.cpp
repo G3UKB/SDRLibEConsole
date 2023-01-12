@@ -61,6 +61,7 @@ bool RadioInterface::ri_set_default_audio() {
 		// Set up a default route for RX1 to Speaker output
 		DeviceEnumList* l = c_server_enum_audio_outputs();
 		for (int i = 0; i < l->entries; i++) {
+			printf("%s", l->devices[i].name);
 			if (String(l->devices[i].name).startsWith("Speakers")) {
 				if (String(l->devices[i].host_api) == "MME") {
 					direction = l->devices[i].direction;

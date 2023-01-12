@@ -133,6 +133,7 @@ void DisplayPanel::draw_all(Graphics& g) {
 		draw_filter(g);
 		g.setColour(freq_cursor_colour);
 		draw_cursor(g);
+
 		int r = c_server_get_display_data(i_radio, (void*)buf);
 		if (r == 1) {
 			g.setColour(pan_colour);

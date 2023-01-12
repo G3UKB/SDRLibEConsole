@@ -25,7 +25,7 @@ The authors can be reached by email at:
 
 */
 
-#include "../common_controls.h"
+//#include "../common_controls.h"
 //#include "../Common/extern.h"
 #include "../../RadioInterface/radio_interface.h"
 #include "../../RadioWindows/radio_window.h"

@@ -34,7 +34,8 @@ public:
     void initialise (const String& commandLine) override
     {
         // Application initialisation
-		
+		std::cout << std::endl << "Start initialisation" << std::endl;
+
 		// Restore all properties
 		PropCache::getInstance()->restore_all();
 
@@ -76,6 +77,7 @@ public:
 				w1->get_component()->start_ui();
 			}
 		}
+		std::cout << std::endl << "End initialisation" << std::endl;
     }
 
     void shutdown() override

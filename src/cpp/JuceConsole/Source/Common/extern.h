@@ -33,6 +33,7 @@ extern "C" {
 	// Required structures
 	// Returned from device enumerator
 	typedef struct DeviceEnum {
+		int default_id;
 		int direction;
 		int index;
 		char name[50];
